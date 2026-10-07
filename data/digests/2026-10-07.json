@@ -1,0 +1,50 @@
+{
+  "id": "2026-10-07",
+  "periodStart": "2026-09-25",
+  "periodEnd": "2026-10-07",
+  "locale": "zh-TW",
+  "headline": "Reflection AI 發表首個 open-weight 模型 Beam,權重與雲端上架尚未確認",
+  "newModels": [],
+  "lifecycleChanges": [],
+  "pricingChanges": [],
+  "security": [],
+  "regulatory": [],
+  "litellm": [],
+  "actionItems": [
+    {
+      "action": "待 Reflection 釋出 Beam 權重後,確認 Hugging Face 權重、license 條款,以及 Bedrock / Foundry / Vertex AI / LiteLLM 是否上架,再決定是否新增 catalog 項目",
+      "priority": "P2"
+    }
+  ],
+  "watchlist": [
+    {
+      "name": "Reflection Beam",
+      "vendor": "other",
+      "status": "announced",
+      "expected": "依 Reflection 說法於本月釋出權重",
+      "note": "Beam 為 text-only MoE,501B total / 23B active parameters,pretrain 23.8T tokens,1M token context window。Reflection 表示將釋出權重與完整技術細節,並透過 hyperscalers 與 neoclouds 發行。目前 Hugging Face 官方 org 尚無公開 models。以上僅來自 independent 報導,benchmark 為廠商自行公布且未經獨立驗證。",
+      "sources": [
+        {
+          "id": "techcrunch-reflection-beam-2026-10-05",
+          "note": "規格與權重釋出時程"
+        },
+        {
+          "id": "huggingface-reflection-org",
+          "note": "官方 org,目前無公開 models"
+        }
+      ]
+    }
+  ],
+  "unverified": [
+    "Beam 的 license 條款(community 報導稱 Apache 2.0,未見官方頁面)",
+    "Beam 的 benchmark 數字(僅廠商自述,無官方頁面可引用,亦未獨立驗證)",
+    "Beam 在 Amazon Bedrock、Microsoft Foundry、Google Vertex AI、LiteLLM 的上架狀態",
+    "Beam license(community 報導稱 Apache 2.0)（只有 community 來源,reflection.ai 官方頁面無法抓取）",
+    "Beam benchmark 數字(例如 SWE-bench Verified、Terminal Bench)（僅 community 報導轉述廠商表格,未見官方頁面,也未獨立驗證）",
+    "Beam 於 Hugging Face 的權重位置與發布日期（HF org 目前 models 為 0,TechCrunch 僅稱將於本月釋出）",
+    "Beam 在 Bedrock / Foundry / Vertex AI / LiteLLM 的可用性（搜尋官方 AWS、Microsoft、Google、LiteLLM 頁面未找到 Beam）",
+    "Beam 的 API 端點(community 報導稱有 beta 端點)（只有 community 來源）"
+  ],
+  "schema": "digest/v1",
+  "generatedAt": "2026-10-07T08:14:26Z"
+}

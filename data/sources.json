@@ -1,6 +1,6 @@
 {
   "schema": "sources/v1",
-  "generatedAt": "2026-09-24T14:30:00Z",
+  "generatedAt": "2026-10-07T08:14:26Z",
   "sources": [
     {
       "id": "anthropic-opus55-announce",
@@ -1001,6 +1001,22 @@
       "publisher": "Cloud Security Alliance",
       "type": "news",
       "accessed": "2026-09-24"
+    },
+    {
+      "id": "techcrunch-reflection-beam-2026-10-05",
+      "title": "Reflection debuts Beam, an open-weight AI model to rival Chinese models at lower compute cost",
+      "publisher": "TechCrunch",
+      "type": "news",
+      "url": "https://techcrunch.com/2026/10/05/reflection-debuts-beam-a-open-weight-ai-model-to-rival-chinese-models-at-lower-compute-cost/",
+      "accessed": "2026-10-07"
+    },
+    {
+      "id": "huggingface-reflection-org",
+      "title": "reflection (Reflection) - Hugging Face",
+      "publisher": "Hugging Face",
+      "type": "community",
+      "url": "https://huggingface.co/reflection",
+      "accessed": "2026-10-07"
     }
   ]
 }
