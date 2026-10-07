@@ -1,0 +1,499 @@
+{
+  "schema": "digest/v1",
+  "id": "2026-09-28",
+  "locale": "zh-TW",
+  "periodStart": "2026-09-25",
+  "periodEnd": "2026-09-28",
+  "generatedAt": "2026-09-28T01:50:00Z",
+  "headline": "本週（09-25～09-28）三雲沒有確認的新模型上架，重點在退役：Foundry 退役表的 Claude 4.5 日期【2026-10-01 更正：實為 Sonnet / Haiku 4.5 2026-11-15、Opus 4.5 2026-11-24，原誤記為 10-19】，Gemini API 的 gemini-2.5-flash-image 10-02 關閉，Bedrock Nova Canvas / Reel 09-30 退役。Bedrock 的 GPT-6 Sol / Luna 官方模型卡已發布，價格與社群資料一致、台北區可用 Global CRIS。LiteLLM 1.103.0 已上 PyPI（09-27），但正式 notes 未出且有行為變更，production 暫留 v1.102.1。",
+  "newModels": [
+    {
+      "title": "Gemini 3.8 Live 在 Agent Platform GA（補登）",
+      "date": "2026-09-24",
+      "vendor": "google",
+      "clouds": [
+        "gcp"
+      ],
+      "detail": "release-note 鏡像站 2026-09-24 條目：Gemini 3.8 Live GA；同日 Meta Muse Spark 1.3 進入 Preview。官方 release notes 頁為 JS 渲染無法直接讀取。屬上週末尾、上期未收錄。",
+      "impact": "low",
+      "sources": [
+        {
+          "id": "releasebot-agent-platform"
+        }
+      ]
+    },
+    {
+      "title": "xAI Grok 4.6 在 Agent Platform GA（補登）",
+      "date": "2026-09-18",
+      "vendor": "xai",
+      "clouds": [
+        "gcp"
+      ],
+      "detail": "release-note 鏡像站 2026-09-18 條目；上期未收錄。目前不在平台評估清單。",
+      "impact": "low",
+      "sources": [
+        {
+          "id": "releasebot-agent-platform"
+        }
+      ]
+    }
+  ],
+  "lifecycleChanges": [
+    {
+      "title": "Foundry：Claude Sonnet 4.5 / Haiku 4.5 / Opus 4.5 退役日（首次收錄，2026-10-01 更正）",
+      "date": "2026-11-15",
+      "vendor": "anthropic",
+      "clouds": [
+        "azure",
+        "vendor-direct"
+      ],
+      "detail": "【2026-10-01 更正】本期原寫三者皆為 2026-10-19，是讀取錯誤；逐字複查 Foundry 退役表（2026-09-21 版，期間未變更）為 claude-sonnet-4-5 2026-11-15、claude-haiku-4-5 2026-11-15、claude-opus-4-5 2026-11-24。Anthropic 另於 2026-09-30 宣布 Sonnet 4.5 退役日 2026-11-30。",
+      "impact": "high",
+      "sources": [
+        {
+          "id": "ms-foundry-retirement-schedule"
+        },
+        {
+          "id": "anthropic-deprecations"
+        }
+      ]
+    },
+    {
+      "title": "gemini-2.5-flash-image：Gemini API 10-02 關閉，Agent Platform 2027-03-15",
+      "date": "2026-10-02",
+      "vendor": "google",
+      "clouds": [
+        "gcp",
+        "vendor-direct"
+      ],
+      "detail": "Gemini API 棄用頁（2026-09-24 更新）列 2026-10-02 關閉；Agent Platform 的 2026-09-14 release note 為延到 2027-03-15。上期把 10-02 當成 Agent Platform 的舊日期，本期更正並新增 Gemini API 事件。",
+      "impact": "high",
+      "sources": [
+        {
+          "id": "google-gemini-api-deprecations"
+        },
+        {
+          "id": "releasebot-agent-platform"
+        },
+        {
+          "id": "digitalapplied-flash-image"
+        }
+      ]
+    },
+    {
+      "title": "Gemini API 限縮 2.5 模型存取",
+      "date": "2026-09-18",
+      "vendor": "google",
+      "clouds": [
+        "vendor-direct",
+        "gcp"
+      ],
+      "detail": "Gemini API changelog 2026-09-18：2.5 模型只開放給過去有實際使用的使用者；棄用頁仍寫 No shutdown date announced。Agent Platform 的 10-20 分階段退役（社群轉述 Google 通知）本週未見更新。",
+      "impact": "medium",
+      "sources": [
+        {
+          "id": "google-gemini-api-changelog"
+        },
+        {
+          "id": "google-gemini-api-deprecations"
+        },
+        {
+          "id": "gcp-gemini25-notice-1763"
+        },
+        {
+          "id": "zentor-gemini25"
+        }
+      ]
+    },
+    {
+      "title": "Foundry 退役表其他近期項目（首次收錄）",
+      "clouds": [
+        "azure"
+      ],
+      "detail": "MAI-Image-2.5 系列 10-01、Kimi-K2.7-Code 10-03、gpt-4o-mini-transcribe / mini-tts（2025-03-20）與 sora-2 10-15、gpt-image-1 10-23、codex-mini 11-15、gpt-chat-latest（2026-08-06）12-02、DeepSeek-V4-Flash-0731 12-03、gpt-image-1.5 12-16。gpt-realtime-mini 在同一張表有互相矛盾的重複列（已記為 conflicting）。",
+      "impact": "medium",
+      "sources": [
+        {
+          "id": "ms-foundry-retirement-schedule"
+        }
+      ]
+    },
+    {
+      "title": "Bedrock GPT-6 Sol / Luna：EOL 不早於 2027-09-22",
+      "date": "2027-09-22",
+      "vendor": "openai",
+      "clouds": [
+        "aws"
+      ],
+      "detail": "官方模型卡：2026-09-22 上架、Legacy 期至少 6 個月、目前 Active。",
+      "impact": "low",
+      "sources": [
+        {
+          "id": "aws-bedrock-sol-card"
+        },
+        {
+          "id": "aws-bedrock-luna-card"
+        }
+      ]
+    },
+    {
+      "title": "複查無變動：Bedrock Legacy 表、Azure o 系列、Anthropic 退役表",
+      "clouds": [
+        "aws",
+        "azure",
+        "vendor-direct"
+      ],
+      "detail": "Bedrock Legacy 表的 Claude 3 Haiku、Nova Premier / Sonic、Nova Canvas / Reel（09-30）、Claude Opus 4.1（10-08 extended access、2027-01-08 EOL）、Claude Sonnet 4（10-14）、Jamba 1.5、Marengo 2.7 日期與上期一致；Azure o 系列仍為 11-19；Foundry 退役表仍未列入 GPT-6 與 Claude Opus 5.5。",
+      "impact": "low",
+      "sources": [
+        {
+          "id": "aws-bedrock-lifecycle-legacy"
+        },
+        {
+          "id": "ms-foundry-retirement-schedule"
+        },
+        {
+          "id": "anthropic-deprecations"
+        }
+      ]
+    }
+  ],
+  "pricingChanges": [
+    {
+      "title": "Bedrock GPT-6 Sol / Luna 價格改為官方",
+      "date": "2026-09-22",
+      "vendor": "openai",
+      "clouds": [
+        "aws"
+      ],
+      "detail": "官方模型卡與上期社群資料一致：Sol Global $2 / $10、Luna $0.10 / $0.50；US Geo 與 mantle In-Region +10%；>272K 整個請求改長文價。",
+      "impact": "medium",
+      "sources": [
+        {
+          "id": "aws-bedrock-sol-card"
+        },
+        {
+          "id": "aws-bedrock-luna-card"
+        }
+      ]
+    },
+    {
+      "title": "Gemini 3.8 Flash：Agent Platform 非 global 端點 +10%",
+      "date": "2027-01-01",
+      "vendor": "google",
+      "clouds": [
+        "gcp"
+      ],
+      "detail": "官方定價頁：促銷期 global $0.75 / $3.75、非 global $0.825 / $4.125；2027-01-01 起 global $1.50 / $7.50、非 global $1.65 / $8.25（cache $0.15 / $0.165）。",
+      "impact": "medium",
+      "sources": [
+        {
+          "id": "google-agentplatform-pricing"
+        }
+      ]
+    },
+    {
+      "title": "Claude Opus 5.5 在 Agent Platform 與 Foundry 的價格取得官方來源",
+      "date": "2026-09-22",
+      "vendor": "anthropic",
+      "clouds": [
+        "gcp",
+        "azure"
+      ],
+      "detail": "兩者皆為 $4 / $20、cache hit $0.20、寫入 $5 / 1 小時 $8；Foundry 公告未說明 US DataZone 是否加價。",
+      "impact": "low",
+      "sources": [
+        {
+          "id": "google-agentplatform-pricing"
+        },
+        {
+          "id": "ms-techcommunity-opus55-foundry"
+        }
+      ]
+    }
+  ],
+  "litellm": [
+    {
+      "title": "LiteLLM 1.103.0 上 PyPI（09-27）",
+      "date": "2026-09-27",
+      "detail": "docs 只有 1.103.0rc1 notes、GitHub 尚無 stable tag。rc1 與 9 月 Townhall 提到的行為變更：master key 未設或為預設值時拒絕啟動、config.yaml 宣告的 key 由檔案擁有、max_budget: 0 改為零額度。建議 production 暫留 v1.102.1，先在 staging 驗證。",
+      "impact": "high",
+      "sources": [
+        {
+          "id": "pypi-litellm"
+        },
+        {
+          "id": "litellm-v1-103-0-rc1"
+        },
+        {
+          "id": "litellm-sept-townhall"
+        },
+        {
+          "id": "homeops-8005"
+        }
+      ]
+    },
+    {
+      "title": "支援窗口改為 v1.100–v1.103（推導）",
+      "detail": "依「最近四條 stable 線」政策，1.103.0 發布後 v1.99.x 已超出窗口；官方政策頁仍列 1.86–1.89，未更新。",
+      "impact": "medium",
+      "sources": [
+        {
+          "id": "litellm-version-support"
+        },
+        {
+          "id": "pypi-litellm"
+        }
+      ]
+    },
+    {
+      "title": "Bedrock GPT-6 的 temperature 問題仍未修正",
+      "detail": "LiteLLM issue #42725 開啟中、修正 PR #42726 待審；TruLens 已於 PR #2816（09-24）修正，Opik #8524 仍開啟。維持 additional_drop_params: [temperature]。Bedrock Sol / Luna 定價 PR #42746 已於 09-23 合併；Azure 定價 PR #42704 仍為 draft。",
+      "impact": "medium",
+      "sources": [
+        {
+          "id": "litellm-issue-42725"
+        },
+        {
+          "id": "litellm-pr-42726"
+        },
+        {
+          "id": "trulens-pr-2816"
+        },
+        {
+          "id": "opik-8524"
+        },
+        {
+          "id": "litellm-pr-42746"
+        },
+        {
+          "id": "litellm-pr-42704"
+        }
+      ]
+    },
+    {
+      "title": "Issue #42689（未知金鑰驗證失敗寫入 spend rows）仍開啟",
+      "detail": "回報者被掃描器灌入 9 萬筆以上；1.103.0-rc.1 只部分修正讀取端。proxy 前維持 WAF / rate limit。",
+      "impact": "medium",
+      "sources": [
+        {
+          "id": "litellm-issue-42689"
+        }
+      ]
+    }
+  ],
+  "security": [
+    {
+      "title": "CVE-2026-59823：LiteLLM SSRF（< 1.83.9，medium）",
+      "date": "2026-09-17",
+      "detail": "透過 user_config 夾帶 api_base 造成 SSRF；2026-09-17 公布，1.83.9 修正。建議版本已涵蓋。",
+      "impact": "medium",
+      "sources": [
+        {
+          "id": "gitlab-cve-2026-59823"
+        }
+      ]
+    },
+    {
+      "title": "GHSA-4xpc-pv4p-pm3w 已編為 CVE-2026-49468（CVSS 9.8）",
+      "detail": "Host header 驗證繞過，1.84.0 修正；嚴重度由 high 上修為 critical。另補登 CVE-2026-59822（MCP 驗證繞過，8.8，1.84.0 修正）。",
+      "impact": "medium",
+      "sources": [
+        {
+          "id": "gitlab-cve-2026-49468"
+        },
+        {
+          "id": "skycloak-cve-2026-59822"
+        }
+      ]
+    },
+    {
+      "title": "LiteLLM 9 月 Townhall：52 個安全修正、CVE 數量會增加",
+      "date": "2026-09-24",
+      "detail": "未驗證漏洞的修正會與揭露同時發布，多數為 low / medium；1.103 起未設定或預設 master key 會拒絕啟動。",
+      "impact": "low",
+      "sources": [
+        {
+          "id": "litellm-sept-townhall"
+        }
+      ]
+    }
+  ],
+  "regulatory": [],
+  "actionItems": [
+    {
+      "priority": "P0",
+      "action": "【2026-10-01 更正】盤點 Claude Sonnet 4.5 使用者並排定遷移到 Sonnet 5.5：Foundry 2026-11-15、Anthropic API 2026-11-30（原寫 09-29 / 10-19 為誤記）。",
+      "due": "2026-11-08"
+    },
+    {
+      "priority": "P0",
+      "action": "【2026-10-01 更正】Foundry claude-haiku-4-5（Anthropic 不早於 10-15；Foundry 表 11-15）與 claude-opus-4-5（11-24）部署排定遷移。",
+      "due": "2026-10-08",
+      "relatedModelIds": [
+        "claude-opus-5-5",
+        "gpt-6-luna",
+        "gemini-3-8-flash"
+      ]
+    },
+    {
+      "priority": "P0",
+      "action": "Gemini API（ai.google.dev）上的 gemini-2.5-flash-image 在 10-02 關閉：確認沒有路由直接走 Gemini API；Agent Platform 同名模型到 2027-03-15。",
+      "due": "2026-09-30"
+    },
+    {
+      "priority": "P0",
+      "action": "Bedrock Nova Canvas / Nova Reel 09-30 退役：從 LiteLLM 設定移除並確認沒有 fallback 指向。",
+      "due": "2026-09-29"
+    },
+    {
+      "priority": "P0",
+      "action": "Azure gpt-4.1-nano（10-14）、Bedrock Claude Sonnet 4（10-14，含台北區）完成遷移（沿用上期）。",
+      "due": "2026-10-07"
+    },
+    {
+      "priority": "P0",
+      "action": "盤點 gemini-2.5-pro / flash / flash-lite 的 GCP 專案（含平常沒流量的 DR / fallback 專案）：10-20 起新專案與閒置專案會被封鎖（沿用上期，仍為社群轉述）。",
+      "due": "2026-10-13"
+    },
+    {
+      "priority": "P0",
+      "action": "LiteLLM production 維持 v1.102.1（最低 v1.101.0）；Bedrock GPT-6 deployment 保留 additional_drop_params: [temperature]。",
+      "due": "2026-10-02",
+      "relatedModelIds": [
+        "gpt-6-astra",
+        "gpt-6-sol",
+        "gpt-6-luna"
+      ]
+    },
+    {
+      "priority": "P1",
+      "action": "在 staging 評估 LiteLLM 1.103.0：確認 LITELLM_MASTER_KEY 已設且非預設、把表示不限額的 max_budget: 0 改為 null、盤點 config.yaml 與 DB 重疊設定，並跑 compat suite；等官方 notes 與 image digest 發布後再排 production。",
+      "due": "2026-10-05"
+    },
+    {
+      "priority": "P1",
+      "action": "Foundry 使用中的 Kimi-K2.7-Code（10-03）、MAI-Image-2.5（10-01）、gpt-4o-mini-transcribe / mini-tts / sora-2（10-15）、gpt-image-1（10-23）若有部署，排定遷移。",
+      "due": "2026-09-30"
+    },
+    {
+      "priority": "P1",
+      "action": "GPT-6 Sol / Luna 的 Bedrock 路由改以官方模型卡為準：global.* 可從台北區（ap-east-2）呼叫；Sol 在 Bedrock 不支援 structured outputs（Luna 支援）；配額以 input + 10×output 估算。",
+      "relatedModelIds": [
+        "gpt-6-sol",
+        "gpt-6-luna"
+      ]
+    },
+    {
+      "priority": "P1",
+      "action": "Bedrock Claude Opus 4.1 於 10-08 進入 public extended access（價格可能上調）、2027-01-08 EOL：確認遷移時程（沿用上期）。",
+      "due": "2026-10-08",
+      "relatedModelIds": [
+        "claude-opus-5-5"
+      ]
+    },
+    {
+      "priority": "P1",
+      "action": "Azure o1 / o3 / o3-mini / o3-pro / o3-deep-research / o4-mini 在 11-19 前遷移；codex-mini 11-15 退役。",
+      "due": "2026-11-05"
+    },
+    {
+      "priority": "P2",
+      "action": "追蹤 Claude Sonnet 5.5 / Haiku 5.5、GPT-6 Cyber、DeepSeek-V4.1-Flash（Foundry）是否正式發布。"
+    }
+  ],
+  "watchlist": [
+    {
+      "name": "Claude Sonnet 5.5",
+      "vendor": "anthropic",
+      "status": "coming-soon",
+      "expected": "2026 年 10 月（官方：coming weeks）",
+      "note": "Anthropic 表示會帶來與 Opus 5.5 相同的效能、效率與安全改進；上線後評估是否取代 Sonnet 5 作為一般預設。2026-09-28 查：官方尚未發布；多個媒體報導洩漏的發布日（未驗證）。",
+      "sources": [
+        {
+          "id": "anthropic-opus55-announce"
+        },
+        {
+          "id": "mikeyk-sonnet55"
+        },
+        {
+          "id": "testingcatalog-sonnet55"
+        }
+      ]
+    },
+    {
+      "name": "Claude Haiku 5.5",
+      "vendor": "anthropic",
+      "status": "coming-soon",
+      "expected": "2026 年 10 月（官方：coming weeks）",
+      "note": "Claude Haiku 4.5 在 Anthropic 平台的退役「不早於 2026-10-15」，Foundry 退役表列 claude-haiku-4-5 為 2026-11-15【2026-10-01 更正，原誤記 10-19】；Haiku 5.5 可能是其替代。2026-09-28 查：尚未發布。",
+      "sources": [
+        {
+          "id": "anthropic-opus55-announce"
+        },
+        {
+          "id": "anthropic-deprecations"
+        },
+        {
+          "id": "ms-foundry-retirement-schedule"
+        }
+      ]
+    },
+    {
+      "name": "Gemini 3.5 Pro",
+      "vendor": "google",
+      "status": "limited-preview",
+      "expected": "未公布",
+      "note": "已宣布但尚無 GA 日期與公開價格；Gemini 3.1 Pro 仍為 preview。",
+      "sources": [
+        {
+          "id": "capitalandcompute-sept"
+        },
+        {
+          "id": "innfactory-gemini"
+        }
+      ]
+    },
+    {
+      "name": "DeepSeek-V4.1-Flash（Microsoft Foundry）",
+      "vendor": "deepseek",
+      "status": "coming-soon",
+      "expected": "未公布",
+      "note": "Microsoft Tech Community 2026-09-23 貼文標題稱「coming to Microsoft Foundry」；內文無法讀取，狀態、區域與價格未知。現行 DeepSeek-V4-Flash-0731 在 Foundry 表的退役日為 2026-12-03。",
+      "sources": [
+        {
+          "id": "ms-techcommunity-deepseek-v41"
+        },
+        {
+          "id": "ms-foundry-retirement-schedule"
+        }
+      ]
+    },
+    {
+      "name": "GPT-6 Cyber",
+      "vendor": "openai",
+      "status": "rumoured",
+      "expected": "未公布",
+      "note": "Fortune 2026-09-24 報導標題稱 OpenAI 將發表 GPT-6 Cyber 模型與資安產品；只看到標題，未見 OpenAI 官方頁面。資安團隊留意是否需 Trusted Access for Cyber。",
+      "sources": [
+        {
+          "id": "fortune-gpt6-cyber"
+        }
+      ]
+    }
+  ],
+  "unverified": [
+    "Gemini 2.5（Agent Platform）10-20 封鎖規則與 2027 停止服務日：仍只有公開 GitHub issue 轉述的 Google 2026-09-15 客戶通知與第三方整理，官方頁無法讀取（JS 渲染）。",
+    "gemini-2.5-flash-image 在 Agent Platform 延到 2027-03-15：取自 release-note 鏡像站與第三方引述。",
+    "Gemini 3.8 Live GA、Grok 4.6 GA、Muse Spark 1.3 Preview（Agent Platform）：只有 release-note 鏡像站。",
+    "Gemini 3.8 Flash 在 Agent Platform 的區域端點：官方模型頁無法讀取，仍取自第三方（innfactory、Requesty）；第三方稱 Vertex 促銷以 50% credits back 實施。",
+    "Claude Sonnet 5.5 / Haiku 5.5：只有洩漏報導標題，Anthropic 未發布。",
+    "GPT-6 Cyber：只有 Fortune 2026-09-24 標題。",
+    "DeepSeek-V4.1-Flash 上 Foundry：只有 Microsoft Tech Community 標題，內文未讀到。",
+    "LiteLLM 1.103.0：PyPI 顯示 09-27 發布，但無官方 release notes / GitHub tag；breaking changes 依 rc1 notes 與 Townhall 推定。",
+    "LiteLLM 支援窗口 v1.100–v1.103：依政策推導，官方頁未更新。",
+    "CVE-2026-59822 的細節取自資安廠商部落格。",
+    "GPT-6 Astra 在 Azure 的退役日：官方表仍未列，第三方顯示 2028-01-11。",
+    "【2026-10-01 更正】本期 Foundry Claude 4.5 退役日原誤記為 2026-10-19，已更正；請以 lifecycle.json 為準。"
+  ]
+}

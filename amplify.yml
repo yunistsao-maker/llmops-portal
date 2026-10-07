@@ -3,15 +3,12 @@ frontend:
   phases:
     preBuild:
       commands:
-        - npm ci --prefix web
+        - python3 tools/validate_data.py
     build:
       commands:
-        # sync-data copies ../data into web/public/data, then tsc + vite build
-        - npm run build --prefix web
+        # site/ is the prebuilt app; this adds data/, runs/, config/ and generates data/manifest.json
+        - node tools/build_site.mjs
   artifacts:
-    baseDirectory: web/dist
+    baseDirectory: dist
     files:
       - '**/*'
-  cache:
-    paths:
-      - web/node_modules/**/*

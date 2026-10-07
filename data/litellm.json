@@ -1,31 +1,38 @@
 {
   "schema": "litellm/v1",
-  "generatedAt": "2026-09-24T14:30:00Z",
+  "generatedAt": "2026-10-06T16:30:00Z",
   "locale": "zh-TW",
-  "asOf": "2026-09-24",
-  "supportPolicy": "LiteLLM 只維護最近四條 stable minor 線（含其中所有 patch）；minor 約每週發布一次，因此每條線約有一個月維護期。企業客戶可洽談更長支援，重大漏洞可能例外修補。",
+  "asOf": "2026-10-06",
+  "supportPolicy": "LiteLLM 只維護最近四條 stable minor 線（含其中所有 patch）；自 1.84.0 起每週的 stable 升 MINOR、PATCH 只用於 hotfix，因此每條線約有一個月維護期。企業客戶可洽談更長支援，重大漏洞可能例外修補。注意：官方政策頁（2026-06-20，2026-10-06 複查未改）列的仍是 1.86–1.89，下方 supportedLines 是依政策與 1.104.0 stable 發布（PyPI 2026-10-03）推導：v1.101–v1.104，v1.100 線已移出窗口。與 1.104.0 同時切出的回移植 patch 只有 1.103.3，與此推導一致。 2026-10-06 複查：PyPI 最新 stable 仍是 1.104.0，窗口不變；v1.105.0 還只有 rc.1。",
   "supportedLines": [
+    "v1.104.x",
+    "v1.103.x",
     "v1.102.x",
-    "v1.101.x",
-    "v1.100.x",
-    "v1.99.x"
+    "v1.101.x"
   ],
   "recommended": {
-    "version": "v1.102.1",
-    "pinning": "以 image digest 釘選（ghcr.io/berriai/litellm@sha256:…），不要用 main-latest 或 *-dev；PyPI 以 hash 釘選（pip install --require-hashes）並經私有 mirror。",
+    "version": "v1.104.0",
+    "pinning": "以 image digest 釘選（docker.litellm.ai/berriai/litellm:1.104.0 的 sha256；image 以 cosign 簽章），不要用 main-latest、*-dev、*-rc；PyPI 以 hash 釘選並經私有 mirror。",
     "rationale": [
-      "支援窗口內最新的 stable 線。",
-      "包含 GPT-6 家族參數處理（≥ v1.101.0）與 retry OOM 修正。",
-      "Claude Opus 5.5、GPT-6 Astra/Sol/Luna、Gemini 3.8 Flash 都能靠 Reload Price Data 取得定價。",
-      "注意 v1.102.0 的 breaking changes，先在 staging 跑 compat suite。"
+      "支援窗口內最新的 stable（PyPI 2026-10-03 22:42 UTC 上傳，官方 release notes 已發布）。2026-10-06 複查：PyPI latest 仍是 1.104.0——沒有 1.104.1，也沒有 1.105.0 stable（1.105.0rc1 是 Pre-release），v1.10x 的版本都沒有被 yank；OSV 的 litellm 公告清單（82 筆，逐筆比對版本範圍）沒有任何一筆涵蓋 1.104.0、1.103.2 或 1.101.4，GitLab advisory 列表也沒有新增。發布三天、還沒有 patch——先在 staging 跑完 compat suite 與負載測試再上 production。",
+      "1.104.0 的 breaking changes：(1) master key 未設、為空或為公開已知值（例如 sk-1234）時 proxy 拒絕啟動；(2) 預算用盡由 HTTP 429 改回 422（litellm_settings.budget_exceeded_status_code: 429 可還原）；(3) stdio MCP server 預設關閉（LITELLM_ENABLE_MCP_STDIO=true 才啟用）；(4) 啟動時 DB setup 失敗會直接退出（ENFORCE_PRISMA_MIGRATION_CHECK=false 可還原）；(5) 自 v1.103.0 以前升級，Admin UI 與 lite CLI 使用者要重新登入。",
+      "自 v1.102.x 以前升級：v1.103.0 的兩個 LiteLLM_SpendLogs 索引 migration 在 1.104.0 改為 no-op，要自己在 transaction 外用 CREATE INDEX CONCURRENTLY 建好（語句見已知陷阱）。",
+      "內建 cost map 新增 Claude Opus 5.5（Anthropic / Bedrock / Vertex AI / Azure AI）與 Bedrock、Azure 的 GPT-6 Sol / Luna。2026-10-06 直接下載 release notes 全文確認：新模型表沒有 Claude Sonnet 5.5 與 GPT-6.1 Sol（兩者到 v1.105.0rc1 的 notes 才列為新條目），GPT-6 Astra 只有 azure/eu/gpt-6-astra 的欄位更新——這些模型在 v1.104.x 以 remote cost map reload 為準。",
+      "包含 v1.103.2 的修正：pass-through endpoint 還原（#43962）、Claude Code safeguards 與 anthropic-beta 轉送（#42152、#42288）。",
+      "仍未修正：Bedrock 上 GPT-6 的 temperature（#42725 / #42726）、未知金鑰寫入 spend rows（#42689）、Chat→Responses bridge 重複記帳（#44500，影響 v1.102.0 以後所有版本）——v1.104.0 的 notes 全文沒有提到這幾個編號（2026-10-06 檢索），v1.105.0rc1 的 notes 也沒有；GitHub issue 頁本期讀不到，開啟狀態沿用 10-05 的讀取。workaround 見已知陷阱。",
+      "暫時無法吸收 1.104 變更者：留在 v1.103.2（仍在支援窗口內，沒有已知的 critical 問題）。v1.103.3（2026-10-03）已上 PyPI，但官方 notes 頁到 2026-10-06 仍回 404、release notes 索引也沒有這個版本，內容只見於第三方轉載（預設強制 migration 檢查、不再由 migration 建立 SpendLogs 索引、相依套件升版）——讀過官方 notes 再升。",
+      "v1.100 線已移出支援窗口，且落在 CVE-2026-89032（1.101.0-rc.1 之前）的受影響範圍：仍在 v1.100.x 的環境請升到 v1.101.4 以上。",
+      "下一個 stable（v1.105.0）還沒發布，rc.1 的官方 notes 已列出三項 breaking change：Bedrock 上的 GPT-5.6 / GPT-6 / GPT-6.1 預設由 Converse 改走原生 Chat Completions（要留在 Converse 明寫 bedrock/converse/<model>）、ENFORCE_PRISMA_MIGRATION_CHECK=false 不再有效（migration 失敗一律不啟動）、/sso/debug/* 預設回 404。rc.1 也帶進 Claude Sonnet 5.5 / GPT-6.1 Sol 的內建 cost map 與 Vertex per-turn-control 的修正（PR #43558）。可以先在 staging 用 rc.1 試跑 compat suite，不要上 production。"
     ]
   },
   "minimumBaseline": {
     "version": "v1.101.0",
     "rationale": [
+      "v1.101 是支援窗口（v1.101–v1.104，依政策推導）最舊的一條線；請用該線最新 patch v1.101.4（2026-10-01；修正 Straiker 與 Azure Content Safety guardrail 的 api_version 問題）。",
       "GPT-6 Sol/Luna 需要的 max_completion_tokens / reasoning 參數處理。",
       "含 OOM 修正。",
-      "遠高於所有已知 CVE 的修正版本（≥ v1.84.0）。"
+      "高於所有已知 CVE 的修正版本：CVE-2026-89032（semantic cache 租戶隔離繞過）修正於 1.101.0-rc.1；CVE-2026-49468、CVE-2026-59822、CVE-2026-59823 為 ≥ v1.84.0；CVE-2026-84377 為 ≥ v1.96.2。",
+      "LiteLLM 約每週發一個 stable minor：v1.105.0 stable（rc.1 已於 2026-10-04 上傳，10-06 仍未發布 stable）發布後 v1.101 線就會移出窗口——不要把 v1.101 當長期落點。"
     ]
   },
   "avoid": [
@@ -49,10 +56,34 @@
     },
     {
       "versions": "< v1.84.0",
-      "reason": "Host header 驗證繞過（GHSA-4xpc-pv4p-pm3w）。",
+      "reason": "Host header 驗證繞過（CVE-2026-49468 / GHSA-4xpc-pv4p-pm3w，CVSS 9.8）、MCP 驗證繞過（CVE-2026-59822，8.8）；< 1.83.9 另有 SSRF（CVE-2026-59823）。",
       "sources": [
         {
           "id": "litellm-host-header"
+        },
+        {
+          "id": "gitlab-cve-2026-49468"
+        },
+        {
+          "id": "skycloak-cve-2026-59822"
+        },
+        {
+          "id": "gitlab-cve-2026-59823"
+        }
+      ]
+    },
+    {
+      "versions": "< v1.101.0",
+      "reason": "只影響有啟用 semantic cache 的多租戶部署：CVE-2026-89032 / GHSA-237m-2qxv-ww7c（High，CVSS 4.0 8.7）——semantic cache 的租戶隔離可被繞過，持有有效 virtual key 的使用者可讀到其他租戶的快取回應。修正於 1.101.0-rc.1，v1.101.0 以後的 stable 都已包含。",
+      "sources": [
+        {
+          "id": "osv-cve-2026-89032"
+        },
+        {
+          "id": "ghsa-237m-2qxv-ww7c"
+        },
+        {
+          "id": "osv-litellm-list"
         }
       ]
     },
@@ -66,11 +97,26 @@
       ]
     },
     {
-      "versions": "≤ v1.98.x",
-      "reason": "已超出官方支援窗口（2026-09-24）。",
+      "versions": "v1.103.0、v1.103.1",
+      "reason": "pass-through endpoint 問題：STORE_MODEL_IN_DB=true 且在 config 宣告 pass-through 時，Authorization 不轉送、Admin UI 無法編輯 pass-through、os.environ/ 目標回 500。v1.103.2 已還原且沒有新的 breaking change，直接用 v1.103.2。",
+      "sources": [
+        {
+          "id": "litellm-v1-103-2"
+        }
+      ]
+    },
+    {
+      "versions": "≤ v1.100.x",
+      "reason": "1.104.0 stable（2026-10-03）發布後已超出「最近四條 stable 線」支援窗口（v1.101–v1.104，依政策推導）；v1.100 線另落在 CVE-2026-89032 的受影響範圍。",
       "sources": [
         {
           "id": "litellm-version-support"
+        },
+        {
+          "id": "pypi-litellm-rss"
+        },
+        {
+          "id": "osv-cve-2026-89032"
         }
       ]
     },
@@ -86,29 +132,194 @@
   ],
   "releases": [
     {
+      "version": "v1.105.0-rc.1",
+      "date": "2026-10-04",
+      "channel": "rc",
+      "highlights": [
+        "2026-10-04 01:36 UTC 上傳到 PyPI（Pre-release）；另有 1.105.0.dev2（10-02）。2026-10-06 仍沒有 1.105.0 stable。官方 notes 已發布（與 v1.104.0-rc.1 比較）。",
+        "Claude Sonnet 5.5（Anthropic、Bedrock、Bedrock Mantle、Vertex AI、Azure AI）、GPT-6.1 Sol（OpenAI、Azure、Bedrock）與 Grok 4.7（Bedrock、Vertex AI）進入內建 cost map，共 78 個新條目。",
+        "Bedrock：GPT-5.6 / GPT-6 / GPT-6.1 預設改走 bedrock-runtime 的原生 Chat Completions（PR #44307）；gpt-oss 與 Grok 可用 chat_completions/ 前綴選用。",
+        "Vertex AI：轉送 per-turn-control beta（PR #43558，對應 issue #43557）；Azure AI Foundry 同樣轉送（PR #43415）。",
+        "計費：service tier 依 catalog 價計費（含自訂價格的 deployment，PR #43890）、Ultrafast 超過 272K 的請求改用長文價（PR #43764）；cost map 修正含 Azure 直售的 DeepSeek V4.1 Flash 價格（PR #43566）。",
+        "新增 fail_closed_rate_limit_enforcement：Redis 的 rate limit 計數器連不上時以 503 拒絕請求（PR #43251）。litellm.agent()、Lens 與 Agent Traces、Entra ID agent identity。"
+      ],
+      "supported": false,
+      "caution": "Release candidate，勿用於正式環境。v1.105.0 stable 發布後 v1.101 線會移出支援窗口。Breaking（相對 v1.104.0）：Bedrock 上的 GPT-5.6 / GPT-6 / GPT-6.1 由 Converse 改走原生 Chat Completions，response id、service_tier 與 reasoning 欄位格式會變（要留在 Converse 用 bedrock/converse/<model>）；ENFORCE_PRISMA_MIGRATION_CHECK=false 被忽略，migration 失敗就不啟動；/sso/debug/* 沒設 ENABLE_SSO_DEBUG=true 時回 404。notes 沒有提到 #42725、#42689、#44500、#44022 的修正；cost map 另列有 Bedrock 模型卡沒有的 profile（jp. / au. / apac. 的 Claude Sonnet 5.5）。",
+      "sources": [
+        {
+          "id": "pypi-litellm-rss"
+        },
+        {
+          "id": "litellm-v1-105-0-rc1"
+        }
+      ]
+    },
+    {
+      "version": "v1.104.0",
+      "date": "2026-10-03",
+      "channel": "stable",
+      "highlights": [
+        "PyPI 2026-10-03 22:42 UTC 上傳、GitHub 標為 Latest；Docker：docker.litellm.ai/berriai/litellm:1.104.0。",
+        "Claude Opus 5.5（Anthropic、Bedrock、Vertex AI、Azure AI）與 Bedrock、Azure 的 GPT-6 Sol / Luna 進入內建 cost map；331 個新模型條目，新 provider Eden AI 與 Nadir。沒有 Claude Sonnet 5.5 與 GPT-6.1 Sol（2026-10-06 全文確認）。",
+        "Master key 強制檢查；dashboard 登入加入外洩密碼偵測、自助改密碼與強制重設。",
+        "group-scoped priority routing、依時段為團隊保留 deployment、LiteAdmin assistant、prompt caching 節省統計。",
+        "rc.1 之後併入：pass-through 還原（#43962）、跨 worker 新建模型的 400 Invalid model name（#44277）、多 pod migration 重試（#44283）；另有 Bedrock Converse reasoning 模型丟棄不支援的取樣參數（#39834）、Claude Code safeguards 與 beta 轉送到 Bedrock Invoke / Vertex（#42288）。",
+        "Bedrock 相關：OpenAI 模型可經 /v1/responses 走 bedrock-runtime 的原生 Responses API（#42767）、未對應的 openai 家族 model ID 導向 Converse（#42713）、Claude 經 Bedrock Mantle 的原生 /v1/messages（#42049）；Azure 的 gpt-5.4+ 帶 reasoning 的工具呼叫橋接到 Foundry Responses API（#42041）。"
+      ],
+      "supported": true,
+      "caution": "Breaking：master key 未設 / 為空 / 為公開已知值時拒絕啟動；預算用盡回 422 而不是 429；stdio MCP 預設關閉；DB setup 失敗時啟動即退出；自 v1.103.0 以前升級要重新登入；v1.103.0 的 SpendLogs 索引 migration 改為 no-op（自 v1.102.x 以前升級要自己建索引）。發布三天、尚無 patch（2026-10-06）——先過 staging。notes 全文沒有提到 #42725、#42689、#44500 的修正。",
+      "sources": [
+        {
+          "id": "litellm-v1-104-0"
+        },
+        {
+          "id": "litellm-v1-104-0-release"
+        },
+        {
+          "id": "pypi-litellm-rss"
+        }
+      ]
+    },
+    {
+      "version": "v1.103.3",
+      "date": "2026-10-03",
+      "channel": "patch",
+      "highlights": [
+        "PyPI 2026-10-03 23:28 UTC 上傳（v1.103 線最新 patch，與 1.104.0 同時切出）。",
+        "內容只見於第三方 Renovate PR 轉載的上游 notes（官方 notes 頁 2026-10-06 仍回 404、release notes 索引沒有這個版本；GitHub tag 頁讀不到）：預設強制 migration 檢查並停止在 migration 中建立 SpendLogs 索引（#44205、#44286）、回移植 #42643 / #44341 / #44346、pyjwt / pypdf / tornado / urllib3 / gitpython 升版（#44352）。"
+      ],
+      "supported": true,
+      "caution": "依第三方轉載，這個 patch 改了預設行為（migration 檢查失敗會擋下啟動）；讀過官方 notes、在 staging 驗證後再升。",
+      "sources": [
+        {
+          "id": "pypi-litellm-1-103-3"
+        },
+        {
+          "id": "pypi-litellm-rss"
+        },
+        {
+          "id": "renovate-litellm-1-103-3"
+        }
+      ]
+    },
+    {
+      "version": "v1.103.2",
+      "date": "2026-10-01",
+      "channel": "patch",
+      "highlights": [
+        "2026-10-01 06:20 UTC 上傳；在 v1.103.1 之上沒有新的 DB migration 或 breaking change。（2026-10-03 起 PyPI latest 為 1.104.0。）",
+        "Claude Code auto mode 可經 gateway 使用：safeguards 與 anthropic-beta 在原生 /v1/messages 原樣轉送，並轉送到 Bedrock Invoke、Vertex AI 與 Azure AI Foundry（PR #42152、#42288）。",
+        "CLI session 的花費改記在每位使用者的 cli-session-<user_id> alias 下，不再是 64 字元的 hash。",
+        "還原 v1.103.0 改動的 pass-through endpoint 處理（PR #43962）：config 與 DB 的 pass-through 重新合併、Authorization 恢復轉送。"
+      ],
+      "supported": true,
+      "sources": [
+        {
+          "id": "litellm-v1-103-2"
+        },
+        {
+          "id": "pypi-litellm-json"
+        }
+      ],
+      "caution": "從 v1.103.0 或更早升級：先讀 v1.103.1 的 breaking changes（session token 失效，需重新登入；自 v1.102.x 以前升級會在啟動時建立 SpendLogs 索引）。升級後 DB 內其他路徑的 pass-through 會重新開始服務。"
+    },
+    {
+      "version": "v1.103.1",
+      "date": "2026-09-29",
+      "channel": "patch",
+      "highlights": [
+        "只有一項變更：Admin UI 與 lite CLI 登入後拿到的 session token 改用獨立的 AES-256-GCM context 與 header-safe 格式（litellm_login_ 前綴）。",
+        "與 1.100.4 / 1.101.3 / 1.102.2 同時發布（2026-09-29 23:04–23:36 UTC），四條線是同一個變更。"
+      ],
+      "supported": true,
+      "sources": [
+        {
+          "id": "litellm-v1-103-1"
+        },
+        {
+          "id": "pypi-litellm-json"
+        }
+      ],
+      "caution": "升級前簽發的 session token 失效：Admin UI 與 lite CLI 使用者要重新登入；rolling upgrade 期間新舊 pod 互不接受對方的 token。仍帶有 v1.103.0 的 pass-through endpoint 問題，請直接用 v1.103.2。"
+    },
+    {
+      "version": "v1.103.0",
+      "date": "2026-09-27",
+      "channel": "stable",
+      "supported": true,
+      "highlights": [
+        "Config file ownership、Fuse V2 router、capability classifier、per-model fast mode。",
+        "MCP client allowlist、delegated OAuth admission、RFC 8693 token exchange；408 個新模型條目。",
+        "以 organization member 追蹤花費、以 project 強制 budget。",
+        "Docker：docker.litellm.ai/berriai/litellm:1.103.0。"
+      ],
+      "caution": "Breaking：config.yaml 宣告的 key 由檔案擁有（runtime 寫入回 400）；org / project max_budget: 0 = 零額度（不限額用 null）；litellm-proxy CLI 棄用改用 lite；啟動時建立 LiteLLM_SpendLogs 新索引會阻擋 spend log 寫入（大表請先 CONCURRENTLY 建索引）；fallback 每一跳重新檢查 budget；未准入的 legacy delegated MCP 回 401。release notes 未提及 9 月 Townhall 所說的 master key 檢查。",
+      "sources": [
+        {
+          "id": "litellm-v1-103-0"
+        },
+        {
+          "id": "pypi-litellm-json"
+        },
+        {
+          "id": "litellm-v1-103-0-rc1"
+        }
+      ]
+    },
+    {
       "version": "v1.103.0-rc.1",
       "channel": "rc",
       "highlights": [
-        "LiteLLM 的 Claude Opus 5.5 Day-0 範例使用此 image（內建 cost map 已含 Opus 5.5）。"
+        "LiteLLM 的 Claude Opus 5.5 Day-0 範例使用此 image（docker.litellm.ai/berriai/litellm:1.103.0-rc.1）。",
+        "config.yaml 宣告的 key 由檔案擁有，執行期透過 DB 修改會被拒；budget 在每次 router fallback 重新檢查；max_budget: 0 代表零額度（不限額請用 null）。",
+        "MCP client allowlist、admin 可強制關閉 session、JWT token exchange；408 個新模型條目、147 筆價格修正。"
       ],
       "supported": false,
       "caution": "Release candidate，勿用於正式環境；等 v1.103.0 stable。",
       "sources": [
         {
           "id": "litellm-opus55"
+        },
+        {
+          "id": "litellm-v1-103-0-rc1"
         }
       ]
     },
     {
-      "version": "v1.102.1",
+      "version": "v1.102.2",
+      "date": "2026-09-29",
       "channel": "patch",
       "highlights": [
-        "v1.102 線的 patch（社群 Renovate PR 已升級至此版）。"
+        "v1.102 線最新 patch。只有一項變更：Admin UI / lite CLI 的 session token 格式（與 1.103.1 相同）。"
+      ],
+      "supported": true,
+      "sources": [
+        {
+          "id": "litellm-v1-102-2"
+        },
+        {
+          "id": "pypi-litellm-json"
+        }
+      ],
+      "caution": "升級前簽發的 session token 失效：Admin UI 與 lite CLI 使用者要重新登入；rolling upgrade 期間新舊 pod 互不接受對方的 token。"
+    },
+    {
+      "version": "v1.102.1",
+      "date": "2026-09-23",
+      "channel": "patch",
+      "highlights": [
+        "v1.102 線的 patch：回移植 Anthropic 相關修正（#42152 / #42288）等；image 以 cosign 簽章。"
       ],
       "supported": true,
       "sources": [
         {
           "id": "litellm-release-notes"
+        },
+        {
+          "id": "litellm-v1-102-1-release"
+        },
+        {
+          "id": "pypi-litellm-json"
         }
       ]
     },
@@ -129,6 +340,30 @@
           "id": "litellm-v1-102-0"
         }
       ]
+    },
+    {
+      "version": "v1.101.4",
+      "date": "2026-10-01",
+      "channel": "patch",
+      "highlights": [
+        "v1.101 線最新 patch；在 v1.101.3 之上沒有新的 DB migration 或 breaking change。",
+        "Straiker guardrail 支援 v3 platform keys（先前 v3 key 每個受保護的請求都回 401）；設定裡殘留不明 api_version 的 Straiker guardrail 會帶警告載入，而不是被略過。",
+        "Azure Content Safety guardrail 不再被共用的 api_version 預設值（v1）弄壞（先前未指定 api_version 會回 404，guardrail 設為 default_on 時所有請求失敗）。",
+        "pyjwt 升到 2.14.0。"
+      ],
+      "supported": true,
+      "sources": [
+        {
+          "id": "litellm-v1-101-4"
+        },
+        {
+          "id": "litellm-v1-101-3"
+        },
+        {
+          "id": "pypi-litellm-json"
+        }
+      ],
+      "caution": "自 v1.101.2 以前升級：v1.101.3（09-29）帶 session token 格式變更，Admin UI 與 lite CLI 使用者要重新登入。這些 guardrail 修正是否已包含在 1.102 / 1.103 線，notes 沒有載明——使用 Straiker 或 Azure Content Safety guardrail 的環境升級後請實測。 v1.104.0 發布後，v1.101 是支援窗口最舊的一條線。"
     },
     {
       "version": "v1.101.0",
@@ -157,17 +392,40 @@
       ]
     },
     {
+      "version": "v1.100.4",
+      "date": "2026-09-29",
+      "channel": "patch",
+      "highlights": [
+        "v1.100 線最新 patch。只有一項變更：Admin UI / lite CLI 的 session token 格式（與 1.103.1 相同）。"
+      ],
+      "supported": false,
+      "sources": [
+        {
+          "id": "litellm-v1-100-4"
+        },
+        {
+          "id": "pypi-litellm-json"
+        }
+      ],
+      "caution": "v1.104.0（2026-10-03）發布後 v1.100 線已移出支援窗口，且整條線落在 CVE-2026-89032（1.101.0-rc.1 之前）的受影響範圍，沒有讀到 v1.100.x 的修正 patch——請升到 v1.101.4 以上。"
+    },
+    {
       "version": "v1.100.1",
       "channel": "patch",
       "highlights": [
         "Retry breadcrumb 記憶體修正（v1.101.0 修正回移植）"
       ],
-      "supported": true,
+      "supported": false,
       "sources": [
         {
           "id": "litellm-v1-100-1"
+        },
+        {
+          "id": "litellm-oom-incident"
         }
-      ]
+      ],
+      "date": "2026-09-09",
+      "caution": "v1.100 線已移出支援窗口（2026-10-03 起），且在 CVE-2026-89032 的受影響範圍內。"
     },
     {
       "version": "v1.100.0",
@@ -176,8 +434,8 @@
       "highlights": [
         "Access group budgets、Together AI 改版、自訂 auto-router tiers"
       ],
-      "supported": true,
-      "caution": "部署持續失敗（Redis 或上游）觸發大量 retry/fallback 時記憶體幾何成長導致 OOM——改用 v1.100.1 以上。",
+      "supported": false,
+      "caution": "部署持續失敗（Redis 無法連線）觸發大量 retry/fallback 時記憶體幾何成長導致 OOM。v1.104.0（2026-10-03）發布後整條 v1.100 線已移出支援窗口，且在 CVE-2026-89032 的受影響範圍內——升到 v1.101.4 以上。",
       "sources": [
         {
           "id": "litellm-release-notes"
@@ -194,11 +452,14 @@
       "highlights": [
         "Dark mode、CLI OAuth login、端到端 batch billing"
       ],
-      "supported": true,
-      "caution": "支援窗口最舊的一條線，下次 minor 發布後即 EOL。",
+      "supported": false,
+      "caution": "1.103.0 發布後已超出「最近四條 stable 線」支援窗口（依政策推導）。",
       "sources": [
         {
           "id": "litellm-release-notes"
+        },
+        {
+          "id": "litellm-version-support"
         }
       ]
     },
@@ -279,17 +540,21 @@
     },
     {
       "id": "GHSA-4xpc-pv4p-pm3w",
-      "title": "Host header injection 造成驗證繞過",
+      "title": "Host header injection 造成驗證繞過（CVE-2026-49468）",
       "affected": "< v1.84.0",
       "fixedIn": "v1.84.0",
-      "severity": "high",
-      "summary": "偽造 Host header 可能繞過驗證。",
+      "severity": "critical",
+      "summary": "偽造 Host header 可能繞過驗證；GitLab Advisory Database 評為 CVSS 9.8（critical）。",
       "action": "升級至 v1.84.0 以上；在 ingress 層固定並驗證 Host header。",
       "sources": [
         {
           "id": "litellm-host-header"
+        },
+        {
+          "id": "gitlab-cve-2026-49468"
         }
-      ]
+      ],
+      "published": "2026-06-16"
     },
     {
       "id": "CVE-2026-30623",
@@ -316,14 +581,113 @@
           "id": "litellm-guardrail-logging"
         }
       ]
+    },
+    {
+      "id": "CVE-2026-59823",
+      "title": "透過 user_config 夾帶 api_base 造成 SSRF（GHSA-hx8v-g79f-8w5f）",
+      "affected": "< 1.83.9",
+      "fixedIn": "1.83.9",
+      "severity": "medium",
+      "published": "2026-09-17",
+      "summary": "請求 body 的 user_config 中夾帶 api_base，可讓 proxy 對任意位址發出請求（CVSS 5）。 2026-10-06：PyPA advisory database 於 10-01 以 PYSEC-2026-4070 收錄（< 1.83.9）。",
+      "action": "確認 production ≥ 1.83.9（建議版本已涵蓋）；限制 proxy 對內網的 egress。",
+      "sources": [
+        {
+          "id": "gitlab-cve-2026-59823"
+        },
+        {
+          "id": "osv-litellm-list"
+        }
+      ]
+    },
+    {
+      "id": "CVE-2026-59822",
+      "title": "MCP 驗證繞過（GHSA-7488-6r32-c95q）",
+      "affected": "< 1.84.0",
+      "fixedIn": "1.84.0",
+      "severity": "high",
+      "published": "2026-06-30",
+      "summary": "MCP gateway 的驗證可被繞過（CVSS 8.8）；資料來源為資安廠商部落格（2026-09-21）。",
+      "action": "確認 ≥ 1.84.0；以 allow-list 管理 MCP server 與工具。",
+      "sources": [
+        {
+          "id": "skycloak-cve-2026-59822"
+        }
+      ]
+    },
+    {
+      "id": "CVE-2026-84377",
+      "title": "已驗證使用者可造成 SSRF 並外洩上游供應商憑證（GHSA-3cv6-jpf6-8222）",
+      "affected": "1.88.6 之前所有版本；1.89.0–<1.89.7；1.90.0–<1.90.7；1.91.0–<1.91.5；1.92.0–<1.92.2；1.93.0–<1.93.2；1.94.0–<1.94.3；1.95.0–<1.95.1；1.96.0–<1.96.2",
+      "fixedIn": "1.88.6 / 1.89.7 / 1.90.7 / 1.91.5 / 1.92.2 / 1.93.2 / 1.94.3 / 1.95.1 / 1.96.2",
+      "severity": "medium",
+      "published": "2026-08-26",
+      "summary": "request body 的驗證是 denylist，沒有涵蓋所有敏感參數，也不檢查巢狀欄位：任何已驗證的 proxy 使用者都能把對上游的呼叫導向自己控制的位址，讓 proxy 把營運者設定的供應商憑證與其他機密送過去，並對 proxy 可達的內部服務做 SSRF（CVSS 6.5，CWE-918）。GitLab Advisory Database 列的受影響範圍到 1.96.x 為止，1.97 以後（含 v1.100–v1.103）不在清單內。 發布日更正（2026-10-05）：BerriAI 自己的 advisory（GHSA-3cv6-jpf6-8222）是 2026-08-26 發布、當時沒有 CVE 編號；OSV 的 CVE 紀錄為 2026-09-02 發布、2026-10-01 修改。先前記的 2026-09-30 取自 GitLab Advisory Database（該頁 10-05 回 404，無法複查）。BerriAI 的 advisory 寫受影響範圍 < 1.94.0、修正於 1.96.2 並回移植到 1.88.x，與 GitLab 的逐線寫法不同——以「≥ 1.96.2 即不受影響」判斷。 2026-10-06：PyPA advisory database 於 10-01 以 PYSEC-2026-4066 收錄，範圍與 GHSA 相同（各線修正版本不變）。",
+      "action": "確認所有環境 ≥ 1.96.2（支援窗口內的版本都是）。仍在更舊版本的環境：升級，並把上游供應商金鑰視為可能已外洩而輪替；限制 proxy 的對外連線（egress allow-list），不要讓它連得到內部管理介面。",
+      "sources": [
+        {
+          "id": "gitlab-cve-2026-84377"
+        },
+        {
+          "id": "litellm-ghsa-3cv6-jpf6-8222"
+        },
+        {
+          "id": "osv-cve-2026-84377"
+        },
+        {
+          "id": "osv-litellm-list"
+        }
+      ]
+    },
+    {
+      "id": "CVE-2026-89032",
+      "title": "Semantic cache 租戶隔離繞過（GHSA-237m-2qxv-ww7c）",
+      "affected": "1.101.0-rc.1 之前的所有版本（OSV / GitHub Advisory Database）；社群提出的 PyPI 範圍為 ≥ 1.90.0rc1、< 1.101.0rc1（advisory-database PR #9851，尚未被採納）",
+      "fixedIn": "1.101.0-rc.1（v1.101.0 以後的 stable 都已包含）",
+      "severity": "high",
+      "published": "2026-09-25",
+      "summary": "semantic cache 層判斷租戶範圍時用的 metadata key 不一致：持有有效 virtual key 的使用者送出語意相近的 prompt，就可能在 /v1/responses、/bedrock/* 等路由讀到其他租戶的快取回應（可能含個資、財務資料或原始碼），也可能讓代理前端以受害者的身分執行攻擊者提供的 tool call（CVSS 4.0 8.7，CWE-863）。GitHub Advisory Database 的狀態是 Unreviewed、沒有列套件與修正版本；BerriAI 自己的 advisory 列表沒有這一則；NVD 與 VulnCheck 的頁面本期沒有讀到。v1.100 線落在受影響範圍內，沒有讀到任何 v1.100.x 的修正 patch。10-02 摘要列為未驗證的線索，10-05 確認。 2026-10-06 複查 OSV：這筆紀錄（modified 2026-10-02）仍只有 git commit 範圍，沒有 PyPI 套件與版本範圍，也沒有和 GHSA-237m-2qxv-ww7c 互列 alias；以 PyPI 套件查 OSV 的 litellm 清單（82 筆）找不到它——pip-audit、osv-scanner 這類依套件版本比對的掃描器不會報出這一筆，不能用掃描結果「沒報」當作不受影響的依據。",
+      "action": "確認所有環境 ≥ v1.101.0（支援窗口 v1.101–v1.104 都是）。仍在 v1.100.x 或更舊、且啟用 semantic cache 的多租戶環境：先關閉 semantic cache 或升級，清空既有快取，並檢視是否有跨租戶的快取命中。沒有啟用 semantic cache 的部署不受這個漏洞影響。 請直接盤點版本與 semantic cache 設定，不要依賴相依套件掃描器。",
+      "sources": [
+        {
+          "id": "osv-cve-2026-89032"
+        },
+        {
+          "id": "ghsa-237m-2qxv-ww7c"
+        },
+        {
+          "id": "ghad-pr-9851"
+        },
+        {
+          "id": "osv-litellm-list"
+        }
+      ]
+    },
+    {
+      "id": "CVE-2026-12770 – 12773、12795 – 12799",
+      "title": "9 筆 2026-06 揭露的低～中度公告（SSO、JWT、MCP、UI、guardrail）——10-01 起掃描器會開始報",
+      "affected": "多數為 ≤ 1.82.2（guardrail 繞過為 ≤ 1.82.5；MCP proxy 驗證為 < 1.84.0；admin key handler 為 ≤ 1.63.1）",
+      "fixedIn": "OSV 只對 MCP proxy 驗證列出修正版 1.84.0；其餘 8 筆只以 last_affected 標示（已知受影響到 1.82.2 / 1.82.5 / 1.63.1），公告沒有寫修正版本",
+      "severity": "medium",
+      "published": "2026-06-21",
+      "summary": "GitHub Advisory Database 於 2026-06-21 發布、PyPA advisory database 於 2026-10-01 補登為 PYSEC（PYSEC-2026-4067～4076 之間）的 9 筆公告：SSO debug flow 缺少驗證（CVE-2026-12795，Moderate）、MCP proxy 驗證不當（CVE-2026-12773，Moderate），以及 Low 的 SSO 登入不使舊 session 失效（12796）、M2M JWT 授權（12771）、PROXY_ADMIN 金鑰產生器 session 過期（12772）、admin key handler 授權（12770）、UI 使用者列舉（12799）、MCP OpenAPI spec loader 的 SSRF（12798）、BannedKeywords / AzureContentSafety guardrail 繞過（12797）。都不是新揭露的漏洞，OSV 列的受影響版本也都早於支援窗口；收錄它們是因為 10-01 之後 pip-audit 這類掃描器對舊版 image 會多報這一批。公告來源寫「vendor was contacted early about this disclosure」，沒有說明修正情形。",
+      "action": "依 OSV 的版本範圍，支援窗口內的版本（v1.101–v1.104）不會被標記。掃描報告出現這批 PYSEC / CVE 時，代表該環境還在 v1.83 以前——那同時也落在 CVE-2026-42208、CVE-2026-49468 等 critical 的範圍，直接升級。因為 8 筆沒有明載修正版本，有啟用 SSO 的環境另外確認 /sso/debug/* 沒有對外開放：v1.105.0rc1 才把這組路由改成預設回 404（PR #43150；notes 沒有說明是否與 CVE-2026-12795 有關）。",
+      "sources": [
+        {
+          "id": "osv-litellm-list"
+        },
+        {
+          "id": "litellm-v1-105-0-rc1"
+        }
+      ]
     }
   ],
   "knownPitfalls": [
     {
       "title": "Bedrock 上的 GPT-6 / GPT-5.6 拒收 temperature",
-      "affects": "bedrock/converse/…openai.gpt-6-*、bedrock_mantle/openai.gpt-6-*（LiteLLM 1.102.1）",
-      "symptom": "400：This model doesn't support the temperature field / Unsupported parameter: 'temperature'；評測框架（TruLens、Opik GEval）預設送 temperature=0 而失敗。",
-      "fix": "該 deployment 設 additional_drop_params: [\"temperature\"]（或全域 drop_params: true）；評測框架改用不送 temperature 的設定。上線前用 compat suite 的 params.temperature 案例驗證。",
+      "affects": "bedrock/converse/…openai.gpt-6-*、bedrock_mantle/openai.gpt-6-*（LiteLLM issue #42725，2026-10-05 仍開啟；v1.101.0 起，回報者稱 1.104.0 的 main 仍可重現）",
+      "symptom": "400：This model doesn't support the temperature field / Unsupported parameter: 'temperature'；評測框架（TruLens、Opik GEval）預設送 temperature=0 而失敗。同一 issue 另回報 Converse 路徑會把 GPT-6 Sol / Luna 的 tools 丟掉。",
+      "fix": "該 deployment 設 additional_drop_params: [\"temperature\"]（issue 標題指出只開 drop_params 仍會回 400）；評測框架改用不送 temperature 的設定（TruLens 已於 PR #2816 修正，Opik #8524 仍開啟）。LiteLLM 修正 PR #42726（drop temperature and top_p for OpenAI GPT-6 models on Converse）2026-10-05 仍未合併，替代方案 PR #43264 已於 09-27 關閉。v1.104.0 列有 #39834「drop unsupported sampling params on converse reasoning models」，是否涵蓋 OpenAI 模型未經證實。tools 被丟棄的部分，留言稱 main 已由 #42746 / #42798 恢復，但哪個版本開始包含沒有載明：必要時設 allowed_openai_params: [\"tools\", \"tool_choice\"]，並在 compat suite 斷言確實有 tool call。上線前用 compat suite 的 params.temperature 案例驗證。 2026-10-06：v1.104.0 的 notes 全文與 v1.105.0rc1 的 notes 都沒有提到 #42725 / #42726；v1.105 起這些模型在 Bedrock 的預設路徑改為原生 Chat Completions（PR #44307），temperature 與 tools 的行為要在新路徑重新驗證——明寫 bedrock/converse/ 的 deployment 不受預設路徑變更影響，additional_drop_params 照舊保留。",
       "sources": [
         {
           "id": "opik-8524"
@@ -332,7 +696,25 @@
           "id": "trulens-2815"
         },
         {
+          "id": "trulens-pr-2816"
+        },
+        {
+          "id": "litellm-issue-42725"
+        },
+        {
+          "id": "litellm-pr-42726"
+        },
+        {
           "id": "litellm-drop-params"
+        },
+        {
+          "id": "litellm-v1-103-2"
+        },
+        {
+          "id": "litellm-v1-104-0-release"
+        },
+        {
+          "id": "litellm-v1-105-0-rc1"
         }
       ]
     },
@@ -393,13 +775,19 @@
       "title": "內建 cost map 不會自動拿到新模型價格",
       "affects": "LITELLM_LOCAL_MODEL_COST_MAP=true 的部署",
       "symptom": "新模型成本記為 0 或錯誤；Reload Price Data 按鈕無效。",
-      "fix": "改用 remote cost map 並在發布日 reload，或升級到包含該模型的 image；每週排程比對 cost map 與 catalog.json。",
+      "fix": "改用 remote cost map 並在發布日 reload，或升級到包含該模型的 image；每週排程比對 cost map 與 catalog.json。 例：v1.104.0 的內建 cost map 沒有 Claude Sonnet 5.5 與 GPT-6.1 Sol（v1.105.0rc1 才有），用內建 map 的環境這兩個模型的花費會記為 0 或用錯價格。",
       "sources": [
         {
           "id": "litellm-opus55"
         },
         {
           "id": "litellm-gemini38"
+        },
+        {
+          "id": "litellm-v1-104-0"
+        },
+        {
+          "id": "litellm-v1-105-0-rc1"
         }
       ]
     },
@@ -411,17 +799,249 @@
       "sources": [
         {
           "id": "google-gemini38-latest"
+        },
+        {
+          "id": "google-agentplatform-pricing"
         }
       ]
     },
     {
       "title": "未知金鑰的驗證失敗也會寫入 spend rows",
-      "affects": "LiteLLM proxy（issue #42689，未修正前）",
-      "symptom": "未驗證的 client 可以讓 usage 資料表無限制成長。",
+      "affects": "LiteLLM proxy（issue #42689，10-05 讀取時仍開啟、沒有連結的修正 PR；回報版本 v1.102.0 與 1.103.0-rc.1。2026-10-06：v1.104.0 的 notes 全文與 v1.105.0rc1 的 notes 都沒有提到修正，issue 頁本期讀不到）",
+      "symptom": "未驗證的 client 可以讓 usage 資料表無限制成長（回報者被掃描器灌入 9 萬筆以上）。",
       "fix": "proxy 前加 WAF / rate limit；監控 spend 資料表大小；追蹤 issue 修正版本。",
       "sources": [
         {
           "id": "litellm-issue-42689"
+        },
+        {
+          "id": "litellm-v1-104-0"
+        },
+        {
+          "id": "litellm-v1-105-0-rc1"
+        }
+      ]
+    },
+    {
+      "title": "1.104 起：master key 未設、為空或為公開已知值時拒絕啟動",
+      "affects": "未設 LITELLM_MASTER_KEY、設為空字串，或使用 sk-1234 這類公開已知值的部署（v1.104.0 起；9 月 Townhall 預告為 1.103，實際列在 1.104.0 的 breaking changes）",
+      "symptom": "升級後 proxy 無法啟動（PR #42019、#42011）。",
+      "fix": "升級前確認 LITELLM_MASTER_KEY 是長隨機值。要換 master key 時用 LITELLM_MIGRATE_FROM_MASTER_KEY 重新加密既有資料；LITELLM_DANGEROUSLY_PERMIT_WEAK_OR_UNSET_MASTER_KEY=true 只給本機 sandbox 用，不要用在任何共用環境。在 staging 先跑一次啟動與 compat suite。",
+      "sources": [
+        {
+          "id": "litellm-v1-104-0"
+        },
+        {
+          "id": "litellm-v1-104-0-release"
+        },
+        {
+          "id": "litellm-sept-townhall"
+        }
+      ]
+    },
+    {
+      "title": "1.103 的 config.yaml 擁有權、max_budget 與 CLI 變更",
+      "affects": "同時用 config.yaml 與 Admin UI / DB 管理設定、以 max_budget: 0 表示不限額、或用 litellm-proxy 指令啟動的部署",
+      "symptom": "runtime 修改 config.yaml 已宣告的 key 回 400；max_budget: 0 的 org / project 會擋下所有請求；litellm-proxy 指令已棄用。",
+      "fix": "盤點 config.yaml 與 DB 重疊的設定；把表示不限額的 max_budget: 0 改為 null；啟動指令改為 lite。",
+      "sources": [
+        {
+          "id": "litellm-v1-103-0"
+        },
+        {
+          "id": "litellm-v1-103-0-rc1"
+        }
+      ]
+    },
+    {
+      "title": "1.103 / 1.104 的 SpendLogs 索引：升級前自己用 CONCURRENTLY 建好",
+      "affects": "LiteLLM_SpendLogs 資料表很大的部署（自 v1.102.x 以前升級到 v1.103.x 或 v1.104.0）",
+      "symptom": "v1.103.0～v1.103.2 會在啟動時建立索引並阻擋 spend log 寫入，時間依資料表大小而定；v1.104.0（以及第三方轉載的 v1.103.3）把這兩個索引 migration 改為 no-op——不自己建就不會有索引。",
+      "fix": "升級前先自己建好索引，migration 會發現並跳過：SET statement_timeout = 0; CREATE INDEX CONCURRENTLY IF NOT EXISTS \"LiteLLM_SpendLogs_api_key_startTime_idx\" ON \"LiteLLM_SpendLogs\"(\"api_key\", \"startTime\"); v1.104.0 的 notes 另列第二個索引：CREATE INDEX CONCURRENTLY IF NOT EXISTS \"LiteLLM_SpendLogs_litellm_call_id_idx\" ON \"LiteLLM_SpendLogs\"(\"litellm_call_id\"); 兩句都要在 transaction 外、連線不中斷的 session 執行。建完用 SELECT indisvalid FROM pg_index WHERE indexrelid = '\"LiteLLM_SpendLogs_api_key_startTime_idx\"'::regclass; 確認為 true——失敗的 concurrent build 會留下 invalid index，migration 一樣會跳過它（此時先 DROP INDEX CONCURRENTLY 再重建）。partitioned table 不能直接 CONCURRENTLY：先在每個 partition 建好對應索引，再對 parent 執行不帶 CONCURRENTLY 的同一句。在 staging 用同等資料量演練。",
+      "sources": [
+        {
+          "id": "litellm-v1-103-0"
+        },
+        {
+          "id": "litellm-v1-103-1"
+        },
+        {
+          "id": "litellm-v1-104-0"
+        }
+      ]
+    },
+    {
+      "title": "升級後 Admin UI 與 lite CLI 的 session token 全部失效",
+      "affects": "升級到 v1.103.1 以上，或 v1.100.4 / v1.101.3 / v1.102.2 以上的部署（rolling upgrade 尤其要注意）",
+      "symptom": "升級前登入的 Admin UI 使用者被登出；lite CLI 持續送舊 token，請求失敗直到重新執行 lite login；rolling upgrade 期間新舊版本的 pod 互不接受對方的 session token。",
+      "fix": "先完成整個 rollout，再通知使用者重新登入（CLI 執行 lite login）。virtual key、master key 與已存的憑證不受影響，應用程式流量不用改。",
+      "sources": [
+        {
+          "id": "litellm-v1-103-1"
+        },
+        {
+          "id": "litellm-v1-103-2"
+        },
+        {
+          "id": "litellm-v1-102-2"
+        },
+        {
+          "id": "litellm-v1-101-3"
+        },
+        {
+          "id": "litellm-v1-100-4"
+        }
+      ]
+    },
+    {
+      "title": "1.103.0 / 1.103.1 的 pass-through endpoint 問題",
+      "affects": "STORE_MODEL_IN_DB=true 且在 config.yaml 宣告 general_settings.pass_through_endpoints 的部署（v1.103.0、v1.103.1）",
+      "symptom": "forward_headers: true 的 pass-through 不再轉送 Authorization；只要 config 宣告了任何 pass-through，Admin UI 就無法新增、修改或刪除 pass-through；os.environ/ 目標未解析就送到上游而回 500。",
+      "fix": "升級到 v1.103.2（PR #43962 還原為 v1.103.0 之前的處理）。升級後 DB 裡其他路徑的 pass-through 會重新開始服務——升級前先盤點 DB 內有沒有不想再開放的 pass-through。",
+      "sources": [
+        {
+          "id": "litellm-v1-103-2"
+        }
+      ]
+    },
+    {
+      "title": "Guardrail 的 api_version 預設值問題（Azure Content Safety、Straiker）",
+      "affects": "使用 Azure Content Safety 或 Straiker guardrail 的部署（v1.101.3 以前；其他線是否已修正，notes 沒有載明）",
+      "symptom": "Azure Content Safety guardrail 未指定 api_version 時，會沿用共用預設值 v1 去呼叫 Azure 而回 404；guardrail 為 default_on 時所有請求失敗。Straiker v3 key（sk_agt_…）每個受保護的請求都回 401。",
+      "fix": "v1.101 線升到 v1.101.4（Azure guardrail 改為回退到 2024-09-01；Straiker 支援 v3 platform API，設定裡殘留不明 api_version 的 Straiker guardrail 會帶警告載入而不是被略過）。升級後用一筆應該被擋下的測試請求確認 guardrail 真的生效，並檢查啟動日誌的 guardrail 載入警告。",
+      "sources": [
+        {
+          "id": "litellm-v1-101-4"
+        }
+      ]
+    },
+    {
+      "title": "1.104：預算用盡回 HTTP 422 而不是 429",
+      "affects": "依 429 判斷預算用盡、或把 429 一律當成可重試 rate limit 的 client、告警與儀表板（v1.104.0 起）",
+      "symptom": "BudgetExceededError 改回 422（PR #42097）：原本依 429 做的告警、統計與重試邏輯不再命中；好處是 client 不會再把預算用盡當成可重試的限流而反覆重送。",
+      "fix": "盤點 client 與告警對 429 / 422 的處理；需要沿用舊行為時設 litellm_settings.budget_exceeded_status_code: 429。perf_probe 與 compat suite 的錯誤分類同步更新。",
+      "sources": [
+        {
+          "id": "litellm-v1-104-0"
+        },
+        {
+          "id": "litellm-v1-104-0-release"
+        }
+      ]
+    },
+    {
+      "title": "1.104：stdio MCP server 預設關閉、DB setup 失敗即退出",
+      "affects": "經 gateway 提供 stdio MCP server 的部署；啟動時 DB migration 可能失敗的環境（v1.104.0 起）",
+      "symptom": "既有的 stdio MCP server 仍列在清單但不會啟動，新增會被拒（PR #44066）；DB setup 失敗時 proxy 直接退出，不再以舊 schema 繼續服務（PR #44206）。",
+      "fix": "需要 stdio MCP 時設 LITELLM_ENABLE_MCP_STDIO=true，並以 allow-list 管理可註冊的 server；升級前確認 migration 帳號的權限與連線，rollout 用 readiness probe 擋住啟動失敗的 pod。ENFORCE_PRISMA_MIGRATION_CHECK=false 在 v1.104.x 可還原舊行為，但 v1.105.0rc1 的 notes 已寫明這個設定會被忽略（PR #44141）——不要依賴它，趁現在把 migration 流程修好。",
+      "sources": [
+        {
+          "id": "litellm-v1-104-0"
+        },
+        {
+          "id": "litellm-v1-105-0-rc1"
+        }
+      ]
+    },
+    {
+      "title": "Chat→Responses bridge 對大型請求重複寫入 spend log（預算被重複扣款）",
+      "affects": "v1.102.0 以後（issue #44500 列 v1.102.0、v1.103.2、v1.103.3、v1.104.0、v1.105.0-rc.1；v1.100.0 不受影響）：經 /v1/chat/completions 呼叫、被橋接到 Responses API 的 non-streaming 請求，且訊息文字（含 system prompt）達 262,144 字元（256 KiB）",
+      "symptom": "同一個請求在 LiteLLM_SpendLogs 出現兩筆（litellm_call_id 與 cost 相同、request_id 不同），key / team / 每日花費被扣兩次；回報者某日 LiteLLM 記為 $86.93，OpenAI 用量頁為 $55.68。",
+      "fix": "暫時設 MAX_BASE64_LENGTH_FOR_LOGGING=0（issue 提供的 workaround）；修正 PR #44508 在 10-05 讀取時未合併；2026-10-06 讀到的 v1.105.0rc1 notes 沒有列這個 PR（issue 頁本期讀不到）。FinOps 對帳時以 litellm_call_id 去重並比對 CSP 帳單；長 context 的 GPT-6 / GPT-5.4+ 工具呼叫流量最容易遇到。",
+      "sources": [
+        {
+          "id": "litellm-issue-44500"
+        },
+        {
+          "id": "litellm-v1-105-0-rc1"
+        }
+      ]
+    },
+    {
+      "title": "Vertex AI 路由丟掉 per-turn-control beta（Claude Code 的 per-message effort）",
+      "affects": "經 Agent Platform（Vertex AI）路由的 Claude 模型 + Claude Code（issue #43557，2026-09-28 開啟、仍未關閉；v1.103.0～v1.104.0-rc.1 與 main）",
+      "symptom": "400：messages.1.output_config: Extra inputs are not permitted；Claude Code 會去掉 beta 後重試，所以表面上成功，但 per-message effort 沒有生效、每個請求多一次往返。另 #44051（開啟中）回報 Vertex partner 的 /v1/messages/count_tokens 會漏算 system 與 tools，token 預估偏低。",
+      "fix": "修正 PR #43558 已列在 v1.105.0rc1 的 notes（Forward the per-turn-control beta for per-message output_config），預期隨 v1.105.0 stable 發布；v1.104.x 以前沒有。修正前，需要 per-message effort 的 Claude Code 流量優先走 Bedrock 或 Anthropic API 路由，並在 gateway 日誌監看這個 400。不要拿 Vertex 路由的 count_tokens 結果做 context 上限判斷。",
+      "sources": [
+        {
+          "id": "litellm-issue-43557"
+        },
+        {
+          "id": "litellm-issue-44051"
+        },
+        {
+          "id": "litellm-v1-105-0-rc1"
+        }
+      ]
+    },
+    {
+      "title": "LiteLLM cost map 缺 Azure Data Zone 價格（GPT-6.1 Sol）",
+      "affects": "Foundry 上以 US / EU / APAC Data Zone 部署的 gpt-6.1-sol（issue #44022，2026-10-01 開啟、仍未關閉；社群回報）",
+      "symptom": "cost map 只有 azure/gpt-6.1-sol，沒有 azure/us/、azure/eu/、azure/apac/ 的變體：Data Zone 部署以 Global 價計算，花費被低估（US 約 10%，EU / APAC 約 20%）。另 #43473（開啟中）回報 DeepSeek-V4.1-Flash 的兩條 Foundry 路徑都以同一組價格計算。",
+      "fix": "在該 deployment 的 model_info 自訂 input_cost_per_token / output_cost_per_token 等價格（依 catalog.json 的 Data Zone 價格），並以 Azure 帳單核對。 2026-10-06：v1.105.0rc1 的新模型表只有 azure/gpt-6.1-sol 與 azure/gpt-6.1-sol-2026-09-29，仍沒有 Data Zone 變體；同一版的 cost map 修正含 Azure 直售的 DeepSeek V4.1 Flash 價格（PR #43566）。",
+      "sources": [
+        {
+          "id": "litellm-issue-44022"
+        },
+        {
+          "id": "litellm-issue-43473"
+        },
+        {
+          "id": "ms-techcommunity-gpt61-sol"
+        },
+        {
+          "id": "litellm-v1-105-0-rc1"
+        }
+      ]
+    },
+    {
+      "title": "1.105 起：Bedrock 上的 GPT-5.6 / GPT-6 / GPT-6.1 預設改走原生 Chat Completions",
+      "affects": "以 bedrock/<model>（沒有 converse/ 前綴）設定 openai.gpt-5.6-*、openai.gpt-6-*、openai.gpt-6.1-* 的 deployment，升級到 v1.105.0 之後（目前只有 rc.1）",
+      "symptom": "同一個 deployment 升級後改打 bedrock-runtime 的 /openai/v1/chat/completions：response id、service_tier 與 reasoning 欄位的格式改變（PR #44307）；下游若解析這些欄位、或 Guardrails / application inference profile 只設在 Converse 上，行為會不同。Bedrock 模型卡上各 API 支援的功能也不一樣（例如 GPT-6 Astra 的 Guardrails 只支援 Converse）。",
+      "fix": "現在就把這些 deployment 明寫成 bedrock/converse/<profile-id>（升級後仍走 Converse），或決定要改走原生路徑並在 staging 重跑 compat suite（tools、temperature、structured outputs、Guardrails、spend 欄位）。本平台 catalog 的 provider 字串都已明寫 converse/。",
+      "sources": [
+        {
+          "id": "litellm-v1-105-0-rc1"
+        },
+        {
+          "id": "aws-bedrock-astra-card"
+        },
+        {
+          "id": "aws-bedrock-gpt61-sol-card"
+        }
+      ]
+    },
+    {
+      "title": "cost map 有列，不代表 Bedrock profile 存在",
+      "affects": "依 LiteLLM cost map 或模型清單來設定 Bedrock inference profile 的團隊（Claude Sonnet 5.5、Claude Opus 5.5）",
+      "symptom": "v1.105.0rc1 的 cost map 有 jp. / au. / apac.anthropic.claude-sonnet-5-5（$2.2 / $11），v1.104.0 有 apac.anthropic.claude-opus-5-5；但 Bedrock 模型卡（2026-10-06）上 Sonnet 5.5 只有 us. / eu. / global.，Opus 5.5 只有 us. / eu. / au. / jp. / global.——設定不存在的 profile 會在呼叫時失敗，而且 Sonnet 5.5 沒有日本境內選項這件事容易被 cost map 誤導。",
+      "fix": "profile ID 以 Bedrock 模型卡的 Programmatic Access 表或 ListInferenceProfiles 的結果為準；每週 inventory 對照時，把 cost map 有、但 ListInferenceProfiles 沒有的 ID 列為警示。",
+      "sources": [
+        {
+          "id": "litellm-v1-105-0-rc1"
+        },
+        {
+          "id": "litellm-v1-104-0"
+        },
+        {
+          "id": "aws-bedrock-sonnet55-card"
+        },
+        {
+          "id": "aws-bedrock-opus55-card"
+        }
+      ]
+    },
+    {
+      "title": "相依套件掃描器看不到 CVE-2026-89032，卻會多報一批舊公告",
+      "affects": "以 pip-audit、osv-scanner 等工具掃描 LiteLLM image 來判斷是否受漏洞影響的流程",
+      "symptom": "OSV 的 CVE-2026-89032 紀錄只有 git commit 範圍、沒有 PyPI 套件範圍，以 PyPI 套件查詢的清單裡沒有它（2026-10-06）——v1.100.x 以下的環境掃描結果不會出現這個 High。另一方面，PyPA advisory database 在 2026-10-01 一次補登 11 筆（PYSEC-2026-4066～4076），舊版 image 的掃描報告會突然變長，但依 OSV 的版本範圍都是 v1.96.2 以前的既有公告。",
+      "fix": "漏洞盤點以版本與功能設定為準：所有環境 ≥ v1.101.0、確認有沒有啟用 semantic cache。掃描器只當輔助；看到 10-01 新增的 PYSEC 不必當成新事件；升到支援窗口內的版本後掃描器不會再標記（其中 8 筆的修正版本公告沒有明載，見公告表）。",
+      "sources": [
+        {
+          "id": "osv-cve-2026-89032"
+        },
+        {
+          "id": "osv-litellm-list"
         }
       ]
     }
@@ -432,6 +1052,60 @@
     },
     {
       "id": "litellm-release-notes"
+    },
+    {
+      "id": "pypi-litellm"
+    },
+    {
+      "id": "litellm-cleaner-versions"
+    },
+    {
+      "id": "litellm-v1-103-0"
+    },
+    {
+      "id": "pypi-litellm-json"
+    },
+    {
+      "id": "litellm-v1-103-1"
+    },
+    {
+      "id": "litellm-v1-103-2"
+    },
+    {
+      "id": "litellm-v1-102-2"
+    },
+    {
+      "id": "litellm-v1-101-4"
+    },
+    {
+      "id": "litellm-v1-100-4"
+    },
+    {
+      "id": "gitlab-cve-2026-84377"
+    },
+    {
+      "id": "litellm-v1-104-0"
+    },
+    {
+      "id": "litellm-v1-104-0-release"
+    },
+    {
+      "id": "pypi-litellm-rss"
+    },
+    {
+      "id": "osv-cve-2026-89032"
+    },
+    {
+      "id": "ghsa-237m-2qxv-ww7c"
+    },
+    {
+      "id": "litellm-issue-44500"
+    },
+    {
+      "id": "litellm-v1-105-0-rc1"
+    },
+    {
+      "id": "osv-litellm-list"
     }
   ]
 }

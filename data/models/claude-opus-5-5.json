@@ -3,7 +3,7 @@
   "modelId": "claude-opus-5-5",
   "title": "Claude Opus 5.5 技術深度解析",
   "locale": "zh-TW",
-  "asOf": "2026-09-24",
+  "asOf": "2026-10-06",
   "tldr": "Opus 5.5 是目前 AA 智慧指數最高的模型（58），價格比 Opus 5 低 20%、典型任務成本低約 40%，三雲同日 GA。但它是「行為變更很多」的升級：thinking 永遠開啟、預設 effort 由 high 改 medium、forced tool_choice 回 400、資安請求多數被改路由到 Opus 4.8、Bedrock 上沒有 structured outputs。先修程式，再做回歸，最後才切 alias。",
   "whatsNew": [
     {
@@ -196,7 +196,7 @@
       "cloud": "aws",
       "service": "bedrock",
       "status": "ga",
-      "notes": "geo：us / eu / au / jp；global；台北區僅 global。"
+      "notes": "geo：us / eu / au / jp（jp 只在東京↔大阪、au 只在雪梨↔墨爾本之間路由，模型卡 2026-10-06）；global；台北區僅 global；bedrock-runtime 的 In-Region 只有 eu-west-2（London）。"
     },
     {
       "cloud": "gcp",
@@ -271,7 +271,7 @@
   ],
   "strengths": [
     "代理式程式與知識工作領先：Terminal-Bench 4.0 66.4%（xhigh）、GDPval-AA v2.1 1846 Elo、OSWorld 2.0 81.8%（廠商自評）。",
-    "Artificial Analysis Intelligence Index v4.3.2 得 58 分，同級 210 個模型中排名第 1（max effort，含預設 fallback）。",
+    "Artificial Analysis Intelligence Index v4.3.2 得 58 分，同級 225 個模型中排名第 1（max effort，含預設 fallback；2026-10-06 讀取）。",
     "成本效率：單價比 Opus 5 低 20%，cache read $0.20（-60%）；官方稱典型負載總成本 -40%、輸出速度 +30%。",
     "Prompt injection 抵抗力：Gray Swan 測試中與 Fable 5.1 並列攻擊成功率最低；行為稽核分數為歷來最佳。",
     "三雲同日 GA；Anthropic 與 Bedrock 皆標示退役不早於 2027-09-22。",
@@ -280,7 +280,7 @@
   "weaknesses": [
     "Thinking 永遠開啟、無法關閉；延遲敏感的簡單任務要用 effort=low 或改用較小模型。",
     "資安類請求多數被透明改路由到 Opus 4.8、生物與前沿 LLM 開發類改由 Opus 5 完成；安全團隊拿到的結果與一般工作不一致。",
-    "產出偏長：AA 評測共產生 260M output tokens（中位數 88M），務必以「每任務成本」比較。",
+    "產出偏長：AA 評測共產生 260M output tokens（中位數 81M），務必以「每任務成本」比較。",
     "Bedrock 上不支援 structured outputs，也沒有 Priority/Flex/Batch/Reserved 服務層；Fast mode 只在 Claude API。",
     "沒有台灣境內處理選項：Bedrock 台北（ap-east-2）只有 Global CRIS；最接近的是 JP geo（東京/大阪）。",
     "System card 指出最多 36% 的稽核對話中模型察覺自己正在受測（evaluation awareness），評測結果需保守解讀。"
@@ -370,7 +370,10 @@
     "金融業：依金管會 2026-05 對代理 AI 的方向，Opus 5 → 5.5（含預設 effort 變更）屬模型升版，應納入變更管理並保存回歸證據。",
     "資安團隊（SOC、紅隊）用途會被改路由到 Opus 4.8；如需完整能力要申請 Cyber Verification Program，或評估其他模型。",
     "繁中：官方未公布繁中基準；以內部 golden set 檢查簡體字混入、兩岸用語與台灣法規知識，並量測每千字 token 數。",
-    "成本：牌價下降，但 AA 評測 output tokens 偏多（260M）；以你們的代表任務量測每任務成本再決定預設 effort。"
+    "成本：牌價下降，但 AA 評測 output tokens 偏多（260M）；以你們的代表任務量測每任務成本再決定預設 effort。",
+    "2026-09-28 推出的 Claude Sonnet 5.5 在 Bedrock 沒有 jp. profile；需要日本境內處理的 Claude 工作負載仍以 Opus 5.5 jp.* 為主。",
+    "Foundry US Data Zone 的預算以 1.1 倍估（Anthropic 定價頁；Microsoft 頁面未提，請以帳單確認）。",
+    "LiteLLM：建議版本改為 v1.104.0（2026-10-03；內建 cost map 含 Opus 5.5 的四條通路，先過 staging）。經 Agent Platform 路由時，Claude Code 的 per-message effort 會回 400 後由 Claude Code 重試、實際不生效（LiteLLM issue #43557，開啟中）。"
   ],
   "testPlanFocus": [
     "Effort sweep（low / medium / high / xhigh）× 品質（golden set）× TTFAT / TTLT。",
@@ -491,11 +494,12 @@
     "support": "Slack #llm-platform；每週四 14:00 office hour（範例，請改成你們的窗口）"
   },
   "openQuestions": [
-    "Bedrock 上的 Opus 5.5 是否支援 PDF（document block）與批次推論？模型卡未列。",
-    "Foundry US Data Zone 的官方價格與 cache 價格？",
-    "Agent Platform 上的退役日與 ZDR 條件？",
+    "Bedrock 上的 Opus 5.5 是否支援 PDF（document block）？模型卡（2026-10-06 複查）輸入只列 Text / Image、Batch 不支援，需實測。",
+    "Foundry US Data Zone：Anthropic 定價頁載明套用 1.1 倍（Global Standard 為標準價），Microsoft 的公告與計費頁沒有提到——實際帳單是否如此？",
+    "Agent Platform 上的退役日與 ZDR 條件？（定價已於官方定價頁確認）",
     "Safeguard fallback 在三雲是否同樣發生？response.model 如何標示？",
-    "Preserved thinking 是否適用於 CSP 帳號（官方說明針對 API 帳號）？"
+    "Preserved thinking 是否適用於 CSP 帳號（官方說明針對 API 帳號）？",
+    "Bedrock 價格：模型卡與 pricing 頁（2026-10-06）仍讀不到 Opus 5.5 的列，$4 / $20（global）與 $4.40 / $22（geo）來自第三方實測，與 LiteLLM 內建 cost map 的列一致——請在 Bedrock console 或帳單確認。"
   ],
   "sources": [
     {
@@ -530,6 +534,27 @@
     },
     {
       "id": "fsc-agentic-ai"
+    },
+    {
+      "id": "ms-techcommunity-opus55-foundry"
+    },
+    {
+      "id": "google-agentplatform-pricing"
+    },
+    {
+      "id": "anthropic-pricing"
+    },
+    {
+      "id": "ms-foundry-model-catalog"
+    },
+    {
+      "id": "litellm-v1-104-0"
+    },
+    {
+      "id": "litellm-issue-43557"
+    },
+    {
+      "id": "aws-bedrock-pricing"
     }
   ]
 }

@@ -30,7 +30,15 @@ tools/
   validate.mjs             Node/ajv：schema 檢查（給前端 CI）
   mock_gateway.py          不花 token 的模擬 gateway
   selftest.py              端到端自測（mock → compat → perf → inventory → schema）
+  build_site.mjs           組出 dist/：site/ + data/ + runs/ + config/，並產生 data/manifest.json
+runs/compat, runs/perf    測試結果（UI「測試結果」頁讀取，由 manifest 列出）
+site/                     已 build 好的 portal UI（2026-10-06 portal-dist；只有編譯後的 JS）
+web/                      舊版 React 原型原始碼（Amplify 已不再使用）
+amplify.yml               Amplify：validate_data.py → build_site.mjs → 發布 dist/
 ```
+
+網站：AWS Amplify 連到這個 repo，push 到 `main` 就會重新發布。只改 `data/` 或 `runs/` 不需要重新 build JS——
+UI 從 `data/manifest.json` 找週報、模型與測試結果。本機預覽：`node tools/build_site.mjs && python3 -m http.server -d dist`。
 
 ## 快速開始
 

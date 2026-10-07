@@ -3,8 +3,8 @@
   "modelId": "gpt-6-sol",
   "title": "GPT-6 Sol 技術深度解析",
   "locale": "zh-TW",
-  "asOf": "2026-09-24",
-  "tldr": "GPT-6 Sol 是 GPT-5.6 Sol 的直接升級：價格減半（$2/$10）、錯誤減半（OpenAI 自述）、AA 48 分，Azure 與 Bedrock 同日 GA。最大的相容性陷阱是 Chat Completions 的工具呼叫只在 reasoning_effort=none 時可用。Bedrock 官方模型卡尚未發布，先留在 beta。",
+  "asOf": "2026-10-06",
+  "tldr": "GPT-6 Sol 是 GPT-5.6 Sol 的直接升級：價格減半（$2/$10）、錯誤減半（OpenAI 自述）、AA 48 分，Azure 與 Bedrock 同日 GA。最大的相容性陷阱是 Chat Completions 的工具呼叫只在 reasoning_effort=none 時可用。Bedrock 官方模型卡已發布（價格與社群資料一致、台北區可用 Global CRIS、runtime 的 structured outputs 只支援 non-streaming、EOL 不早於 2027-09-22）；LiteLLM 的 Bedrock temperature 問題仍需 additional_drop_params。",
   "whatsNew": [
     {
       "title": "Astra 的方法下放",
@@ -51,6 +51,15 @@
         },
         {
           "id": "litellm-sol-luna"
+        }
+      ]
+    },
+    {
+      "title": "Bedrock 官方模型卡發布",
+      "detail": "Global $2 / $10（cache write $2.50、read $0.20）；US Geo 與 mantle In-Region +10%；>272K 輸入整個請求改長文價 $4 / $15；output token 以 10 倍計入配額；只有 Standard 層。",
+      "sources": [
+        {
+          "id": "aws-bedrock-sol-card"
         }
       ]
     }
@@ -120,6 +129,17 @@
           "id": "openai-latest-model-guide"
         }
       ]
+    },
+    {
+      "title": "Bedrock 的 structured outputs 需要 strict 設定",
+      "detail": "模型卡（2026-10-02，直接下載）把 structured outputs（JSON Schema）列為 bedrock-runtime 支援：只適用 non-streaming 呼叫；Chat Completions 用 response_format.json_schema、Responses 用 text.format、Converse 用 outputConfig.textFormat，而且 Converse 必須另外設 additionalModelRequestFields.text.format.strict = true。09-28 的資料記為不支援（當時經轉述工具讀取，無法判斷是頁面改了還是讀錯）。",
+      "migration": "Converse 呼叫補上 strict 設定並用 compat suite 驗證；需要串流又要 JSON schema 的應用改走 Azure 路由，或在應用端驗證輸出。",
+      "severity": "low",
+      "sources": [
+        {
+          "id": "aws-bedrock-sol-card"
+        }
+      ]
     }
   ],
   "availabilityMatrix": [
@@ -133,7 +153,7 @@
       "cloud": "aws",
       "service": "bedrock",
       "status": "ga",
-      "notes": "官方模型卡待發布；profile：us.* / global.*。"
+      "notes": "官方模型卡已發布：profile us.* / global.*；APAC（含台北 ap-east-2）只有 Global CRIS；mantle 只在 us-east-1；runtime 支援 Invoke、四個 API 都可套 Guardrails（模型卡 2026-10-06）；EOL 不早於 2027-09-22。"
     },
     {
       "cloud": "gcp",
@@ -161,29 +181,35 @@
       "note": "僅 effort=none"
     },
     {
-      "route": "gpt-6-sol@bedrock",
-      "surface": "Converse",
+      "route": "gpt-6-sol@bedrock（bedrock-runtime /openai/v1）",
+      "surface": "Responses / Chat Completions / Converse / Invoke",
       "status": "supported",
-      "note": "社群使用紀錄"
+      "note": "官方模型卡（2026-10-06）；Messages 不支援，Invoke 自這一版模型卡起支援"
+    },
+    {
+      "route": "gpt-6-sol@bedrock（bedrock-mantle, us-east-1）",
+      "surface": "Responses / Chat Completions",
+      "status": "supported",
+      "note": "僅 us-east-1 in-region"
     },
     {
       "route": "gpt-6-sol@bedrock",
-      "surface": "OpenAI 相容（runtime / mantle）",
-      "status": "unknown",
-      "note": "待官方模型卡"
+      "surface": "Structured outputs",
+      "status": "supported",
+      "note": "bedrock-runtime JSON Schema（non-streaming；Responses、Chat Completions、InvokeModel、Converse；Converse 需 strict 設定）；模型卡 2026-10-06"
     }
   ],
   "strengths": [
-    "AA Intelligence Index v4.3.2 48 分（max，#18/210），每任務成本 $1.06。",
+    "AA Intelligence Index v4.3.2 48 分（max，#25 / 225），每任務成本 $1.04。",
     "價格減半：$2 / $10、cached input $0.20；Azure 另有 Provisioned 與 Priority Processing。",
     "支援 effort none～max：none 時可用 temperature，也能在 Chat Completions 使用工具。",
-    "113 tok/s（AA），輸出相對精簡（77M tokens）。",
+    "110 tok/s（AA，2026-10-06 讀取），輸出相對精簡（77M tokens）。",
     "1.05M context、128K output。"
   ],
   "weaknesses": [
-    "max effort 首 token 延遲高（AA 142.7 秒）——互動場景請用 low/medium。",
+    "max effort 首 token 延遲高（AA 約 110 秒，2026-10-06 讀取）——互動場景請用 low/medium。",
     "Chat Completions + tools 需 effort=none；要 reasoning + tools 必須改 Responses API。",
-    "Bedrock 模型卡在發布日尚未上線，Bedrock 價格與區域目前只有社群資料。",
+    "Bedrock：structured outputs 只支援 non-streaming（Converse 需 strict 設定）、只有 Standard 層；output token 以 10 倍計入配額；APAC 只有 Global CRIS。",
     "不支援 fine-tuning；長文（>272K）$4/$15。"
   ],
   "bestFor": [
@@ -218,13 +244,23 @@
   "enterpriseNotes": [
     "最適合做 tier/general 的預設候選：價格、速度與能力平衡。",
     "Azure Priority Processing 只在 Global 與 US Data Zone；APAC 仍是 Global。",
-    "Bedrock 官方模型卡發布前，價格與 API 面以社群資料為準——維持 beta。"
+    "Bedrock：台北區（ap-east-2）可直接呼叫 global.openai.gpt-6-sol；APAC 沒有 geo 選項，資料可能在任何區域處理。",
+    "Bedrock 容量規劃：output token 以 10 倍計入 TPM。",
+    "GPT-6.1 Sol 已於 2026-09-29 推出（同價、AA 52 分、但沒有 effort=none）；依賴 effort=none 的應用暫時留在 GPT-6 Sol。",
+    "OpenAI 2026-09-25 修正 GPT-6 Sol / Luna 的影像編碼 bug（先前會降低影像理解品質）：在這之前做的影像輸入評測請重跑。公告範圍是 OpenAI API 與 Codex，Bedrock / Foundry 是否受影響未載明。",
+    "Bedrock 模型卡（2026-10-06）放寬了三件事：runtime 新增 Invoke；Guardrails 由只有 Converse 擴大到 Responses、Chat Completions、InvokeModel、Converse；prompt caching 的 implicit 在這四個 API 都支援，explicit 不支援 Converse（要設 prompt_cache_options.mode = explicit）。structured outputs 仍只有 non-streaming。",
+    "LiteLLM issue #42725（開啟中）另回報 Bedrock Converse 路徑會丟掉 GPT-6 Sol / Luna 的 tools；留言稱 main 已恢復，但哪個版本開始包含沒有載明——Bedrock 路由上線前用 compat suite 斷言確實有 tool call。",
+    "LiteLLM issue #44500（2026-10-04，開啟中）：經 /v1/chat/completions 呼叫、被橋接到 Responses API 的大型 non-streaming 請求（訊息文字達 256 KiB）會重複寫入 spend log，預算被扣兩次；影響 v1.102.0 以後（含 1.104.0）。暫時設 MAX_BASE64_LENGTH_FOR_LOGGING=0，並以 CSP 帳單對帳。",
+    "LiteLLM v1.105.0（目前只有 rc.1）會把 Bedrock 上的 GPT-5.6 / GPT-6 / GPT-6.1 預設路徑由 Converse 改成原生 Chat Completions；明寫 bedrock/converse/ 的 deployment 不受影響。升級前在 staging 重跑 compat suite。"
   ],
   "testPlanFocus": [
     "Chat Completions + tools（effort=none）與 Responses + tools（effort=medium）兩種路徑的回歸。",
     "effort none / low / medium 的品質與 TTFAT。",
     "與 GPT-5.6 Sol 的 pairwise 評測與每任務成本。",
-    "Bedrock 路徑的 temperature 丟棄與 profile ID。"
+    "Bedrock 路徑的 temperature 丟棄與 profile ID。",
+    "Bedrock 路徑的 structured outputs（模型卡現列為支援：non-streaming、Converse 需 strict 設定）與 10× output 配額下的最大併發。",
+    "影像輸入 golden set 重跑（OpenAI 09-25 修正影像編碼 bug 之後），含 computer use。",
+    "Bedrock Converse 路徑的工具呼叫：斷言回應裡確實有 tool call（LiteLLM issue #42725 回報 tools 被丟棄）。"
   ],
   "onboarding": {
     "audience": "一般應用開發團隊",
@@ -235,7 +271,7 @@
     "steps": [
       {
         "title": "選路由",
-        "detail": "預設 gpt-6-sol（Azure Global Standard）；需要穩定延遲用 gpt-6-sol@azure-priority；AWS 專案用 gpt-6-sol@bedrock（beta）。"
+        "detail": "預設 gpt-6-sol（Azure Global Standard）；需要穩定延遲用 gpt-6-sol@azure-priority；AWS 專案用 gpt-6-sol@bedrock（global，台北區可呼叫）。"
       },
       {
         "title": "選 API",
@@ -259,7 +295,7 @@
       {
         "alias": "gpt-6-sol@bedrock",
         "target": "bedrock/converse/global.openai.gpt-6-sol",
-        "note": "beta"
+        "note": "官方模型卡已發布；平台是否開放依發布關卡決定"
       },
       {
         "alias": "tier/general",
@@ -297,8 +333,10 @@
     "support": "Slack #llm-platform；每週四 14:00 office hour（範例，請改成你們的窗口）"
   },
   "openQuestions": [
-    "Bedrock 官方模型卡（端點、區域、EOL no sooner than）何時發布？",
-    "Azure 退役日？"
+    "Azure 退役日？（官方表 2026-10-02 查仍未列入；模型目錄中繼資料 inferenceDeprecationDate 為 2028-03-11，意義沒有文件說明）",
+    "LiteLLM 何時合併 Bedrock temperature 修正（PR #42726）？（2026-10-05 仍未合併；v1.104.0 不含）",
+    "Bedrock 上 GPT-6 Sol 的 ZDR 與資料保留條件是否與 AWS 公告（被標記流量最多 30 天）一致？",
+    "GPT-6.1 Sol 推出後，GPT-6 Sol 何時會被標為 deprecated？（2026-10-02：Bedrock 模型卡仍為 Active；OpenAI 10-01 的棄用公告把 gpt-6-sol 列為 gpt-5.1 與 gpt-5.3-codex 的建議替代。2026-10-05：OpenAI pricing 頁沒有 gpt-6-sol 的列（只有 gpt-6.1-sol），All models 頁仍列出）"
   ],
   "sources": [
     {
@@ -324,6 +362,30 @@
     },
     {
       "id": "aws-sol-luna-blog"
+    },
+    {
+      "id": "aws-bedrock-sol-card"
+    },
+    {
+      "id": "litellm-issue-42725"
+    },
+    {
+      "id": "openai-changelog"
+    },
+    {
+      "id": "openai-deprecations"
+    },
+    {
+      "id": "ms-foundry-model-catalog"
+    },
+    {
+      "id": "openai-pricing"
+    },
+    {
+      "id": "litellm-issue-44500"
+    },
+    {
+      "id": "litellm-v1-105-0-rc1"
     }
   ]
 }

@@ -1,0 +1,733 @@
+{
+  "schema": "digest/v1",
+  "id": "2026-10-02",
+  "locale": "zh-TW",
+  "periodStart": "2026-10-01",
+  "periodEnd": "2026-10-02",
+  "generatedAt": "2026-10-02T17:15:00Z",
+  "headline": "Gemini 4 Argon 已於 09-30 發表，但還不能用：目前只開放給 Fairwind Program 的受信任資安防禦團隊，Gemini API 與 Agent Platform 都沒有 model ID、價格列或上線日，三雲都無法上架（上期漏列，本期補登）。Agent Platform 的官方頁面這次可以直接讀取：gemini-2.5-pro / flash / flash-lite 的 Retirement date 是 2026-10-20——先前「只封鎖閒置專案、2027 才停止」的說法只見於社群轉述，官方頁面沒有，請以 10-20 規劃。Foundry 把 Claude Sonnet 4.5 的退役日由 11-15 改為 11-30，與 Anthropic 一致。OpenAI 10-01 宣布 gpt-5.1 / gpt-5.3-codex / gpt-5.4-nano（2027-04-01）與 TTS 模型（2027-01-06）棄用。LiteLLM 建議版本維持 v1.103.2：patch notes 已讀到，09-29 的四線同步 patch 是 session token 格式變更而不是安全修正；另新增一則 medium 公告 CVE-2026-84377，只影響 1.96.1 以前的版本。",
+  "newModels": [
+    {
+      "title": "Gemini 4 Argon：已發表，僅限 Fairwind Program（補登）",
+      "date": "2026-09-30",
+      "vendor": "google",
+      "clouds": [
+        "gcp",
+        "vendor-direct"
+      ],
+      "detail": "Google 09-30 發表新旗艦 Gemini 4 Argon。目前只有「一部分」Fairwind Program 夥伴可用——對象是政府與國家資安機關、關鍵基礎設施營運者（醫療、電信、能源、金融）與核心技術平台，需填表申請並通過審查。官方稱會「盡快」開放給開發者與企業，先從付費 API 客戶與 Google AI Ultra 開始，沒有日期。Gemini API 的 models / changelog / pricing / deprecations 頁與 Agent Platform 的 release notes、模型版本頁、定價頁（皆 10-01 更新，10-02 兩次複查）都沒有 Argon；AWS、Azure 也沒有。公告規格：output 上限 1M tokens（原 64K）；context window 與 model ID 未公布。獨立評測：Artificial Analysis v4.3.2 為 53 分（以 High effort 評測，#8；Claude Opus 5.5 58、Sonnet 5.5 56、GPT-6 Astra 53、GPT-6.1 Sol 52 為 max effort）、Vals Index 68.9%（41 個模型中第 1）；其餘為 Google 自報，且 Google 自己的表也顯示 Argon 在 Terminal-bench 4.0、FrontierSWE v2、OSWorld-2.0 等項目不是第一。已列入 watchlist；沒有 model ID 之前無法建立 catalog 條目或路由。",
+      "impact": "high",
+      "sources": [
+        {
+          "id": "google-gemini4-argon-blog"
+        },
+        {
+          "id": "deepmind-fairwind-program"
+        },
+        {
+          "id": "google-fairwind-program"
+        },
+        {
+          "id": "google-gemini-api-models"
+        },
+        {
+          "id": "google-agentplatform-release-notes"
+        },
+        {
+          "id": "aa-gemini4-argon"
+        },
+        {
+          "id": "vals-gemini4-argon"
+        }
+      ]
+    },
+    {
+      "title": "Agent Platform：Grok 4.7（Preview）、Gemini 3.8 Flash TTS（Preview）",
+      "date": "2026-09-30",
+      "clouds": [
+        "gcp"
+      ],
+      "detail": "官方 release notes：09-30 xAI Grok 4.7 在 Model Garden 為 Preview；09-28 Gemini 3.8 Flash TTS / Flash-Lite TTS 在 global endpoint 為 Preview（Gemini API 已於 09-22 GA）。先前只見於鏡像站的項目也由官方頁面確認：09-28 Claude Sonnet 5.5 上 Model Garden、09-24 Gemini 3.8 Live GA 與 Muse Spark 1.3 Preview、09-18 Grok 4.6 GA。",
+      "impact": "low",
+      "sources": [
+        {
+          "id": "google-agentplatform-release-notes"
+        }
+      ]
+    },
+    {
+      "title": "Foundry：MAI 語音模型",
+      "date": "2026-10-01",
+      "vendor": "microsoft",
+      "clouds": [
+        "azure"
+      ],
+      "detail": "Microsoft 10-01 發表 MAI-Transcribe-2-Streaming（60 種語言，introductory $0.54 / 小時至年底）、MAI-Voice-2.1（$22 / 百萬字元，23 種語言）、MAI-Voice-2.1-Flash（$15 / 百萬字元），透過 Azure Speech 與 Foundry 的 API 提供；GA / preview 狀態與區域未載明。語音模型，不在文字 gateway 的範圍。",
+      "impact": "low",
+      "sources": [
+        {
+          "id": "ms-techcommunity-mai-voice"
+        }
+      ]
+    },
+    {
+      "title": "OpenAI：影像編碼 bug 修正、GPT-6.1 Sol Multi-agent（beta）、Astra Ultrafast",
+      "date": "2026-09-29",
+      "vendor": "openai",
+      "clouds": [
+        "vendor-direct"
+      ],
+      "detail": "OpenAI changelog（上期未讀）：09-25 修正 GPT-6 Sol / Luna 的影像編碼 bug（先前會降低影像理解），並建議重跑影像輸入的評測；09-29 GPT-6.1 Sol 在 Responses API 支援 Multi-agent（beta）；GPT-6 Astra Ultrafast 是 Responses API 的 service_tier: \"ultrafast\"（global processing、US data residency，不支援 EU 等區域駐留）。Bedrock / Foundry 是否同樣受影響或提供，頁面未載明。GPT-6 Luna 的 knowledge cutoff 為 2026-05-18。",
+      "impact": "medium",
+      "sources": [
+        {
+          "id": "openai-changelog"
+        },
+        {
+          "id": "openai-models"
+        }
+      ]
+    },
+    {
+      "title": "既有模型的補充與更正",
+      "clouds": [
+        "aws",
+        "azure"
+      ],
+      "detail": "Claude Sonnet 5.5：Bedrock 模型卡確認 runtime 支援 Messages / Converse / Invoke 與 prompt caching、effort 含 xhigh、APAC 13 個區域（含台北）都只有 Global CRIS，仍未列價格。GPT-6.1 Sol：Bedrock runtime 支援 Responses / Chat Completions / Converse / Invoke、output token 以 10 倍計入配額、explicit prompt caching 列為 Not Supported（與 What's New 仍矛盾）；Foundry 的 APAC Data Zone = australiaeast、japaneast、koreacentral、southeastasia、southindia，沒有台灣。GPT-6 Astra / Sol / Luna：Bedrock 模型卡現在把 structured outputs（JSON Schema，僅 non-streaming）列為 bedrock-runtime 支援——先前 Astra 與 Sol 記為不支援；Astra 的 bedrock-mantle 現在有 us-east-1 與 us-west-2 兩區。更正上期：(1)「Foundry 首次有 APAC Data Zone」不正確——GPT-5.x 已經有，GPT-6.1 Sol 只是 GPT-6 家族的第一個；(2) DeepSeek-V4.1-Flash 的 $0.3 / $1.2 是 Direct from Azure（preview）的價格，Fireworks（GA）是 $0.37 / $1.50。",
+      "impact": "medium",
+      "sources": [
+        {
+          "id": "aws-bedrock-sonnet55-card"
+        },
+        {
+          "id": "aws-bedrock-gpt61-sol-card"
+        },
+        {
+          "id": "aws-bedrock-astra-card"
+        },
+        {
+          "id": "aws-bedrock-sol-card"
+        },
+        {
+          "id": "aws-bedrock-luna-card"
+        },
+        {
+          "id": "ms-foundry-region-availability"
+        },
+        {
+          "id": "ms-azure-regions-list"
+        },
+        {
+          "id": "ms-techcommunity-deepseek-v41"
+        }
+      ]
+    },
+    {
+      "title": "追蹤中、無變動",
+      "detail": "Claude Haiku 5.5、GPT-6 Cyber、GPT-6.1 Sol Ultrafast、Gemini 3.5 Pro 都還沒發布（Anthropic release notes 最新 09-30、OpenAI changelog 最新 09-29、Gemini API changelog 最新 09-22）。AWS What's New 在 10-01～10-02 沒有新的 Bedrock 項目；Bedrock 仍沒有 Gemini（只有 Gemma）。",
+      "impact": "low",
+      "sources": [
+        {
+          "id": "anthropic-release-notes"
+        },
+        {
+          "id": "openai-changelog"
+        },
+        {
+          "id": "google-gemini-api-changelog"
+        },
+        {
+          "id": "aws-whats-new-feed"
+        }
+      ]
+    }
+  ],
+  "lifecycleChanges": [
+    {
+      "title": "Agent Platform：Gemini 2.5 的官方 Retirement date 是 2026-10-20",
+      "date": "2026-10-20",
+      "vendor": "google",
+      "clouds": [
+        "gcp"
+      ],
+      "detail": "官方模型版本頁（10-01 更新）：gemini-2.5-pro、gemini-2.5-flash、gemini-2.5-flash-lite 的 Retirement date 都是 October 20, 2026，建議替代為 gemini-3.8-flash、gemini-3.5-flash、gemini-3.5-flash-lite、gemini-3.1-flash-lite 或 Gemma 4；頁面聲明時程可延後但不會提前。先前資料依社群轉述的 Google 09-15 客戶通知，把 10-20 記為「只封鎖新專案與閒置專案，使用中的專案到 2027-01～03 才停止」——官方模型版本頁與 release notes 都沒有這段文字。已把三個模型的事件改為 2026-10-20 退役（official），2027 的日期降為備註。請當作 10-20 停止服務來規劃，並在 GCP 帳號通知核對。留意：建議替代之一的 gemini-3.8-flash 屬於「短期提供」類，沒有 12 個月保證，退役只保證 45 天通知。",
+      "impact": "high",
+      "sources": [
+        {
+          "id": "google-agentplatform-model-versions"
+        },
+        {
+          "id": "gcp-gemini25-notice-4509"
+        }
+      ]
+    },
+    {
+      "title": "Foundry：Claude Sonnet 4.5 改為 2026-11-30；Haiku 4.5 事件日期更正為 11-15",
+      "date": "2026-11-30",
+      "vendor": "anthropic",
+      "clouds": [
+        "azure"
+      ],
+      "detail": "Foundry 退役表（HTTP Last-Modified 10-01 22:13 UTC）：claude-sonnet-4-5 由 2026-11-15 改為 2026-11-30，並列出替代 claude-sonnet-5-5，與 Anthropic 一致。頁面顯示的更新日期仍是 09-21——日期沒動但內容變了。Haiku 4.5（11-15）與 Opus 4.5（11-24）的列不變。更正：Foundry Haiku 4.5 的事件先前以 10-15 倒數，但那是 Anthropic 的「不早於 10-15」（模型仍為 Active，是下限不是退役日）；事件日期改回 Foundry 表列的 11-15。Anthropic 承諾退役前至少 60 天通知，而 Haiku 4.5 與 Opus 4.5 都還沒公告——Foundry 表列的 11-15 / 11-24 之後可能比照 Sonnet 4.5 改期（推論），但仍請以表列日期規劃。",
+      "impact": "medium",
+      "sources": [
+        {
+          "id": "ms-foundry-retirement-schedule"
+        },
+        {
+          "id": "anthropic-deprecations"
+        }
+      ]
+    },
+    {
+      "title": "OpenAI API：gpt-5.1 家族與 TTS 模型棄用",
+      "date": "2026-10-01",
+      "vendor": "openai",
+      "clouds": [
+        "vendor-direct"
+      ],
+      "detail": "10-01 公告：gpt-5.3-codex、gpt-5.1 → gpt-6-sol，gpt-5.4-nano → gpt-6-luna，2027-04-01 關閉（六個月通知）；tts-1、tts-1-hd、gpt-4o-mini-tts（兩個 snapshot）→ gpt-realtime-2.1-mini，2027-01-06 關閉。只影響 OpenAI 一方 API；Azure 上的同名模型依 Foundry 退役表另計。",
+      "impact": "medium",
+      "sources": [
+        {
+          "id": "openai-deprecations"
+        }
+      ]
+    },
+    {
+      "title": "新收錄的退役（官方頁面先前未讀到）",
+      "clouds": [
+        "gcp",
+        "azure",
+        "vendor-direct"
+      ],
+      "detail": "Agent Platform：16 個開源模型 MaaS 端點於 2026-10-21 退役（release note 07-21；含 deepseek-v3.1 / v3.2、llama-3.3-70b、qwen3 系列、gpt-oss-20b 等）；text-embedding-004 / 005、text-multilingual-embedding-002、multimodalembedding@001 於 2027-04-01 退役（換 embedding 模型要重建向量索引）。Gemini API：antigravity-preview-05-2026 於 10-05、veo-3.1 三個 preview 於 10-22 關閉。Foundry：Cohere-parse-v5（Preview）2026-12-15、Kimi-K2.5（Preview）2027-01-26。另把 Gemini 2.5 的三個替代模型在 Agent Platform 的「最低可用日」加入行事曆：gemini-3.1-flash-lite 2027-05-07、gemini-3.5-flash 2027-05-19、gemini-3.5-flash-lite 2027-07-21。",
+      "impact": "medium",
+      "sources": [
+        {
+          "id": "google-agentplatform-release-notes"
+        },
+        {
+          "id": "google-agentplatform-model-versions"
+        },
+        {
+          "id": "google-gemini-api-deprecations"
+        },
+        {
+          "id": "ms-foundry-retirement-schedule"
+        }
+      ]
+    },
+    {
+      "title": "gemini-2.5-flash-image（Gemini API）今天到期",
+      "date": "2026-10-02",
+      "vendor": "google",
+      "clouds": [
+        "vendor-direct",
+        "gcp"
+      ],
+      "detail": "Gemini API 棄用頁仍列 2026-10-02 關閉；頁面沒有說明是否已實際關閉。表列替代 gemini-3.1-flash-image-preview 自己的關閉日已過，定價頁改為建議 gemini-3.1-flash-image 或 gemini-3.1-flash-lite-image。Agent Platform 的同名模型為 2027-03-15，現在由官方 release note（09-14）與模型版本頁確認。",
+      "impact": "medium",
+      "sources": [
+        {
+          "id": "google-gemini-api-deprecations"
+        },
+        {
+          "id": "google-gemini-api-pricing"
+        },
+        {
+          "id": "google-agentplatform-release-notes"
+        }
+      ]
+    },
+    {
+      "title": "複查無變動",
+      "clouds": [
+        "aws",
+        "azure",
+        "vendor-direct"
+      ],
+      "detail": "Bedrock Legacy 表的 10 個事件全部相同（Opus 4.1 於 10-08 進入 extended access、Sonnet 4 於 10-14 EOL；本期改為直接下載模型卡與生命週期頁的 markdown 版核對）；Foundry 其餘 30 個事件相同；Anthropic 的 Haiku 4.5（不早於 10-15）、Opus 4.5（不早於 11-24）不變。Foundry 退役表仍未列入 GPT-6 家族與 Claude 5.5；模型目錄的中繼資料有 inferenceDeprecationDate（GPT-6 Sol / Luna / 6.1 Sol 2028-03-11、Astra 2028-01-11、Opus 5.5 2027-09-18、Sonnet 5.5 2027-09-29），但這個欄位的意義沒有文件說明。Bedrock 生命週期頁的措辭補充：EOL 後呼叫失敗「除非與供應商另有私下約定」；GPT-6.1 Sol 的 6 個月通知有安全 / 合規例外。",
+      "impact": "low",
+      "sources": [
+        {
+          "id": "aws-bedrock-lifecycle-legacy"
+        },
+        {
+          "id": "aws-bedrock-lifecycle"
+        },
+        {
+          "id": "ms-foundry-retirement-schedule"
+        },
+        {
+          "id": "ms-foundry-model-catalog"
+        },
+        {
+          "id": "anthropic-deprecations"
+        }
+      ]
+    }
+  ],
+  "pricingChanges": [
+    {
+      "title": "Gemini 4 Argon 公告價（尚不可購買）",
+      "date": "2026-09-30",
+      "vendor": "google",
+      "clouds": [
+        "gcp",
+        "vendor-direct"
+      ],
+      "detail": "introductory $2 / $10 per 1M tokens，期滿後 $4 / $20（期限未公布）；cached input 為 input 價的 95% off。Gemini API 與 Agent Platform 的定價頁都還沒有 Argon 的列。對照現有牌價：Claude Sonnet 5.5 與 GPT-6.1 Sol $2 / $10、Claude Opus 5.5 $4 / $20、GPT-6 Astra $10 / $50。",
+      "impact": "medium",
+      "sources": [
+        {
+          "id": "google-gemini4-argon-blog"
+        },
+        {
+          "id": "google-gemini-api-pricing"
+        },
+        {
+          "id": "google-agentplatform-pricing"
+        }
+      ]
+    },
+    {
+      "title": "Bedrock：GPT-6 Astra Ultrafast 的價格是 Standard 的 6 倍",
+      "date": "2026-09-30",
+      "vendor": "openai",
+      "clouds": [
+        "aws"
+      ],
+      "detail": "模型卡（10-02）：Ultrafast 以 Responses API 的 service_tier: \"ultrafast\" 請求，價格為 Standard 的 6 倍——Global CRIS $60 / $300（cache read $6、30 分鐘寫入 $75；>272K 長文 $120 / $450），US Geo 與 mantle（us-east-1）$66 / $330。上期記為「價格未公布」。任何能把 service_tier 送到這條路由的 client 都可能讓成本變 6 倍：在 gateway 決定是否允許這個參數。",
+      "impact": "medium",
+      "sources": [
+        {
+          "id": "aws-bedrock-astra-card"
+        },
+        {
+          "id": "aws-astra-ultrafast"
+        }
+      ]
+    },
+    {
+      "title": "Claude on Foundry：US Data Zone 套用 1.1 倍",
+      "vendor": "anthropic",
+      "clouds": [
+        "azure"
+      ],
+      "detail": "Anthropic 定價頁：Foundry 的 US Data Zone Standard 部署套用 1.1 倍（Claude 4.6 以後的模型；Global Standard 為標準價），並依 Claude API 的 per-model 費率計價（Sonnet 5.5 cache hit $0.20、5 分鐘寫入 $2.50、1 小時寫入 $4）。Microsoft 的公告與計費頁沒有提到加價，上期記為「未說明」。預算請以 1.1 倍估，並以帳單確認。",
+      "impact": "medium",
+      "sources": [
+        {
+          "id": "anthropic-pricing"
+        },
+        {
+          "id": "ms-foundry-claude-models"
+        }
+      ]
+    },
+    {
+      "title": "Claude Sonnet 5.5 在 Agent Platform 的價格由官方確認",
+      "date": "2026-09-28",
+      "vendor": "anthropic",
+      "clouds": [
+        "gcp"
+      ],
+      "detail": "global $2 / $10（cache hit $0.20、寫入 $2.50 / $4.00、Batch 五折）；US / EU multi-region $2.20 / $11。數值與先前推定相同，驗證等級由 derived 改為 official。Bedrock 的價格仍未公布。",
+      "impact": "low",
+      "sources": [
+        {
+          "id": "google-agentplatform-pricing"
+        }
+      ]
+    },
+    {
+      "title": "Gemini 3.8 Flash：促銷價以 credits back 提供",
+      "vendor": "google",
+      "clouds": [
+        "gcp"
+      ],
+      "detail": "Agent Platform 定價頁：$0.75 / $3.75 的 introductory pricing 到 2026-12-31，註記為以「淨支出 50% credits back」方式提供；2027-01-01 起 $1.50 / $7.50。Gemini 3.7 / 3.6 Flash 同一時程；另列 Priority（$1.35 / $6.75）與 Flex / Batch（$0.375 / $1.875）。帳單上可能先以標準價計費再回饋 credits——FinOps 對帳時留意，細節請向 Google 帳務確認。",
+      "impact": "low",
+      "sources": [
+        {
+          "id": "google-agentplatform-pricing"
+        },
+        {
+          "id": "google-gemini-api-pricing"
+        }
+      ]
+    }
+  ],
+  "litellm": [
+    {
+      "title": "建議版本維持 v1.103.2；patch notes 已讀到",
+      "date": "2026-10-01",
+      "detail": "10-02 複查 PyPI：1.103.2 仍是 latest，v1.104.0 stable 未發布（只有 rc1 / rc2 與 1.105.0 的開發版）。1.103.1 只改 Admin UI / lite CLI 的 session token 格式；1.103.2 在其上沒有新的 migration 或 breaking change，加入 Claude Code auto mode 轉送與 CLI session 花費歸戶，並還原 1.103.0 改壞的 pass-through endpoint 處理（STORE_MODEL_IN_DB=true 時 Authorization 不轉送等）——不要停在 1.103.0 / 1.103.1。09-29 四條線同步發的 patch（1.100.4 / 1.101.3 / 1.102.2 / 1.103.1）內容都是同一個 session token 變更，notes 沒有安全修正的字樣；上期「疑似安全回移植」的猜測沒有得到支持。",
+      "impact": "medium",
+      "sources": [
+        {
+          "id": "litellm-v1-103-2"
+        },
+        {
+          "id": "litellm-v1-103-1"
+        },
+        {
+          "id": "litellm-v1-102-2"
+        },
+        {
+          "id": "litellm-v1-100-4"
+        },
+        {
+          "id": "pypi-litellm-json"
+        }
+      ]
+    },
+    {
+      "title": "升級注意：重新登入、SpendLogs 索引、guardrail",
+      "date": "2026-10-01",
+      "detail": "升級到 1.103.1 以上（或 1.100.4 / 1.101.3 / 1.102.2 以上）後，Admin UI 與 lite CLI 使用者要重新登入；rolling upgrade 期間新舊 pod 互不接受對方的 token，先完成 rollout 再通知。應用程式用的 virtual key 不受影響。自 1.102.x 以前升到 1.103.x 會在啟動時建立 LiteLLM_SpendLogs 索引並阻擋 spend log 寫入——notes 提供了 CREATE INDEX CONCURRENTLY 的語句（已寫入已知陷阱）。1.101.4（10-01）修正 Azure Content Safety guardrail 因共用 api_version 預設值而回 404、以及 Straiker v3 key 的問題；其他線是否已包含，notes 沒有載明。",
+      "impact": "medium",
+      "sources": [
+        {
+          "id": "litellm-v1-103-1"
+        },
+        {
+          "id": "litellm-v1-101-4"
+        }
+      ]
+    },
+    {
+      "title": "Gemini 4 Argon 沒有 Day-0 文章；兩個已知問題仍未見修正",
+      "detail": "LiteLLM blog 與 release notes 都沒有 Argon / Gemini 4——模型還沒有 model ID，也無從設定路由。Bedrock 上 GPT-6 的 temperature 修正（#42725 / #42726）與「未知金鑰也會寫入 spend rows」（#42689）都不在 1.103.1 / 1.103.2 的變更清單內；issue 現況無法讀取（GitHub 被擋）。",
+      "impact": "low",
+      "sources": [
+        {
+          "id": "litellm-blog"
+        },
+        {
+          "id": "litellm-release-notes"
+        },
+        {
+          "id": "litellm-v1-103-2"
+        }
+      ]
+    }
+  ],
+  "security": [
+    {
+      "title": "LiteLLM CVE-2026-84377（medium）：已驗證使用者可外洩供應商憑證",
+      "date": "2026-09-30",
+      "detail": "GHSA-3cv6-jpf6-8222，CVSS 6.5，09-30 公布：任何已驗證的 proxy 使用者可利用 request body 的路由參數，讓 proxy 把上游供應商憑證送到自己控制的位址，並對內部服務做 SSRF。受影響：1.88.6 以前，以及 1.89–1.96 各線在修正版之前的版本（修正版 1.88.6 / 1.89.7 / 1.90.7 / 1.91.5 / 1.92.2 / 1.93.2 / 1.94.3 / 1.95.1 / 1.96.2）；1.97 以後（含 v1.100–v1.103）不在清單內。支援窗口內的環境不受影響；仍在舊版的環境升級後要輪替供應商金鑰。資料來自 GitLab Advisory Database，GitHub advisories 仍無法直接讀取。",
+      "impact": "medium",
+      "sources": [
+        {
+          "id": "gitlab-cve-2026-84377"
+        }
+      ]
+    },
+    {
+      "title": "Gemini 4 Argon 的存取條件：不能掛在共用 gateway",
+      "date": "2026-09-30",
+      "vendor": "google",
+      "detail": "Google 對受信任的防禦者提供「沒有 cyber guardrails」的 Argon；一般版本上線前還在強化 misuse、prompt injection、misalignment 與 sandbox 四類防護。Fairwind 條款：只能給組織內的資安、事件應變或滲透測試團隊，需 phishing-resistant MFA 與逐人使用紀錄，不得分享、轉發或轉售存取——即使公司取得資格，也不能把它當一般模型掛在內部 gateway 上。以 Gemini Enterprise 的 managed model 存取時支援 zero data retention。最強的模型先受限發布已是常態（Claude Opus 5.5 會把資安請求改路由、GPT-6 Astra 的 Cyber 分級為 Critical）：平台的模型上架流程要能處理「有條件存取」的模型。",
+      "impact": "medium",
+      "sources": [
+        {
+          "id": "google-gemini4-argon-blog"
+        },
+        {
+          "id": "deepmind-fairwind-program"
+        },
+        {
+          "id": "google-fairwind-program"
+        }
+      ]
+    }
+  ],
+  "regulatory": [
+    {
+      "title": "美國：發布前自願讓政府取得模型的框架（EO 14409）",
+      "date": "2026-09-30",
+      "detail": "Google 在 Argon 公告中說正在參與美國政府的「自願性發布前模型存取流程」，沒有指明是哪一個。官方文件中唯一找到的對應框架是 Executive Order 14409（2026-06-02）第 3(b) 條：開發者可自願讓聯邦政府在對其他受信任夥伴發布前最多 30 天取得 covered frontier model；第 3(c) 條明定這不構成強制許可或事前審查。兩者是否為同一件事，沒有頁面證實。對平台的意義：前沿模型的上市時間可能受這類流程影響；2026-06 也發生過出口管制讓 Claude Fable 5 / Mythos 5 中斷的事（06-12 實施；律所 HSF Kramer 稱 06-30 解除）——關鍵工作負載要有不同供應商的 fallback。本期沒有讀到任何點名台灣的規定。",
+      "impact": "medium",
+      "sources": [
+        {
+          "id": "google-gemini4-argon-blog"
+        },
+        {
+          "id": "whitehouse-eo-14409"
+        },
+        {
+          "id": "hsf-frontier-ai-export"
+        },
+        {
+          "id": "anthropic-fable-mythos-access"
+        }
+      ]
+    },
+    {
+      "title": "台灣與歐盟：本期沒有新事實（涵蓋不足）",
+      "detail": "iThome 的數發部標籤頁最新一篇是 09-15，窗口內沒有新項目。金管會與 EU 的官方頁面本期沒有實際讀取，只做了搜尋——這是「未檢查」，不是「沒有變化」。iThome 08-26 的標題提到數發部預計 10 月公布機關 AI 內控範本，尚未確認是否已發布。",
+      "impact": "low",
+      "sources": [
+        {
+          "id": "ithome-moda-tag"
+        },
+        {
+          "id": "pts-moda-agentic-ai"
+        }
+      ]
+    }
+  ],
+  "actionItems": [
+    {
+      "priority": "P0",
+      "action": "Agent Platform 的 gemini-2.5-pro / flash / flash-lite：官方 Retirement date 是 10-20。盤點所有 GCP 專案（含平常沒有流量的 DR / fallback 專案），10-13 前把路由切到 gemini-3.8-flash、gemini-3.5-flash 或 gemini-3.5-flash-lite 並完成回歸；同時在 GCP 帳號通知確認是否適用「使用中的專案延到 2027」。",
+      "due": "2026-10-13",
+      "relatedModelIds": [
+        "gemini-3-8-flash"
+      ]
+    },
+    {
+      "priority": "P0",
+      "action": "Azure gpt-4.1-nano（10-14）、Bedrock Claude Sonnet 4（10-14，含台北區）完成遷移。",
+      "due": "2026-10-07"
+    },
+    {
+      "priority": "P0",
+      "action": "LiteLLM：確認沒有任何環境低於 1.96.2（CVE-2026-84377）或落在支援窗口外；所有環境升到所在線的最新 patch（1.100.4 / 1.101.4 / 1.102.2 / 1.103.2），已在 1.103.0 / 1.103.1 的直接升 1.103.2。",
+      "due": "2026-10-06"
+    },
+    {
+      "priority": "P0",
+      "action": "Gemini API（ai.google.dev）：gemini-2.5-flash-image 今天到期、antigravity-preview-05-2026 於 10-05 關閉——確認沒有路由直接使用這些 ID。",
+      "due": "2026-10-05"
+    },
+    {
+      "priority": "P1",
+      "action": "在 staging 驗證 LiteLLM v1.103.2：max_budget: 0 → null、config.yaml 與 DB 重疊的設定、CLI 改 lite、SpendLogs 索引先 CONCURRENTLY 建好、pass-through endpoints 與 guardrail 回歸；排定升級窗口，事先通知 Admin UI / lite CLI 使用者升級後要重新登入。",
+      "due": "2026-10-08"
+    },
+    {
+      "priority": "P1",
+      "action": "Bedrock Claude Opus 4.1 於 10-08 進入 public extended access（價格可能上調）：確認遷移時程。",
+      "due": "2026-10-08",
+      "relatedModelIds": [
+        "claude-opus-5-5"
+      ]
+    },
+    {
+      "priority": "P1",
+      "action": "確認有沒有使用 Agent Platform 的開源模型 MaaS 端點（10-21 退役）或 Gemini API 的 veo-3.1 preview（10-22）。",
+      "due": "2026-10-14"
+    },
+    {
+      "priority": "P1",
+      "action": "Foundry 的 Claude 4.5：Haiku 4.5（11-15）、Opus 4.5（11-24）、Sonnet 4.5（11-30，Anthropic API 同日）排定遷移；Haiku 4.5 的替代先評估 Claude Sonnet 5.5 / GPT-6 Luna / Gemini 3.8 Flash（Haiku 5.5 未發布）。",
+      "due": "2026-11-01",
+      "relatedModelIds": [
+        "claude-sonnet-5-5",
+        "gpt-6-luna",
+        "gemini-3-8-flash",
+        "claude-opus-5-5"
+      ]
+    },
+    {
+      "priority": "P1",
+      "action": "Azure o 系列（11-19）、codex-mini（11-15）遷移。",
+      "due": "2026-11-05"
+    },
+    {
+      "priority": "P1",
+      "action": "對 Claude Sonnet 5.5 與 GPT-6.1 Sol 啟動 G1–G6 評估（tier/general 候選，與 GPT-6 Sol 比較每任務成本）；有影像輸入的 GPT-6 Sol / Luna 評測要重跑（OpenAI 09-25 修正影像編碼 bug）。",
+      "relatedModelIds": [
+        "claude-sonnet-5-5",
+        "gpt-6-1-sol",
+        "gpt-6-sol",
+        "gpt-6-luna"
+      ]
+    },
+    {
+      "priority": "P1",
+      "action": "法務 / 資安評估 Foundry GPT-6.1 Sol 的 APAC Data Zone：資料可在澳洲、日本、韓國、新加坡、印度任一地處理，沒有台灣，且 Microsoft 可不經通知增加區域。",
+      "relatedModelIds": [
+        "gpt-6-1-sol"
+      ]
+    },
+    {
+      "priority": "P1",
+      "action": "FinOps：Claude on Foundry 的 US Data Zone 部署以 1.1 倍重估預算並核對帳單；Bedrock 上 GPT-6.1 Sol 的配額以 output ×10 規劃。",
+      "relatedModelIds": [
+        "claude-opus-5-5",
+        "claude-sonnet-5-5",
+        "gpt-6-1-sol"
+      ]
+    },
+    {
+      "priority": "P1",
+      "action": "Gateway：決定是否允許 client 送 service_tier: \"ultrafast\"（Bedrock 與 OpenAI 上的 GPT-6 Astra，Bedrock 為 6 倍價）；不允許就在 gateway 丟棄或拒絕這個參數，允許則設團隊預算與告警。",
+      "relatedModelIds": [
+        "gpt-6-astra"
+      ]
+    },
+    {
+      "priority": "P2",
+      "action": "Gemini 4 Argon：現在不能上架。若公司屬於關鍵基礎設施或核心技術平台、且資安團隊有需要，可由資安團隊自行向 Google 申請 Fairwind Program（僅限內部資安用途，不能掛在共用 gateway）；平台團隊等 model ID 出現在 Gemini API / Agent Platform 文件後再啟動 G1。"
+    },
+    {
+      "priority": "P2",
+      "action": "追蹤 Claude Haiku 5.5、GPT-6 Cyber、GPT-6.1 Sol Ultrafast、Gemini 3.5 Pro，以及數發部的代理 AI 安全參考指引草案與機關 AI 內控範本。"
+    }
+  ],
+  "watchlist": [
+    {
+      "name": "Gemini 4 Argon",
+      "vendor": "google",
+      "status": "limited-preview",
+      "expected": "未公布（官方：as soon as possible，先開放付費 API 客戶與 Google AI Ultra）",
+      "note": "Google 2026-09-30 發表的新旗艦。目前只有「一部分」Fairwind Program 夥伴可用：對象是政府與國家資安機關、關鍵基礎設施營運者（醫療、電信、能源、金融）與核心技術平台，需填表申請並通過背景審查；只能給內部資安、事件應變或滲透測試團隊做防禦用途，要有 phishing-resistant MFA 與使用紀錄，不得分享、轉發或轉售存取——所以即使取得資格也不能掛在共用 gateway 上。Google 稱會「盡快」開放給開發者與企業，先從付費 API 客戶與 Google AI Ultra 開始，沒有日期。Gemini API 與 Agent Platform 文件（皆 2026-10-01 更新，10-02 兩次複查）都沒有 model ID、價格列或 release note；AWS / Azure 不提供。公告價：introductory $2 / $10（期滿後 $4 / $20，期限未公布），cached input 為 input 價的 95% off；output 上限 1M tokens（原為 64K）；context window 與 model ID 未公布（Artificial Analysis 列 1M）。Artificial Analysis Intelligence Index v4.3.2 為 53 分（High，#8）；Vals Index 68.9%（第 1）；其餘 benchmark 為 Google 自報。Fairwind 頁面稱以 Gemini Enterprise 的 managed model 存取時支援 zero data retention。",
+      "sources": [
+        {
+          "id": "google-gemini4-argon-blog"
+        },
+        {
+          "id": "deepmind-fairwind-program"
+        },
+        {
+          "id": "google-fairwind-program"
+        },
+        {
+          "id": "deepmind-gemini-cyber"
+        },
+        {
+          "id": "google-gemini-api-models"
+        },
+        {
+          "id": "google-agentplatform-release-notes"
+        },
+        {
+          "id": "aa-gemini4-argon"
+        },
+        {
+          "id": "vals-gemini4-argon"
+        }
+      ]
+    },
+    {
+      "name": "Claude Haiku 5.5",
+      "vendor": "anthropic",
+      "status": "coming-soon",
+      "expected": "2026 年 10 月（官方：coming weeks）",
+      "note": "Claude Haiku 4.5 在 Anthropic 平台「不早於 2026-10-15」、Foundry 表為 2026-11-15；Haiku 5.5 可能是其替代。2026-10-02 查：仍未發布（Anthropic release notes 最新為 09-30，news、deprecations、pricing 頁都沒有 Haiku 5.5）。",
+      "sources": [
+        {
+          "id": "anthropic-opus55-announce"
+        },
+        {
+          "id": "anthropic-deprecations"
+        },
+        {
+          "id": "anthropic-models-overview"
+        },
+        {
+          "id": "anthropic-release-notes"
+        }
+      ]
+    },
+    {
+      "name": "Gemini 3.5 Pro",
+      "vendor": "google",
+      "status": "limited-preview",
+      "expected": "未公布",
+      "note": "已宣布但沒有 GA 日期與公開價格。2026-10-02 查：Gemini API 與 Agent Platform 都沒有模型頁、價格或發布條目，Gemini 3.1 Pro 仍為 preview；Google 已先發表 Gemini 4 Argon。",
+      "sources": [
+        {
+          "id": "capitalandcompute-sept"
+        },
+        {
+          "id": "innfactory-gemini"
+        },
+        {
+          "id": "google-gemini-api-models"
+        },
+        {
+          "id": "google-agentplatform-release-notes"
+        }
+      ]
+    },
+    {
+      "name": "DeepSeek-V4.1-Flash（Microsoft Foundry）",
+      "vendor": "deepseek",
+      "status": "limited-preview",
+      "expected": "未公布",
+      "note": "Microsoft 貼文（2026-09-23，09-25 修訂）：Direct from Azure 為 public preview、Fireworks on Foundry 為 GA；文字 + 影像輸入、1M context、reasoning effort 1–100。價格（input / output / cache，每百萬 token）：Direct Global Standard $0.3 / $1.2 / $0.006、Fireworks $0.37 / $1.50 / $0.007。模型目錄（2026-10-02 查）：兩種部署都只有 Global Standard，29 個區域，APAC 為 australiaeast、japaneast、japanwest、koreacentral、southindia，沒有 Data Zone；中繼資料 inferenceDeprecationDate 為 Direct 2026-12-15、Fireworks 2027-09-15。退役表沒有這個模型的列。",
+      "sources": [
+        {
+          "id": "ms-techcommunity-deepseek-v41"
+        },
+        {
+          "id": "ms-foundry-retirement-schedule"
+        },
+        {
+          "id": "ms-foundry-model-catalog"
+        }
+      ]
+    },
+    {
+      "name": "GPT-6 Cyber",
+      "vendor": "openai",
+      "status": "rumoured",
+      "expected": "未公布",
+      "note": "2026-10-02 查：OpenAI 官方仍未發布（models、changelog、deprecations 頁都沒有；cyber 模型為 gpt-5.6-cyber，另有 gpt-daybreak-red-latest / gpt-daybreak-blue-latest 別名）。PYMNTS 2026-09-25 引述 Fortune：OpenAI 準備推出 GPT-6 Cyber 與資安 gateway 產品，無日期、價格與平台資訊。",
+      "sources": [
+        {
+          "id": "fortune-gpt6-cyber"
+        },
+        {
+          "id": "pymnts-gpt6-cyber"
+        },
+        {
+          "id": "openai-models"
+        }
+      ]
+    },
+    {
+      "name": "GPT-6.1 Sol Ultrafast",
+      "vendor": "openai",
+      "status": "coming-soon",
+      "expected": "官方：coming days（2026-09-29 起）",
+      "note": "OpenAI 發表 GPT-6.1 Sol 時預告；2026-10-02 查 models 與 changelog 頁仍未出現。已上線的是 GPT-6 Astra Ultrafast：Responses API 的 service_tier: \"ultrafast\"（global processing、US data residency，不支援 EU 等區域駐留），Bedrock 09-30 也推出 Astra Ultrafast，模型卡列價為 Standard 的 6 倍（Global CRIS $60 / $300）。",
+      "sources": [
+        {
+          "id": "openai-gpt61-sol-announce"
+        },
+        {
+          "id": "openai-devday-2026"
+        },
+        {
+          "id": "aws-astra-ultrafast"
+        },
+        {
+          "id": "openai-changelog"
+        },
+        {
+          "id": "aws-bedrock-astra-card"
+        }
+      ]
+    }
+  ],
+  "unverified": [
+    "Gemini 4 Argon：context window、model ID、introductory 價格的期限與一般開放日期都未公布；除 Artificial Analysis 與 Vals AI 外的 benchmark 為 Google 自報，兩家如何取得存取未說明。Fairwind 頁面沒有地區限制的文字，但也沒有說明台灣的組織能否通過審查。",
+    "Gemini 2.5（Agent Platform）：社群轉述的 Google 09-15 客戶通知（10-20 只封鎖新專案與閒置專案，使用中的專案到 2027-01-28 / 03-31 / 08-06 才停止）沒有任何官方頁面佐證，也沒有被否定；引述它的 GitHub issue 本期無法讀取原文。",
+    "Foundry 模型目錄的 inferenceDeprecationDate 是否等同退役日：沒有文件說明；34 個同時有退役表列的模型中 25 個相同、9 個不同。",
+    "Claude on Foundry 的 US Data Zone 1.1 倍：只見於 Anthropic 定價頁，Microsoft 頁面沒有提到，兩邊未對齊。",
+    "GPT-6.1 Sol 在 Bedrock：explicit prompt caching 模型卡與 What's New 矛盾；模型卡沒有逐區域表（台北能否呼叫未載明）；max output 131,072 與 OpenAI 的 128K 不一致。",
+    "Claude Sonnet 5.5 與 Opus 5.5 在 Bedrock 的價格：模型卡未列，只指向 Bedrock pricing 頁，而該頁的價格表是動態載入、無法讀到。",
+    "LiteLLM：GitHub security advisories 與 issues（#42725 / #42726 / #42689 / #42746 / #42704）無法讀取；搜尋結果標題提到 GHSA-237m-2qxv-ww7c（稱影響 1.101.0-rc.1 之前的版本），頁面被擋、無法確認——若屬實，v1.100 線會受影響。",
+    "Artificial Analysis 的名次：GPT-6.1 Sol 頁面的分母讀取異常，只保留名次；Argon 以 High effort 評測（其他旗艦為 max），速度、TTFT 與每任務成本未提供。",
+    "法規：EU 與金管會的官方頁面本期沒有讀取；美國出口管制在 2026-07-01 之後的現況未確認；Google 所說的自願流程是否即 EO 14409 未證實。",
+    "GPT-6 Cyber：仍只有媒體報導（Fortune、PYMNTS），OpenAI 未發布。"
+  ]
+}

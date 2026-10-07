@@ -3,7 +3,7 @@
   "modelId": "gpt-6-astra",
   "title": "GPT-6 Astra 技術深度解析",
   "locale": "zh-TW",
-  "asOf": "2026-09-24",
+  "asOf": "2026-10-06",
   "tldr": "GPT-6 Astra 是 OpenAI 目前最強、也最貴的模型（$10/$50），定位最難的長時程代理與電腦操作工作；Azure 與 Bedrock 皆 GA，GCP 沒有。導入前要先把應用改成 Responses API（工具呼叫）、移除 temperature 與 effort=none，並把 Bedrock 上 output token 以 10 倍計入配額的規則算進容量規劃。它也是首個資安能力 Critical 的模型，代理與 computer use 情境需要更嚴格的權限與人工關卡。",
   "whatsNew": [
     {
@@ -166,7 +166,7 @@
     },
     {
       "title": "Bedrock 特有限制",
-      "detail": "必須用 us.* / global.* profile；runtime 不支援 structured outputs 與 count tokens；server-side tools 與 caching 只在 us-west-2 的 bedrock-mantle；output token 以 10 倍計入 TPM。",
+      "detail": "必須用 us.* / global.* profile；runtime 不支援 count tokens 與 server-side tools；structured outputs 在 runtime 以 JSON Schema 支援（non-streaming；Converse 需另設 strict，模型卡 2026-10-02，先前記為不支援）；server-side tools 與 prompt caching 只在 bedrock-mantle（us-east-1、us-west-2）；output token 以 10 倍計入 TPM；Ultrafast 只在 runtime 的 us.* / global.* 與 mantle 的 us-east-1，價格為 Standard 的 6 倍。",
       "migration": "依用途選 endpoint；配額以 input + 10×output 估算。",
       "severity": "medium",
       "sources": [
@@ -181,13 +181,13 @@
       "cloud": "azure",
       "service": "foundry",
       "status": "ga",
-      "notes": "Global Standard（APAC：Japan East、Korea Central、Australia East、South India）、US/EU Data Zone、Provisioned。"
+      "notes": "Global Standard（APAC：Japan East、Korea Central、Australia East、South India、Southeast Asia）、US Data Zone、Provisioned。EU Data Zone 見於發布部落格的價格，但區域可用性頁與模型目錄都沒有列——部署前在 portal 確認。 2026-10-05：09-03 的發布文沒有 EU 字樣，第三方追蹤站只列美國的 Data Zone。"
     },
     {
       "cloud": "aws",
       "service": "bedrock",
       "status": "ga",
-      "notes": "US geo、Global；mantle 只在 us-west-2；台北區不在清單。"
+      "notes": "US geo、Global；mantle 在 us-east-1 與 us-west-2；台北區不在清單；Ultrafast 為 Standard 的 6 倍價。"
     },
     {
       "cloud": "gcp",
@@ -199,7 +199,7 @@
       "cloud": "vendor-direct",
       "service": "openai-api",
       "status": "ga",
-      "notes": "Batch / Flex 半價、Fast mode 2 倍價。"
+      "notes": "Batch / Flex 半價、Fast mode 2 倍價；Ultrafast 為 Responses API 的 service_tier: \"ultrafast\"（US data residency）。"
     }
   ],
   "apiCompatibility": [
@@ -227,15 +227,15 @@
       "note": "Guardrails 只在 Converse"
     },
     {
-      "route": "gpt-6-astra@bedrock（bedrock-mantle, us-west-2）",
+      "route": "gpt-6-astra@bedrock（bedrock-mantle, us-east-1 / us-west-2）",
       "surface": "Responses（server-side tools、caching）",
       "status": "supported"
     },
     {
       "route": "gpt-6-astra@bedrock",
       "surface": "Structured outputs",
-      "status": "not-supported",
-      "note": "bedrock-runtime"
+      "status": "supported",
+      "note": "bedrock-runtime JSON Schema（non-streaming；Converse 需 strict 設定）；模型卡 2026-10-02"
     },
     {
       "route": "Google Cloud",
@@ -245,7 +245,7 @@
     }
   ],
   "strengths": [
-    "AA Intelligence Index v4.3.2 53 分（max，#6/210），且 token 用量相對精簡（60M，中位數 88M）。",
+    "AA Intelligence Index v4.3.2 53 分（max，#7 / 225），且 token 用量相對精簡（60M，中位數 81M）。",
     "代理與科學任務強：Terminal-Bench-Science 0.1 64.6%、AutomationBench 41.4%（OpenAI 自報，引自 Anthropic 比較表）。",
     "1.05M context、128K output；Azure 提供 Global、US/EU Data Zone 與 Provisioned Throughput。",
     "OpenAI 稱為至今最對齊的模型：高嚴重度 misalignment 旗標約為前代一半，prompt injection 抵抗力明顯提升。",
@@ -253,10 +253,10 @@
   ],
   "weaknesses": [
     "最貴：Global $10/$50；Data Zone / In-Region +10%（Azure EU Data Zone +20%）；長文 $20/$75。",
-    "慢：AA 測得 52.5 tok/s；max effort 的首答 token 約 352 秒。",
+    "慢：AA 測得 63 tok/s；max effort 的首答 token 約 309 秒（2026-10-06 讀取）。",
     "工具呼叫要走 Responses API；Chat Completions 只支援基本 function calling；不支援 effort=none 與 temperature。",
     "資安能力 Critical：監控更嚴；資安研究工作可能需要 Trusted Access for Cyber。",
-    "Bedrock：bedrock-mantle 只在 us-west-2；APAC 只有 Global CRIS，台北區不在模型卡清單；runtime 不支援 structured outputs；output token 以 10 倍計入 TPM 配額。",
+    "Bedrock：bedrock-mantle 只在 us-east-1 與 us-west-2；APAC 只有 Global CRIS，台北區不在模型卡清單；structured outputs 只支援 non-streaming；output token 以 10 倍計入 TPM 配額；Ultrafast 為 Standard 的 6 倍價。",
     "不支援 fine-tuning；Google Cloud 未上架。"
   ],
   "bestFor": [
@@ -322,10 +322,13 @@
     }
   ],
   "enterpriseNotes": [
-    "資料駐留：Azure APAC 只能 Global Standard（資料可能在任意區域處理），Data Zone 只有 US / EU；Bedrock APAC 只有 Global CRIS，且台北區不在清單。",
+    "資料駐留：Azure APAC 只能 Global Standard（資料可能在任意區域處理），Data Zone 確認的只有 US（EU 見於 09-22 發布部落格的價格，但區域頁與第三方追蹤站都沒有列）；Bedrock APAC 只有 Global CRIS，且台北區不在清單。",
     "成本：三雲最貴；>272K 輸入改長文價（$20 / $75）；Azure EU Data Zone +20%。建議只放在 tier/frontier 並設團隊預算。",
     "金融業：代理 + computer use 的情境直接對應金管會對代理 AI 的要求（權限邊界、稽核軌跡、中止與回滾）。",
-    "容量：Bedrock output token 以 10 倍計入 TPM；Azure 初期 Limited Access、Tier 1 配額僅 1,000 RPM / 1M TPM（Global Standard）。"
+    "容量：Bedrock output token 以 10 倍計入 TPM；Azure 初期 Limited Access、Tier 1 配額僅 1,000 RPM / 1M TPM（Global Standard）。",
+    "Ultrafast：OpenAI API 以 Responses API 的 service_tier: \"ultrafast\" 提供（global processing、US data residency，不支援 EU 等區域駐留）；Bedrock 同樣以 service_tier 請求，模型卡列價為 Standard 的 6 倍（Global CRIS $60 / $300）。有資料駐留要求的工作負載不要用；在 gateway 決定是否允許這個參數並設預算。",
+    "LiteLLM issue #44500（2026-10-04，開啟中）：經 /v1/chat/completions 呼叫、被橋接到 Responses API 的大型 non-streaming 請求（訊息文字達 256 KiB）會重複寫入 spend log，預算被扣兩次；影響 v1.102.0 以後（含 1.104.0）。暫時設 MAX_BASE64_LENGTH_FOR_LOGGING=0，並以 CSP 帳單對帳。",
+    "Bedrock 模型卡（2026-10-06 複查）沒有變：Guardrails 仍只支援 Converse、prompt caching 仍只在 bedrock-mantle 的 Responses API、runtime 不支援 Invoke——同家族的 GPT-6 Sol / Luna / 6.1 Sol 這一輪都已放寬。LiteLLM v1.105.0（目前只有 rc.1）會把 Bedrock 上的 GPT-5.6 / GPT-6 / GPT-6.1 預設路徑由 Converse 改成原生 Chat Completions；明寫 bedrock/converse/ 的 deployment 不受影響。升級前在 staging 重跑 compat suite。"
   ],
   "testPlanFocus": [
     "Chat Completions → Responses 遷移的回歸（含工具呼叫與串流）。",
@@ -423,10 +426,11 @@
     "support": "Slack #llm-platform；每週四 14:00 office hour（範例，請改成你們的窗口）"
   },
   "openQuestions": [
-    "Azure 官方退役表何時列入 gpt-6-astra？",
+    "Azure 官方退役表何時列入 gpt-6-astra？（2026-10-05 查仍未列入；模型目錄中繼資料 inferenceDeprecationDate 為 2028-01-11，意義沒有文件說明）",
     "Bedrock 上 Astra 的資料保留與 ZDR 條件（Sol/Luna 公告為最多 30 天、ZDR 需申請）？",
     "LiteLLM /v1/responses → Bedrock runtime Responses（同步、無 server tools）的工具呼叫行為？",
-    "APAC 何時會有 Data Zone？"
+    "APAC 何時會有 Data Zone？",
+    "Foundry 到底有沒有 Astra 的 EU Data Zone？（價格只見於 09-22 的部落格，該頁 2026-10-05 回 503；09-03 發布文、區域可用性頁的美洲分頁與第三方追蹤站都只有美國 Data Zone）"
   ],
   "sources": [
     {
@@ -464,6 +468,30 @@
     },
     {
       "id": "google-agentplatform-openai"
+    },
+    {
+      "id": "openai-changelog"
+    },
+    {
+      "id": "aws-astra-ultrafast"
+    },
+    {
+      "id": "ms-foundry-region-availability"
+    },
+    {
+      "id": "ms-foundry-model-catalog"
+    },
+    {
+      "id": "litellm-issue-44500"
+    },
+    {
+      "id": "ms-foundry-astra-blog"
+    },
+    {
+      "id": "foundrymap-astra"
+    },
+    {
+      "id": "litellm-v1-105-0-rc1"
     }
   ]
 }

@@ -1,0 +1,416 @@
+{
+  "schema": "deep-dive/v1",
+  "modelId": "gpt-6-1-sol",
+  "title": "GPT-6.1 Sol 技術深度解析",
+  "locale": "zh-TW",
+  "asOf": "2026-10-06",
+  "tldr": "GPT-6.1 Sol 是 GPT-6 Sol 一週後的升級：價格相同（$2 / $10）、cached input 減半（$0.10），AA v4.3.2 由 48 升到 52，每任務成本 $0.72。最大的差異是 effort 不再有 none——temperature 不能用，原本靠 effort=none 在 Chat Completions 呼叫工具的程式要改走 Responses。Foundry 首次為 GPT-6 家族提供 APAC Data Zone（+20%）；Bedrock runtime 支援 structured outputs（streaming 也可以）與 implicit / explicit prompt caching（模型卡 10-06 改寫；Converse 只有 implicit），但 Guardrails 不支援 Responses API，EOL 依 OpenAI 條款。",
+  "whatsNew": [
+    {
+      "title": "GPT-6 Sol 的升級版",
+      "detail": "OpenAI DevDay（2026-09-29）發布；API 與 ChatGPT 同日上線，Ultrafast 版本「coming days」。",
+      "sources": [
+        {
+          "id": "openai-gpt61-sol-announce"
+        },
+        {
+          "id": "openai-devday-2026"
+        }
+      ]
+    },
+    {
+      "title": "價格與快取",
+      "detail": "$2 input、$0.10 cached input、$2.50 cache write、$10 output；長文（>272K）$4 / $15。",
+      "sources": [
+        {
+          "id": "openai-gpt61-sol-model"
+        },
+        {
+          "id": "ms-techcommunity-gpt61-sol"
+        }
+      ]
+    },
+    {
+      "title": "三條企業通路同日 GA",
+      "detail": "Bedrock（2026-09-29）、Foundry（Global、US / EU / APAC Data Zone、Provisioned）、OpenAI API。",
+      "sources": [
+        {
+          "id": "aws-gpt61-sol-whatsnew"
+        },
+        {
+          "id": "ms-techcommunity-gpt61-sol"
+        }
+      ]
+    },
+    {
+      "title": "智慧指數",
+      "detail": "AA v4.3.2 52 分（max，#11 / 225）；2026-10-06 讀取為 58 tok/s、首 token 約 279 秒。",
+      "sources": [
+        {
+          "id": "aa-gpt61-sol"
+        }
+      ]
+    },
+    {
+      "title": "Multi-agent（beta）",
+      "detail": "OpenAI changelog（2026-09-29）：GPT-6.1 Sol 在 Responses API 支援 Multi-agent（beta），可在單一請求中把工作委派給 subagents。Bedrock 與 Foundry 是否提供未載明。",
+      "sources": [
+        {
+          "id": "openai-changelog"
+        }
+      ]
+    }
+  ],
+  "vsPredecessor": {
+    "predecessorId": "gpt-6-sol",
+    "changes": [
+      {
+        "area": "Reasoning effort",
+        "before": "none ～ max（預設 medium）",
+        "after": "low ～ max（預設 medium）",
+        "impact": "沒有 none：temperature 不可用，Chat Completions + tools 的舊用法要改。"
+      },
+      {
+        "area": "Cached input",
+        "before": "$0.20",
+        "after": "$0.10",
+        "impact": "代理 / 長對話工作受益。"
+      },
+      {
+        "area": "AA Intelligence Index v4.3.2",
+        "before": "48",
+        "after": "52",
+        "impact": "同價更強。"
+      },
+      {
+        "area": "Foundry Data Zone",
+        "before": "US / EU",
+        "after": "US / EU / APAC",
+        "impact": "APAC 區域處理選項（+20%）。"
+      },
+      {
+        "area": "Bedrock API 面",
+        "before": "Responses / Chat Completions / Converse / Invoke（GPT-6 Sol 的模型卡 10-06 起也列 Invoke）",
+        "after": "相同",
+        "impact": "structured outputs：6.1 Sol 支援 streaming 與 non-streaming，GPT-6 Sol 只有 non-streaming。Guardrails：GPT-6 Sol 四個 API 都支援，6.1 Sol 不支援 Responses。prompt caching 兩者相同（Converse 只有 implicit）。"
+      },
+      {
+        "area": "Bedrock 生命週期",
+        "before": "EOL 不早於 2027-09-22",
+        "after": "依 OpenAI 一方條款，EOL 未公布（至少 6 個月通知）",
+        "impact": "沒有 Bedrock 的最低可用保證。"
+      }
+    ]
+  },
+  "breakingChanges": [
+    {
+      "title": "沒有 effort=none",
+      "detail": "GPT-6 Sol 用 none + temperature 或 none + Chat Completions tools 的程式在 6.1 會失敗或行為改變。",
+      "migration": "改用 low；工具呼叫走 /v1/responses；移除 temperature。",
+      "severity": "high",
+      "sources": [
+        {
+          "id": "openai-gpt61-sol-model"
+        },
+        {
+          "id": "litellm-gpt61-sol"
+        }
+      ]
+    },
+    {
+      "title": "Bedrock 路徑 temperature 不會被丟棄",
+      "detail": "LiteLLM issue #42725 尚未修正（GPT-6 家族共通）。",
+      "migration": "deployment 加 additional_drop_params: [\"temperature\"]。",
+      "severity": "medium",
+      "sources": [
+        {
+          "id": "litellm-issue-42725"
+        }
+      ]
+    },
+    {
+      "title": "Bedrock：prompt caching 的支援依 API 而不同（模型卡 10-06 改寫）",
+      "detail": "模型卡（2026-10-06）：implicit 與 explicit 都支援——Responses、Chat Completions（runtime 與 mantle）與 InvokeModel（runtime）支援兩種；Converse 只有 implicit，原生 cachePoint 無效。10-05 讀到的版本寫「Explicit prompt caching is not supported for this Bedrock model」，已被取代；現在與 AWS What's New（09-29）一致。",
+      "migration": "要用 explicit caching 就走 Responses / Chat Completions / InvokeModel 並設 prompt_cache_options.mode = explicit（TTL 30m、前綴至少 1,024 tokens、每個請求最多 4 次 cache write）。經 LiteLLM 的 bedrock/converse/ 路徑只能靠 implicit caching——以回應的 cache 用量欄位與帳單確認實際命中。",
+      "severity": "low",
+      "sources": [
+        {
+          "id": "aws-bedrock-gpt61-sol-card"
+        },
+        {
+          "id": "aws-gpt61-sol-whatsnew"
+        }
+      ]
+    }
+  ],
+  "availabilityMatrix": [
+    {
+      "cloud": "azure",
+      "service": "foundry",
+      "status": "ga",
+      "notes": "Global、US / EU / APAC Data Zone（APAC：australiaeast、japaneast、koreacentral、southeastasia、southindia；沒有台灣）；Provisioned 只有 Global 與 US Data Zone。"
+    },
+    {
+      "cloud": "aws",
+      "service": "bedrock",
+      "status": "ga",
+      "notes": "global. / us.；runtime 支援 Responses / Chat Completions / Converse / Invoke；mantle 只在 us-east-1（Responses / Chat Completions）；Guardrails 不支援 Responses；implicit / explicit prompt caching（Converse 只有 implicit）；output token 以 10 倍計入配額；EOL 依 OpenAI 條款。"
+    },
+    {
+      "cloud": "gcp",
+      "service": "agent-platform",
+      "status": "not-offered",
+      "notes": "未上架。"
+    },
+    {
+      "cloud": "vendor-direct",
+      "service": "openai-api",
+      "status": "ga",
+      "notes": "Responses API 支援 Multi-agent（beta）。Ultrafast 版本仍未發布（已上線的是 GPT-6 Astra 的 service_tier: ultrafast）。"
+    }
+  ],
+  "apiCompatibility": [
+    {
+      "route": "gpt-6-1-sol@foundry（/openai/v1）",
+      "surface": "Responses",
+      "status": "supported"
+    },
+    {
+      "route": "gpt-6-1-sol@foundry（/openai/v1）",
+      "surface": "Chat Completions + tools",
+      "status": "unknown",
+      "note": "沒有 effort=none；以 compat suite 驗證"
+    },
+    {
+      "route": "gpt-6-1-sol@bedrock（bedrock-runtime）",
+      "surface": "Structured outputs（JSON Schema）",
+      "status": "supported",
+      "note": "streaming 與 non-streaming；Responses、Chat Completions、InvokeModel、Converse（Converse 需 strict 設定）；模型卡 2026-10-06"
+    },
+    {
+      "route": "gpt-6-1-sol@bedrock（bedrock-runtime）",
+      "surface": "Responses / Chat Completions / Converse / Invoke",
+      "status": "supported",
+      "note": "Bedrock 模型卡（2026-10-06 複查）；Messages 不支援"
+    },
+    {
+      "route": "gpt-6-1-sol@bedrock（bedrock-mantle）",
+      "surface": "Responses / Chat Completions",
+      "status": "supported",
+      "note": "只在 us-east-1；Converse、Invoke、Messages 不支援"
+    },
+    {
+      "route": "LiteLLM gateway",
+      "surface": "/v1/responses、/v1/chat/completions",
+      "status": "supported",
+      "note": "Day-0；工具呼叫自動橋接到 Responses"
+    }
+  ],
+  "strengths": [
+    "AA Intelligence Index v4.3.2 52 分（max），比 GPT-6 Sol 高 4 分，每任務成本 $0.72（AA）。",
+    "價格不變（$2 / $10），cached input $0.10（GPT-6 Sol 為 $0.20）。",
+    "Foundry 提供 Global、US / EU / APAC Data Zone 與 Provisioned（Global、US Data Zone）。",
+    "Bedrock runtime 支援 structured outputs（JSON Schema，streaming 與 non-streaming）、implicit / explicit prompt caching，以及 Chat Completions / InvokeModel / Converse 上的 Guardrails（模型卡 2026-10-06）。",
+    "1.05M context、128K output。"
+  ],
+  "weaknesses": [
+    "沒有 effort=none：不能用 temperature；需要極低延遲或 Chat Completions + tools 的場景仍要用 GPT-6 Sol 或 Luna。",
+    "AA max effort 首 token 約 279 秒、58 tok/s（2026-10-06 讀取；GPT-6 Sol 為 110 tok/s）。",
+    "Bedrock：Guardrails 不支援 Responses API（reasoning + tools 的建議 API）；Converse 路徑只有 implicit prompt caching；EOL 未公布（依 OpenAI 條款）。",
+    "APAC Data Zone 比 Global 貴 20%；仍無台灣境內處理。"
+  ],
+  "bestFor": [
+    "GPT-6 Sol 的升級候選（相同價格、更高分數）",
+    "需要 APAC 資料區域處理的 OpenAI 工作負載（Foundry APAC Data Zone）",
+    "Bedrock 上需要 structured outputs 的 OpenAI 模型"
+  ],
+  "avoidFor": [
+    "依賴 temperature 或 effort=none 的既有程式",
+    "延遲敏感的即時對話（改用 GPT-6 Luna 或等 Ultrafast）"
+  ],
+  "safetyAndCompliance": [
+    {
+      "item": "APAC Data Zone",
+      "detail": "Foundry 的 APAC Data Zone 目前是 australiaeast、japaneast、koreacentral、southeastasia、southindia 五個 Azure 區域：資料可在其中任一國家處理，不含台灣；Microsoft 可不經通知增加區域。是否可用於機密資料需法務依這個範圍判斷。",
+      "sources": [
+        {
+          "id": "ms-techcommunity-gpt61-sol"
+        },
+        {
+          "id": "ms-foundry-region-availability"
+        },
+        {
+          "id": "ms-foundry-deployment-types"
+        },
+        {
+          "id": "ms-azure-regions-list"
+        }
+      ]
+    },
+    {
+      "item": "Bedrock 生命週期",
+      "detail": "沒有 Bedrock 最低可用日；退役以 OpenAI 通知為準（GA 模型至少 6 個月，安全或合規因素可以更短）。",
+      "sources": [
+        {
+          "id": "aws-bedrock-gpt61-sol-card"
+        },
+        {
+          "id": "aws-bedrock-lifecycle"
+        }
+      ]
+    }
+  ],
+  "enterpriseNotes": [
+    "GPT-6 家族第一個有 APAC Data Zone 的模型（較早的 GPT-5.x 已經有）：涵蓋 australiaeast、japaneast、koreacentral、southeastasia、southindia，資料可在澳洲、日本、韓國、新加坡、印度任一地處理，沒有台灣，Microsoft 可不經通知增加區域。機密資料若可接受這個範圍，可評估 APAC Data Zone 路由（+20%）。",
+    "tier/general 候選：與 GPT-6 Sol 同價、分數更高，但失去 effort=none；兩者並存一段時間較安全。",
+    "金融業：GPT-6 Sol → 6.1 Sol 屬模型升版，走變更管理。",
+    "Bedrock 容量規劃：output token 以 10 倍計入配額（模型卡）；EOL 依 OpenAI 條款，GA 模型至少 6 個月通知，但安全或合規因素可以更短。",
+    "LiteLLM cost map 沒有 gpt-6.1-sol 的 Azure Data Zone 價格（issue #44022，開啟中，社群回報）：US / EU / APAC Data Zone 部署的花費會以 Global 價計算而被低估 10–20%——在 deployment 的 model_info 自訂價格。",
+    "LiteLLM issue #44500（2026-10-04，開啟中）：經 /v1/chat/completions 呼叫、被橋接到 Responses API 的大型 non-streaming 請求（訊息文字達 256 KiB）會重複寫入 spend log，預算被扣兩次；影響 v1.102.0 以後（含 1.104.0）。暫時設 MAX_BASE64_LENGTH_FOR_LOGGING=0，並以 CSP 帳單對帳。",
+    "LiteLLM v1.105.0rc1 的 release notes 才把 gpt-6.1-sol（OpenAI、Azure、Bedrock、Bedrock Mantle）列入內建 cost map；v1.104.x 要用 remote cost map reload。LiteLLM v1.105.0（目前只有 rc.1）會把 Bedrock 上的 GPT-5.6 / GPT-6 / GPT-6.1 預設路徑由 Converse 改成原生 Chat Completions；明寫 bedrock/converse/ 的 deployment 不受影響。升級前在 staging 重跑 compat suite。"
+  ],
+  "testPlanFocus": [
+    "GPT-6 Sol（effort=none 用法）→ 6.1 Sol 的回歸：工具呼叫、temperature。",
+    "effort low / medium 的 TTFAT 與品質 vs GPT-6 Sol 與 Claude Sonnet 5.5。",
+    "Foundry APAC Data Zone 的延遲（從台灣）與配額。",
+    "Bedrock prompt caching 實測（Converse 的 implicit、Responses 的 explicit）；structured outputs（含 streaming）；Guardrails 在各 API 的行為。"
+  ],
+  "onboarding": {
+    "audience": "一般應用開發團隊（GPT-6 Sol 使用者）",
+    "prerequisites": [
+      "gateway key 在 gpt-6-1-sol 允許清單中",
+      "移除 temperature 與 effort=none",
+      "工具呼叫改走 Responses"
+    ],
+    "steps": [
+      {
+        "title": "選路由",
+        "detail": "預設 gpt-6-1-sol（Azure Global Standard）；需 APAC 區域處理用 @azure-apac；AWS 專案用 @bedrock。"
+      },
+      {
+        "title": "選 API",
+        "detail": "工具呼叫用 /v1/responses；純文字可用 /v1/chat/completions。"
+      },
+      {
+        "title": "驗證",
+        "detail": "golden set 對照 GPT-6 Sol 與 Claude Sonnet 5.5。"
+      }
+    ],
+    "aliases": [
+      {
+        "alias": "gpt-6-1-sol",
+        "target": "azure/<gpt-6.1-sol deployment>（Global Standard）",
+        "note": "預設"
+      },
+      {
+        "alias": "gpt-6-1-sol@azure-apac",
+        "target": "azure/<APAC Data Zone deployment>",
+        "note": "APAC 區域處理（+20%）"
+      },
+      {
+        "alias": "gpt-6-1-sol@bedrock",
+        "target": "bedrock/converse/global.openai.gpt-6.1-sol",
+        "note": "provider 字串待驗證"
+      }
+    ],
+    "parameterGuidance": [
+      {
+        "parameter": "reasoning_effort",
+        "guidance": "low | medium（預設）| high | xhigh | max；沒有 none。"
+      },
+      {
+        "parameter": "temperature / top_p",
+        "guidance": "不要送。"
+      },
+      {
+        "parameter": "max_tokens",
+        "guidance": "改用 max_completion_tokens（Chat）或 max_output_tokens（Responses）。"
+      }
+    ],
+    "codeSamples": [
+      {
+        "lang": "python",
+        "title": "Responses API（經 gateway）",
+        "code": "import os\nfrom openai import OpenAI\n\nclient = OpenAI(base_url=\"https://llm-gateway.example.internal/v1\", api_key=os.environ[\"LITELLM_API_KEY\"])\n\nresp = client.responses.create(\n    model=\"gpt-6-1-sol\",\n    reasoning={\"effort\": \"low\"},  # 沒有 none\n    input=\"比較這兩份合約的差異。\",\n)\nprint(resp.output_text)\n"
+      },
+      {
+        "lang": "yaml",
+        "title": "LiteLLM 設定",
+        "code": "model_list:\n  - model_name: gpt-6-1-sol\n    litellm_params:\n      model: azure/gpt-6.1-sol\n      api_base: os.environ/AZURE_OPENAI_API_BASE\n      api_key: os.environ/AZURE_OPENAI_API_KEY\n      api_version: \"v1\"\n    model_info: {catalog_id: gpt-6-1-sol, service: foundry, data_residency: global}\n  - model_name: gpt-6-1-sol@bedrock\n    litellm_params:\n      model: bedrock/converse/global.openai.gpt-6.1-sol   # 依 GPT-6 Sol 命名推定，請驗證\n      aws_region_name: ap-east-2\n      additional_drop_params: [\"temperature\"]\n    model_info: {catalog_id: gpt-6-1-sol, service: bedrock, data_residency: global}\n"
+      }
+    ],
+    "dataClassification": "範例政策：公開/內部資料可用任一已核准路由；機密資料只可用明確限定處理地的路由（例：Bedrock JP geo）並經法務核准；極機密資料不開放（三雲皆無台灣境內處理選項）。請依公司資料分級規範調整。",
+    "support": "Slack #llm-platform；每週四 14:00 office hour（範例，請改成你們的窗口）"
+  },
+  "openQuestions": [
+    "Bedrock 逐區域可用性？（2026-10-06 模型卡新增 us.* 的 source Region 表，但 global.* 仍沒有逐區域表；台北能否呼叫 global.openai.gpt-6.1-sol 未載明）",
+    "Bedrock prompt caching：模型卡 10-06 已改為 implicit / explicit 都支援（Converse 只有 implicit）——經 LiteLLM 的 Converse 路徑實際能拿到多少 cache 命中？",
+    "Bedrock 的 max output：模型卡 131,072、OpenAI 128K，哪個為準？",
+    "Foundry APAC Data Zone 的配額？",
+    "Multi-agent（beta）在 Bedrock / Foundry 是否可用？",
+    "GPT-6 Sol 是否會被標為 deprecated？（2026-10-02：Bedrock 模型卡仍為 Active；OpenAI 10-01 的棄用公告把 gpt-6-sol 列為 gpt-5.1 與 gpt-5.3-codex 的建議替代。2026-10-05：OpenAI pricing 頁沒有 gpt-6-sol 的列）",
+    "Ultrafast 版本的價格與通路？（2026-10-06 仍未發布；pricing 頁的 Ultrafast 列只有 gpt-6-astra）"
+  ],
+  "sources": [
+    {
+      "id": "openai-gpt61-sol-model"
+    },
+    {
+      "id": "openai-gpt61-sol-announce"
+    },
+    {
+      "id": "openai-devday-2026"
+    },
+    {
+      "id": "aws-bedrock-gpt61-sol-card"
+    },
+    {
+      "id": "aws-gpt61-sol-whatsnew"
+    },
+    {
+      "id": "ms-techcommunity-gpt61-sol"
+    },
+    {
+      "id": "aa-gpt61-sol"
+    },
+    {
+      "id": "litellm-gpt61-sol"
+    },
+    {
+      "id": "litellm-issue-42725"
+    },
+    {
+      "id": "aws-bedrock-lifecycle"
+    },
+    {
+      "id": "openai-changelog"
+    },
+    {
+      "id": "openai-deprecations"
+    },
+    {
+      "id": "ms-foundry-region-availability"
+    },
+    {
+      "id": "ms-foundry-deployment-types"
+    },
+    {
+      "id": "ms-azure-regions-list"
+    },
+    {
+      "id": "ms-foundry-model-catalog"
+    },
+    {
+      "id": "litellm-issue-44022"
+    },
+    {
+      "id": "litellm-issue-44500"
+    },
+    {
+      "id": "openai-pricing"
+    },
+    {
+      "id": "litellm-v1-105-0-rc1"
+    }
+  ]
+}

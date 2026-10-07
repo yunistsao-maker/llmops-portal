@@ -1,0 +1,463 @@
+{
+  "schema": "deep-dive/v1",
+  "modelId": "claude-sonnet-5-5",
+  "title": "Claude Sonnet 5.5 技術深度解析",
+  "locale": "zh-TW",
+  "asOf": "2026-10-06",
+  "tldr": "Sonnet 5.5 是 Sonnet 5 的直接升級：同價（$2 / $10）、官方稱快 30%、多數工作便宜至多 30%，AA v4.3.2 56 分（僅次 Opus 5.5 的 58）。但它延續 Opus 5.5 的行為變更：thinking 不能完全關閉（disabled → between_tools）、forced tool_choice 回 400、temperature 非預設值回 400，預設 effort 是 high。AA 評測非常冗長（420M output tokens），每任務成本反而高於 Opus 5.5——一定要用自己的任務量測。Bedrock 沒有 jp profile，台灣團隊在 AWS 上只能走 Global CRIS。它也是 Sonnet 4.5 退役（Anthropic 與 Foundry 皆為 2026-11-30）的官方建議替代。",
+  "whatsNew": [
+    {
+      "title": "更快、更便宜的 Sonnet",
+      "detail": "官方：比 Sonnet 5 快 30%、多數工作成本低至多 30%；tokenizer 與單價和 Sonnet 5 相同（$2 / $10、cache 寫入 5 分鐘 $2.50 / 1 小時 $4、cache read $0.20、Batch 五折）。",
+      "sources": [
+        {
+          "id": "anthropic-sonnet55-news"
+        },
+        {
+          "id": "anthropic-sonnet55-overview"
+        },
+        {
+          "id": "anthropic-sonnet55-whatsnew"
+        }
+      ]
+    },
+    {
+      "title": "新 thinking 模式 between_tools",
+      "detail": "取代 thinking.type = disabled：只在工具呼叫之間思考，僅限 low / medium / high effort，不可與 display、budget_tokens、block_binding 併用。",
+      "sources": [
+        {
+          "id": "anthropic-sonnet55-whatsnew"
+        }
+      ]
+    },
+    {
+      "title": "新 API 能力",
+      "detail": "per-message effort（beta）、mid-conversation system message、mid-conversation tool changes（beta）、compact on demand（compact-2026-09-04）、inline tool definitions（inline-tools-2026-09-15）。",
+      "sources": [
+        {
+          "id": "anthropic-sonnet55-whatsnew"
+        }
+      ]
+    },
+    {
+      "title": "1M context、128K output",
+      "detail": "Batch API 搭配 output-300k-2026-03-24 header 可輸出 300K；knowledge cutoff 2026-06；prompt caching 最低 512 tokens。",
+      "sources": [
+        {
+          "id": "anthropic-sonnet55-overview"
+        }
+      ]
+    },
+    {
+      "title": "拒答分類",
+      "detail": "stop_details 新增 cyber、bio、frontier_llm、reasoning_extraction、general_harms 五類。",
+      "sources": [
+        {
+          "id": "anthropic-sonnet55-whatsnew"
+        }
+      ]
+    }
+  ],
+  "vsPredecessor": {
+    "predecessorId": "claude-sonnet-5",
+    "changes": [
+      {
+        "area": "單價",
+        "before": "$2 / $10",
+        "after": "$2 / $10",
+        "impact": "不變；官方稱 token 用量下降使多數工作便宜至多 30%，但 AA max effort 評測很冗長，需自行量測。"
+      },
+      {
+        "area": "Thinking 關閉",
+        "before": "thinking.type = disabled",
+        "after": "between_tools（disabled 回 400）",
+        "impact": "原本關閉 thinking 求低延遲的程式需改寫。"
+      },
+      {
+        "area": "tool_choice any / tool",
+        "before": "支援",
+        "after": "400",
+        "impact": "依賴強制工具呼叫的流程改用 strict tool use。"
+      },
+      {
+        "area": "取樣參數",
+        "before": "可設 temperature 等",
+        "after": "temperature / top_p / top_k 非預設值回 400",
+        "impact": "評測框架與舊 prompt 若送 temperature=0 會失敗。"
+      },
+      {
+        "area": "Computer use 工具（Claude API / GCP）",
+        "before": "computer_20251124",
+        "after": "computer_toolset_20260801",
+        "impact": "Bedrock 仍接受舊版。"
+      },
+      {
+        "area": "Thinking block 綁定",
+        "before": "—",
+        "after": "只在產生它的帳號或已連結帳號可用，跨帳號會被靜默丟棄",
+        "impact": "跨 CSP fallback 後推理脈絡遺失且不報錯。"
+      }
+    ]
+  },
+  "breakingChanges": [
+    {
+      "title": "thinking disabled 改為 between_tools",
+      "detail": "thinking.type = disabled 與手動 budget_tokens 回 400。",
+      "migration": "改送 between_tools（effort 限 low / medium / high）或省略 thinking、用 effort 控制深度。",
+      "severity": "high",
+      "sources": [
+        {
+          "id": "anthropic-sonnet55-whatsnew"
+        }
+      ]
+    },
+    {
+      "title": "不支援 forced tool use",
+      "detail": "tool_choice any / tool 回 400；經 LiteLLM 開 drop_params 時可能被靜默降為 auto。",
+      "migration": "改用 auto + strict tool use；compat suite 斷言確實有 tool call。",
+      "severity": "high",
+      "sources": [
+        {
+          "id": "anthropic-sonnet55-whatsnew"
+        },
+        {
+          "id": "litellm-sonnet55"
+        }
+      ]
+    },
+    {
+      "title": "temperature / top_p / top_k 非預設值回 400",
+      "detail": "Sonnet 5 可用的取樣參數在 5.5 會被拒。",
+      "migration": "client 不送；gateway 開 drop_params 並以 compat suite 驗證。",
+      "severity": "high",
+      "sources": [
+        {
+          "id": "anthropic-sonnet55-overview"
+        }
+      ]
+    },
+    {
+      "title": "Thinking block 綁定帳號",
+      "detail": "從其他帳號送入的 thinking block 會被靜默丟棄，請求仍成功。",
+      "migration": "同模型 fallback 盡量留在同一帳號體系；監控 fallback 後的品質。",
+      "severity": "medium",
+      "sources": [
+        {
+          "id": "anthropic-sonnet55-whatsnew"
+        }
+      ]
+    },
+    {
+      "title": "computer_20251124 在 Claude API 與 Google Cloud 被拒",
+      "detail": "需改用 computer_toolset_20260801；Bedrock 仍接受舊版。",
+      "migration": "更新 computer use 代理的工具定義。",
+      "severity": "medium",
+      "sources": [
+        {
+          "id": "anthropic-sonnet55-whatsnew"
+        }
+      ]
+    },
+    {
+      "title": "advisor tool 不接受 Opus 4.8 / 4.7 / Sonnet 5 作為 advisor",
+      "detail": "使用 advisor tool 的流程需改指定較新模型。",
+      "migration": "advisor 改用 Opus 5.5。",
+      "severity": "low",
+      "sources": [
+        {
+          "id": "anthropic-sonnet55-whatsnew"
+        }
+      ]
+    }
+  ],
+  "availabilityMatrix": [
+    {
+      "cloud": "aws",
+      "service": "bedrock",
+      "status": "ga",
+      "notes": "us. / eu. / global. profile；沒有 jp. / au.；APAC 13 個區域（含台北）都只有 Global CRIS；runtime 支援 Messages / Converse / Invoke 與 prompt caching；不支援 structured outputs、Batch；價格未列於模型卡（LiteLLM cost map 列 global $2 / $10、us. / eu. $2.2 / $11，不是 AWS 公布的數字）。"
+    },
+    {
+      "cloud": "gcp",
+      "service": "agent-platform",
+      "status": "ga",
+      "notes": "global、us / eu multi-region（+10%）；Google release note（2026-09-28）與官方定價頁已確認。"
+    },
+    {
+      "cloud": "azure",
+      "service": "foundry",
+      "status": "ga",
+      "notes": "Hosted on Azure：Global Standard、US Data Zone（Anthropic 定價頁：US Data Zone 套用 1.1 倍）；Hosted on Anthropic：Global Standard；$2 / $10。"
+    },
+    {
+      "cloud": "vendor-direct",
+      "service": "anthropic-api",
+      "status": "ga",
+      "notes": "Claude API 與 Claude Platform on AWS。"
+    }
+  ],
+  "apiCompatibility": [
+    {
+      "route": "claude-sonnet-5-5@bedrock（bedrock-runtime）",
+      "surface": "Converse",
+      "status": "supported",
+      "note": "LiteLLM Day-0 範例"
+    },
+    {
+      "route": "claude-sonnet-5-5@bedrock（bedrock-runtime）",
+      "surface": "Anthropic Messages / Invoke",
+      "status": "supported",
+      "note": "Bedrock 模型卡（2026-10-06 複查）：runtime 支援 Messages、Converse、Invoke；bedrock-mantle 只支援 Messages"
+    },
+    {
+      "route": "claude-sonnet-5-5@bedrock",
+      "surface": "Structured outputs",
+      "status": "not-supported"
+    },
+    {
+      "route": "claude-sonnet-5-5@agent-platform",
+      "surface": "Anthropic Messages（rawPredict）",
+      "status": "supported"
+    },
+    {
+      "route": "claude-sonnet-5-5@foundry",
+      "surface": "Anthropic Messages（/anthropic）",
+      "status": "supported"
+    },
+    {
+      "route": "LiteLLM gateway",
+      "surface": "/v1/chat/completions、/v1/messages",
+      "status": "supported",
+      "note": "Day-0 支援"
+    }
+  ],
+  "strengths": [
+    "AA Intelligence Index v4.3.2 56 分（max effort），在 225 個同級模型中排名第 2，僅次於 Opus 5.5；價格是 Opus 5.5 的一半。",
+    "官方稱比 Sonnet 5 快 30%、多數工作成本低至多 30%；AA 測得 127 tok/s（2026-10-06 讀取，上週約 140）。",
+    "1M context、128K output（Batch API 搭配 beta header 可到 300K）；prompt caching 最低 512 tokens。",
+    "支援 per-message effort、mid-conversation system message、compact on demand、inline tools 等新 API 能力（多為 beta）。",
+    "四個通路同日可用；Anthropic 與 Bedrock 皆標示退役不早於 2027-09-28。"
+  ],
+  "weaknesses": [
+    "很冗長：AA 評測產生 420M output tokens（中位數 81M），每任務成本 $7.67，高於 Opus 5.5 的 $5.98——務必以每任務成本比較。",
+    "AA max effort 首 token 約 442 秒；互動場景要用 low / medium。",
+    "thinking 不能完全關閉、forced tool_choice 回 400、temperature 非預設值回 400：舊 Sonnet 程式需改寫。",
+    "Bedrock：沒有 jp / au profile，APAC 只有 Global CRIS；不支援 structured outputs、Batch 與 Priority / Flex；模型卡與 pricing 頁未列價格。",
+    "沒有台灣境內處理選項。"
+  ],
+  "bestFor": [
+    "Sonnet 5 / Sonnet 4.5 的直接升級（一般程式、分析、代理工作）",
+    "需要接近 Opus 能力但單價減半的工作負載",
+    "Sonnet 4.5 退役（Anthropic 與 Foundry 皆為 2026-11-30）的替代"
+  ],
+  "avoidFor": [
+    "高量、成本敏感且輸出量大的工作（冗長度高，改用 GPT-6 Luna / Gemini 3.8 Flash）",
+    "需要日本境內處理的 Bedrock 工作負載（沒有 jp profile，改用 Opus 5.5 jp.*）",
+    "仍依賴 forced tool_choice、thinking disabled 或 temperature 的程式"
+  ],
+  "safetyAndCompliance": [
+    {
+      "item": "拒答與分類",
+      "detail": "stop_reason: refusal（HTTP 200）；stop_details 五類（cyber、bio、frontier_llm、reasoning_extraction、general_harms）。監控與計費要以 stop_reason 統計，不能只看狀態碼。",
+      "sources": [
+        {
+          "id": "anthropic-sonnet55-whatsnew"
+        }
+      ]
+    },
+    {
+      "item": "Refusal 計費",
+      "detail": "Anthropic 2026-09-24 起恢復對 bio、frontier_llm、reasoning_extraction 類「輸出前拒答」計費。",
+      "sources": [
+        {
+          "id": "anthropic-release-notes"
+        }
+      ]
+    },
+    {
+      "item": "資料處理",
+      "detail": "Foundry 上 Hosted on Anthropic 選項由 Anthropic 營運、資料可能在 Azure 之外處理；Bedrock 與 Agent Platform 依各 CSP 條款。",
+      "sources": [
+        {
+          "id": "ms-techcommunity-sonnet55-foundry"
+        },
+        {
+          "id": "ms-foundry-claude-hosting"
+        }
+      ]
+    }
+  ],
+  "enterpriseNotes": [
+    "資料駐留：三雲都沒有台灣境內處理；Bedrock 也沒有日本 geo（與 Opus 5.5 不同）。需日本境內處理的 Claude 工作負載目前只能用 Opus 5.5 jp.* 或 Sonnet 5（如有）。",
+    "Sonnet 4.5 退役：Anthropic API 與 Foundry 退役表皆為 2026-11-30（Foundry 表在 10-02 由 11-15 改為 11-30）；建議替代 Sonnet 5.5。Bedrock 與 Google Cloud 尚未公告。",
+    "金融業：Sonnet 5 → 5.5 的參數與 thinking 行為變更屬模型升版，應走變更管理並保存回歸證據。",
+    "成本：單價同 Sonnet 5，但 AA 評測輸出量是中位數的 5 倍；先用內部任務量測每任務成本再決定預設 effort（預設 high 偏貴）。",
+    "Foundry US Data Zone：Anthropic 定價頁載明套用 1.1 倍（Global Standard 為標準價），Microsoft 的公告與計費頁沒有提到；預算以 1.1 倍估，並以帳單確認。",
+    "LiteLLM：建議版本改為 v1.104.0（先過 staging）；v1.104.0 release notes 的新模型表沒有讀到 claude-sonnet-5-5，請用 remote cost map reload。經 Agent Platform 路由時，Claude Code 的 per-message effort 會回 400 後重試、實際不生效（LiteLLM issue #43557，開啟中）。"
+  ],
+  "testPlanFocus": [
+    "effort low / medium / high / xhigh 的品質、TTFAT 與每任務成本 vs Sonnet 5 與 Opus 5.5。",
+    "thinking disabled → between_tools、forced tool_choice、temperature 三類回歸。",
+    "跨帳號 / 跨 CSP fallback 後的對話品質（thinking 被丟棄）。",
+    "繁中品質、簡體字混入與 token 效率。",
+    "Bedrock 路由：global.* 從台北的延遲；structured outputs 不支援的應用。"
+  ],
+  "onboarding": {
+    "audience": "透過公司 LiteLLM gateway 呼叫的應用開發團隊（特別是 Sonnet 4.5 / Sonnet 5 使用者）",
+    "prerequisites": [
+      "gateway key 在 claude-sonnet-5-5 允許清單中（beta 期間需申請）。",
+      "程式已移除 thinking disabled / budget_tokens、forced tool_choice、temperature / top_p / top_k。",
+      "確認資料等級與可用路由。"
+    ],
+    "steps": [
+      {
+        "title": "申請存取",
+        "detail": "在 portal 申請 beta，填用途與資料等級。"
+      },
+      {
+        "title": "選路由",
+        "detail": "預設 claude-sonnet-5-5（Bedrock global，台北區可呼叫）；GCP 專案用 @vertex；Azure 專案用 @azure。沒有日本境內選項。"
+      },
+      {
+        "title": "設定 effort",
+        "detail": "預設是 high；互動用途明確送 low 或 medium，要降低延遲可改用 thinking between_tools。"
+      },
+      {
+        "title": "從 Sonnet 4.5 遷移",
+        "detail": "Anthropic API 與 Foundry 皆為 2026-11-30 退役；先跑 golden set 對照，再切 alias。"
+      },
+      {
+        "title": "監控拒答",
+        "detail": "記錄 stop_reason 與 stop_details 類別。"
+      }
+    ],
+    "aliases": [
+      {
+        "alias": "claude-sonnet-5-5",
+        "target": "bedrock/converse/global.anthropic.claude-sonnet-5-5",
+        "note": "預設路由"
+      },
+      {
+        "alias": "claude-sonnet-5-5@vertex",
+        "target": "vertex_ai/claude-sonnet-5-5（global）"
+      },
+      {
+        "alias": "claude-sonnet-5-5@azure",
+        "target": "azure_ai/claude-sonnet-5-5"
+      },
+      {
+        "alias": "tier/general",
+        "target": "評估是否由 gpt-6-sol 改指向 claude-sonnet-5-5 或 gpt-6-1-sol",
+        "note": "能力層 alias，依發布關卡決定"
+      }
+    ],
+    "parameterGuidance": [
+      {
+        "parameter": "reasoning_effort / output_config.effort",
+        "guidance": "low | medium | high（預設）| xhigh | max。xhigh 見於 Bedrock 模型卡；其他通路是否接受請用 compat suite 確認。"
+      },
+      {
+        "parameter": "thinking",
+        "guidance": "不要送 disabled 或 budget_tokens；可省略、送 adaptive，或 between_tools（限 low～high）。"
+      },
+      {
+        "parameter": "tool_choice",
+        "guidance": "只用 auto 或 none。"
+      },
+      {
+        "parameter": "temperature / top_p / top_k",
+        "guidance": "不要送非預設值（400）。"
+      },
+      {
+        "parameter": "max_tokens",
+        "guidance": "包含 thinking；預設 effort high 時要預留空間。"
+      }
+    ],
+    "codeSamples": [
+      {
+        "lang": "python",
+        "title": "OpenAI SDK（經 gateway）",
+        "code": "import os\nfrom openai import OpenAI\n\nclient = OpenAI(base_url=\"https://llm-gateway.example.internal/v1\", api_key=os.environ[\"LITELLM_API_KEY\"])\n\nresp = client.chat.completions.create(\n    model=\"claude-sonnet-5-5\",\n    reasoning_effort=\"medium\",  # 預設是 high；互動用途建議 low / medium\n    max_tokens=8000,\n    messages=[{\"role\": \"user\", \"content\": \"用三點摘要這次變更的風險。\"}],\n)\nprint(resp.model, resp.choices[0].finish_reason)\nprint(resp.choices[0].message.content)\n"
+      },
+      {
+        "lang": "python",
+        "title": "Anthropic SDK + between_tools（經 gateway 的 /v1/messages）",
+        "code": "import os\nfrom anthropic import Anthropic\n\nclient = Anthropic(base_url=\"https://llm-gateway.example.internal\", auth_token=os.environ[\"LITELLM_API_KEY\"])\n\nmsg = client.messages.create(\n    model=\"claude-sonnet-5-5\",\n    max_tokens=4000,\n    thinking={\"type\": \"between_tools\"},          # 取代 disabled；限 low / medium / high\n    extra_body={\"output_config\": {\"effort\": \"low\"}},\n    messages=[{\"role\": \"user\", \"content\": \"列出三個測試案例。\"}],\n)\nif msg.stop_reason == \"refusal\":\n    print(\"refused:\", getattr(msg, \"stop_details\", None))\nelse:\n    print(msg.content[-1].text)\n"
+      },
+      {
+        "lang": "yaml",
+        "title": "LiteLLM 設定",
+        "code": "model_list:\n  - model_name: claude-sonnet-5-5\n    litellm_params:\n      model: bedrock/converse/global.anthropic.claude-sonnet-5-5\n      aws_region_name: ap-east-2\n    model_info: {catalog_id: claude-sonnet-5-5, service: bedrock, data_residency: global}\n  - model_name: claude-sonnet-5-5@vertex\n    litellm_params:\n      model: vertex_ai/claude-sonnet-5-5\n      vertex_project: os.environ/VERTEX_PROJECT\n      vertex_location: global\n    model_info: {catalog_id: claude-sonnet-5-5, service: agent-platform, data_residency: global}\n  - model_name: claude-sonnet-5-5@azure\n    litellm_params:\n      model: azure_ai/claude-sonnet-5-5\n      api_base: os.environ/AZURE_AI_CLAUDE_API_BASE\n      api_key: os.environ/AZURE_AI_CLAUDE_API_KEY\n    model_info: {catalog_id: claude-sonnet-5-5, service: foundry, data_residency: global}\n"
+      }
+    ],
+    "dataClassification": "範例政策：公開/內部資料可用任一已核准路由；機密資料只可用明確限定處理地的路由（例：Bedrock JP geo）並經法務核准；極機密資料不開放（三雲皆無台灣境內處理選項）。請依公司資料分級規範調整。",
+    "support": "Slack #llm-platform；每週四 14:00 office hour（範例，請改成你們的窗口）"
+  },
+  "openQuestions": [
+    "Bedrock 價格與 geo 加價？（模型卡 2026-10-06 仍未列；pricing 頁的靜態內容沒有 Claude 5.x 的列。LiteLLM v1.105.0rc1 的 cost map 列 global $2 / $10、us. / eu. $2.2 / $11）",
+    "Bedrock 是否會加 jp. / au. profile？（2026-10-06：模型卡仍只有 us. / eu.；LiteLLM cost map 有 jp. / au. / apac. 的列，但那不是 AWS 的資料）",
+    "Foundry US Data Zone 的 1.1 倍只見於 Anthropic 定價頁，Microsoft 頁面未提——實際帳單是否如此？",
+    "xhigh effort：Bedrock 模型卡列出；Anthropic API、Agent Platform 與 Foundry 是否接受？",
+    "Agent Platform 的區域與配額？（定價頁只有 Global 與 US / EU multi-region）",
+    "Haiku 5.5 何時發布？（2026-10-06 仍未發布；Sonnet 5.5 發布文寫 coming weeks）"
+  ],
+  "sources": [
+    {
+      "id": "anthropic-sonnet55-news"
+    },
+    {
+      "id": "anthropic-sonnet55-overview"
+    },
+    {
+      "id": "anthropic-sonnet55-whatsnew"
+    },
+    {
+      "id": "anthropic-release-notes"
+    },
+    {
+      "id": "aws-bedrock-sonnet55-card"
+    },
+    {
+      "id": "ms-techcommunity-sonnet55-foundry"
+    },
+    {
+      "id": "anthropic-claude-on-gcp"
+    },
+    {
+      "id": "aa-sonnet55"
+    },
+    {
+      "id": "litellm-sonnet55"
+    },
+    {
+      "id": "ms-foundry-claude-hosting"
+    },
+    {
+      "id": "google-agentplatform-pricing"
+    },
+    {
+      "id": "google-agentplatform-release-notes"
+    },
+    {
+      "id": "anthropic-pricing"
+    },
+    {
+      "id": "ms-foundry-retirement-schedule"
+    },
+    {
+      "id": "ms-foundry-model-catalog"
+    },
+    {
+      "id": "litellm-v1-104-0"
+    },
+    {
+      "id": "litellm-issue-43557"
+    },
+    {
+      "id": "anthropic-sonnet55-announce"
+    },
+    {
+      "id": "litellm-v1-105-0-rc1"
+    }
+  ]
+}

@@ -3,8 +3,8 @@
   "modelId": "gpt-6-luna",
   "title": "GPT-6 Luna 技術深度解析",
   "locale": "zh-TW",
-  "asOf": "2026-09-24",
-  "tldr": "GPT-6 Luna 是高量低價層（$0.10 / $0.50，每任務約 $0.07），適合分類、擷取、摘要與路由；請以 effort none / low 使用，max effort 的首 token 會超過 100 秒。",
+  "asOf": "2026-10-06",
+  "tldr": "GPT-6 Luna 是高量低價層（$0.10 / $0.50，每任務約 $0.07），適合分類、擷取、摘要與路由；請以 effort none / low 使用，max effort 的首 token 會超過 100 秒。Bedrock 官方模型卡已發布：價格與社群資料一致、台北區可用 Global CRIS、runtime 支援 structured outputs（non-streaming）。",
   "whatsNew": [
     {
       "title": "價格減半",
@@ -24,6 +24,15 @@
       "sources": [
         {
           "id": "aws-sol-luna-whatsnew"
+        }
+      ]
+    },
+    {
+      "title": "Bedrock 官方模型卡發布",
+      "detail": "Global $0.10 / $0.50（cache write $0.125、read $0.01）；US Geo 與 mantle In-Region +10%；>272K 長文 $0.20 / $0.75；output token 以 10 倍計入配額；只有 Standard 層。",
+      "sources": [
+        {
+          "id": "aws-bedrock-luna-card"
         }
       ]
     }
@@ -69,7 +78,7 @@
       "cloud": "aws",
       "service": "bedrock",
       "status": "ga",
-      "notes": "官方模型卡待發布。"
+      "notes": "官方模型卡已發布：profile us.* / global.*；APAC（含台北）只有 Global CRIS；mantle 只在 us-east-1；runtime 支援 Invoke、四個 API 都可套 Guardrails（模型卡 2026-10-06）；EOL 不早於 2027-09-22。"
     },
     {
       "cloud": "gcp",
@@ -92,21 +101,33 @@
       "note": "Chat + tools 限 effort=none"
     },
     {
-      "route": "gpt-6-luna@bedrock",
-      "surface": "Converse",
+      "route": "gpt-6-luna@bedrock（bedrock-runtime /openai/v1）",
+      "surface": "Responses / Chat Completions / Converse / Invoke",
       "status": "supported",
-      "note": "社群使用紀錄"
+      "note": "官方模型卡（2026-10-06）；Messages 不支援，Invoke 自這一版模型卡起支援"
+    },
+    {
+      "route": "gpt-6-luna@bedrock（bedrock-mantle, us-east-1）",
+      "surface": "Responses / Chat Completions",
+      "status": "supported",
+      "note": "僅 us-east-1 in-region"
+    },
+    {
+      "route": "gpt-6-luna@bedrock",
+      "surface": "Structured outputs",
+      "status": "supported",
+      "note": "bedrock-runtime JSON Schema（non-streaming；Responses、Chat Completions、InvokeModel、Converse；Converse 需 strict 設定）；模型卡 2026-10-06"
     }
   ],
   "strengths": [
     "極低價：$0.10 / $0.50，cached input $0.01；Batch/Flex 再五折。",
-    "AA 37 分，在同級 175 個模型中排名第 6；每任務 $0.07。",
-    "131 tok/s（AA）；effort=none 時延遲最低。",
+    "AA 38 分，在同級 176 個模型中排名第 6；每任務 $0.07。",
+    "135 tok/s（AA，2026-10-06 讀取）；effort=none 時延遲最低。",
     "適合當 router、分類器或 guardrail 前置過濾器。"
   ],
   "weaknesses": [
-    "max effort 首 token 102.8 秒——請以 none/low 使用。",
-    "偏冗長（AA 評測 150M tokens）。",
+    "max effort 首 token 約 88 秒（AA，2026-10-06 讀取）——請以 none/low 使用。",
+    "偏冗長（AA 評測 140M tokens，同級中位數 100M）。",
     "Azure 沒有 Provisioned；Chat Completions + tools 同樣限 effort=none。"
   ],
   "bestFor": [
@@ -131,12 +152,21 @@
   ],
   "enterpriseNotes": [
     "適合 tier/fast 與 LiteLLM auto router 的低成本層。",
-    "與 Gemini 3.8 Flash 比較時用相同任務與 effort 量測每任務成本。"
+    "與 Gemini 3.8 Flash 比較時用相同任務與 effort 量測每任務成本。",
+    "Bedrock：台北區（ap-east-2）可直接呼叫 global.openai.gpt-6-luna；APAC 沒有 geo 選項。",
+    "Bedrock 容量規劃：output token 以 10 倍計入 TPM。",
+    "OpenAI 2026-09-25 修正 GPT-6 Sol / Luna 的影像編碼 bug（先前會降低影像理解品質）：在這之前做的影像輸入評測請重跑。公告範圍是 OpenAI API 與 Codex，Bedrock / Foundry 是否受影響未載明。",
+    "OpenAI 10-01 把 gpt-6-luna 列為 gpt-5.4-nano（2027-04-01 關閉）的建議替代；knowledge cutoff 為 2026-05-18。",
+    "LiteLLM issue #42725（開啟中）另回報 Bedrock Converse 路徑會丟掉 GPT-6 Sol / Luna 的 tools；留言稱 main 已恢復，但哪個版本開始包含沒有載明——Bedrock 路由上線前用 compat suite 斷言確實有 tool call。",
+    "Bedrock 模型卡（2026-10-06）放寬了三件事：runtime 新增 Invoke；Guardrails 由只有 Converse 擴大到 Responses、Chat Completions、InvokeModel、Converse；prompt caching 的 implicit 在這四個 API 都支援，explicit 不支援 Converse（要設 prompt_cache_options.mode = explicit）。structured outputs 仍只有 non-streaming。",
+    "LiteLLM v1.105.0（目前只有 rc.1）會把 Bedrock 上的 GPT-5.6 / GPT-6 / GPT-6.1 預設路徑由 Converse 改成原生 Chat Completions；明寫 bedrock/converse/ 的 deployment 不受影響。升級前在 staging 重跑 compat suite。"
   ],
   "testPlanFocus": [
     "分類/擷取 golden set 的準確率 vs GPT-5.6 Luna 與 Gemini 3.8 Flash",
     "effort none 的延遲分佈",
-    "繁中擷取（姓名、地址、統編）正確率"
+    "繁中擷取（姓名、地址、統編）正確率",
+    "影像輸入 golden set 重跑（OpenAI 09-25 修正影像編碼 bug 之後）",
+    "Bedrock Converse 路徑的工具呼叫：斷言回應裡確實有 tool call（LiteLLM issue #42725）"
   ],
   "onboarding": {
     "audience": "資料處理、分類與路由類應用",
@@ -157,6 +187,11 @@
       {
         "alias": "gpt-6-luna",
         "target": "azure/<gpt-6-luna deployment>"
+      },
+      {
+        "alias": "gpt-6-luna@bedrock",
+        "target": "bedrock/converse/global.openai.gpt-6-luna",
+        "note": "台北區可呼叫；需 additional_drop_params: [temperature]"
       },
       {
         "alias": "tier/fast",
@@ -181,7 +216,8 @@
     "support": "Slack #llm-platform；每週四 14:00 office hour（範例，請改成你們的窗口）"
   },
   "openQuestions": [
-    "Bedrock 官方模型卡與價格？"
+    "Azure 退役日？（官方表 2026-10-02 查仍未列入；模型目錄中繼資料 inferenceDeprecationDate 為 2028-03-11，意義沒有文件說明）",
+    "LiteLLM 何時合併 Bedrock temperature 修正（PR #42726）？（10-05 讀取時仍未合併；v1.104.0 與 v1.105.0rc1 的 notes 都沒有列。v1.105 起預設路徑改為原生 Chat Completions，要重新驗證）"
   ],
   "sources": [
     {
@@ -198,6 +234,30 @@
     },
     {
       "id": "litellm-sol-luna"
+    },
+    {
+      "id": "aws-bedrock-luna-card"
+    },
+    {
+      "id": "aws-sol-luna-blog"
+    },
+    {
+      "id": "openai-changelog"
+    },
+    {
+      "id": "openai-deprecations"
+    },
+    {
+      "id": "openai-models"
+    },
+    {
+      "id": "ms-foundry-model-catalog"
+    },
+    {
+      "id": "litellm-issue-42725"
+    },
+    {
+      "id": "litellm-v1-105-0-rc1"
     }
   ]
 }
