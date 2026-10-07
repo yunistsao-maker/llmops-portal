@@ -1,0 +1,329 @@
+{
+  "schema": "deep-dive/v1",
+  "modelId": "gpt-6-sol",
+  "title": "GPT-6 Sol 技術深度解析",
+  "locale": "zh-TW",
+  "asOf": "2026-09-24",
+  "tldr": "GPT-6 Sol 是 GPT-5.6 Sol 的直接升級：價格減半（$2/$10）、錯誤減半（OpenAI 自述）、AA 48 分，Azure 與 Bedrock 同日 GA。最大的相容性陷阱是 Chat Completions 的工具呼叫只在 reasoning_effort=none 時可用。Bedrock 官方模型卡尚未發布，先留在 beta。",
+  "whatsNew": [
+    {
+      "title": "Astra 的方法下放",
+      "detail": "以類似 Astra 的方法改進專業工作、事實性、程式、computer use 與對齊；OpenAI 稱錯誤約為 GPT-5.6 Sol 的一半。",
+      "sources": [
+        {
+          "id": "macrumors-sol-luna"
+        },
+        {
+          "id": "aws-sol-luna-blog"
+        }
+      ]
+    },
+    {
+      "title": "價格減半",
+      "detail": "$2 / $10、cached input $0.20（90% 折扣），長文 $4 / $15。",
+      "sources": [
+        {
+          "id": "openai-gpt6-sol-model"
+        },
+        {
+          "id": "ms-foundry-gpt6-blog"
+        }
+      ]
+    },
+    {
+      "title": "企業部署選項",
+      "detail": "Azure：Standard（28 個 Global 區域 + US/EU Data Zone）、Provisioned、Priority Processing（Global 與 US Data Zone）；Bedrock：GA。",
+      "sources": [
+        {
+          "id": "ms-foundry-gpt6-blog"
+        },
+        {
+          "id": "aws-sol-luna-whatsnew"
+        }
+      ]
+    },
+    {
+      "title": "Caching 改善",
+      "detail": "代理可重用更多 context；中途改 reasoning effort 不再破壞 cache（LiteLLM 說明）。",
+      "sources": [
+        {
+          "id": "macrumors-sol-luna"
+        },
+        {
+          "id": "litellm-sol-luna"
+        }
+      ]
+    }
+  ],
+  "vsPredecessor": {
+    "predecessorId": "gpt-5.6-sol",
+    "changes": [
+      {
+        "area": "單價",
+        "before": "$4 / $20（牌價）",
+        "after": "$2 / $10",
+        "impact": "與 GPT-5.6 Sol 促銷價相比約一半。"
+      },
+      {
+        "area": "Knowledge cutoff",
+        "before": "2026-02-16",
+        "after": "2026-04-20",
+        "impact": "較新的知識。"
+      },
+      {
+        "area": "Chat Completions 工具呼叫",
+        "before": "可用",
+        "after": "只在 reasoning_effort=none 時可用",
+        "impact": "需要 reasoning 的代理應用要改 Responses API。"
+      },
+      {
+        "area": "Prompt caching 參數",
+        "before": "prompt_cache_retention",
+        "after": "prompt_cache_options.ttl",
+        "impact": "更新 SDK 呼叫。"
+      }
+    ]
+  },
+  "breakingChanges": [
+    {
+      "title": "Chat Completions + tools 需 effort=none",
+      "detail": "Sol/Luna 的 function calling 在 Chat Completions 只有 reasoning_effort=\"none\" 時可用。",
+      "migration": "需要 reasoning + tools 的應用改走 /v1/responses；只需工具、不需推理者明確送 none。",
+      "severity": "high",
+      "sources": [
+        {
+          "id": "openai-latest-model-guide"
+        }
+      ]
+    },
+    {
+      "title": "temperature 只在 effort=none 時生效",
+      "detail": "effort ≠ none 時要移除 temperature、top_p、top_logprobs。",
+      "migration": "client 不送；Bedrock 路徑在 gateway 加 additional_drop_params。",
+      "severity": "medium",
+      "sources": [
+        {
+          "id": "openai-latest-model-guide"
+        },
+        {
+          "id": "litellm-sol-luna"
+        }
+      ]
+    },
+    {
+      "title": "Prompt caching 參數改名",
+      "detail": "prompt_cache_retention → prompt_cache_options.ttl = \"30m\"。",
+      "migration": "更新 SDK 呼叫。",
+      "severity": "low",
+      "sources": [
+        {
+          "id": "openai-latest-model-guide"
+        }
+      ]
+    }
+  ],
+  "availabilityMatrix": [
+    {
+      "cloud": "azure",
+      "service": "foundry",
+      "status": "ga",
+      "notes": "Standard、Provisioned、Priority Processing。"
+    },
+    {
+      "cloud": "aws",
+      "service": "bedrock",
+      "status": "ga",
+      "notes": "官方模型卡待發布；profile：us.* / global.*。"
+    },
+    {
+      "cloud": "gcp",
+      "service": "agent-platform",
+      "status": "not-offered",
+      "notes": "未上架。"
+    },
+    {
+      "cloud": "vendor-direct",
+      "service": "openai-api",
+      "status": "ga",
+      "notes": "Tier 1 500 RPM / 500K TPM … Tier 5 15K RPM / 40M TPM。"
+    }
+  ],
+  "apiCompatibility": [
+    {
+      "route": "gpt-6-sol@foundry",
+      "surface": "Responses",
+      "status": "supported"
+    },
+    {
+      "route": "gpt-6-sol@foundry",
+      "surface": "Chat Completions + tools",
+      "status": "partial",
+      "note": "僅 effort=none"
+    },
+    {
+      "route": "gpt-6-sol@bedrock",
+      "surface": "Converse",
+      "status": "supported",
+      "note": "社群使用紀錄"
+    },
+    {
+      "route": "gpt-6-sol@bedrock",
+      "surface": "OpenAI 相容（runtime / mantle）",
+      "status": "unknown",
+      "note": "待官方模型卡"
+    }
+  ],
+  "strengths": [
+    "AA Intelligence Index v4.3.2 48 分（max，#18/210），每任務成本 $1.06。",
+    "價格減半：$2 / $10、cached input $0.20；Azure 另有 Provisioned 與 Priority Processing。",
+    "支援 effort none～max：none 時可用 temperature，也能在 Chat Completions 使用工具。",
+    "113 tok/s（AA），輸出相對精簡（77M tokens）。",
+    "1.05M context、128K output。"
+  ],
+  "weaknesses": [
+    "max effort 首 token 延遲高（AA 142.7 秒）——互動場景請用 low/medium。",
+    "Chat Completions + tools 需 effort=none；要 reasoning + tools 必須改 Responses API。",
+    "Bedrock 模型卡在發布日尚未上線，Bedrock 價格與區域目前只有社群資料。",
+    "不支援 fine-tuning；長文（>272K）$4/$15。"
+  ],
+  "bestFor": [
+    "多數企業預設工作負載：程式、分析、多步驟流程（GPT-5.6 Sol 的直接升級）",
+    "成本受控的代理任務",
+    "Azure 上需要 PTU 或 Priority SLA 的正式環境"
+  ],
+  "avoidFor": [
+    "最困難的推理任務（改用 Astra 或 Opus 5.5）",
+    "仍用 Chat Completions + tools 且需要 reasoning 的舊程式（需改 Responses）"
+  ],
+  "safetyAndCompliance": [
+    {
+      "item": "Bedrock 資料處理",
+      "detail": "硬體隔離、零操作員存取；推論資料不用於訓練；被標記流量最多保留 30 天，ZDR 需向 AWS 申請。",
+      "sources": [
+        {
+          "id": "aws-sol-luna-blog"
+        }
+      ]
+    },
+    {
+      "item": "對齊",
+      "detail": "OpenAI 稱在對齊測試中，關於程式工作的誤導性宣稱比例較低。",
+      "sources": [
+        {
+          "id": "macrumors-sol-luna"
+        }
+      ]
+    }
+  ],
+  "enterpriseNotes": [
+    "最適合做 tier/general 的預設候選：價格、速度與能力平衡。",
+    "Azure Priority Processing 只在 Global 與 US Data Zone；APAC 仍是 Global。",
+    "Bedrock 官方模型卡發布前，價格與 API 面以社群資料為準——維持 beta。"
+  ],
+  "testPlanFocus": [
+    "Chat Completions + tools（effort=none）與 Responses + tools（effort=medium）兩種路徑的回歸。",
+    "effort none / low / medium 的品質與 TTFAT。",
+    "與 GPT-5.6 Sol 的 pairwise 評測與每任務成本。",
+    "Bedrock 路徑的 temperature 丟棄與 profile ID。"
+  ],
+  "onboarding": {
+    "audience": "一般應用開發團隊",
+    "prerequisites": [
+      "gateway key 在 gpt-6-sol 允許清單中",
+      "若使用工具，確認 effort 與 API 的組合"
+    ],
+    "steps": [
+      {
+        "title": "選路由",
+        "detail": "預設 gpt-6-sol（Azure Global Standard）；需要穩定延遲用 gpt-6-sol@azure-priority；AWS 專案用 gpt-6-sol@bedrock（beta）。"
+      },
+      {
+        "title": "選 API",
+        "detail": "需要 reasoning + tools → /v1/responses；只要快速工具呼叫 → /v1/chat/completions + reasoning_effort=none。"
+      },
+      {
+        "title": "驗證",
+        "detail": "用 golden set 對照 GPT-5.6 Sol。"
+      }
+    ],
+    "aliases": [
+      {
+        "alias": "gpt-6-sol",
+        "target": "azure/<gpt-6-sol deployment>（Global Standard）",
+        "note": "預設"
+      },
+      {
+        "alias": "gpt-6-sol@azure-priority",
+        "target": "azure/<Priority Processing deployment>"
+      },
+      {
+        "alias": "gpt-6-sol@bedrock",
+        "target": "bedrock/converse/global.openai.gpt-6-sol",
+        "note": "beta"
+      },
+      {
+        "alias": "tier/general",
+        "target": "GA 後評估指向 gpt-6-sol",
+        "note": "能力層 alias"
+      }
+    ],
+    "parameterGuidance": [
+      {
+        "parameter": "reasoning_effort",
+        "guidance": "none | low | medium（預設）| high | xhigh | max。"
+      },
+      {
+        "parameter": "tools（Chat Completions）",
+        "guidance": "只在 reasoning_effort=none 時可用。"
+      },
+      {
+        "parameter": "temperature",
+        "guidance": "只在 effort=none 時生效。"
+      }
+    ],
+    "codeSamples": [
+      {
+        "lang": "python",
+        "title": "Chat Completions + tools（effort=none）",
+        "code": "import os\nfrom openai import OpenAI\n\nclient = OpenAI(base_url=\"https://llm-gateway.example.internal/v1\", api_key=os.environ[\"LITELLM_API_KEY\"])\n\nresp = client.chat.completions.create(\n    model=\"gpt-6-sol\",\n    reasoning_effort=\"none\",   # Chat Completions 的工具呼叫只在 none 時可用\n    temperature=0.2,            # 只在 effort=none 時生效\n    tools=[{\"type\": \"function\", \"function\": {\n        \"name\": \"lookup_policy\",\n        \"parameters\": {\"type\": \"object\", \"properties\": {\"topic\": {\"type\": \"string\"}}},\n    }}],\n    messages=[{\"role\": \"user\", \"content\": \"請查詢出差報帳規定。\"}],\n)\nprint(resp.choices[0].message.tool_calls)\n"
+      },
+      {
+        "lang": "bash",
+        "title": "curl（Responses、effort=medium）",
+        "code": "curl -sS https://llm-gateway.example.internal/v1/responses \\\n  -H \"Authorization: Bearer $LITELLM_API_KEY\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"model\": \"gpt-6-sol\", \"reasoning\": {\"effort\": \"medium\"}, \"input\": \"比較這兩份合約的差異。\"}'"
+      }
+    ],
+    "dataClassification": "範例政策：公開/內部資料可用任一已核准路由；機密資料只可用明確限定處理地的路由（例：Bedrock JP geo）並經法務核准；極機密資料不開放（三雲皆無台灣境內處理選項）。請依公司資料分級規範調整。",
+    "support": "Slack #llm-platform；每週四 14:00 office hour（範例，請改成你們的窗口）"
+  },
+  "openQuestions": [
+    "Bedrock 官方模型卡（端點、區域、EOL no sooner than）何時發布？",
+    "Azure 退役日？"
+  ],
+  "sources": [
+    {
+      "id": "openai-gpt6-sol-model"
+    },
+    {
+      "id": "openai-latest-model-guide"
+    },
+    {
+      "id": "ms-foundry-gpt6-blog"
+    },
+    {
+      "id": "aws-sol-luna-whatsnew"
+    },
+    {
+      "id": "aa-sol"
+    },
+    {
+      "id": "litellm-sol-luna"
+    },
+    {
+      "id": "macrumors-sol-luna"
+    },
+    {
+      "id": "aws-sol-luna-blog"
+    }
+  ]
+}

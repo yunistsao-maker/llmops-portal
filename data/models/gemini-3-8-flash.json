@@ -1,0 +1,310 @@
+{
+  "schema": "deep-dive/v1",
+  "modelId": "gemini-3-8-flash",
+  "title": "Gemini 3.8 Flash 技術深度解析",
+  "locale": "zh-TW",
+  "asOf": "2026-09-24",
+  "tldr": "Gemini 3.8 Flash 是目前最快的實用型模型之一（約 291 tok/s），多模態輸入與 Google 工具整合是強項；只在 GCP。要注意三件事：促銷價 2027-01-01 翻倍、移除了 temperature 等取樣參數、Agent Platform 沒有亞太單一區域端點。AA 上市時的 59 分與現行 v4.3.2 的 41 分是不同版本，不要拿來和其他模型混比。",
+  "whatsNew": [
+    {
+      "title": "直接 GA",
+      "detail": "2026-09-02 以穩定版 gemini-3.8-flash 推出，定位長時程軟體工程、自主代理與企業流程。",
+      "sources": [
+        {
+          "id": "google-gemini38-model"
+        },
+        {
+          "id": "google-gemini38-latest"
+        }
+      ]
+    },
+    {
+      "title": "同價更強",
+      "detail": "與 3.7 Flash 同為 $0.75 / $3.75（促銷），AA 上市評測 +3 分。",
+      "sources": [
+        {
+          "id": "aa-gemini38-article"
+        }
+      ]
+    },
+    {
+      "title": "工具與模態",
+      "detail": "文字、影像、影片、音訊、PDF 輸入；Search / Maps grounding、code execution、URL context、file search、computer use（preview）；Batch、Flex、Priority。",
+      "sources": [
+        {
+          "id": "google-gemini38-model"
+        }
+      ]
+    },
+    {
+      "title": "Cyber 變體",
+      "detail": "另有 Gemini 3.8 Flash Cyber（資安專用）。",
+      "sources": [
+        {
+          "id": "innfactory-gemini"
+        }
+      ]
+    }
+  ],
+  "vsPredecessor": {
+    "predecessorId": "gemini-3-7-flash",
+    "changes": [
+      {
+        "area": "AA 指數（上市當日版本）",
+        "before": "56",
+        "after": "59",
+        "impact": "+3 分（high）。"
+      },
+      {
+        "area": "每任務輸出 token",
+        "before": "約 37k",
+        "after": "約 48k（+30%）",
+        "impact": "每任務成本 $0.40 → $0.58（+40%）。"
+      },
+      {
+        "area": "單價",
+        "before": "$0.75 / $3.75（促銷）",
+        "after": "$0.75 / $3.75（促銷至 2026-12-31）",
+        "impact": "2027 起 $1.50 / $7.50。"
+      }
+    ]
+  },
+  "breakingChanges": [
+    {
+      "title": "移除取樣參數",
+      "detail": "temperature、top_p、top_k、thinking_budget、candidate_count 需自設定移除。",
+      "migration": "改用 thinking_level；gateway 對此 deployment 開 drop_params。",
+      "severity": "high",
+      "sources": [
+        {
+          "id": "google-gemini38-latest"
+        }
+      ]
+    },
+    {
+      "title": "FunctionResponse 必須帶 call_id 與 name",
+      "detail": "否則函式呼叫失敗；工具呼叫前夾帶文字可能觸發 Malformed_Function_Call。",
+      "migration": "更新 agent loop 的 function response 組裝。",
+      "severity": "high",
+      "sources": [
+        {
+          "id": "google-gemini38-latest"
+        },
+        {
+          "id": "litellm-gemini38"
+        }
+      ]
+    },
+    {
+      "title": "不支援 minimal thinking",
+      "detail": "thinking_level=minimal 回 400。",
+      "migration": "最低用 low。",
+      "severity": "medium",
+      "sources": [
+        {
+          "id": "google-gemini38-latest"
+        },
+        {
+          "id": "litellm-gemini38"
+        }
+      ]
+    },
+    {
+      "title": "不允許 prefill",
+      "detail": "預先填入 model turn 不再被接受。",
+      "migration": "改用 system 指示或 structured outputs。",
+      "severity": "medium",
+      "sources": [
+        {
+          "id": "google-gemini38-latest"
+        }
+      ]
+    }
+  ],
+  "availabilityMatrix": [
+    {
+      "cloud": "gcp",
+      "service": "agent-platform",
+      "status": "ga",
+      "notes": "global 與 EU multi-region（資料駐留 + ML processing）；無亞太單一區域。"
+    },
+    {
+      "cloud": "vendor-direct",
+      "service": "gemini-api",
+      "status": "ga",
+      "notes": "AI Studio / Gemini API。"
+    },
+    {
+      "cloud": "aws",
+      "service": "bedrock",
+      "status": "not-offered",
+      "notes": "Bedrock 只有 Gemma 系列。"
+    },
+    {
+      "cloud": "azure",
+      "service": "foundry",
+      "status": "not-offered",
+      "notes": "未上架。"
+    }
+  ],
+  "apiCompatibility": [
+    {
+      "route": "gemini-3-8-flash@agent-platform",
+      "surface": "generateContent",
+      "status": "supported"
+    },
+    {
+      "route": "gemini-3-8-flash@agent-platform",
+      "surface": "OpenAI 相容 /chat/completions（原生）",
+      "status": "unknown",
+      "note": "以 compat suite 驗證"
+    },
+    {
+      "route": "LiteLLM gateway",
+      "surface": "/v1/chat/completions、/v1/responses、/v1/messages",
+      "status": "supported",
+      "note": "LiteLLM Day-0 說明"
+    }
+  ],
+  "strengths": [
+    "速度：AA 測得 291 tok/s，high effort 首 token 約 15 秒。",
+    "多模態輸入：文字、影像、影片、音訊、PDF。",
+    "內建工具：Search / Maps grounding、code execution、URL context、file search、computer use（preview）。",
+    "與 3.7 Flash 同價但分數更高；支援 Batch、Flex、Priority。"
+  ],
+  "weaknesses": [
+    "促銷價 2027-01-01 翻倍（$1.50 / $7.50、cache $0.15）。",
+    "每任務輸出 token 比 3.7 Flash 多約 30%，每任務成本上升約 40%（AA 上市評測）。",
+    "AA v4.3.2 只得 41 分（#40）；上市時的 59 分來自舊版 index，不可直接比較。",
+    "移除 temperature/top_p/top_k/thinking_budget/candidate_count；不允許 prefill；FunctionResponse 必須帶 call_id 與 name。",
+    "Agent Platform 只有 global 與 EU multi-region，沒有亞太單一區域端點；AWS/Azure 不提供。"
+  ],
+  "bestFor": [
+    "高吞吐的代理子任務與程式輔助",
+    "影音、文件等多模態理解",
+    "需要 Google Search grounding 的應用",
+    "成本敏感但仍需不錯推理的場景"
+  ],
+  "avoidFor": [
+    "依賴固定 temperature 的舊 prompt",
+    "資料必須留在特定亞太區域",
+    "最困難的推理任務（改用 Opus 5.5 / Astra）"
+  ],
+  "safetyAndCompliance": [
+    {
+      "item": "Grounding 的資料流",
+      "detail": "使用 Google Search / Maps grounding 時查詢會送到 Google 搜尋服務；機密情境需評估。",
+      "sources": [
+        {
+          "id": "google-gemini38-model"
+        }
+      ]
+    },
+    {
+      "item": "資料駐留",
+      "detail": "EU multi-region 有資料駐留與 ML processing 保證；global 無。",
+      "sources": [
+        {
+          "id": "innfactory-gemini"
+        }
+      ]
+    }
+  ],
+  "enterpriseNotes": [
+    "台灣：GCP 有 asia-east1（彰化），但 3.8 Flash 未見單一區域端點；資料可能在境外處理。",
+    "預算：同時列出促銷價與 2027 標準價；cost map 需在 2027-01-01 前更新。",
+    "適合 tier/fast：速度最快，但冗長度上升，須以每任務成本與 GPT-6 Luna 比較。"
+  ],
+  "testPlanFocus": [
+    "移除 temperature 後的回歸（原本依賴低 temperature 的抽取任務）",
+    "function calling 的 call_id / name 與 Malformed_Function_Call",
+    "thinking_level low / medium / high 的品質與延遲",
+    "影片、音訊、PDF 多模態理解（繁中內容）",
+    "從台灣呼叫 global endpoint 的實測 TTFT（驗證 AA 的速度優勢）"
+  ],
+  "onboarding": {
+    "audience": "多模態、grounding 與高吞吐應用團隊（GCP）",
+    "prerequisites": [
+      "GCP 專案已在 Agent Platform 啟用 Gemini API 並授權服務帳號",
+      "移除 temperature / top_p / top_k"
+    ],
+    "steps": [
+      {
+        "title": "選路由",
+        "detail": "預設 gemini-3-8-flash（global）；需歐盟駐留用 @vertex-eu。"
+      },
+      {
+        "title": "設定 thinking",
+        "detail": "reasoning_effort low | medium | high（gateway 映射為 thinking_level）。"
+      },
+      {
+        "title": "更新 function calling",
+        "detail": "FunctionResponse 帶 call_id 與 name。"
+      }
+    ],
+    "aliases": [
+      {
+        "alias": "gemini-3-8-flash",
+        "target": "vertex_ai/gemini-3.8-flash（global）",
+        "note": "預設"
+      },
+      {
+        "alias": "gemini-3-8-flash@vertex-eu",
+        "target": "vertex_ai/gemini-3.8-flash（eu multi-region）"
+      }
+    ],
+    "parameterGuidance": [
+      {
+        "parameter": "reasoning_effort → thinking_level",
+        "guidance": "low | medium（預設）| high；沒有 minimal。"
+      },
+      {
+        "parameter": "temperature / top_p / top_k",
+        "guidance": "已移除，不要送。"
+      },
+      {
+        "parameter": "max_tokens",
+        "guidance": "上限 65,536（含 thinking）。"
+      }
+    ],
+    "codeSamples": [
+      {
+        "lang": "python",
+        "title": "OpenAI SDK + 影像輸入（經 gateway）",
+        "code": "import base64, os\nfrom openai import OpenAI\n\nclient = OpenAI(base_url=\"https://llm-gateway.example.internal/v1\", api_key=os.environ[\"LITELLM_API_KEY\"])\nimg = base64.b64encode(open(\"chart.png\", \"rb\").read()).decode()\n\nresp = client.chat.completions.create(\n    model=\"gemini-3-8-flash\",\n    reasoning_effort=\"low\",  # 映射為 thinking_level；不支援 minimal\n    messages=[{\"role\": \"user\", \"content\": [\n        {\"type\": \"text\", \"text\": \"用繁體中文說明這張圖的趨勢。\"},\n        {\"type\": \"image_url\", \"image_url\": {\"url\": f\"data:image/png;base64,{img}\"}},\n    ]}],\n)\nprint(resp.choices[0].message.content)\n"
+      },
+      {
+        "lang": "yaml",
+        "title": "LiteLLM 設定",
+        "code": "model_list:\n  - model_name: gemini-3-8-flash\n    litellm_params:\n      model: vertex_ai/gemini-3.8-flash\n      vertex_project: os.environ/VERTEX_PROJECT\n      vertex_location: global\n      drop_params: true\n    model_info: {catalog_id: gemini-3-8-flash, data_residency: global}\n"
+      }
+    ],
+    "dataClassification": "範例政策：公開/內部資料可用任一已核准路由；機密資料只可用明確限定處理地的路由（例：Bedrock JP geo）並經法務核准；極機密資料不開放（三雲皆無台灣境內處理選項）。請依公司資料分級規範調整。",
+    "support": "Slack #llm-platform；每週四 14:00 office hour（範例，請改成你們的窗口）"
+  },
+  "openQuestions": [
+    "Agent Platform 退役日？",
+    "asia-east1 等亞太單一區域端點是否會開放？",
+    "OpenAI 相容端點對 3.8 Flash 參數的支援範圍？"
+  ],
+  "sources": [
+    {
+      "id": "google-gemini38-model"
+    },
+    {
+      "id": "google-gemini38-latest"
+    },
+    {
+      "id": "aa-gemini38"
+    },
+    {
+      "id": "aa-gemini38-article"
+    },
+    {
+      "id": "innfactory-gemini"
+    },
+    {
+      "id": "litellm-gemini38"
+    }
+  ]
+}

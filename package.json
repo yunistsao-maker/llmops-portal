@@ -1,0 +1,19 @@
+{
+  "name": "llmops-model-portal-data",
+  "version": "1.0.0",
+  "description": "Data contract, seed research data and test tools for an enterprise LLMOps model-release portal",
+  "scripts": {
+    "schema": "ts-json-schema-generator -p schema/types.ts -t '*' -o schema/llmops.schema.json --no-type-check",
+    "typecheck": "tsc --noEmit --strict schema/types.ts",
+    "validate": "node tools/validate.mjs && python3 tools/validate_data.py",
+    "selftest": "python3 tools/selftest.py"
+  },
+  "dependencies": {
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
+    "ts-json-schema-generator": "^2.9.0",
+    "typescript": "^5.9.3"
+  },
+  "private": true,
+  "type": "module"
+}

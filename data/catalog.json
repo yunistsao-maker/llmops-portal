@@ -1,0 +1,3551 @@
+{
+  "schema": "catalog/v1",
+  "generatedAt": "2026-09-24T14:30:00Z",
+  "locale": "zh-TW",
+  "asOf": "2026-09-24",
+  "models": [
+    {
+      "id": "claude-opus-5-5",
+      "name": "Claude Opus 5.5",
+      "vendor": "anthropic",
+      "family": "Claude Opus",
+      "tier": "frontier",
+      "releaseDate": "2026-09-22",
+      "platformStatus": "evaluating",
+      "predecessorId": "claude-opus-5",
+      "modalities": {
+        "input": [
+          "text",
+          "image",
+          "pdf"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "knowledgeCutoff": "2026-06",
+      "reasoning": {
+        "supported": true,
+        "alwaysOn": true,
+        "effortLevels": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ],
+        "defaultEffort": "medium",
+        "parameter": "output_config.effort（Messages API）；經 LiteLLM 以 reasoning_effort 傳入",
+        "notes": [
+          "thinking.type = disabled，或 enabled + budget_tokens，都會回 400 invalid_request_error。",
+          "預設 effort 由 Opus 5 的 high 改為 medium：沒有指定 effort 的請求會想得比以前少。",
+          "同 effort 下比 Opus 5 想得更多（尤其 xhigh/max），max_tokens 需預留 thinking 空間。"
+        ]
+      },
+      "vendorModelId": "claude-opus-5-5",
+      "systemCardUrl": "https://www-cdn.anthropic.com/fc1b44717c85dc068bc6ba5024219938094694bd/Claude%20Opus%205.5%20System%20Card.pdf",
+      "modelCardUrl": "https://platform.claude.com/docs/en/models/opus-5-5/whats-new-opus-5-5",
+      "summary": "Anthropic 於 2026-09-22 發布的 Claude 5.5 家族首款模型，官方稱多數工作達 Claude Fable 5.1 水準，典型工作負載成本比 Opus 5 低約 40%（單價 $4/$20，且每任務 token 更少）。Bedrock、Agent Platform、Foundry 三雲同日 GA。導入重點：thinking 無法關閉、預設 effort 改為 medium、forced tool_choice 會回 400，資安類請求多數會被自動改路由到 Claude Opus 4.8。",
+      "strengths": [
+        "代理式程式與知識工作領先：Terminal-Bench 4.0 66.4%（xhigh）、GDPval-AA v2.1 1846 Elo、OSWorld 2.0 81.8%（廠商自評）。",
+        "Artificial Analysis Intelligence Index v4.3.2 得 58 分，同級 210 個模型中排名第 1（max effort，含預設 fallback）。",
+        "成本效率：單價比 Opus 5 低 20%，cache read $0.20（-60%）；官方稱典型負載總成本 -40%、輸出速度 +30%。",
+        "Prompt injection 抵抗力：Gray Swan 測試中與 Fable 5.1 並列攻擊成功率最低；行為稽核分數為歷來最佳。",
+        "三雲同日 GA；Anthropic 與 Bedrock 皆標示退役不早於 2027-09-22。",
+        "1M context 無長文加價；prompt caching 最低 512 tokens、4 個 checkpoint、TTL 5 分鐘或 1 小時。"
+      ],
+      "weaknesses": [
+        "Thinking 永遠開啟、無法關閉；延遲敏感的簡單任務要用 effort=low 或改用較小模型。",
+        "資安類請求多數被透明改路由到 Opus 4.8、生物與前沿 LLM 開發類改由 Opus 5 完成；安全團隊拿到的結果與一般工作不一致。",
+        "產出偏長：AA 評測共產生 260M output tokens（中位數 88M），務必以「每任務成本」比較。",
+        "Bedrock 上不支援 structured outputs，也沒有 Priority/Flex/Batch/Reserved 服務層；Fast mode 只在 Claude API。",
+        "沒有台灣境內處理選項：Bedrock 台北（ap-east-2）只有 Global CRIS；最接近的是 JP geo（東京/大阪）。",
+        "System card 指出最多 36% 的稽核對話中模型察覺自己正在受測（evaluation awareness），評測結果需保守解讀。"
+      ],
+      "bestFor": [
+        "大型 codebase 遷移、重構、code review 與長時間無人值守的代理任務",
+        "財務、法律、顧問類知識工作與需要可追溯引用的研究報告",
+        "需要清楚、結論先行寫作風格的長時段協作",
+        "computer use / 多工具代理流程"
+      ],
+      "avoidFor": [
+        "低延遲即時對話（always-on thinking 會墊高首 token 延遲）",
+        "大量簡單分類/擷取（改用 GPT-6 Luna、Gemini 3.8 Flash 或 Haiku 等級）",
+        "資安研究、滲透測試類工作（會被改路由；需申請 Cyber Verification Program）",
+        "仍依賴 forced tool_choice、關閉 thinking 或 temperature 的既有程式（需先改寫）"
+      ],
+      "safety": {
+        "classifications": [
+          "Anthropic RSP：生物 CB-1（未達 CB-2）；AI R&D 能力約與 Mythos 5.1 相當或略高。",
+          "部署時套用與 Fable 5.1 同級的 cyber、bio、distillation safeguards（首個如此部署的 Opus）。"
+        ],
+        "behaviours": [
+          "資安類任務多數透明改路由至 Claude Opus 4.8；生物與前沿 LLM 開發類由 Claude Opus 5 完成（官方 benchmark 註腳）。",
+          "拒答回 HTTP 200 + stop_reason: \"refusal\" + stop_details（新增 reasoning_extraction 類別）；可用 beta 的 fallbacks: \"default\" 在伺服器端改用建議模型重試。",
+          "Preserved thinking（反蒸餾）：2026-08-31 00:00 UTC 之後建立的 API 帳號預設啟用；改動先前的 system prompt、tools 或訊息會回 400。",
+          "輸出帶有為 EU AI Act 設計的浮水印（watermarking）。",
+          "可提供 ZDR（Zero Data Retention）。"
+        ],
+        "programmes": [
+          "Cyber Verification Program（將擴大到 Opus 5.5，分三級信任存取，最高可用 Mythos）",
+          "Life Sciences Verification Program（生物研究用途）"
+        ],
+        "sources": [
+          {
+            "id": "anthropic-opus55-announce"
+          },
+          {
+            "id": "anthropic-opus55-whatsnew"
+          },
+          {
+            "id": "anthropic-opus55-systemcard"
+          }
+        ]
+      },
+      "offerings": [
+        {
+          "id": "claude-opus-5-5@bedrock",
+          "cloud": "aws",
+          "service": "bedrock",
+          "status": "ga",
+          "availableSince": "2026-09-22",
+          "providerModelId": "anthropic.claude-opus-5-5",
+          "inferenceTargets": [
+            {
+              "scope": "geo",
+              "id": "jp.anthropic.claude-opus-5-5",
+              "geography": "Japan（ap-northeast-1 / ap-northeast-3）"
+            },
+            {
+              "scope": "geo",
+              "id": "au.anthropic.claude-opus-5-5",
+              "geography": "Australia"
+            },
+            {
+              "scope": "geo",
+              "id": "us.anthropic.claude-opus-5-5",
+              "geography": "US + Canada"
+            },
+            {
+              "scope": "geo",
+              "id": "eu.anthropic.claude-opus-5-5",
+              "geography": "EU"
+            },
+            {
+              "scope": "global",
+              "id": "global.anthropic.claude-opus-5-5",
+              "geography": "全球動態路由（無駐留保證）"
+            }
+          ],
+          "endpoints": [
+            {
+              "endpoint": "bedrock-runtime",
+              "apis": [
+                "anthropic-messages",
+                "bedrock-converse",
+                "bedrock-invoke"
+              ],
+              "notes": [
+                "Responses 與 Chat Completions（OpenAI 相容）不支援。",
+                "In-Region 不提供：必須呼叫 geo 或 global inference profile。"
+              ]
+            },
+            {
+              "endpoint": "bedrock-mantle",
+              "apis": [
+                "anthropic-messages"
+              ],
+              "notes": [
+                "僅 us-east-1、ap-southeast-4、us-gov-west-1 in-region；/anthropic/v1/messages。"
+              ]
+            }
+          ],
+          "apacAvailability": [
+            {
+              "region": "ap-east-2",
+              "label": "Taipei",
+              "scopes": [
+                "global"
+              ],
+              "note": "台北區只能用 Global CRIS"
+            },
+            {
+              "region": "ap-northeast-1",
+              "label": "Tokyo",
+              "scopes": [
+                "geo",
+                "global"
+              ]
+            },
+            {
+              "region": "ap-northeast-3",
+              "label": "Osaka",
+              "scopes": [
+                "geo",
+                "global"
+              ]
+            },
+            {
+              "region": "ap-northeast-2",
+              "label": "Seoul",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-southeast-1",
+              "label": "Singapore",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-southeast-2",
+              "label": "Sydney",
+              "scopes": [
+                "geo",
+                "global"
+              ],
+              "note": "AU geo"
+            },
+            {
+              "region": "ap-south-1",
+              "label": "Mumbai",
+              "scopes": [
+                "global"
+              ]
+            }
+          ],
+          "regionNotes": [
+            "JP geo 資料留在日本；從台北呼叫 jp.* 需把 client region 設為 ap-northeast-1 或 ap-northeast-3。"
+          ],
+          "dataProcessing": {
+            "processor": "AWS Bedrock（Anthropic 模型，透過 AWS Marketplace 計費）",
+            "residencyOptions": [
+              "JP geo",
+              "AU geo",
+              "US geo",
+              "EU geo",
+              "Global（無駐留保證）"
+            ],
+            "taiwanResidency": "no",
+            "zdr": "unknown",
+            "retentionNotes": [
+              "模型卡列出 abuse detection 為支援功能；是否留存及留存多久請依 AWS 第三方模型條款確認。",
+              "Invocation logging 由客戶自行開關（CloudWatch/S3）。"
+            ],
+            "sources": [
+              {
+                "id": "aws-bedrock-opus55-card"
+              }
+            ]
+          },
+          "features": [
+            {
+              "feature": "streaming",
+              "status": "supported"
+            },
+            {
+              "feature": "tool-calling",
+              "status": "supported"
+            },
+            {
+              "feature": "forced-tool-choice",
+              "status": "not-supported",
+              "note": "模型層級限制：tool_choice any/tool 回 400",
+              "sources": [
+                {
+                  "id": "anthropic-opus55-whatsnew"
+                }
+              ]
+            },
+            {
+              "feature": "structured-outputs",
+              "status": "not-supported",
+              "note": "Bedrock 模型卡：runtime 與 mantle 皆不支援",
+              "sources": [
+                {
+                  "id": "aws-bedrock-opus55-card"
+                }
+              ]
+            },
+            {
+              "feature": "vision",
+              "status": "supported"
+            },
+            {
+              "feature": "pdf-input",
+              "status": "unknown",
+              "note": "模型卡輸入模態只列 Text/Image；PDF 需以 Messages API document block 實測"
+            },
+            {
+              "feature": "prompt-caching",
+              "status": "supported",
+              "note": "implicit + explicit；最少 512 tokens、4 checkpoints、TTL 5m/1h",
+              "sources": [
+                {
+                  "id": "aws-bedrock-opus55-card"
+                }
+              ]
+            },
+            {
+              "feature": "batch",
+              "status": "not-supported",
+              "note": "模型卡服務層：Batch ✗",
+              "sources": [
+                {
+                  "id": "aws-bedrock-opus55-card"
+                }
+              ]
+            },
+            {
+              "feature": "reasoning-control",
+              "status": "supported",
+              "note": "effort low～max；無法關閉 thinking"
+            },
+            {
+              "feature": "temperature",
+              "status": "not-supported",
+              "note": "Opus 4.8/5 起不支援 temperature/top_p/top_k 與 prefill（LiteLLM Opus 5 說明）；Opus 5.5 預期延續，請以 compat suite 驗證",
+              "sources": [
+                {
+                  "id": "litellm-opus5"
+                }
+              ]
+            },
+            {
+              "feature": "count-tokens",
+              "status": "partial",
+              "note": "僅 bedrock-mantle 支援",
+              "sources": [
+                {
+                  "id": "aws-bedrock-opus55-card"
+                }
+              ]
+            },
+            {
+              "feature": "guardrails",
+              "status": "partial",
+              "note": "bedrock-runtime 支援、bedrock-mantle 不支援",
+              "sources": [
+                {
+                  "id": "aws-bedrock-opus55-card"
+                }
+              ]
+            },
+            {
+              "feature": "computer-use",
+              "status": "supported",
+              "note": "Bedrock 仍使用 computer_20251124（Claude API/GCP 已改 computer_toolset_20260801）",
+              "sources": [
+                {
+                  "id": "aws-bedrock-opus55-card"
+                },
+                {
+                  "id": "anthropic-opus55-whatsnew"
+                }
+              ]
+            },
+            {
+              "feature": "provisioned-throughput",
+              "status": "not-supported",
+              "note": "Reserved 服務層 ✗",
+              "sources": [
+                {
+                  "id": "aws-bedrock-opus55-card"
+                }
+              ]
+            },
+            {
+              "feature": "priority-tier",
+              "status": "not-supported",
+              "sources": [
+                {
+                  "id": "aws-bedrock-opus55-card"
+                }
+              ]
+            },
+            {
+              "feature": "flex-tier",
+              "status": "not-supported",
+              "sources": [
+                {
+                  "id": "aws-bedrock-opus55-card"
+                }
+              ]
+            },
+            {
+              "feature": "fast-mode",
+              "status": "not-supported",
+              "note": "Fast mode 只在 Claude API",
+              "sources": [
+                {
+                  "id": "litellm-opus55"
+                },
+                {
+                  "id": "classmethod-opus55-bedrock"
+                }
+              ]
+            }
+          ],
+          "pricing": [
+            {
+              "scope": "global",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 4.0,
+              "output": 20.0,
+              "notes": [
+                "Cache 價格請見 Bedrock pricing 頁；Anthropic 官方價為 cache read $0.20、5 分鐘寫入 $5、1 小時寫入 $8。"
+              ],
+              "sources": [
+                {
+                  "id": "classmethod-opus55-bedrock"
+                },
+                {
+                  "id": "anthropic-pricing"
+                }
+              ],
+              "verification": "independent"
+            },
+            {
+              "scope": "geo",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 4.4,
+              "output": 22.0,
+              "notes": [
+                "Geo / In-Region 比 Global 高 10%（東京實測價 $4.40 / $22）。"
+              ],
+              "sources": [
+                {
+                  "id": "classmethod-opus55-bedrock"
+                }
+              ],
+              "verification": "independent"
+            }
+          ],
+          "quotas": [
+            {
+              "scope": "account default",
+              "note": "依帳號與區域預設配額；上線前在 Service Quotas 申請 geo/global profile 的 TPM/RPM。",
+              "sources": [
+                {
+                  "id": "aws-bedrock-opus55-card"
+                }
+              ],
+              "verification": "official"
+            }
+          ],
+          "lifecycle": {
+            "eolNoSoonerThan": "2027-09-22",
+            "legacyPeriod": "6 個月",
+            "notes": [
+              "依 2026-09-07 起的新生命週期政策，進入 Legacy 時才會公布確切 EOL 日。"
+            ]
+          },
+          "litellmModel": "bedrock/global.anthropic.claude-opus-5-5",
+          "onboardingNotes": [
+            "在 Bedrock console 啟用模型存取（Marketplace product prod-e5xo6z26ie45g）。",
+            "LiteLLM 部落格範例用裸 ID anthropic.claude-opus-5-5，但模型卡顯示 bedrock-runtime 沒有 In-Region——請改用 global.* 或 jp.* profile。",
+            "台灣團隊建議：一般資料走 global.*（台北區可直接呼叫）；需日本境內處理的資料走 jp.*。"
+          ],
+          "sources": [
+            {
+              "id": "aws-bedrock-opus55-card"
+            },
+            {
+              "id": "classmethod-opus55-bedrock"
+            }
+          ],
+          "verification": "official"
+        },
+        {
+          "id": "claude-opus-5-5@agent-platform",
+          "cloud": "gcp",
+          "service": "agent-platform",
+          "status": "ga",
+          "availableSince": "2026-09-22",
+          "providerModelId": "claude-opus-5-5",
+          "inferenceTargets": [
+            {
+              "scope": "global",
+              "id": "global",
+              "geography": "全球動態路由"
+            },
+            {
+              "scope": "multi-region",
+              "id": "us",
+              "geography": "United States multi-region"
+            },
+            {
+              "scope": "multi-region",
+              "id": "eu",
+              "geography": "Europe multi-region"
+            }
+          ],
+          "endpoints": [
+            {
+              "endpoint": "aiplatform.googleapis.com（:rawPredict / :streamRawPredict）",
+              "apis": [
+                "anthropic-messages"
+              ],
+              "notes": [
+                "Agent Platform 上的 Claude 不支援 OpenAI 相容 /chat/completions（回 FAILED_PRECONDITION）。",
+                "multi-region 主機：aiplatform.us.rep.googleapis.com / aiplatform.eu.rep.googleapis.com。"
+              ]
+            }
+          ],
+          "apacAvailability": [
+            {
+              "region": "global",
+              "label": "Global endpoint",
+              "scopes": [
+                "global"
+              ],
+              "note": "無亞太單一區域端點；官方頁 ML processing 欄另列 asia-southeast1"
+            }
+          ],
+          "dataProcessing": {
+            "processor": "Google Cloud（Anthropic 提供模型）",
+            "residencyOptions": [
+              "Global",
+              "US multi-region",
+              "EU multi-region"
+            ],
+            "taiwanResidency": "no",
+            "zdr": "unknown",
+            "retentionNotes": [
+              "依 Google Cloud 生成式 AI 資料治理條款；Claude 的保留政策請與 Google 確認。"
+            ],
+            "sources": [
+              {
+                "id": "google-agentplatform-opus55"
+              },
+              {
+                "id": "anthropic-claude-on-gcp"
+              }
+            ]
+          },
+          "features": [
+            {
+              "feature": "streaming",
+              "status": "supported"
+            },
+            {
+              "feature": "tool-calling",
+              "status": "supported"
+            },
+            {
+              "feature": "forced-tool-choice",
+              "status": "not-supported",
+              "note": "模型層級限制",
+              "sources": [
+                {
+                  "id": "anthropic-opus55-whatsnew"
+                }
+              ]
+            },
+            {
+              "feature": "vision",
+              "status": "supported"
+            },
+            {
+              "feature": "pdf-input",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "google-agentplatform-opus55"
+                }
+              ]
+            },
+            {
+              "feature": "prompt-caching",
+              "status": "supported"
+            },
+            {
+              "feature": "computer-use",
+              "status": "partial",
+              "note": "需改用 computer_toolset_20260801；computer_20251124 會回 400",
+              "sources": [
+                {
+                  "id": "anthropic-opus55-whatsnew"
+                }
+              ]
+            },
+            {
+              "feature": "fast-mode",
+              "status": "not-supported",
+              "sources": [
+                {
+                  "id": "litellm-opus55"
+                }
+              ]
+            },
+            {
+              "feature": "provisioned-throughput",
+              "status": "unknown",
+              "note": "Anthropic 說明 PT 需 regional endpoint；Opus 5.5 目前只有 global 與 multi-region",
+              "sources": [
+                {
+                  "id": "anthropic-claude-on-gcp"
+                }
+              ]
+            }
+          ],
+          "pricing": [
+            {
+              "scope": "global",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 4.0,
+              "output": 20.0,
+              "cacheRead": 0.2,
+              "cacheWrite": 5.0,
+              "cacheWrite1h": 8.0,
+              "notes": [
+                "Anthropic：Google Cloud global endpoint 無加價。"
+              ],
+              "sources": [
+                {
+                  "id": "anthropic-pricing"
+                },
+                {
+                  "id": "anthropic-claude-on-gcp"
+                }
+              ],
+              "verification": "derived"
+            },
+            {
+              "scope": "multi-region",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 4.4,
+              "output": 22.0,
+              "notes": [
+                "regional / multi-region 比 global 高 10%。"
+              ],
+              "sources": [
+                {
+                  "id": "anthropic-claude-on-gcp"
+                }
+              ],
+              "verification": "derived"
+            }
+          ],
+          "quotas": [
+            {
+              "scope": "global endpoint",
+              "rpm": 2000,
+              "inputTpm": 20000000,
+              "outputTpm": 2000000,
+              "note": "QPM 2,000；input TPM 含 uncached 與 cache write",
+              "sources": [
+                {
+                  "id": "google-agentplatform-claude-quotas"
+                }
+              ],
+              "verification": "official"
+            },
+            {
+              "scope": "multi-region（us / eu 各自）",
+              "rpm": 1000,
+              "inputTpm": 10000000,
+              "outputTpm": 1000000,
+              "sources": [
+                {
+                  "id": "google-agentplatform-claude-quotas"
+                }
+              ],
+              "verification": "official"
+            }
+          ],
+          "lifecycle": {
+            "notes": [
+              "Google Cloud 自訂合作夥伴模型退役時程（Anthropic 日期不適用）；模型頁尚未公布退役日。"
+            ]
+          },
+          "litellmModel": "vertex_ai/claude-opus-5-5",
+          "onboardingNotes": [
+            "在 Model Garden 啟用 Claude Opus 5.5，並授予服務帳號 roles/aiplatform.user。",
+            "LiteLLM 設 vertex_location: global（或 us / eu）；Claude Code 以 CLOUD_ML_REGION=global。"
+          ],
+          "sources": [
+            {
+              "id": "google-agentplatform-opus55"
+            },
+            {
+              "id": "google-agentplatform-claude-quotas"
+            }
+          ],
+          "verification": "official"
+        },
+        {
+          "id": "claude-opus-5-5@foundry",
+          "cloud": "azure",
+          "service": "foundry",
+          "status": "ga",
+          "availableSince": "2026-09-22",
+          "providerModelId": "claude-opus-5-5",
+          "inferenceTargets": [
+            {
+              "scope": "global",
+              "id": "Global Standard",
+              "geography": "任意區域處理"
+            },
+            {
+              "scope": "data-zone",
+              "id": "Data Zone Standard (US)",
+              "geography": "美國（僅 Hosted on Azure 版本）"
+            }
+          ],
+          "endpoints": [
+            {
+              "endpoint": "https://<resource>.services.ai.azure.com/anthropic",
+              "apis": [
+                "anthropic-messages"
+              ],
+              "notes": [
+                "Claude 走獨立的 /anthropic 端點與 Anthropic Messages API，不走 /openai/v1。"
+              ]
+            }
+          ],
+          "apacAvailability": [],
+          "regionNotes": [
+            "只有 Global Standard 與 US Data Zone；沒有 EU 或 APAC Data Zone。"
+          ],
+          "dataProcessing": {
+            "processor": "Anthropic（賣方與營運方，為獨立資料處理者；Azure 為平台）",
+            "residencyOptions": [
+              "Global Standard",
+              "US Data Zone（Hosted on Azure）"
+            ],
+            "taiwanResidency": "no",
+            "zdr": "available",
+            "retentionNotes": [
+              "資料保留依 Anthropic DPA 與商業條款，非 Azure OpenAI 條款。",
+              "Hosted on Anthropic infrastructure 選項的資料可能在 Azure 之外處理。",
+              "自動 safeguards 可能將內容送交 Anthropic Trust & Safety 審查（InfoQ 引述 Microsoft 文件）。"
+            ],
+            "sources": [
+              {
+                "id": "ms-foundry-claude-hosting"
+              },
+              {
+                "id": "anthropic-claude-in-foundry"
+              },
+              {
+                "id": "infoq-claude-foundry-eu"
+              },
+              {
+                "id": "innfactory-claude"
+              }
+            ]
+          },
+          "features": [
+            {
+              "feature": "streaming",
+              "status": "supported"
+            },
+            {
+              "feature": "tool-calling",
+              "status": "supported"
+            },
+            {
+              "feature": "forced-tool-choice",
+              "status": "not-supported",
+              "note": "模型層級限制",
+              "sources": [
+                {
+                  "id": "anthropic-opus55-whatsnew"
+                }
+              ]
+            },
+            {
+              "feature": "vision",
+              "status": "supported"
+            },
+            {
+              "feature": "prompt-caching",
+              "status": "supported",
+              "note": "cache hit $0.20、寫入 $5、1 小時寫入 $8",
+              "sources": [
+                {
+                  "id": "dailydev-opus55-foundry"
+                }
+              ]
+            },
+            {
+              "feature": "fast-mode",
+              "status": "not-supported",
+              "sources": [
+                {
+                  "id": "anthropic-opus55-whatsnew"
+                }
+              ]
+            },
+            {
+              "feature": "zero-data-retention",
+              "status": "supported",
+              "note": "訂閱層級 ZDR；Anthropic 列為 Covered Model 者會回 Data retention required（400）",
+              "sources": [
+                {
+                  "id": "ms-foundry-claude-howto"
+                }
+              ]
+            }
+          ],
+          "pricing": [
+            {
+              "scope": "global",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 4.0,
+              "output": 20.0,
+              "cacheRead": 0.2,
+              "cacheWrite": 5.0,
+              "cacheWrite1h": 8.0,
+              "notes": [
+                "以 Claude Consumption Units 透過 Azure Marketplace 計費；US Data Zone 價格請於 Azure portal 確認。"
+              ],
+              "sources": [
+                {
+                  "id": "dailydev-opus55-foundry"
+                },
+                {
+                  "id": "anthropic-claude-in-foundry"
+                }
+              ],
+              "verification": "independent"
+            }
+          ],
+          "quotas": [],
+          "lifecycle": {
+            "eolNoSoonerThan": "2027-09-22",
+            "notes": [
+              "Anthropic 聲明其日期適用 Foundry；但 Foundry 退役表可能另列日期（例：claude-opus-5 在 Foundry 表為 2027-07-08，Anthropic 為不早於 2027-07-24）——以較早者規劃。"
+            ]
+          },
+          "litellmModel": "azure_ai/claude-opus-5-5",
+          "onboardingNotes": [
+            "部署時選 Hosted on Azure（預設）或 Hosted on Anthropic infrastructure；選 Data Zone 可限定美國處理。",
+            "部署名稱建立後無法修改；LiteLLM 的 model 使用部署名稱。"
+          ],
+          "sources": [
+            {
+              "id": "ms-foundry-claude-models"
+            },
+            {
+              "id": "ms-foundry-claude-hosting"
+            },
+            {
+              "id": "anthropic-claude-in-foundry"
+            }
+          ],
+          "verification": "official"
+        }
+      ],
+      "benchmarks": [
+        {
+          "name": "Artificial Analysis Intelligence Index",
+          "version": "v4.3.2",
+          "variant": "Adaptive reasoning, max effort, default fallback",
+          "score": 58,
+          "unit": "index",
+          "rank": "#1 / 210",
+          "measuredBy": "independent",
+          "date": "2026-09-24",
+          "sources": [
+            {
+              "id": "aa-opus55"
+            }
+          ]
+        },
+        {
+          "name": "Terminal-Bench 4.0",
+          "variant": "xhigh effort, production safeguards on",
+          "score": 66.4,
+          "unit": "percent",
+          "measuredBy": "vendor",
+          "date": "2026-09-22",
+          "notes": "安全機制介入的題目由 Opus 4.8 / Opus 5 完成",
+          "sources": [
+            {
+              "id": "anthropic-opus55-announce"
+            }
+          ]
+        },
+        {
+          "name": "FrontierCode v1.1 (Main)",
+          "variant": "max effort",
+          "score": 54.4,
+          "unit": "percent",
+          "measuredBy": "vendor",
+          "date": "2026-09-22",
+          "sources": [
+            {
+              "id": "anthropic-opus55-announce"
+            }
+          ]
+        },
+        {
+          "name": "CursorBench 4.0",
+          "variant": "max effort",
+          "score": 57.8,
+          "unit": "percent",
+          "measuredBy": "vendor",
+          "date": "2026-09-22",
+          "sources": [
+            {
+              "id": "anthropic-opus55-announce"
+            }
+          ]
+        },
+        {
+          "name": "GDPval-AA v2.1",
+          "variant": "max effort",
+          "score": 1846,
+          "unit": "elo",
+          "measuredBy": "vendor",
+          "date": "2026-09-22",
+          "sources": [
+            {
+              "id": "anthropic-opus55-announce"
+            }
+          ]
+        },
+        {
+          "name": "AutomationBench (Zapier)",
+          "variant": "無 fallback，safeguard 介入算失敗",
+          "score": 40.0,
+          "unit": "percent",
+          "measuredBy": "independent",
+          "date": "2026-09-22",
+          "sources": [
+            {
+              "id": "anthropic-opus55-announce"
+            }
+          ]
+        },
+        {
+          "name": "Humanity's Last Exam",
+          "variant": "with tools, max effort",
+          "score": 67.7,
+          "unit": "percent",
+          "measuredBy": "vendor",
+          "date": "2026-09-22",
+          "sources": [
+            {
+              "id": "anthropic-opus55-announce"
+            }
+          ]
+        },
+        {
+          "name": "OSWorld 2.0",
+          "variant": "partial credit",
+          "score": 81.8,
+          "unit": "percent",
+          "measuredBy": "vendor",
+          "date": "2026-09-22",
+          "sources": [
+            {
+              "id": "anthropic-opus55-announce"
+            }
+          ]
+        },
+        {
+          "name": "Terminal-Bench 2.1 (Vals AI)",
+          "variant": "Opus 5 / Opus 4.8 作為 server-side fallback",
+          "score": 87.64,
+          "unit": "percent",
+          "rank": "#1",
+          "measuredBy": "independent",
+          "date": "2026-09-22",
+          "notes": "若將需 fallback 的題目算失敗則為 79.77%",
+          "sources": [
+            {
+              "id": "vals-opus55"
+            }
+          ]
+        }
+      ],
+      "performanceReference": [
+        {
+          "provider": "Anthropic API（Artificial Analysis）",
+          "variant": "max effort, default fallback",
+          "costPerIndexTaskUsd": 5.98,
+          "indexOutputTokensMillions": 260,
+          "date": "2026-09-24",
+          "notes": "AA 尚未公布輸出速度；Anthropic 稱輸出速度比 Opus 5 快 30% 以上。",
+          "sources": [
+            {
+              "id": "aa-opus55"
+            },
+            {
+              "id": "anthropic-opus55-announce"
+            }
+          ]
+        }
+      ],
+      "litellm": {
+        "providerStrings": [
+          {
+            "service": "anthropic-api",
+            "model": "anthropic/claude-opus-5-5"
+          },
+          {
+            "service": "bedrock",
+            "model": "bedrock/global.anthropic.claude-opus-5-5",
+            "note": "日本境內：bedrock/jp.anthropic.claude-opus-5-5 + aws_region_name: ap-northeast-1"
+          },
+          {
+            "service": "agent-platform",
+            "model": "vertex_ai/claude-opus-5-5",
+            "note": "vertex_location: global | us | eu"
+          },
+          {
+            "service": "foundry",
+            "model": "azure_ai/claude-opus-5-5",
+            "note": "api_base 指向 https://<resource>.services.ai.azure.com/anthropic"
+          }
+        ],
+        "minVersionRouting": "v1.76.0（Reload Price Data 或 POST /reload/model_cost_map）",
+        "minVersionBundledCostMap": "v1.103.0-rc.1（PR #42489 之後建置的 image）",
+        "recommendedVersion": "v1.102.1（Reload Price Data）；使用內建 cost map 者等 v1.103.x 穩定版",
+        "caveats": [
+          "forced tool_choice 會回 400；drop_params 開啟時 LiteLLM 會降為 auto 並記 warning——請求成功，但模型可以不呼叫工具。",
+          "thinking 無法關閉；預設 effort 從 Opus 5 的 high 變 medium，沒指定 effort 的請求思考會變少。",
+          "thinking block 綁定模型：fallback 到 Sonnet / Haiku 會丟失先前的推理內容，fallback 請優先設在同模型的其他 CSP。",
+          "Fast mode 只支援 anthropic/ provider，不支援 Bedrock、Agent Platform、Azure，也不能與 Batch 併用。",
+          "Bedrock 請用 inference profile（global.* / jp.*）；裸 anthropic.claude-opus-5-5 沒有 on-demand in-region。"
+        ],
+        "configSnippet": "- model_name: claude-opus-5-5\n  litellm_params:\n    model: bedrock/global.anthropic.claude-opus-5-5\n    aws_region_name: ap-east-2\n  model_info:\n    catalog_id: claude-opus-5-5\n    data_residency: global\n",
+        "status": "researched",
+        "sources": [
+          {
+            "id": "litellm-opus55"
+          },
+          {
+            "id": "aws-bedrock-opus55-card"
+          }
+        ]
+      },
+      "tags": [
+        "frontier",
+        "coding",
+        "agentic",
+        "computer-use",
+        "1m-context",
+        "three-cloud"
+      ],
+      "sources": [
+        {
+          "id": "anthropic-opus55-announce"
+        },
+        {
+          "id": "anthropic-opus55-whatsnew"
+        },
+        {
+          "id": "anthropic-opus55-systemcard"
+        },
+        {
+          "id": "anthropic-release-notes"
+        },
+        {
+          "id": "aws-bedrock-opus55-card"
+        },
+        {
+          "id": "google-agentplatform-opus55"
+        },
+        {
+          "id": "ms-foundry-claude-models"
+        },
+        {
+          "id": "aa-opus55"
+        },
+        {
+          "id": "litellm-opus55"
+        }
+      ],
+      "lastVerified": "2026-09-24"
+    },
+    {
+      "id": "gpt-6-astra",
+      "name": "GPT-6 Astra",
+      "vendor": "openai",
+      "family": "GPT-6",
+      "tier": "frontier",
+      "releaseDate": "2026-09-03",
+      "platformStatus": "evaluating",
+      "predecessorId": "gpt-5.6-sol",
+      "modalities": {
+        "input": [
+          "text",
+          "image"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "contextWindow": 1050000,
+      "maxOutputTokens": 128000,
+      "knowledgeCutoff": "2026-04-30",
+      "reasoning": {
+        "supported": true,
+        "alwaysOn": true,
+        "effortLevels": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ],
+        "parameter": "reasoning.effort（Responses）／reasoning_effort（Chat Completions）",
+        "notes": [
+          "不支援 none 與 minimal——原本用 minimal 的請從 low 開始評估。",
+          "reasoning 開啟時要移除 temperature、top_p、top_logprobs（Chat Completions 另需移除 logprobs）。",
+          "預設 effort 請以 OpenAI 模型頁為準。"
+        ]
+      },
+      "vendorModelId": "gpt-6-astra",
+      "systemCardUrl": "https://deploymentsafety.openai.com/gpt-6-astra",
+      "modelCardUrl": "https://developers.openai.com/api/docs/models",
+      "summary": "OpenAI 於 2026-09-03 推出的 GPT-6 首款旗艦，定位最困難的端到端工作：長時程代理、computer/browser use、研究與文件產出。Azure Foundry（版本 2026-09-03）先以 Limited Access 釋出後轉 GA，Bedrock 於 09-08 GA；Google Cloud 未提供。單價 $10/$50（輸入 >272K 改用長文價），是目前三雲最貴的通用模型，也是 OpenAI 第一個資安能力被評為 Critical 的模型。",
+      "strengths": [
+        "AA Intelligence Index v4.3.2 53 分（max，#6/210），且 token 用量相對精簡（60M，中位數 88M）。",
+        "代理與科學任務強：Terminal-Bench-Science 0.1 64.6%、AutomationBench 41.4%（OpenAI 自報，引自 Anthropic 比較表）。",
+        "1.05M context、128K output；Azure 提供 Global、US/EU Data Zone 與 Provisioned Throughput。",
+        "OpenAI 稱為至今最對齊的模型：高嚴重度 misalignment 旗標約為前代一半，prompt injection 抵抗力明顯提升。",
+        "Bedrock 與 Azure 的 Global 價格與 OpenAI 一方價一致，可計入既有雲端承諾。"
+      ],
+      "weaknesses": [
+        "最貴：Global $10/$50；Data Zone / In-Region +10%（Azure EU Data Zone +20%）；長文 $20/$75。",
+        "慢：AA 測得 52.5 tok/s；max effort 的首答 token 約 352 秒。",
+        "工具呼叫要走 Responses API；Chat Completions 只支援基本 function calling；不支援 effort=none 與 temperature。",
+        "資安能力 Critical：監控更嚴；資安研究工作可能需要 Trusted Access for Cyber。",
+        "Bedrock：bedrock-mantle 只在 us-west-2；APAC 只有 Global CRIS，台北區不在模型卡清單；runtime 不支援 structured outputs；output token 以 10 倍計入 TPM 配額。",
+        "不支援 fine-tuning；Google Cloud 未上架。"
+      ],
+      "bestFor": [
+        "最高難度、需要判斷力的長時程代理任務",
+        "電腦 / 瀏覽器操作自動化",
+        "需要 1M context 的大型文件分析、研究與正式文件產出",
+        "已有 Azure 或 AWS 承諾額度、需要 OpenAI 旗艦的團隊"
+      ],
+      "avoidFor": [
+        "高併發、延遲敏感的對話",
+        "大量例行工作（改用 GPT-6 Sol / Luna）",
+        "必須部署在 Google Cloud 的工作負載",
+        "尚未改寫成 Responses API、仍依賴 Chat Completions + tools 或 temperature 的舊程式"
+      ],
+      "safety": {
+        "classifications": [
+          "OpenAI Preparedness Framework：Cybersecurity = Critical（首個達到此級的模型）。",
+          "Biological = High（未達 Critical）。"
+        ],
+        "behaviours": [
+          "OpenAI 觀察到 Astra 較能控制自身 CoT、較少在 CoT 中暴露不當意圖，監控難度上升（system card）。",
+          "對 skills 與 context 檔（如 AGENTS.md）中的指示更敏感，可能出現需核准的暫停（OpenAI migration guide）。"
+        ],
+        "programmes": [
+          "Trusted Access for Cyber（Daybreak 系列資安模型需註冊）"
+        ],
+        "sources": [
+          {
+            "id": "openai-astra-systemcard"
+          },
+          {
+            "id": "infoq-astra-critical"
+          },
+          {
+            "id": "openai-latest-model-guide"
+          }
+        ]
+      },
+      "offerings": [
+        {
+          "id": "gpt-6-astra@bedrock",
+          "cloud": "aws",
+          "service": "bedrock",
+          "status": "ga",
+          "availableSince": "2026-09-08",
+          "providerModelId": "openai.gpt-6-astra",
+          "inferenceTargets": [
+            {
+              "scope": "global",
+              "id": "global.openai.gpt-6-astra",
+              "geography": "全球動態路由"
+            },
+            {
+              "scope": "geo",
+              "id": "us.openai.gpt-6-astra",
+              "geography": "US"
+            },
+            {
+              "scope": "in-region",
+              "id": "openai.gpt-6-astra",
+              "geography": "us-west-2（僅 bedrock-mantle）"
+            }
+          ],
+          "endpoints": [
+            {
+              "endpoint": "bedrock-runtime（/openai/v1）",
+              "apis": [
+                "openai-responses",
+                "openai-chat-completions",
+                "bedrock-converse"
+              ],
+              "notes": [
+                "runtime 上的 Responses 一律同步、沒有 server-side tools、只支援 default project。",
+                "必須用 us.* 或 global.* profile。"
+              ]
+            },
+            {
+              "endpoint": "bedrock-mantle（https://bedrock-mantle.us-west-2.api.aws/openai/v1）",
+              "apis": [
+                "openai-responses",
+                "openai-chat-completions"
+              ],
+              "notes": [
+                "只在 us-west-2 in-region；支援 server-side tool calling 與 prompt caching（Responses API）。"
+              ]
+            }
+          ],
+          "apacAvailability": [
+            {
+              "region": "ap-northeast-1",
+              "label": "Tokyo",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-northeast-2",
+              "label": "Seoul",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-northeast-3",
+              "label": "Osaka",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-southeast-1",
+              "label": "Singapore",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-southeast-2",
+              "label": "Sydney",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-south-1",
+              "label": "Mumbai",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-east-2",
+              "label": "Taipei",
+              "scopes": [],
+              "note": "不在模型卡區域清單——從台北需改由東京等區域呼叫"
+            }
+          ],
+          "dataProcessing": {
+            "processor": "AWS Bedrock（推論在 Bedrock 基礎設施；資料不用於訓練，不需同意與 OpenAI 分享）",
+            "residencyOptions": [
+              "US geo",
+              "Global",
+              "us-west-2 in-region（mantle）"
+            ],
+            "taiwanResidency": "no",
+            "zdr": "on-request",
+            "retentionNotes": [
+              "AWS 在 GPT-6 Sol/Luna 公告說明：被標記的流量最多保留 30 天，ZDR 需透過 AWS 帳戶團隊申請——Astra 適用範圍請向 AWS 確認。"
+            ],
+            "sources": [
+              {
+                "id": "aws-bedrock-astra-card"
+              },
+              {
+                "id": "aws-sol-luna-blog"
+              }
+            ]
+          },
+          "features": [
+            {
+              "feature": "streaming",
+              "status": "supported"
+            },
+            {
+              "feature": "tool-calling",
+              "status": "supported",
+              "note": "建議 Responses API"
+            },
+            {
+              "feature": "structured-outputs",
+              "status": "not-supported",
+              "note": "bedrock-runtime 不支援",
+              "sources": [
+                {
+                  "id": "aws-bedrock-astra-card"
+                }
+              ]
+            },
+            {
+              "feature": "vision",
+              "status": "supported"
+            },
+            {
+              "feature": "prompt-caching",
+              "status": "partial",
+              "note": "僅 bedrock-mantle 的 Responses API（implicit + explicit）",
+              "sources": [
+                {
+                  "id": "aws-bedrock-astra-card"
+                }
+              ]
+            },
+            {
+              "feature": "count-tokens",
+              "status": "not-supported",
+              "note": "bedrock-runtime",
+              "sources": [
+                {
+                  "id": "aws-bedrock-astra-card"
+                }
+              ]
+            },
+            {
+              "feature": "guardrails",
+              "status": "partial",
+              "note": "僅 Converse API",
+              "sources": [
+                {
+                  "id": "aws-bedrock-astra-card"
+                }
+              ]
+            },
+            {
+              "feature": "server-side-tools",
+              "status": "partial",
+              "note": "僅 bedrock-mantle",
+              "sources": [
+                {
+                  "id": "aws-bedrock-astra-card"
+                }
+              ]
+            },
+            {
+              "feature": "temperature",
+              "status": "not-supported",
+              "note": "reasoning 模型拒收 temperature",
+              "sources": [
+                {
+                  "id": "trulens-2815"
+                }
+              ]
+            },
+            {
+              "feature": "fine-tuning",
+              "status": "not-supported",
+              "sources": [
+                {
+                  "id": "apidog-astra"
+                }
+              ]
+            },
+            {
+              "feature": "provisioned-throughput",
+              "status": "not-supported",
+              "note": "Reserved ✗",
+              "sources": [
+                {
+                  "id": "aws-bedrock-astra-card"
+                }
+              ]
+            },
+            {
+              "feature": "priority-tier",
+              "status": "not-supported",
+              "sources": [
+                {
+                  "id": "aws-bedrock-astra-card"
+                }
+              ]
+            },
+            {
+              "feature": "flex-tier",
+              "status": "not-supported",
+              "sources": [
+                {
+                  "id": "aws-bedrock-astra-card"
+                }
+              ]
+            }
+          ],
+          "pricing": [
+            {
+              "scope": "global",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 10.0,
+              "output": 50.0,
+              "cacheRead": 1.0,
+              "cacheWrite": 12.5,
+              "longContext": {
+                "thresholdInputTokens": 272000,
+                "input": 20.0,
+                "output": 75.0,
+                "cacheRead": 2.0,
+                "cacheWrite": 25.0
+              },
+              "notes": [
+                "cache 寫入為 30 分鐘 TTL。"
+              ],
+              "sources": [
+                {
+                  "id": "aws-bedrock-astra-card"
+                }
+              ],
+              "verification": "official"
+            },
+            {
+              "scope": "geo / in-region",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 11.0,
+              "output": 55.0,
+              "cacheRead": 1.1,
+              "cacheWrite": 13.75,
+              "longContext": {
+                "thresholdInputTokens": 272000,
+                "input": 22.0,
+                "output": 82.5,
+                "cacheRead": 2.2,
+                "cacheWrite": 27.5
+              },
+              "notes": [
+                "In-Region 價已含高於 OpenAI 一方價 10% 的費用。"
+              ],
+              "sources": [
+                {
+                  "id": "aws-bedrock-astra-card"
+                }
+              ],
+              "verification": "official"
+            }
+          ],
+          "quotas": [
+            {
+              "scope": "bedrock-runtime",
+              "note": "以 TPM 管理，output token 以 10 倍燒耗（1 個 output token 消耗 10 個 TPM）——容量規劃必須把輸出放大 10 倍計算。",
+              "sources": [
+                {
+                  "id": "aws-bedrock-astra-card"
+                }
+              ],
+              "verification": "official"
+            }
+          ],
+          "lifecycle": {
+            "eolNoSoonerThan": "2027-09-08",
+            "legacyPeriod": "至少 6 個月"
+          },
+          "litellmModel": "bedrock/converse/global.openai.gpt-6-astra",
+          "onboardingNotes": [
+            "Bedrock console 建立 long-term API key 或用 IAM/SigV4；OpenAI SDK 設 OPENAI_BASE_URL=https://bedrock-runtime.<region>.amazonaws.com/openai/v1。",
+            "需要 server-side tools 或 prompt caching 時改走 bedrock-mantle（us-west-2）。"
+          ],
+          "sources": [
+            {
+              "id": "aws-bedrock-astra-card"
+            },
+            {
+              "id": "aws-astra-whatsnew"
+            },
+            {
+              "id": "aws-bedrock-openai-cards"
+            },
+            {
+              "id": "aws-bedrock-responses-api"
+            },
+            {
+              "id": "aws-bedrock-endpoints"
+            }
+          ],
+          "verification": "official"
+        },
+        {
+          "id": "gpt-6-astra@foundry",
+          "cloud": "azure",
+          "service": "foundry",
+          "status": "ga",
+          "availableSince": "2026-09-03",
+          "providerModelId": "gpt-6-astra（version 2026-09-03）",
+          "inferenceTargets": [
+            {
+              "scope": "global",
+              "id": "Global Standard",
+              "geography": "任意區域處理"
+            },
+            {
+              "scope": "data-zone",
+              "id": "Data Zone Standard (US)",
+              "geography": "US"
+            },
+            {
+              "scope": "data-zone",
+              "id": "Data Zone Standard (EU)",
+              "geography": "EU"
+            }
+          ],
+          "endpoints": [
+            {
+              "endpoint": "https://<resource>.openai.azure.com/openai/v1",
+              "apis": [
+                "openai-responses",
+                "openai-chat-completions"
+              ],
+              "notes": [
+                "v1 GA API：直接用 OpenAI() client + base_url，不需 api-version；model 填部署名稱。"
+              ]
+            }
+          ],
+          "apacAvailability": [
+            {
+              "region": "japaneast",
+              "label": "Japan East",
+              "scopes": [
+                "global"
+              ],
+              "note": "Global Standard / Global Provisioned"
+            },
+            {
+              "region": "koreacentral",
+              "label": "Korea Central",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "australiaeast",
+              "label": "Australia East",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "southindia",
+              "label": "South India",
+              "scopes": [
+                "global"
+              ]
+            }
+          ],
+          "regionNotes": [
+            "Data Zone 只有 US 與 EU；APAC 只能用 Global 部署（資料可能在任意區域處理）。",
+            "上線初期以 Limited Access 釋出，部分訂閱需先申請配額。"
+          ],
+          "dataProcessing": {
+            "processor": "Microsoft（Azure OpenAI 為 Microsoft 一方服務）",
+            "residencyOptions": [
+              "Global Standard",
+              "US Data Zone",
+              "EU Data Zone"
+            ],
+            "taiwanResidency": "no",
+            "zdr": "unknown",
+            "retentionNotes": [
+              "請依 Azure OpenAI data privacy 文件確認 abuse monitoring 設定與資料保留。"
+            ],
+            "sources": [
+              {
+                "id": "ms-foundry-gpt6-blog"
+              },
+              {
+                "id": "foundrymap-astra"
+              }
+            ]
+          },
+          "features": [
+            {
+              "feature": "streaming",
+              "status": "supported"
+            },
+            {
+              "feature": "tool-calling",
+              "status": "supported",
+              "note": "OpenAI：tool calling 需 Responses API；Chat Completions 僅基本 function calling",
+              "sources": [
+                {
+                  "id": "openai-latest-model-guide"
+                }
+              ]
+            },
+            {
+              "feature": "structured-outputs",
+              "status": "supported",
+              "note": "依 OpenAI 規格；Azure 上請以 compat suite 驗證",
+              "sources": [
+                {
+                  "id": "apidog-astra"
+                }
+              ]
+            },
+            {
+              "feature": "vision",
+              "status": "supported"
+            },
+            {
+              "feature": "prompt-caching",
+              "status": "supported",
+              "note": "cached input $1.00、cache write $12.50（Global）",
+              "sources": [
+                {
+                  "id": "ms-foundry-gpt6-blog"
+                }
+              ]
+            },
+            {
+              "feature": "provisioned-throughput",
+              "status": "supported",
+              "note": "Global 與 US/EU Data Zone",
+              "sources": [
+                {
+                  "id": "ms-foundry-gpt6-blog"
+                }
+              ]
+            },
+            {
+              "feature": "priority-tier",
+              "status": "not-supported",
+              "note": "Priority Processing 僅 Sol",
+              "sources": [
+                {
+                  "id": "ms-foundry-gpt6-blog"
+                }
+              ]
+            },
+            {
+              "feature": "temperature",
+              "status": "not-supported",
+              "note": "reasoning 開啟時不支援",
+              "sources": [
+                {
+                  "id": "openai-latest-model-guide"
+                }
+              ]
+            },
+            {
+              "feature": "fine-tuning",
+              "status": "not-supported",
+              "sources": [
+                {
+                  "id": "apidog-astra"
+                }
+              ]
+            }
+          ],
+          "pricing": [
+            {
+              "scope": "global",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 10.0,
+              "output": 50.0,
+              "cacheRead": 1.0,
+              "cacheWrite": 12.5,
+              "longContext": {
+                "thresholdInputTokens": 272000,
+                "input": 20.0,
+                "output": 75.0,
+                "cacheRead": 2.0,
+                "cacheWrite": 25.0
+              },
+              "sources": [
+                {
+                  "id": "ms-foundry-gpt6-blog"
+                }
+              ],
+              "verification": "official"
+            },
+            {
+              "scope": "data-zone-us",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 11.0,
+              "output": 55.0,
+              "cacheRead": 1.1,
+              "cacheWrite": 13.75,
+              "longContext": {
+                "thresholdInputTokens": 272000,
+                "input": 22.0,
+                "output": 82.5,
+                "cacheRead": 2.2,
+                "cacheWrite": 27.5
+              },
+              "sources": [
+                {
+                  "id": "ms-foundry-gpt6-blog"
+                }
+              ],
+              "verification": "official"
+            },
+            {
+              "scope": "data-zone-eu",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 12.0,
+              "output": 60.0,
+              "cacheRead": 1.2,
+              "cacheWrite": 15.0,
+              "longContext": {
+                "thresholdInputTokens": 272000,
+                "input": 24.0,
+                "output": 90.0,
+                "cacheRead": 2.4,
+                "cacheWrite": 30.0
+              },
+              "sources": [
+                {
+                  "id": "ms-foundry-gpt6-blog"
+                }
+              ],
+              "verification": "official"
+            }
+          ],
+          "quotas": [
+            {
+              "scope": "Global Standard, Tier 1",
+              "rpm": 1000,
+              "tpm": 1000000,
+              "sources": [
+                {
+                  "id": "kingy-astra-access"
+                }
+              ],
+              "verification": "independent"
+            },
+            {
+              "scope": "Data Zone Standard, Tier 1",
+              "rpm": 333,
+              "tpm": 333000,
+              "note": "Tier 5/6 訂閱預設有配額；其他 tier 需先申請",
+              "sources": [
+                {
+                  "id": "kingy-astra-access"
+                }
+              ],
+              "verification": "independent"
+            }
+          ],
+          "lifecycle": {
+            "notes": [
+              "官方退役表（2026-09-24）尚未列入 gpt-6-astra；第三方追蹤頁顯示 2028-01-11（未驗證）。"
+            ]
+          },
+          "litellmModel": "azure/<your-gpt-6-astra-deployment>",
+          "onboardingNotes": [
+            "LiteLLM azure provider 以部署名稱路由；v1 GA API 可設 api_version: \"v1\"（請以你的 LiteLLM 版本驗證）。"
+          ],
+          "sources": [
+            {
+              "id": "ms-foundry-astra-blog"
+            },
+            {
+              "id": "ms-foundry-gpt6-blog"
+            },
+            {
+              "id": "foundrymap-astra"
+            },
+            {
+              "id": "ms-foundry-models-sold-by-azure"
+            },
+            {
+              "id": "ms-foundry-endpoints"
+            },
+            {
+              "id": "technspire-astra-foundry"
+            },
+            {
+              "id": "litellm-azure"
+            }
+          ],
+          "verification": "official"
+        }
+      ],
+      "benchmarks": [
+        {
+          "name": "Artificial Analysis Intelligence Index",
+          "version": "v4.3.2",
+          "variant": "max effort",
+          "score": 53,
+          "unit": "index",
+          "rank": "#6 / 210",
+          "measuredBy": "independent",
+          "date": "2026-09-24",
+          "sources": [
+            {
+              "id": "aa-astra"
+            }
+          ]
+        },
+        {
+          "name": "Terminal-Bench 4.0",
+          "variant": "high effort（OpenAI 自報）",
+          "score": 57.9,
+          "unit": "percent",
+          "measuredBy": "vendor",
+          "date": "2026-09-22",
+          "sources": [
+            {
+              "id": "anthropic-opus55-announce"
+            }
+          ]
+        },
+        {
+          "name": "FrontierCode v1.1 (Main)",
+          "variant": "OpenAI 自報",
+          "score": 53.3,
+          "unit": "percent",
+          "measuredBy": "vendor",
+          "date": "2026-09-22",
+          "sources": [
+            {
+              "id": "anthropic-opus55-announce"
+            }
+          ]
+        },
+        {
+          "name": "GDPval-AA v2.1",
+          "score": 1542,
+          "unit": "elo",
+          "measuredBy": "independent",
+          "date": "2026-09-22",
+          "sources": [
+            {
+              "id": "anthropic-opus55-announce"
+            }
+          ]
+        },
+        {
+          "name": "AutomationBench (Zapier)",
+          "score": 41.4,
+          "unit": "percent",
+          "measuredBy": "independent",
+          "date": "2026-09-22",
+          "sources": [
+            {
+              "id": "anthropic-opus55-announce"
+            }
+          ]
+        },
+        {
+          "name": "Humanity's Last Exam",
+          "variant": "with tools",
+          "score": 57.2,
+          "unit": "percent",
+          "measuredBy": "vendor",
+          "date": "2026-09-22",
+          "sources": [
+            {
+              "id": "anthropic-opus55-announce"
+            }
+          ]
+        },
+        {
+          "name": "Terminal-Bench-Science 0.1",
+          "variant": "OpenAI 自報",
+          "score": 64.6,
+          "unit": "percent",
+          "measuredBy": "vendor",
+          "date": "2026-09-22",
+          "sources": [
+            {
+              "id": "anthropic-opus55-announce"
+            }
+          ]
+        }
+      ],
+      "performanceReference": [
+        {
+          "provider": "OpenAI API（Artificial Analysis）",
+          "variant": "max effort",
+          "outputTokensPerSec": 52.5,
+          "ttftSec": 352.15,
+          "costPerIndexTaskUsd": 3.26,
+          "indexOutputTokensMillions": 60,
+          "date": "2026-09-24",
+          "notes": "TTFT 含 max effort 的 thinking 時間；實際產品請以你會用的 effort 自測。",
+          "sources": [
+            {
+              "id": "aa-astra"
+            }
+          ]
+        }
+      ],
+      "litellm": {
+        "providerStrings": [
+          {
+            "service": "openai-api",
+            "model": "openai/gpt-6-astra"
+          },
+          {
+            "service": "bedrock",
+            "model": "bedrock/converse/global.openai.gpt-6-astra",
+            "note": "server-side tools / caching：bedrock_mantle/openai.gpt-6-astra（us-west-2）"
+          },
+          {
+            "service": "foundry",
+            "model": "azure/<deployment-name>"
+          }
+        ],
+        "minVersionRouting": "v1.76.0（Reload Price Data）",
+        "minVersionParams": "v1.101.0（GPT-6 家族的 max_completion_tokens / reasoning 參數處理）",
+        "recommendedVersion": "v1.102.1",
+        "caveats": [
+          "舊版 LiteLLM 的 reasoning classifier 只比對 gpt-5*：gpt-6-* 會保留 max_tokens 與 temperature 而被拒；升級前由 client 改送 max_completion_tokens、不要送 temperature。",
+          "Bedrock 路徑（bedrock/converse/…openai.gpt-6-*、bedrock_mantle/openai.gpt-6-*）在 v1.102.1 仍不會自動丟棄 temperature（opik #8524、trulens #2815）——在這些 deployment 加 additional_drop_params: [\"temperature\"] 並用 compat suite 驗證。",
+          ">272K 輸入會觸發長文價；請確認 cost map 已含 long-context tier，否則成本會被低估。",
+          "Astra 的工具呼叫請走 /v1/responses；/v1/chat/completions 只支援基本 function calling。",
+          "reasoning_effort 不接受 none；LiteLLM auto router 若把 none 帶入會被拒。"
+        ],
+        "configSnippet": "- model_name: gpt-6-astra\n  litellm_params:\n    model: azure/gpt-6-astra\n    api_base: os.environ/AZURE_OPENAI_API_BASE\n    api_key: os.environ/AZURE_OPENAI_API_KEY\n    api_version: \"v1\"\n  model_info:\n    catalog_id: gpt-6-astra\n",
+        "status": "researched",
+        "sources": [
+          {
+            "id": "litellm-astra"
+          },
+          {
+            "id": "litellm-sol-luna"
+          },
+          {
+            "id": "opik-8524"
+          },
+          {
+            "id": "trulens-2815"
+          }
+        ]
+      },
+      "tags": [
+        "frontier",
+        "agentic",
+        "computer-use",
+        "1m-context",
+        "critical-cyber"
+      ],
+      "sources": [
+        {
+          "id": "openai-models"
+        },
+        {
+          "id": "openai-latest-model-guide"
+        },
+        {
+          "id": "openai-astra-systemcard"
+        },
+        {
+          "id": "aws-bedrock-astra-card"
+        },
+        {
+          "id": "ms-foundry-gpt6-blog"
+        },
+        {
+          "id": "aa-astra"
+        },
+        {
+          "id": "litellm-astra"
+        }
+      ],
+      "lastVerified": "2026-09-24"
+    },
+    {
+      "id": "gpt-6-sol",
+      "name": "GPT-6 Sol",
+      "vendor": "openai",
+      "family": "GPT-6",
+      "tier": "balanced",
+      "releaseDate": "2026-09-22",
+      "platformStatus": "evaluating",
+      "predecessorId": "gpt-5.6-sol",
+      "modalities": {
+        "input": [
+          "text",
+          "image"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "contextWindow": 1050000,
+      "maxOutputTokens": 128000,
+      "knowledgeCutoff": "2026-04-20",
+      "reasoning": {
+        "supported": true,
+        "alwaysOn": false,
+        "effortLevels": [
+          "none",
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ],
+        "defaultEffort": "medium",
+        "parameter": "reasoning.effort（Responses）／reasoning_effort（Chat Completions）",
+        "notes": [
+          "Chat Completions 的 function calling 只有在 reasoning_effort=\"none\" 時可用；需要 reasoning + tools 請改 Responses API。",
+          "effort ≠ none 時要移除 temperature、top_p、top_logprobs；temperature 只在 effort=none 時生效。",
+          "prompt_cache_retention 改為 prompt_cache_options.ttl（\"30m\"）。"
+        ]
+      },
+      "vendorModelId": "gpt-6-sol",
+      "modelCardUrl": "https://developers.openai.com/api/docs/models/gpt-6-sol",
+      "summary": "2026-09-22 與 Luna 同日推出，把 Astra 的訓練方法帶到日常工作層級。價格 $2/$10，約為 GPT-5.6 Sol 促銷價的一半；OpenAI 稱錯誤約為 GPT-5.6 Sol 的一半。OpenAI API、Azure Foundry（GA，含 Provisioned 與 Priority Processing）、Bedrock（GA）同日上線；Google Cloud 未提供。適合作為多數團隊的新預設模型候選。",
+      "strengths": [
+        "AA Intelligence Index v4.3.2 48 分（max，#18/210），每任務成本 $1.06。",
+        "價格減半：$2 / $10、cached input $0.20；Azure 另有 Provisioned 與 Priority Processing。",
+        "支援 effort none～max：none 時可用 temperature，也能在 Chat Completions 使用工具。",
+        "113 tok/s（AA），輸出相對精簡（77M tokens）。",
+        "1.05M context、128K output。"
+      ],
+      "weaknesses": [
+        "max effort 首 token 延遲高（AA 142.7 秒）——互動場景請用 low/medium。",
+        "Chat Completions + tools 需 effort=none；要 reasoning + tools 必須改 Responses API。",
+        "Bedrock 模型卡在發布日尚未上線，Bedrock 價格與區域目前只有社群資料。",
+        "不支援 fine-tuning；長文（>272K）$4/$15。"
+      ],
+      "bestFor": [
+        "多數企業預設工作負載：程式、分析、多步驟流程（GPT-5.6 Sol 的直接升級）",
+        "成本受控的代理任務",
+        "Azure 上需要 PTU 或 Priority SLA 的正式環境"
+      ],
+      "avoidFor": [
+        "最困難的推理任務（改用 Astra 或 Opus 5.5）",
+        "仍用 Chat Completions + tools 且需要 reasoning 的舊程式（需改 Responses）"
+      ],
+      "safety": {
+        "classifications": [
+          "與 Astra 相同的方法開發；OpenAI 稱誤導性程式工作宣稱率較低（系統卡請見 Deployment Safety Hub）。"
+        ],
+        "behaviours": [
+          "溝通風格改為較短、少術語。"
+        ],
+        "programmes": [],
+        "sources": [
+          {
+            "id": "macrumors-sol-luna"
+          },
+          {
+            "id": "openai-latest-model-guide"
+          }
+        ]
+      },
+      "offerings": [
+        {
+          "id": "gpt-6-sol@bedrock",
+          "cloud": "aws",
+          "service": "bedrock",
+          "status": "ga",
+          "availableSince": "2026-09-22",
+          "providerModelId": "openai.gpt-6-sol",
+          "inferenceTargets": [
+            {
+              "scope": "global",
+              "id": "global.openai.gpt-6-sol",
+              "geography": "全球動態路由"
+            },
+            {
+              "scope": "geo",
+              "id": "us.openai.gpt-6-sol",
+              "geography": "US"
+            }
+          ],
+          "endpoints": [
+            {
+              "endpoint": "bedrock-runtime",
+              "apis": [
+                "bedrock-converse"
+              ],
+              "notes": [
+                "OpenAI 相容 API 支援情形待官方模型卡確認；社群已有 Chat Completions 使用紀錄。",
+                "裸 openai.gpt-6-sol 回「on-demand throughput isn't supported」，需用 profile。"
+              ]
+            },
+            {
+              "endpoint": "bedrock-mantle",
+              "apis": [
+                "openai-chat-completions",
+                "openai-responses"
+              ],
+              "notes": [
+                "依 LiteLLM/社群的 bedrock_mantle/openai.gpt-6-sol 使用紀錄，待官方確認。"
+              ]
+            }
+          ],
+          "apacAvailability": [
+            {
+              "region": "ap-south-1",
+              "label": "Mumbai",
+              "scopes": [
+                "global"
+              ],
+              "note": "社群觀察到 profile ACTIVE；其他 APAC 區域待模型卡"
+            }
+          ],
+          "regionNotes": [
+            "社群觀察：us-east-1、us-west-2、eu-west-1、ap-south-1 profile 為 ACTIVE。"
+          ],
+          "dataProcessing": {
+            "processor": "AWS Bedrock（硬體隔離、零操作員存取）",
+            "residencyOptions": [
+              "US geo",
+              "Global"
+            ],
+            "taiwanResidency": "no",
+            "zdr": "on-request",
+            "retentionNotes": [
+              "被標記的流量最多保留 30 天；ZDR 需透過 AWS 帳戶團隊申請。",
+              "推論資料不用於訓練，與 OpenAI 分享為選擇性。"
+            ],
+            "sources": [
+              {
+                "id": "aws-sol-luna-blog"
+              }
+            ]
+          },
+          "features": [
+            {
+              "feature": "streaming",
+              "status": "supported"
+            },
+            {
+              "feature": "prompt-caching",
+              "status": "supported",
+              "note": "explicit prompt caching",
+              "sources": [
+                {
+                  "id": "aws-sol-luna-blog"
+                }
+              ]
+            },
+            {
+              "feature": "vision",
+              "status": "supported",
+              "note": "text + image（不含 PDF）",
+              "sources": [
+                {
+                  "id": "modelsdev-7805"
+                }
+              ]
+            },
+            {
+              "feature": "reasoning-control",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "aws-sol-luna-whatsnew"
+                }
+              ]
+            },
+            {
+              "feature": "temperature",
+              "status": "partial",
+              "note": "僅 effort=none；Bedrock 路徑經 LiteLLM 時 temperature 不會被自動丟棄",
+              "sources": [
+                {
+                  "id": "opik-8524"
+                }
+              ]
+            }
+          ],
+          "pricing": [
+            {
+              "scope": "global",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 2.0,
+              "cacheWrite": 2.5,
+              "cacheRead": 0.2,
+              "output": 10.0,
+              "longContext": {
+                "thresholdInputTokens": 272000,
+                "input": 4.0,
+                "cacheWrite": 5.0,
+                "cacheRead": 0.4,
+                "output": 15.0
+              },
+              "notes": [
+                "Bedrock 模型卡在 2026-09-22 尚未發布；價格取自社群 PR（OpenAI 價 + geo/in-region 10%）。上線前以 Bedrock pricing 頁核對。"
+              ],
+              "sources": [
+                {
+                  "id": "genai-prices-713"
+                },
+                {
+                  "id": "modelsdev-7805"
+                }
+              ],
+              "verification": "community"
+            },
+            {
+              "scope": "geo / in-region",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 2.2,
+              "cacheWrite": 2.75,
+              "cacheRead": 0.22,
+              "output": 11.0,
+              "longContext": {
+                "thresholdInputTokens": 272000,
+                "input": 4.4,
+                "cacheWrite": 5.5,
+                "cacheRead": 0.44,
+                "output": 16.5
+              },
+              "notes": [
+                "Bedrock 模型卡在 2026-09-22 尚未發布；價格取自社群 PR（OpenAI 價 + geo/in-region 10%）。上線前以 Bedrock pricing 頁核對。"
+              ],
+              "sources": [
+                {
+                  "id": "genai-prices-713"
+                },
+                {
+                  "id": "modelsdev-7805"
+                }
+              ],
+              "verification": "community"
+            }
+          ],
+          "quotas": [],
+          "lifecycle": {
+            "notes": [
+              "新政策：請於模型卡發布後讀取「EOL no sooner than」與 Legacy period。"
+            ]
+          },
+          "litellmModel": "bedrock/converse/global.openai.gpt-6-sol",
+          "onboardingNotes": [
+            "官方模型卡發布前先在 staging 以 compat suite 驗證 API 面與價格。"
+          ],
+          "sources": [
+            {
+              "id": "aws-sol-luna-whatsnew"
+            },
+            {
+              "id": "aws-sol-luna-blog"
+            },
+            {
+              "id": "modelsdev-7805"
+            },
+            {
+              "id": "genai-prices-713"
+            }
+          ],
+          "verification": "community"
+        },
+        {
+          "id": "gpt-6-sol@foundry",
+          "cloud": "azure",
+          "service": "foundry",
+          "status": "ga",
+          "availableSince": "2026-09-22",
+          "providerModelId": "gpt-6-sol",
+          "inferenceTargets": [
+            {
+              "scope": "global",
+              "id": "Global Standard"
+            },
+            {
+              "scope": "data-zone",
+              "id": "Data Zone Standard (US)"
+            },
+            {
+              "scope": "data-zone",
+              "id": "Data Zone Standard (EU)"
+            }
+          ],
+          "endpoints": [
+            {
+              "endpoint": "https://<resource>.openai.azure.com/openai/v1",
+              "apis": [
+                "openai-responses",
+                "openai-chat-completions"
+              ]
+            }
+          ],
+          "apacAvailability": [
+            {
+              "region": "global",
+              "label": "Global Standard（28 個 Global 區域）",
+              "scopes": [
+                "global"
+              ],
+              "note": "APAC 無 Data Zone"
+            }
+          ],
+          "dataProcessing": {
+            "processor": "Microsoft（Azure OpenAI）",
+            "residencyOptions": [
+              "Global Standard",
+              "US Data Zone",
+              "EU Data Zone"
+            ],
+            "taiwanResidency": "no",
+            "zdr": "unknown",
+            "retentionNotes": [
+              "請依 Azure OpenAI data privacy 文件確認 abuse monitoring 設定。"
+            ],
+            "sources": [
+              {
+                "id": "ms-foundry-gpt6-blog"
+              }
+            ]
+          },
+          "features": [
+            {
+              "feature": "streaming",
+              "status": "supported"
+            },
+            {
+              "feature": "tool-calling",
+              "status": "supported",
+              "note": "Chat Completions 限 effort=none；Responses 無此限制",
+              "sources": [
+                {
+                  "id": "openai-latest-model-guide"
+                }
+              ]
+            },
+            {
+              "feature": "provisioned-throughput",
+              "status": "supported",
+              "note": "Global 與 US/EU Data Zone",
+              "sources": [
+                {
+                  "id": "ms-foundry-gpt6-blog"
+                }
+              ]
+            },
+            {
+              "feature": "priority-tier",
+              "status": "supported",
+              "note": "Priority Processing：Global 與 US Data Zone",
+              "sources": [
+                {
+                  "id": "ms-foundry-gpt6-blog"
+                }
+              ]
+            },
+            {
+              "feature": "prompt-caching",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "ms-foundry-gpt6-blog"
+                }
+              ]
+            }
+          ],
+          "pricing": [
+            {
+              "scope": "global",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 2.0,
+              "cacheRead": 0.2,
+              "cacheWrite": 2.5,
+              "output": 10.0,
+              "longContext": {
+                "thresholdInputTokens": 272000,
+                "input": 4.0,
+                "cacheRead": 0.4,
+                "cacheWrite": 5.0,
+                "output": 15.0
+              },
+              "sources": [
+                {
+                  "id": "ms-foundry-gpt6-blog"
+                }
+              ],
+              "verification": "official"
+            },
+            {
+              "scope": "data-zone-us",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 2.2,
+              "cacheRead": 0.22,
+              "cacheWrite": 2.75,
+              "output": 11.0,
+              "longContext": {
+                "thresholdInputTokens": 272000,
+                "input": 4.4,
+                "cacheRead": 0.44,
+                "cacheWrite": 5.5,
+                "output": 16.5
+              },
+              "sources": [
+                {
+                  "id": "ms-foundry-gpt6-blog"
+                }
+              ],
+              "verification": "official"
+            },
+            {
+              "scope": "data-zone-eu",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 2.4,
+              "cacheRead": 0.24,
+              "cacheWrite": 3.0,
+              "output": 12.0,
+              "longContext": {
+                "thresholdInputTokens": 272000,
+                "input": 4.8,
+                "cacheRead": 0.48,
+                "cacheWrite": 6.0,
+                "output": 18.0
+              },
+              "sources": [
+                {
+                  "id": "ms-foundry-gpt6-blog"
+                }
+              ],
+              "verification": "official"
+            }
+          ],
+          "quotas": [],
+          "lifecycle": {
+            "notes": [
+              "官方退役表（2026-09-24）尚未列入。"
+            ]
+          },
+          "litellmModel": "azure/<your-gpt-6-sol-deployment>",
+          "onboardingNotes": [
+            "需要穩定延遲的正式環境考慮 Provisioned 或 Priority Processing。"
+          ],
+          "sources": [
+            {
+              "id": "ms-foundry-gpt6-blog"
+            },
+            {
+              "id": "litellm-pr-42704"
+            }
+          ],
+          "verification": "official"
+        }
+      ],
+      "benchmarks": [
+        {
+          "name": "Artificial Analysis Intelligence Index",
+          "version": "v4.3.2",
+          "variant": "max effort",
+          "score": 48,
+          "unit": "index",
+          "rank": "#18 / 210",
+          "measuredBy": "independent",
+          "date": "2026-09-24",
+          "sources": [
+            {
+              "id": "aa-sol"
+            }
+          ]
+        }
+      ],
+      "performanceReference": [
+        {
+          "provider": "OpenAI API（Artificial Analysis）",
+          "variant": "max effort",
+          "outputTokensPerSec": 113.3,
+          "ttftSec": 142.74,
+          "costPerIndexTaskUsd": 1.06,
+          "indexOutputTokensMillions": 77,
+          "date": "2026-09-24",
+          "sources": [
+            {
+              "id": "aa-sol"
+            }
+          ]
+        }
+      ],
+      "litellm": {
+        "providerStrings": [
+          {
+            "service": "openai-api",
+            "model": "openai/gpt-6-sol"
+          },
+          {
+            "service": "bedrock",
+            "model": "bedrock/converse/global.openai.gpt-6-sol"
+          },
+          {
+            "service": "foundry",
+            "model": "azure/<deployment-name>"
+          }
+        ],
+        "minVersionRouting": "v1.76.0（Reload Price Data）",
+        "minVersionParams": "v1.101.0",
+        "recommendedVersion": "v1.102.1",
+        "caveats": [
+          "舊版 LiteLLM 的 reasoning classifier 只比對 gpt-5*：gpt-6-* 會保留 max_tokens 與 temperature 而被拒；升級前由 client 改送 max_completion_tokens、不要送 temperature。",
+          "Bedrock 路徑（bedrock/converse/…openai.gpt-6-*、bedrock_mantle/openai.gpt-6-*）在 v1.102.1 仍不會自動丟棄 temperature（opik #8524、trulens #2815）——在這些 deployment 加 additional_drop_params: [\"temperature\"] 並用 compat suite 驗證。",
+          ">272K 輸入會觸發長文價；請確認 cost map 已含 long-context tier，否則成本會被低估。",
+          "prompt cache breakpoints 在 /chat/completions、/responses、/v1/messages 皆支援；中途改 reasoning effort 不再破壞 cache。"
+        ],
+        "status": "researched",
+        "sources": [
+          {
+            "id": "litellm-sol-luna"
+          },
+          {
+            "id": "litellm-pr-42746"
+          },
+          {
+            "id": "litellm-pr-42704"
+          },
+          {
+            "id": "opik-8524"
+          }
+        ]
+      },
+      "tags": [
+        "balanced",
+        "default-candidate",
+        "1m-context"
+      ],
+      "sources": [
+        {
+          "id": "openai-gpt6-sol-model"
+        },
+        {
+          "id": "openai-latest-model-guide"
+        },
+        {
+          "id": "ms-foundry-gpt6-blog"
+        },
+        {
+          "id": "aws-sol-luna-whatsnew"
+        },
+        {
+          "id": "aa-sol"
+        },
+        {
+          "id": "litellm-sol-luna"
+        }
+      ],
+      "lastVerified": "2026-09-24"
+    },
+    {
+      "id": "gpt-6-luna",
+      "name": "GPT-6 Luna",
+      "vendor": "openai",
+      "family": "GPT-6",
+      "tier": "efficient",
+      "releaseDate": "2026-09-22",
+      "platformStatus": "evaluating",
+      "predecessorId": "gpt-5.6-luna",
+      "modalities": {
+        "input": [
+          "text",
+          "image"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "contextWindow": 1050000,
+      "maxOutputTokens": 128000,
+      "reasoning": {
+        "supported": true,
+        "alwaysOn": false,
+        "effortLevels": [
+          "none",
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ],
+        "defaultEffort": "medium",
+        "parameter": "reasoning.effort（Responses）／reasoning_effort（Chat Completions）",
+        "notes": [
+          "Chat Completions 的 function calling 只有在 reasoning_effort=\"none\" 時可用；需要 reasoning + tools 請改 Responses API。",
+          "effort ≠ none 時要移除 temperature、top_p、top_logprobs；temperature 只在 effort=none 時生效。",
+          "prompt_cache_retention 改為 prompt_cache_options.ttl（\"30m\"）。"
+        ]
+      },
+      "vendorModelId": "gpt-6-luna",
+      "summary": "GPT-6 家族的高量低價層：$0.10 / $0.50（約 GPT-5.6 Luna 的一半），適合摘要、擷取、分類與路由。AA 37 分、每任務成本僅 $0.07。OpenAI API、Azure Foundry（Standard；Global 與 US/EU Data Zone）、Bedrock 同日 GA。",
+      "strengths": [
+        "極低價：$0.10 / $0.50，cached input $0.01；Batch/Flex 再五折。",
+        "AA 37 分，在同級 175 個模型中排名第 6；每任務 $0.07。",
+        "131 tok/s（AA）；effort=none 時延遲最低。",
+        "適合當 router、分類器或 guardrail 前置過濾器。"
+      ],
+      "weaknesses": [
+        "max effort 首 token 102.8 秒——請以 none/low 使用。",
+        "偏冗長（AA 評測 150M tokens）。",
+        "Azure 沒有 Provisioned；Chat Completions + tools 同樣限 effort=none。"
+      ],
+      "bestFor": [
+        "大量分類、擷取、摘要與資料清洗",
+        "意圖路由、guardrail 前置分類",
+        "Batch / Flex 離線作業"
+      ],
+      "avoidFor": [
+        "複雜多步推理與長時程代理",
+        "高風險決策輔助"
+      ],
+      "safety": {
+        "classifications": [],
+        "behaviours": [
+          "溝通風格與 Astra 相同（較短、少術語）。"
+        ],
+        "programmes": [],
+        "sources": [
+          {
+            "id": "macrumors-sol-luna"
+          }
+        ]
+      },
+      "offerings": [
+        {
+          "id": "gpt-6-luna@bedrock",
+          "cloud": "aws",
+          "service": "bedrock",
+          "status": "ga",
+          "availableSince": "2026-09-22",
+          "providerModelId": "openai.gpt-6-luna",
+          "inferenceTargets": [
+            {
+              "scope": "global",
+              "id": "global.openai.gpt-6-luna"
+            },
+            {
+              "scope": "geo",
+              "id": "us.openai.gpt-6-luna",
+              "geography": "US"
+            }
+          ],
+          "endpoints": [
+            {
+              "endpoint": "bedrock-runtime",
+              "apis": [
+                "bedrock-converse"
+              ],
+              "notes": [
+                "OpenAI 相容 API 支援情形待官方模型卡確認。"
+              ]
+            }
+          ],
+          "apacAvailability": [
+            {
+              "region": "ap-south-1",
+              "label": "Mumbai",
+              "scopes": [
+                "global"
+              ],
+              "note": "社群觀察"
+            }
+          ],
+          "dataProcessing": {
+            "processor": "AWS Bedrock",
+            "residencyOptions": [
+              "US geo",
+              "Global"
+            ],
+            "taiwanResidency": "no",
+            "zdr": "on-request",
+            "retentionNotes": [
+              "被標記的流量最多保留 30 天；ZDR 需透過 AWS 帳戶團隊申請。"
+            ],
+            "sources": [
+              {
+                "id": "aws-sol-luna-blog"
+              }
+            ]
+          },
+          "features": [
+            {
+              "feature": "streaming",
+              "status": "supported"
+            },
+            {
+              "feature": "prompt-caching",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "aws-sol-luna-blog"
+                }
+              ]
+            },
+            {
+              "feature": "reasoning-control",
+              "status": "supported",
+              "note": "每個請求可調 effort",
+              "sources": [
+                {
+                  "id": "aws-sol-luna-blog"
+                }
+              ]
+            }
+          ],
+          "pricing": [
+            {
+              "scope": "global",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 0.1,
+              "cacheWrite": 0.125,
+              "cacheRead": 0.01,
+              "output": 0.5,
+              "longContext": {
+                "thresholdInputTokens": 272000,
+                "input": 0.2,
+                "cacheWrite": 0.25,
+                "cacheRead": 0.02,
+                "output": 0.75
+              },
+              "notes": [
+                "Bedrock 模型卡在 2026-09-22 尚未發布；價格取自社群 PR（OpenAI 價 + geo/in-region 10%）。上線前以 Bedrock pricing 頁核對。"
+              ],
+              "sources": [
+                {
+                  "id": "genai-prices-713"
+                },
+                {
+                  "id": "modelsdev-7805"
+                }
+              ],
+              "verification": "community"
+            },
+            {
+              "scope": "geo / in-region",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 0.11,
+              "cacheWrite": 0.1375,
+              "cacheRead": 0.011,
+              "output": 0.55,
+              "longContext": {
+                "thresholdInputTokens": 272000,
+                "input": 0.22,
+                "cacheWrite": 0.275,
+                "cacheRead": 0.022,
+                "output": 0.825
+              },
+              "notes": [
+                "Bedrock 模型卡在 2026-09-22 尚未發布；價格取自社群 PR（OpenAI 價 + geo/in-region 10%）。上線前以 Bedrock pricing 頁核對。"
+              ],
+              "sources": [
+                {
+                  "id": "genai-prices-713"
+                },
+                {
+                  "id": "modelsdev-7805"
+                }
+              ],
+              "verification": "community"
+            }
+          ],
+          "quotas": [],
+          "lifecycle": {
+            "notes": [
+              "請於模型卡發布後讀取「EOL no sooner than」與 Legacy period。"
+            ]
+          },
+          "litellmModel": "bedrock/converse/global.openai.gpt-6-luna",
+          "onboardingNotes": [
+            "適合放在 LiteLLM auto router 的低成本層。"
+          ],
+          "sources": [
+            {
+              "id": "aws-sol-luna-whatsnew"
+            },
+            {
+              "id": "modelsdev-7805"
+            },
+            {
+              "id": "genai-prices-713"
+            }
+          ],
+          "verification": "community"
+        },
+        {
+          "id": "gpt-6-luna@foundry",
+          "cloud": "azure",
+          "service": "foundry",
+          "status": "ga",
+          "availableSince": "2026-09-22",
+          "providerModelId": "gpt-6-luna",
+          "inferenceTargets": [
+            {
+              "scope": "global",
+              "id": "Global Standard"
+            },
+            {
+              "scope": "data-zone",
+              "id": "Data Zone Standard (US)"
+            },
+            {
+              "scope": "data-zone",
+              "id": "Data Zone Standard (EU)"
+            }
+          ],
+          "endpoints": [
+            {
+              "endpoint": "https://<resource>.openai.azure.com/openai/v1",
+              "apis": [
+                "openai-responses",
+                "openai-chat-completions"
+              ]
+            }
+          ],
+          "apacAvailability": [
+            {
+              "region": "global",
+              "label": "Global Standard",
+              "scopes": [
+                "global"
+              ]
+            }
+          ],
+          "dataProcessing": {
+            "processor": "Microsoft（Azure OpenAI）",
+            "residencyOptions": [
+              "Global Standard",
+              "US Data Zone",
+              "EU Data Zone"
+            ],
+            "taiwanResidency": "no",
+            "zdr": "unknown",
+            "retentionNotes": [],
+            "sources": [
+              {
+                "id": "ms-foundry-gpt6-blog"
+              }
+            ]
+          },
+          "features": [
+            {
+              "feature": "streaming",
+              "status": "supported"
+            },
+            {
+              "feature": "provisioned-throughput",
+              "status": "not-supported",
+              "note": "僅 Standard 部署",
+              "sources": [
+                {
+                  "id": "ms-foundry-gpt6-blog"
+                }
+              ]
+            },
+            {
+              "feature": "prompt-caching",
+              "status": "supported"
+            }
+          ],
+          "pricing": [
+            {
+              "scope": "global",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 0.1,
+              "cacheRead": 0.01,
+              "cacheWrite": 0.125,
+              "output": 0.5,
+              "longContext": {
+                "thresholdInputTokens": 272000,
+                "input": 0.2,
+                "cacheRead": 0.02,
+                "cacheWrite": 0.25,
+                "output": 0.75
+              },
+              "sources": [
+                {
+                  "id": "ms-foundry-gpt6-blog"
+                }
+              ],
+              "verification": "official"
+            },
+            {
+              "scope": "data-zone-us",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 0.11,
+              "cacheRead": 0.011,
+              "cacheWrite": 0.1375,
+              "output": 0.55,
+              "longContext": {
+                "thresholdInputTokens": 272000,
+                "input": 0.22,
+                "cacheRead": 0.022,
+                "cacheWrite": 0.275,
+                "output": 0.825
+              },
+              "sources": [
+                {
+                  "id": "ms-foundry-gpt6-blog"
+                }
+              ],
+              "verification": "official"
+            },
+            {
+              "scope": "data-zone-eu",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 0.12,
+              "cacheRead": 0.012,
+              "cacheWrite": 0.15,
+              "output": 0.6,
+              "longContext": {
+                "thresholdInputTokens": 272000,
+                "input": 0.24,
+                "cacheRead": 0.024,
+                "cacheWrite": 0.3,
+                "output": 0.9
+              },
+              "sources": [
+                {
+                  "id": "ms-foundry-gpt6-blog"
+                }
+              ],
+              "verification": "official"
+            }
+          ],
+          "quotas": [],
+          "lifecycle": {
+            "notes": [
+              "官方退役表（2026-09-24）尚未列入。"
+            ]
+          },
+          "litellmModel": "azure/<your-gpt-6-luna-deployment>",
+          "onboardingNotes": [],
+          "sources": [
+            {
+              "id": "ms-foundry-gpt6-blog"
+            }
+          ],
+          "verification": "official"
+        }
+      ],
+      "benchmarks": [
+        {
+          "name": "Artificial Analysis Intelligence Index",
+          "version": "v4.3.2",
+          "variant": "max effort",
+          "score": 37,
+          "unit": "index",
+          "rank": "#6 / 175（同級）",
+          "measuredBy": "independent",
+          "date": "2026-09-24",
+          "sources": [
+            {
+              "id": "aa-luna"
+            }
+          ]
+        }
+      ],
+      "performanceReference": [
+        {
+          "provider": "OpenAI API（Artificial Analysis）",
+          "variant": "max effort",
+          "outputTokensPerSec": 131.4,
+          "ttftSec": 102.82,
+          "costPerIndexTaskUsd": 0.07,
+          "indexOutputTokensMillions": 150,
+          "date": "2026-09-24",
+          "sources": [
+            {
+              "id": "aa-luna"
+            }
+          ]
+        }
+      ],
+      "litellm": {
+        "providerStrings": [
+          {
+            "service": "openai-api",
+            "model": "openai/gpt-6-luna"
+          },
+          {
+            "service": "bedrock",
+            "model": "bedrock/converse/global.openai.gpt-6-luna"
+          },
+          {
+            "service": "foundry",
+            "model": "azure/<deployment-name>"
+          }
+        ],
+        "minVersionRouting": "v1.76.0（Reload Price Data）",
+        "minVersionParams": "v1.101.0",
+        "recommendedVersion": "v1.102.1",
+        "caveats": [
+          "舊版 LiteLLM 的 reasoning classifier 只比對 gpt-5*：gpt-6-* 會保留 max_tokens 與 temperature 而被拒；升級前由 client 改送 max_completion_tokens、不要送 temperature。",
+          "Bedrock 路徑（bedrock/converse/…openai.gpt-6-*、bedrock_mantle/openai.gpt-6-*）在 v1.102.1 仍不會自動丟棄 temperature（opik #8524、trulens #2815）——在這些 deployment 加 additional_drop_params: [\"temperature\"] 並用 compat suite 驗證。",
+          ">272K 輸入會觸發長文價；請確認 cost map 已含 long-context tier，否則成本會被低估。"
+        ],
+        "status": "researched",
+        "sources": [
+          {
+            "id": "litellm-sol-luna"
+          },
+          {
+            "id": "litellm-pr-42746"
+          },
+          {
+            "id": "opik-8524"
+          }
+        ]
+      },
+      "tags": [
+        "efficient",
+        "high-volume",
+        "router"
+      ],
+      "sources": [
+        {
+          "id": "openai-latest-model-guide"
+        },
+        {
+          "id": "ms-foundry-gpt6-blog"
+        },
+        {
+          "id": "aws-sol-luna-whatsnew"
+        },
+        {
+          "id": "aa-luna"
+        },
+        {
+          "id": "litellm-sol-luna"
+        }
+      ],
+      "lastVerified": "2026-09-24"
+    },
+    {
+      "id": "gemini-3-8-flash",
+      "name": "Gemini 3.8 Flash",
+      "vendor": "google",
+      "family": "Gemini Flash",
+      "tier": "efficient",
+      "releaseDate": "2026-09-02",
+      "platformStatus": "evaluating",
+      "predecessorId": "gemini-3-7-flash",
+      "modalities": {
+        "input": [
+          "text",
+          "image",
+          "video",
+          "audio",
+          "pdf"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "contextWindow": 1048576,
+      "maxOutputTokens": 65536,
+      "knowledgeCutoff": "2026-03（第三方資料）",
+      "reasoning": {
+        "supported": true,
+        "alwaysOn": true,
+        "effortLevels": [
+          "low",
+          "medium",
+          "high"
+        ],
+        "defaultEffort": "medium",
+        "parameter": "thinking_level（取代 thinking_budget）；LiteLLM 以 reasoning_effort 映射",
+        "notes": [
+          "minimal 不支援，會回 400。"
+        ]
+      },
+      "vendorModelId": "gemini-3.8-flash",
+      "modelCardUrl": "https://ai.google.dev/gemini-api/docs/models/gemini-3.8-flash",
+      "summary": "Google 於 2026-09-02 直接 GA 的 Flash 旗艦，主打長時程軟體工程、自主代理與企業流程；只在 Gemini API 與 Agent Platform（原 Vertex AI）提供，AWS/Azure 沒有。促銷價 $0.75/$3.75 至 2026-12-31，2027-01-01 起 $1.50/$7.50——預算要同時列兩組價格。AA 測得約 291 tok/s，是最快的模型之一。",
+      "strengths": [
+        "速度：AA 測得 291 tok/s，high effort 首 token 約 15 秒。",
+        "多模態輸入：文字、影像、影片、音訊、PDF。",
+        "內建工具：Search / Maps grounding、code execution、URL context、file search、computer use（preview）。",
+        "與 3.7 Flash 同價但分數更高；支援 Batch、Flex、Priority。"
+      ],
+      "weaknesses": [
+        "促銷價 2027-01-01 翻倍（$1.50 / $7.50、cache $0.15）。",
+        "每任務輸出 token 比 3.7 Flash 多約 30%，每任務成本上升約 40%（AA 上市評測）。",
+        "AA v4.3.2 只得 41 分（#40）；上市時的 59 分來自舊版 index，不可直接比較。",
+        "移除 temperature/top_p/top_k/thinking_budget/candidate_count；不允許 prefill；FunctionResponse 必須帶 call_id 與 name。",
+        "Agent Platform 只有 global 與 EU multi-region，沒有亞太單一區域端點；AWS/Azure 不提供。"
+      ],
+      "bestFor": [
+        "高吞吐的代理子任務與程式輔助",
+        "影音、文件等多模態理解",
+        "需要 Google Search grounding 的應用",
+        "成本敏感但仍需不錯推理的場景"
+      ],
+      "avoidFor": [
+        "依賴固定 temperature 的舊 prompt",
+        "資料必須留在特定亞太區域",
+        "最困難的推理任務（改用 Opus 5.5 / Astra）"
+      ],
+      "safety": {
+        "classifications": [
+          "另有 Gemini 3.8 Flash Cyber（資安專用變體，存取需另行申請）。"
+        ],
+        "behaviours": [
+          "官方說明較長、較複雜的任務「刻意」使用更多 token 進行自我驗證與工具協調。"
+        ],
+        "programmes": [],
+        "sources": [
+          {
+            "id": "google-gemini38-latest"
+          },
+          {
+            "id": "innfactory-gemini"
+          }
+        ]
+      },
+      "offerings": [
+        {
+          "id": "gemini-3-8-flash@agent-platform",
+          "cloud": "gcp",
+          "service": "agent-platform",
+          "status": "ga",
+          "availableSince": "2026-09-02",
+          "providerModelId": "gemini-3.8-flash",
+          "inferenceTargets": [
+            {
+              "scope": "global",
+              "id": "global",
+              "geography": "全球（無駐留保證）"
+            },
+            {
+              "scope": "multi-region",
+              "id": "eu",
+              "geography": "EU multi-region（資料駐留 + ML processing）"
+            }
+          ],
+          "endpoints": [
+            {
+              "endpoint": "aiplatform.googleapis.com（generateContent）",
+              "apis": [
+                "gemini-generate-content"
+              ],
+              "notes": [
+                "OpenAI 相容端點是否支援 3.8 Flash 的全部參數，請以 compat suite 驗證。"
+              ]
+            }
+          ],
+          "apacAvailability": [
+            {
+              "region": "global",
+              "label": "Global endpoint",
+              "scopes": [
+                "global"
+              ],
+              "note": "未見 asia-east1（彰化）等單一區域端點（第三方 2026-09-18）"
+            }
+          ],
+          "dataProcessing": {
+            "processor": "Google Cloud",
+            "residencyOptions": [
+              "Global",
+              "EU multi-region"
+            ],
+            "taiwanResidency": "no",
+            "zdr": "unknown",
+            "retentionNotes": [
+              "依 Google Cloud 生成式 AI 資料治理條款。"
+            ],
+            "sources": [
+              {
+                "id": "innfactory-gemini"
+              }
+            ]
+          },
+          "features": [
+            {
+              "feature": "streaming",
+              "status": "supported"
+            },
+            {
+              "feature": "tool-calling",
+              "status": "supported",
+              "note": "FunctionResponse 需帶 call_id 與 name",
+              "sources": [
+                {
+                  "id": "google-gemini38-latest"
+                }
+              ]
+            },
+            {
+              "feature": "structured-outputs",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "google-gemini38-model"
+                }
+              ]
+            },
+            {
+              "feature": "vision",
+              "status": "supported"
+            },
+            {
+              "feature": "audio-input",
+              "status": "supported"
+            },
+            {
+              "feature": "video-input",
+              "status": "supported"
+            },
+            {
+              "feature": "pdf-input",
+              "status": "supported"
+            },
+            {
+              "feature": "prompt-caching",
+              "status": "supported",
+              "note": "cached input $0.075（促銷期）",
+              "sources": [
+                {
+                  "id": "google-gemini38-latest"
+                }
+              ]
+            },
+            {
+              "feature": "batch",
+              "status": "supported",
+              "note": "五折",
+              "sources": [
+                {
+                  "id": "litellm-gemini38"
+                }
+              ]
+            },
+            {
+              "feature": "flex-tier",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "google-gemini38-model"
+                }
+              ]
+            },
+            {
+              "feature": "priority-tier",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "google-gemini38-model"
+                }
+              ]
+            },
+            {
+              "feature": "temperature",
+              "status": "not-supported",
+              "note": "3.8 Flash 移除 temperature/top_p/top_k",
+              "sources": [
+                {
+                  "id": "google-gemini38-latest"
+                }
+              ]
+            },
+            {
+              "feature": "computer-use",
+              "status": "partial",
+              "note": "Preview",
+              "sources": [
+                {
+                  "id": "google-gemini38-model"
+                }
+              ]
+            },
+            {
+              "feature": "server-side-tools",
+              "status": "supported",
+              "note": "Search / Maps grounding、code execution、URL context、file search",
+              "sources": [
+                {
+                  "id": "google-gemini38-model"
+                }
+              ]
+            }
+          ],
+          "pricing": [
+            {
+              "scope": "standard (global)",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 0.75,
+              "output": 3.75,
+              "cacheRead": 0.075,
+              "batchDiscountPct": 50,
+              "validFrom": "2026-09-02",
+              "validUntil": "2026-12-31",
+              "thereafter": {
+                "input": 1.5,
+                "output": 7.5,
+                "cacheRead": 0.15
+              },
+              "notes": [
+                "Output 價格含 thinking tokens。"
+              ],
+              "sources": [
+                {
+                  "id": "google-gemini38-latest"
+                },
+                {
+                  "id": "innfactory-gemini"
+                }
+              ],
+              "verification": "official"
+            }
+          ],
+          "quotas": [],
+          "lifecycle": {
+            "notes": [
+              "Google 穩定版通常自發布起提供至少 12 個月；3.8 Flash 退役日尚未公布（推估不早於 2027-09）。"
+            ]
+          },
+          "litellmModel": "vertex_ai/gemini-3.8-flash",
+          "onboardingNotes": [
+            "2027-01-01 前更新 LiteLLM cost map 與預算（標準價翻倍）。",
+            "移除 client 端送出的 temperature/top_p（或在該 deployment 開 drop_params）。"
+          ],
+          "sources": [
+            {
+              "id": "google-gemini38-model"
+            },
+            {
+              "id": "google-gemini38-latest"
+            },
+            {
+              "id": "innfactory-gemini"
+            }
+          ],
+          "verification": "independent"
+        }
+      ],
+      "benchmarks": [
+        {
+          "name": "Artificial Analysis Intelligence Index",
+          "version": "v4.3.2",
+          "variant": "high effort",
+          "score": 41,
+          "unit": "index",
+          "rank": "#40 / 210",
+          "measuredBy": "independent",
+          "date": "2026-09-24",
+          "sources": [
+            {
+              "id": "aa-gemini38"
+            }
+          ]
+        },
+        {
+          "name": "Artificial Analysis Intelligence Index",
+          "version": "v4.3 之前版本（上市當日）",
+          "variant": "high effort",
+          "score": 59,
+          "unit": "index",
+          "measuredBy": "independent",
+          "date": "2026-09-02",
+          "notes": "AA 於 2026-09-07 發布 v4.3（加入 Terminal-Bench 4.0 與 AutomationBench-AA），兩個版本的分數不可直接比較。",
+          "sources": [
+            {
+              "id": "aa-gemini38-article"
+            },
+            {
+              "id": "aa-index-v43"
+            }
+          ]
+        },
+        {
+          "name": "DeepSWE v1.1",
+          "score": 73.7,
+          "unit": "percent",
+          "measuredBy": "vendor",
+          "date": "2026-09-02",
+          "sources": [
+            {
+              "id": "llmstats-gemini38"
+            }
+          ]
+        },
+        {
+          "name": "Terminal-Bench 2.1",
+          "score": 89.4,
+          "unit": "percent",
+          "measuredBy": "vendor",
+          "date": "2026-09-02",
+          "sources": [
+            {
+              "id": "llmstats-gemini38"
+            }
+          ]
+        },
+        {
+          "name": "Vals Finance Agent v2",
+          "score": 61.4,
+          "unit": "percent",
+          "measuredBy": "vendor",
+          "date": "2026-09-02",
+          "sources": [
+            {
+              "id": "llmstats-gemini38"
+            }
+          ]
+        }
+      ],
+      "performanceReference": [
+        {
+          "provider": "Google（Artificial Analysis）",
+          "variant": "high effort",
+          "outputTokensPerSec": 291.0,
+          "ttftSec": 15.14,
+          "costPerIndexTaskUsd": 1.24,
+          "indexOutputTokensMillions": 170,
+          "date": "2026-09-24",
+          "sources": [
+            {
+              "id": "aa-gemini38"
+            }
+          ]
+        },
+        {
+          "provider": "Google（Artificial Analysis 上市評測）",
+          "variant": "high effort, pre-v4.3 index",
+          "outputTokensPerSec": 300.0,
+          "costPerIndexTaskUsd": 0.58,
+          "date": "2026-09-02",
+          "notes": "每任務平均 48k output tokens，比 3.7 Flash 多 30%。",
+          "sources": [
+            {
+              "id": "aa-gemini38-article"
+            }
+          ]
+        }
+      ],
+      "litellm": {
+        "providerStrings": [
+          {
+            "service": "gemini-api",
+            "model": "gemini/gemini-3.8-flash"
+          },
+          {
+            "service": "agent-platform",
+            "model": "vertex_ai/gemini-3.8-flash",
+            "note": "vertex_location: global"
+          }
+        ],
+        "minVersionRouting": "v1.76.0（Reload Price Data）",
+        "minVersionBundledCostMap": "v1.101.0-rc.1",
+        "recommendedVersion": "v1.102.1",
+        "caveats": [
+          "reasoning_effort 會映射為 thinkingLevel；minimal 不支援（400）。",
+          "3.8 Flash 移除 temperature/top_p/top_k——建議該 deployment 開 drop_params。",
+          "Function calling：FunctionResponse 要帶 call_id 與 name；工具呼叫前夾帶文字可能觸發 Malformed_Function_Call。",
+          "促銷價至 2026-12-31；2027-01-01 前要更新 cost map，否則成本低估 50%。"
+        ],
+        "status": "researched",
+        "sources": [
+          {
+            "id": "litellm-gemini38"
+          },
+          {
+            "id": "google-gemini38-latest"
+          }
+        ]
+      },
+      "tags": [
+        "efficient",
+        "fast",
+        "multimodal",
+        "grounding",
+        "promo-pricing"
+      ],
+      "sources": [
+        {
+          "id": "google-gemini38-model"
+        },
+        {
+          "id": "google-gemini38-latest"
+        },
+        {
+          "id": "aa-gemini38"
+        },
+        {
+          "id": "aa-gemini38-article"
+        },
+        {
+          "id": "innfactory-gemini"
+        },
+        {
+          "id": "litellm-gemini38"
+        }
+      ],
+      "lastVerified": "2026-09-24"
+    }
+  ],
+  "watchlist": [
+    {
+      "name": "Claude Sonnet 5.5",
+      "vendor": "anthropic",
+      "status": "coming-soon",
+      "expected": "2026 年 10 月（官方：coming weeks）",
+      "note": "Anthropic 表示會帶來與 Opus 5.5 相同的效能、效率與安全改進；上線後評估是否取代 Sonnet 5 作為一般預設。",
+      "sources": [
+        {
+          "id": "anthropic-opus55-announce"
+        },
+        {
+          "id": "mikeyk-sonnet55"
+        }
+      ]
+    },
+    {
+      "name": "Claude Haiku 5.5",
+      "vendor": "anthropic",
+      "status": "coming-soon",
+      "expected": "2026 年 10 月（官方：coming weeks）",
+      "note": "Claude Haiku 4.5 在 Anthropic 平台的退役「不早於 2026-10-15」，Haiku 5.5 可能是其替代。",
+      "sources": [
+        {
+          "id": "anthropic-opus55-announce"
+        },
+        {
+          "id": "anthropic-deprecations"
+        }
+      ]
+    },
+    {
+      "name": "Gemini 3.5 Pro",
+      "vendor": "google",
+      "status": "limited-preview",
+      "expected": "未公布",
+      "note": "已宣布但尚無 GA 日期與公開價格；Gemini 3.1 Pro 仍為 preview。",
+      "sources": [
+        {
+          "id": "capitalandcompute-sept"
+        },
+        {
+          "id": "innfactory-gemini"
+        }
+      ]
+    }
+  ]
+}

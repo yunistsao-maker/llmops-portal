@@ -1,0 +1,203 @@
+{
+  "schema": "deep-dive/v1",
+  "modelId": "gpt-6-luna",
+  "title": "GPT-6 Luna 技術深度解析",
+  "locale": "zh-TW",
+  "asOf": "2026-09-24",
+  "tldr": "GPT-6 Luna 是高量低價層（$0.10 / $0.50，每任務約 $0.07），適合分類、擷取、摘要與路由；請以 effort none / low 使用，max effort 的首 token 會超過 100 秒。",
+  "whatsNew": [
+    {
+      "title": "價格減半",
+      "detail": "$0.10 / $0.50、cached input $0.01；Batch / Flex 再五折。",
+      "sources": [
+        {
+          "id": "ms-foundry-gpt6-blog"
+        },
+        {
+          "id": "litellm-sol-luna"
+        }
+      ]
+    },
+    {
+      "title": "可調 reasoning",
+      "detail": "每個請求可調 effort，平衡品質、速度與成本。",
+      "sources": [
+        {
+          "id": "aws-sol-luna-whatsnew"
+        }
+      ]
+    }
+  ],
+  "vsPredecessor": {
+    "predecessorId": "gpt-5.6-luna",
+    "changes": [
+      {
+        "area": "單價",
+        "before": "GPT-5.6 Luna（$0.20 / $1.20 牌價）",
+        "after": "$0.10 / $0.50",
+        "impact": "約一半。"
+      },
+      {
+        "area": "Chat Completions 工具呼叫",
+        "before": "可用",
+        "after": "只在 effort=none 時可用",
+        "impact": "路由/分類器通常用 none，影響小。"
+      }
+    ]
+  },
+  "breakingChanges": [
+    {
+      "title": "Chat Completions + tools 需 effort=none",
+      "detail": "同 Sol。",
+      "migration": "分類/路由用途固定 effort=none。",
+      "severity": "medium",
+      "sources": [
+        {
+          "id": "openai-latest-model-guide"
+        }
+      ]
+    }
+  ],
+  "availabilityMatrix": [
+    {
+      "cloud": "azure",
+      "service": "foundry",
+      "status": "ga",
+      "notes": "Standard（Global、US/EU Data Zone）；無 Provisioned。"
+    },
+    {
+      "cloud": "aws",
+      "service": "bedrock",
+      "status": "ga",
+      "notes": "官方模型卡待發布。"
+    },
+    {
+      "cloud": "gcp",
+      "service": "agent-platform",
+      "status": "not-offered",
+      "notes": "未上架。"
+    },
+    {
+      "cloud": "vendor-direct",
+      "service": "openai-api",
+      "status": "ga",
+      "notes": ""
+    }
+  ],
+  "apiCompatibility": [
+    {
+      "route": "gpt-6-luna@foundry",
+      "surface": "Responses / Chat Completions",
+      "status": "supported",
+      "note": "Chat + tools 限 effort=none"
+    },
+    {
+      "route": "gpt-6-luna@bedrock",
+      "surface": "Converse",
+      "status": "supported",
+      "note": "社群使用紀錄"
+    }
+  ],
+  "strengths": [
+    "極低價：$0.10 / $0.50，cached input $0.01；Batch/Flex 再五折。",
+    "AA 37 分，在同級 175 個模型中排名第 6；每任務 $0.07。",
+    "131 tok/s（AA）；effort=none 時延遲最低。",
+    "適合當 router、分類器或 guardrail 前置過濾器。"
+  ],
+  "weaknesses": [
+    "max effort 首 token 102.8 秒——請以 none/low 使用。",
+    "偏冗長（AA 評測 150M tokens）。",
+    "Azure 沒有 Provisioned；Chat Completions + tools 同樣限 effort=none。"
+  ],
+  "bestFor": [
+    "大量分類、擷取、摘要與資料清洗",
+    "意圖路由、guardrail 前置分類",
+    "Batch / Flex 離線作業"
+  ],
+  "avoidFor": [
+    "複雜多步推理與長時程代理",
+    "高風險決策輔助"
+  ],
+  "safetyAndCompliance": [
+    {
+      "item": "作為 guardrail 前置分類器",
+      "detail": "低價適合做輸入分類，但它本身也需要 prompt injection 測試（SEC-01、SEC-02）。",
+      "sources": [
+        {
+          "id": "braintrust-redteam"
+        }
+      ]
+    }
+  ],
+  "enterpriseNotes": [
+    "適合 tier/fast 與 LiteLLM auto router 的低成本層。",
+    "與 Gemini 3.8 Flash 比較時用相同任務與 effort 量測每任務成本。"
+  ],
+  "testPlanFocus": [
+    "分類/擷取 golden set 的準確率 vs GPT-5.6 Luna 與 Gemini 3.8 Flash",
+    "effort none 的延遲分佈",
+    "繁中擷取（姓名、地址、統編）正確率"
+  ],
+  "onboarding": {
+    "audience": "資料處理、分類與路由類應用",
+    "prerequisites": [
+      "gateway key 在 gpt-6-luna 允許清單中"
+    ],
+    "steps": [
+      {
+        "title": "固定 effort",
+        "detail": "分類/擷取用 none；需要少量推理用 low。"
+      },
+      {
+        "title": "離線作業用 Batch",
+        "detail": "大量離線工作透過 Batch / Flex 半價。"
+      }
+    ],
+    "aliases": [
+      {
+        "alias": "gpt-6-luna",
+        "target": "azure/<gpt-6-luna deployment>"
+      },
+      {
+        "alias": "tier/fast",
+        "target": "GA 後評估指向 gpt-6-luna 或 gemini-3-8-flash",
+        "note": "能力層 alias"
+      }
+    ],
+    "parameterGuidance": [
+      {
+        "parameter": "reasoning_effort",
+        "guidance": "預設請明確送 none 或 low。"
+      }
+    ],
+    "codeSamples": [
+      {
+        "lang": "bash",
+        "title": "curl（分類，effort=none）",
+        "code": "curl -sS https://llm-gateway.example.internal/v1/chat/completions \\\n  -H \"Authorization: Bearer $LITELLM_API_KEY\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"model\": \"gpt-6-luna\",\n    \"reasoning_effort\": \"none\",\n    \"temperature\": 0,\n    \"messages\": [{\"role\": \"user\", \"content\": \"用三點摘要這次變更的風險。\"}]\n  }'"
+      }
+    ],
+    "dataClassification": "範例政策：公開/內部資料可用任一已核准路由；機密資料只可用明確限定處理地的路由（例：Bedrock JP geo）並經法務核准；極機密資料不開放（三雲皆無台灣境內處理選項）。請依公司資料分級規範調整。",
+    "support": "Slack #llm-platform；每週四 14:00 office hour（範例，請改成你們的窗口）"
+  },
+  "openQuestions": [
+    "Bedrock 官方模型卡與價格？"
+  ],
+  "sources": [
+    {
+      "id": "openai-latest-model-guide"
+    },
+    {
+      "id": "ms-foundry-gpt6-blog"
+    },
+    {
+      "id": "aws-sol-luna-whatsnew"
+    },
+    {
+      "id": "aa-luna"
+    },
+    {
+      "id": "litellm-sol-luna"
+    }
+  ]
+}

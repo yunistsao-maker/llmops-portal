@@ -1,0 +1,15 @@
+# source archives
+*.zip
+
+# dependencies / build output
+node_modules/
+dist/
+*.tsbuildinfo
+
+# generated internal inventory (only the .example is tracked)
+data/internal/platform-inventory.json
+
+# python
+__pycache__/
+*.pyc
+.pytest_cache/

@@ -1,0 +1,1508 @@
+{
+  "schema": "requirements/v1",
+  "generatedAt": "2026-09-24T14:30:00Z",
+  "locale": "zh-TW",
+  "asOf": "2026-09-24",
+  "requirements": [
+    {
+      "id": "REQ-U01",
+      "title": "API 相容性（Azure / AWS / GCP）",
+      "origin": "user",
+      "priority": "P0",
+      "verdict": "critical",
+      "why": "同一個模型在三雲的 API 面不同：Opus 5.5 在 Bedrock 沒有 OpenAI 相容 API、在 Agent Platform 只能走 rawPredict、在 Foundry 走獨立 /anthropic 端點；GPT-6 的工具呼叫要 Responses API；Bedrock 上 Opus 5.5 與 Astra 都不支援 structured outputs。只測「能不能回話」會漏掉大多數上線後的故障。",
+      "howToImplement": [
+        "以「路由」為單位測（模型 × CSP × endpoint × 區域 × 經不經 LiteLLM），不是以模型為單位。",
+        "用 tools/compat_suite.py 跑參數層級案例：streaming、stream usage、tool auto/forced、structured output、vision、temperature、reasoning_effort、max_tokens vs max_completion_tokens、prompt caching 用量欄位、context 溢位錯誤、Responses API、/v1/messages。",
+        "每條路由同時測「直連 CSP」與「經 LiteLLM」，才能分辨是 gateway 還是 CSP 的問題。",
+        "結果寫入 CompatRun JSON，portal 以 route × case 矩陣顯示；把官方模型卡的支援表也放進 Offering.features 做對照。"
+      ],
+      "acceptanceCriteria": [
+        "所有 required 案例在預定上線的每條路由 100% pass，或有書面豁免與替代做法。",
+        "每個 fail 都對應到 onboarding 頁上的已知限制或遷移步驟。"
+      ],
+      "gate": "G3",
+      "tooling": [
+        "tools/compat_suite.py",
+        "LiteLLM /v1/chat/completions、/v1/responses、/v1/messages"
+      ],
+      "sources": [
+        {
+          "id": "aws-bedrock-opus55-card"
+        },
+        {
+          "id": "aws-bedrock-astra-card"
+        },
+        {
+          "id": "openai-latest-model-guide"
+        },
+        {
+          "id": "anthropic-opus55-whatsnew"
+        }
+      ]
+    },
+    {
+      "id": "REQ-U02",
+      "title": "效能：latency、TTFT、TTLT、throughput",
+      "origin": "user",
+      "priority": "P0",
+      "verdict": "critical",
+      "why": "推理模型讓「延遲」的定義失真：AA 量到 GPT-6 Astra（max）首 token 352 秒、Gemini 3.8 Flash（high）15 秒——差別主要是 thinking 時間與 effort 設定，不是網路。必須用固定 effort、固定輸入/輸出長度、從你的網路位置量測，並把 TTFT 與 TTFAT（首個答案 token）分開。",
+      "howToImplement": [
+        "量 TTFT、TTFAT、ITL、TTLT、每請求 output tok/s、聚合 tok/s、RPS、錯誤率（429/5xx/timeout）與 goodput（符合 SLO 的比例）。",
+        "每個模型用「應用實際會用的 effort」量測，另外跑一組 effort sweep（low/medium/high）。",
+        "測試 profile 至少包含 chat-short（~1K in / 300 out）、rag-long（~32K in / 800 out）、agent-tool（含工具呼叫）、zh-TW（繁中輸入/輸出）。",
+        "從台灣的實際網路出口量測各 CSP 路由（Bedrock global/jp、Azure Japan East Global Standard、Agent Platform global），每天 3 個時段、連續 3 天。",
+        "用 tools/perf_probe.py 做 gateway 層探測；需要大量負載或 trace replay 時用 NVIDIA AIPerf。"
+      ],
+      "acceptanceCriteria": [
+        "每條路由的 p90 TTFAT 與 p90 TTLT 符合該用途的 SLO（例：互動聊天 p90 TTFAT ≤ 5 秒）。",
+        "在申請到的配額內跑到目標併發，429 比例 ≤ 1%。",
+        "結果附上 effort、profile、client 位置與 LiteLLM 版本，否則不列入比較。"
+      ],
+      "gate": "G4",
+      "tooling": [
+        "tools/perf_probe.py",
+        "NVIDIA AIPerf",
+        "LiteLLM Prometheus metrics"
+      ],
+      "sources": [
+        {
+          "id": "aa-perf-methodology"
+        },
+        {
+          "id": "nvidia-aiperf"
+        },
+        {
+          "id": "nvidia-nim-metrics"
+        },
+        {
+          "id": "aa-astra"
+        },
+        {
+          "id": "aa-gemini38"
+        }
+      ]
+    },
+    {
+      "id": "REQ-U03",
+      "title": "Intelligence index（外部智慧指數）",
+      "origin": "user",
+      "priority": "P1",
+      "verdict": "important",
+      "why": "外部指數適合做「初篩與排序」，不適合做上線決策：AA Intelligence Index 會改版且不可跨版比較（Gemini 3.8 Flash 上市時 59 分、v4.3.2 為 41 分），而且通常以 max effort 英文任務計分，與你的工作負載不同。",
+      "howToImplement": [
+        "同時保存分數、index 版本、effort/variant、量測日期與來源；portal 只比較相同版本的分數。",
+        "並列 AA 的每任務成本與 output token 用量（冗長度），不只看分數。",
+        "把外部指數與內部評測（REQ-G04）放在同一頁，決策以內部評測為準。"
+      ],
+      "acceptanceCriteria": [
+        "每個分數都有 version + variant + date + source。",
+        "版本不同的分數在 UI 上不會被放在同一條排行。"
+      ],
+      "gate": "G1",
+      "tooling": [
+        "Artificial Analysis",
+        "Vals AI",
+        "廠商 system card"
+      ],
+      "sources": [
+        {
+          "id": "aa-methodology"
+        },
+        {
+          "id": "aa-index-v43"
+        },
+        {
+          "id": "aa-gemini38"
+        },
+        {
+          "id": "aa-gemini38-article"
+        }
+      ]
+    },
+    {
+      "id": "REQ-U04",
+      "title": "Model card（標準化模型卡）",
+      "origin": "user",
+      "priority": "P0",
+      "verdict": "critical",
+      "why": "各家模型卡欄位不同，且 CSP 模型卡才有你真正需要的資訊（端點、區域、生命週期、服務層、不支援的功能）。例如 Bedrock 模型卡揭露 Opus 5.5 不支援 structured outputs、Astra 的 output token 以 10 倍計入配額。",
+      "howToImplement": [
+        "用 schema/types.ts 的 Model + Offering 結構正規化：模態、context、max output、knowledge cutoff、reasoning/effort、每條路由的端點、區域、資料處理、功能支援、價格、配額、生命週期。",
+        "同時連結廠商 system card（安全評估）與 CSP 模型卡（營運細節）。",
+        "每個欄位都帶 sources 與 verification（official / independent / community）。"
+      ],
+      "acceptanceCriteria": [
+        "每個上線模型的每條路由都有完整 Offering 資料，community/unverified 欄位在 GA 前改為 official。"
+      ],
+      "gate": "G1",
+      "tooling": [
+        "data/catalog.json",
+        "schema/types.ts"
+      ],
+      "sources": [
+        {
+          "id": "aws-bedrock-opus55-card"
+        },
+        {
+          "id": "aws-bedrock-astra-card"
+        },
+        {
+          "id": "anthropic-opus55-systemcard"
+        },
+        {
+          "id": "openai-astra-systemcard"
+        }
+      ]
+    },
+    {
+      "id": "REQ-U05",
+      "title": "AI 安全測試",
+      "origin": "user",
+      "priority": "P0",
+      "verdict": "critical",
+      "why": "新一代模型的安全行為本身會改變 API 回應：Opus 5.5 把多數資安請求改路由到 Opus 4.8，拒答以 HTTP 200 + stop_reason: refusal 回傳；GPT-6 Astra 是首個資安能力 Critical 的模型。安全測試要涵蓋攻擊成功率，也要涵蓋「過度拒答」與「fallback 偵測」。",
+      "howToImplement": [
+        "以 OWASP LLM Top 10 與 OWASP Agentic Top 10（2026）為類別骨架，並對應數發部 AI 風險分類框架的 20 個子類別。",
+        "自動化：promptfoo（CI 友善）、garak（廣度掃描）、PyRIT（多輪攻擊）；代理情境加入間接注入（RAG 文件、工具輸出）。",
+        "量 ASR（攻擊成功率）、over-refusal 率、PII/秘密洩漏率、system prompt 洩漏率，並與現役模型比較。",
+        "記錄每次回應的實際模型（response.model）與 stop_reason，偵測 safeguard fallback。",
+        "繁中攻擊語料與台灣在地議題（含主權立場偏誤）納入測試。"
+      ],
+      "acceptanceCriteria": [
+        "各類 ASR 不高於現役模型（或核准的絕對門檻）；over-refusal 在業務樣本上 ≤ 約定值。",
+        "有 fallback / refusal 的比例統計，並寫進 onboarding 頁的已知行為。"
+      ],
+      "gate": "G6",
+      "tooling": [
+        "promptfoo",
+        "garak",
+        "PyRIT",
+        "DeepTeam",
+        "Bedrock Guardrails / Azure Prompt Shields / Model Armor"
+      ],
+      "sources": [
+        {
+          "id": "imperva-owasp"
+        },
+        {
+          "id": "modulos-owasp-agentic"
+        },
+        {
+          "id": "moda-risk-framework"
+        },
+        {
+          "id": "braintrust-redteam"
+        },
+        {
+          "id": "anthropic-opus55-whatsnew"
+        },
+        {
+          "id": "infoq-astra-critical"
+        }
+      ]
+    },
+    {
+      "id": "REQ-U06",
+      "title": "每個新模型的 tech deep dive",
+      "origin": "user",
+      "priority": "P1",
+      "verdict": "important",
+      "why": "決策者需要「和上一代差在哪、會壞什麼」而不是行銷摘要。9 月 Opus 5.5 的預設 effort、thinking、tool_choice 都變了，這些才是 deep dive 的重點。",
+      "howToImplement": [
+        "用 data/models/<id>.json（DeepDive 結構）：TL;DR、what's new、vs predecessor 對照、breaking changes 與遷移、三雲可用矩陣、API 相容矩陣、安全與合規、台灣企業注意事項、測試重點、onboarding、未解問題。",
+        "每週排程任務自動產出新模型的初稿，由平台團隊審核後發布。"
+      ],
+      "acceptanceCriteria": [
+        "新模型發布後 5 個工作天內有 deep dive 初稿；GA 前所有 breaking change 都有遷移做法。"
+      ],
+      "gate": "G1",
+      "tooling": [
+        "data/models/*.json",
+        "每週排程研究任務"
+      ],
+      "sources": [
+        {
+          "id": "anthropic-opus55-whatsnew"
+        },
+        {
+          "id": "openai-latest-model-guide"
+        },
+        {
+          "id": "google-gemini38-latest"
+        }
+      ]
+    },
+    {
+      "id": "REQ-U07",
+      "title": "Onboarding 資訊頁",
+      "origin": "user",
+      "priority": "P0",
+      "verdict": "critical",
+      "why": "開發者最常卡在：要申請什麼權限、用哪個 alias、哪些參數會被拒、資料等級能不能用。這頁直接決定支援工單量。",
+      "howToImplement": [
+        "每個模型提供：前置條件、步驟、gateway alias、參數指引、程式範例（OpenAI SDK / Anthropic SDK 經 LiteLLM）、允許的資料等級、支援窗口。",
+        "把 compat suite 的 fail 案例自動轉成「已知限制」區塊。"
+      ],
+      "acceptanceCriteria": [
+        "新團隊照頁面 30 分鐘內可完成第一次呼叫；GA 後兩週內支援工單中「參數/權限」類 < 20%。"
+      ],
+      "gate": "G9",
+      "tooling": [
+        "data/models/*.json → onboarding"
+      ],
+      "sources": [
+        {
+          "id": "litellm-opus55"
+        },
+        {
+          "id": "ms-azure-openai-v1-api"
+        }
+      ]
+    },
+    {
+      "id": "REQ-U08",
+      "title": "平台模型清單與 EOL",
+      "origin": "user",
+      "priority": "P0",
+      "verdict": "critical",
+      "why": "EOL 是最常造成 production 中斷的事件，而且同一模型在不同通路的日期不同、日期還會變動（Azure o3-pro 退役日被提前約一個月；Gemini 2.5 在 Google 自家頁面之間日期不一致，9 月又重新發布通知改成分階段退役）。",
+      "howToImplement": [
+        "平台清單以 LiteLLM /model/info 為準（tools/sync_inventory.py），對照 data/lifecycle.json 產出 platform-inventory.json。",
+        "EOL 以「通路」為單位記錄並保留來源；conflicts 分兩種：conflicting（官方頁面彼此不一致，以最早日期倒數）與 superseded（被取代的舊公告日，只作歷史顯示）。",
+        "T-90 / T-60 / T-30 自動通知使用該 alias 的團隊（依 LiteLLM spend logs 找出使用者）。"
+      ],
+      "acceptanceCriteria": [
+        "每個上線 deployment 都對得到 lifecycle 資料或被標為 unknown 並有負責人。",
+        "沒有任何 deployment 在退役前 30 天仍無遷移計畫。"
+      ],
+      "gate": "G10",
+      "tooling": [
+        "tools/sync_inventory.py",
+        "data/lifecycle.json",
+        "LiteLLM /model/info"
+      ],
+      "sources": [
+        {
+          "id": "aws-bedrock-lifecycle-legacy"
+        },
+        {
+          "id": "ms-foundry-retirement-schedule"
+        },
+        {
+          "id": "google-vertex-model-versions"
+        },
+        {
+          "id": "model-eol-feed"
+        },
+        {
+          "id": "hidekazu-lifecycle"
+        }
+      ]
+    },
+    {
+      "id": "REQ-U09",
+      "title": "模型定價",
+      "origin": "user",
+      "priority": "P0",
+      "verdict": "critical",
+      "why": "牌價只是起點：GPT-6 在 Azure EU Data Zone 比 Global 貴 20%、Bedrock geo/in-region 貴 10%；>272K 輸入改長文價；Gemini 3.8 Flash 促銷價 2027-01-01 翻倍；Bedrock 的 Astra output 以 10 倍計入配額。",
+      "howToImplement": [
+        "PriceSheet 以路由 × 範圍（global/geo/data-zone）記錄，含 cache read/write、長文門檻、batch 折扣、促銷起訖與到期後價格。",
+        "portal 提供「每任務成本」試算（輸入、輸出、reasoning、cache 命中率），不只顯示每百萬 token 單價。"
+      ],
+      "acceptanceCriteria": [
+        "每個上線路由都有 official 價格；促銷到期前 7 天自動提醒更新 cost map。"
+      ],
+      "gate": "G7",
+      "tooling": [
+        "data/catalog.json pricing",
+        "LiteLLM cost map"
+      ],
+      "sources": [
+        {
+          "id": "ms-foundry-gpt6-blog"
+        },
+        {
+          "id": "aws-bedrock-astra-card"
+        },
+        {
+          "id": "google-gemini38-latest"
+        }
+      ]
+    },
+    {
+      "id": "REQ-U10",
+      "title": "LiteLLM 版本相容性",
+      "origin": "user",
+      "priority": "P0",
+      "verdict": "critical",
+      "why": "「能不能路由」只是第一層；參數處理（GPT-6 需 ≥ v1.101.0）、Bedrock 路徑的 temperature 問題、支援窗口（只維護最近四條線）與安全漏洞（CVE-2026-42208、PyPI 供應鏈攻擊）同樣決定能否上線。",
+      "howToImplement": [
+        "每個模型記錄 minVersionRouting / minVersionBundledCostMap / minVersionParams / recommendedVersion / caveats。",
+        "gateway 版本升級本身也走發布關卡：staging 跑 compat suite + 負載測試後再上 production。",
+        "以 image digest 與 hash 釘選；追蹤 GHSA 與 LiteLLM 安全公告。"
+      ],
+      "acceptanceCriteria": [
+        "production 版本在官方支援窗口內且不在 avoid 清單；每次升級都有 compat suite 報告。"
+      ],
+      "gate": "G3",
+      "tooling": [
+        "data/litellm.json",
+        "tools/compat_suite.py"
+      ],
+      "sources": [
+        {
+          "id": "litellm-version-support"
+        },
+        {
+          "id": "litellm-cve-2026-42208"
+        },
+        {
+          "id": "litellm-supplychain-issue"
+        },
+        {
+          "id": "opik-8524"
+        }
+      ]
+    },
+    {
+      "id": "REQ-U11",
+      "title": "主要優缺點",
+      "origin": "user",
+      "priority": "P1",
+      "verdict": "important",
+      "why": "優缺點清單有用，但要轉成「適合 / 不適合的用途」與選型指引，否則讀者無法行動。",
+      "howToImplement": [
+        "每個模型寫 strengths / weaknesses / bestFor / avoidFor，並在 portal 提供依用途、資料等級、延遲、成本篩選的選型器。"
+      ],
+      "acceptanceCriteria": [
+        "每個 GA 模型都有 bestFor / avoidFor，且與內部評測結果一致。"
+      ],
+      "gate": "G9",
+      "tooling": [
+        "data/catalog.json"
+      ],
+      "sources": [
+        {
+          "id": "anthropic-opus55-announce"
+        },
+        {
+          "id": "openai-latest-model-guide"
+        }
+      ]
+    },
+    {
+      "id": "REQ-U12",
+      "title": "排程化研究",
+      "origin": "user",
+      "priority": "P1",
+      "verdict": "important",
+      "why": "9 月初四大廠在 72 小時內相繼發布新模型，同月又有多筆退役日期被調整（有些提前），人工追蹤不可行；但網路研究會出錯，必須有人審核才能進 production 資料。",
+      "howToImplement": [
+        "每週排程任務產出 digest 與資料更新草稿；每筆事實附來源與可信度。",
+        "建議資料流：排程任務 → PR 到 portal repo 的 data/ → 平台團隊審核 → 合併後 UI 自動更新。",
+        "另在內部 CI 每日用 CSP API 核對生命週期（Bedrock ListFoundationModels 的 modelLifecycle、Azure 退役表、Agent Platform 模型版本頁）。"
+      ],
+      "acceptanceCriteria": [
+        "每週一上午前有 digest；未驗證事實獨立列出；資料檔通過 schema 驗證。"
+      ],
+      "gate": "G0",
+      "tooling": [
+        "每週排程研究任務",
+        "tools/validate_data.py"
+      ],
+      "sources": [
+        {
+          "id": "aws-bedrock-lifecycle"
+        },
+        {
+          "id": "capitalandcompute-sept"
+        },
+        {
+          "id": "vorplabs-foundry"
+        }
+      ]
+    },
+    {
+      "id": "REQ-G01",
+      "title": "資料處理地點與駐留（依路由）",
+      "origin": "gap",
+      "priority": "P0",
+      "verdict": "critical",
+      "why": "這是清單中最大的缺口。9 月的新模型在三雲都沒有台灣境內處理選項：Bedrock 台北區只有 Opus 5.5 的 Global CRIS、Astra 甚至不在台北區清單；Azure 的 GPT-6 在 APAC 只有 Global；Foundry 上的 Claude 由 Anthropic 以獨立資料處理者身分營運；Agent Platform 的 Opus 5.5 與 Gemini 3.8 Flash 只有 global 與 US/EU multi-region。",
+      "howToImplement": [
+        "每條路由記錄處理者、駐留選項、是否可台灣境內、ZDR 與保留政策（Offering.dataProcessing）。",
+        "制定「資料等級 → 允許路由」政策（例：機密資料只允許 JP geo 或明確簽署 DPA 的路由），並在 LiteLLM 以 team/key 的 model 存取清單強制執行。",
+        "把 Global 路由在 UI 上標成「資料可能在任何國家處理」。"
+      ],
+      "acceptanceCriteria": [
+        "每個 GA 路由都有資料處理欄位且經法務/資安簽核；政策已在 gateway 強制。"
+      ],
+      "gate": "G2",
+      "tooling": [
+        "data/catalog.json dataProcessing",
+        "LiteLLM team/key 存取控制"
+      ],
+      "sources": [
+        {
+          "id": "aws-bedrock-opus55-card"
+        },
+        {
+          "id": "aws-bedrock-astra-card"
+        },
+        {
+          "id": "ms-foundry-claude-hosting"
+        },
+        {
+          "id": "ms-foundry-gpt6-blog"
+        },
+        {
+          "id": "google-agentplatform-opus55"
+        }
+      ]
+    },
+    {
+      "id": "REQ-G02",
+      "title": "法規與合規對應",
+      "origin": "gap",
+      "priority": "P0",
+      "verdict": "critical",
+      "why": "台灣《人工智慧基本法》已於 2026-01-14 公布施行，數發部 2026-07-07 公布 AI 風險分類框架（3 大類 20 子類、4 步驟）；金管會 2026-05-07 宣布把代理 AI 納入金融業 AI 指引，並要求模型升版與 prompt 調整納入變更管理。若有歐盟業務，EU AI Act 第 50 條透明義務已於 2026-08-02 生效，浮水印寬限到 2026-12-02。另外，2026-06 美國出口管制指令曾讓 Fable 5 / Mythos 5 全面停用兩週多。",
+      "howToImplement": [
+        "每個模型與用途做風險分類（依數發部框架），高風險用途需人工介入與完整稽核軌跡。",
+        "模型上線、升版、alias 切換一律走變更管理並保存決策紀錄（對應金管會指引）。",
+        "標記「出口管制敏感」模型並準備替代路由。",
+        "需要第三方驗證時，參考數發部 AI 產品與系統評測中心（AIEC）的評測項目；金融業同時對照金管會 2024 年《金融業運用 AI 指引》。"
+      ],
+      "acceptanceCriteria": [
+        "每個 GA 模型有風險分類與合規檢核紀錄；變更紀錄可稽核。"
+      ],
+      "gate": "G2",
+      "tooling": [
+        "requirements.json gates",
+        "決策紀錄（release record）"
+      ],
+      "sources": [
+        {
+          "id": "tw-ai-basic-act"
+        },
+        {
+          "id": "tw-ai-basic-act-promulgated"
+        },
+        {
+          "id": "moda-risk-framework"
+        },
+        {
+          "id": "fsc-agentic-ai"
+        },
+        {
+          "id": "fsc-ai-guideline"
+        },
+        {
+          "id": "aiec"
+        },
+        {
+          "id": "eu-ai-act-omnibus"
+        },
+        {
+          "id": "anthropic-fable-mythos-access"
+        }
+      ]
+    },
+    {
+      "id": "REQ-G03",
+      "title": "發布關卡與決策紀錄",
+      "origin": "gap",
+      "priority": "P0",
+      "verdict": "critical",
+      "why": "沒有明確的關卡與簽核，portal 只是資訊頁，不是 LLMOps。稽核與金管會變更管理都需要「誰在什麼證據下核准」。",
+      "howToImplement": [
+        "採用 G0–G10 關卡（見 gates），每關定義負責人、進入/退出條件、證據。",
+        "每個模型版本產出一份 release record（證據連結、核准人、日期）。"
+      ],
+      "acceptanceCriteria": [
+        "每個 GA 模型都有完整 release record；跳關需要書面豁免。"
+      ],
+      "gate": "G3",
+      "tooling": [
+        "requirements.json gates"
+      ],
+      "sources": [
+        {
+          "id": "fsc-agentic-ai"
+        }
+      ]
+    },
+    {
+      "id": "REQ-G04",
+      "title": "內部品質評測（含繁中在地化）",
+      "origin": "gap",
+      "priority": "P0",
+      "verdict": "critical",
+      "why": "外部指數以英文與 max effort 為主。繁中常見問題：輸出混入簡體字或中國用語、台灣法規/制度知識錯誤、同樣內容的 token 數與成本差很多。",
+      "howToImplement": [
+        "每個主要用途建立 golden set（100–300 題），以現役模型為基準做 pairwise LLM-as-judge + 人工抽查。",
+        "繁中指標：簡體字比例、兩岸用語偏差、台灣在地知識（TMMLU+、TMLU、TW-LegalBench 等）、每千字 token 數。",
+        "每次模型或 alias 變更都跑回歸。"
+      ],
+      "acceptanceCriteria": [
+        "新模型在各用途不低於現役模型（或差距在核准容忍度內）；簡體字比例 ≤ 約定門檻。"
+      ],
+      "gate": "G5",
+      "tooling": [
+        "內部 golden set",
+        "TMMLU+",
+        "TW-LegalBench",
+        "LLM-as-judge"
+      ],
+      "sources": [
+        {
+          "id": "tmmlu-plus"
+        },
+        {
+          "id": "tw-legalbench"
+        },
+        {
+          "id": "tw-sovereignty-bias"
+        }
+      ]
+    },
+    {
+      "id": "REQ-G05",
+      "title": "Breaking change 與遷移指南",
+      "origin": "gap",
+      "priority": "P0",
+      "verdict": "critical",
+      "why": "這一代的升級幾乎都有參數層級的破壞性變更：Opus 5.5 無法關閉 thinking、forced tool_choice 回 400、預設 effort 改 medium；GPT-6 移除 effort none（Astra）、reasoning 開啟時不收 temperature、工具要 Responses API；Gemini 3.8 Flash 移除 temperature/top_p/top_k、不允許 prefill。",
+      "howToImplement": [
+        "deep dive 的 breakingChanges 區塊必填，含遷移做法與嚴重度。",
+        "compat suite 為每個 breaking change 建一個測試案例。"
+      ],
+      "acceptanceCriteria": [
+        "GA 前每個 breaking change 都有遷移說明與測試。"
+      ],
+      "gate": "G3",
+      "tooling": [
+        "data/models/*.json",
+        "tools/compat_suite.py"
+      ],
+      "sources": [
+        {
+          "id": "anthropic-opus55-whatsnew"
+        },
+        {
+          "id": "openai-latest-model-guide"
+        },
+        {
+          "id": "google-gemini38-latest"
+        }
+      ]
+    },
+    {
+      "id": "REQ-G06",
+      "title": "Alias 與版本釘選策略",
+      "origin": "gap",
+      "priority": "P0",
+      "verdict": "critical",
+      "why": "應用程式直接寫死 CSP model ID，會讓每次退役都變成全公司改碼；反之完全用浮動 alias 又會讓行為在不知情下改變（Azure 部署預設可自動升級）。",
+      "howToImplement": [
+        "兩層 alias：能力層（tier/frontier、tier/general、tier/fast）供可接受升級的應用；釘選名（claude-opus-5-5@bedrock-jp）供需要可重現性的應用。",
+        "Azure 部署明確設定 versionUpgradeOption；Provisioned 部署不會自動升級，需排程手動遷移。",
+        "alias 切換走變更管理與 canary。"
+      ],
+      "acceptanceCriteria": [
+        "所有應用都透過 gateway alias 呼叫；alias 對應表在 portal 公開。"
+      ],
+      "gate": "G9",
+      "tooling": [
+        "LiteLLM model_list / model_group_alias"
+      ],
+      "sources": [
+        {
+          "id": "vorplabs-foundry"
+        }
+      ]
+    },
+    {
+      "id": "REQ-G07",
+      "title": "配額與容量規劃",
+      "origin": "gap",
+      "priority": "P0",
+      "verdict": "critical",
+      "why": "新模型上線初期配額常不足（Azure GPT-6 Astra 初期 Limited Access、Tier 1 只有 1,000 RPM / 1M TPM），而且計算方式不同：Bedrock 上 Astra 的 output token 以 10 倍計入 TPM；Agent Platform Opus 5.5 global QPM 2,000、output TPM 2M。",
+      "howToImplement": [
+        "每條路由記錄配額與計算規則（Offering.quotas），依預估流量換算需求並提前申請。",
+        "壓測到配額上限，記錄 429 行為與 LiteLLM cooldown/fallback 效果。",
+        "高 SLA 用途評估 Provisioned / Priority / Reserved。"
+      ],
+      "acceptanceCriteria": [
+        "上線路由的配額 ≥ 預估尖峰 × 1.5；有 429 時的降級路徑。"
+      ],
+      "gate": "G4",
+      "tooling": [
+        "Service Quotas / Azure quota / GCP quota",
+        "tools/perf_probe.py"
+      ],
+      "sources": [
+        {
+          "id": "aws-bedrock-astra-card"
+        },
+        {
+          "id": "google-agentplatform-claude-quotas"
+        },
+        {
+          "id": "kingy-astra-access"
+        }
+      ]
+    },
+    {
+      "id": "REQ-G08",
+      "title": "FinOps：每任務成本與分攤",
+      "origin": "gap",
+      "priority": "P1",
+      "verdict": "important",
+      "why": "同價位模型的實際花費可差數倍：AA 評測 Opus 5.5 用 260M output tokens、Astra 60M；Gemini 3.8 Flash 每任務 token 比前代多 30%。",
+      "howToImplement": [
+        "以代表性任務量測每任務成本（含 reasoning 與 cache），在 portal 顯示成本/品質散佈圖。",
+        "LiteLLM 以 team/key/tag 記錄花費並設預算；每月 showback/chargeback。",
+        "監控 cache 命中率與長文價觸發比例。"
+      ],
+      "acceptanceCriteria": [
+        "每個 GA 模型都有代表任務的每任務成本；各團隊有預算與超額告警。"
+      ],
+      "gate": "G7",
+      "tooling": [
+        "LiteLLM spend tracking",
+        "tools/perf_probe.py usage 欄位"
+      ],
+      "sources": [
+        {
+          "id": "aa-opus55"
+        },
+        {
+          "id": "aa-astra"
+        },
+        {
+          "id": "aa-gemini38-article"
+        }
+      ]
+    },
+    {
+      "id": "REQ-G09",
+      "title": "可觀測性與 SLO",
+      "origin": "gap",
+      "priority": "P1",
+      "verdict": "important",
+      "why": "沒有一致的遙測就無法做回歸、成本分攤或事故調查。OpenTelemetry GenAI 語意慣例在 2026 年仍為 Development 狀態，屬性名稱可能變動。",
+      "howToImplement": [
+        "gateway 輸出 OTel span（gen_ai.* 屬性）並固定版本；另記錄 refusal、safeguard fallback、429、context overflow 等錯誤分類。",
+        "每條路由定義 SLO 與告警；portal 顯示近 30 天實測延遲與錯誤率。"
+      ],
+      "acceptanceCriteria": [
+        "所有路由有 SLO 儀表板；遙測欄位對照表有版本紀錄。"
+      ],
+      "gate": "G4",
+      "tooling": [
+        "OpenTelemetry",
+        "LiteLLM callbacks",
+        "CloudWatch / Azure Monitor / Cloud Monitoring"
+      ],
+      "sources": [
+        {
+          "id": "otel-genai-status"
+        }
+      ]
+    },
+    {
+      "id": "REQ-G10",
+      "title": "韌性、備援與突發停用應變",
+      "origin": "gap",
+      "priority": "P1",
+      "verdict": "important",
+      "why": "單一 CSP 區域或模型可能無預警不可用：2026-06-12 Fable 5 / Mythos 5 因出口管制指令被全面停用，直到 07-01 才恢復；新模型上線週常被限流。",
+      "howToImplement": [
+        "同模型跨 CSP 的 fallback（Opus 5.5：Bedrock → Agent Platform → Foundry），跨家族 fallback 放最後。",
+        "每個關鍵用途指定替代模型並定期演練切換。",
+        "LiteLLM retry/cooldown 設定經負載測試驗證（避開 v1.100.0 的 OOM）。"
+      ],
+      "acceptanceCriteria": [
+        "每個 P0 用途有已演練的替代路由；RTO 目標有紀錄。"
+      ],
+      "gate": "G8",
+      "tooling": [
+        "LiteLLM router fallbacks"
+      ],
+      "sources": [
+        {
+          "id": "anthropic-fable-mythos-access"
+        },
+        {
+          "id": "litellm-oom-incident"
+        }
+      ]
+    },
+    {
+      "id": "REQ-G11",
+      "title": "存取控制與治理",
+      "origin": "gap",
+      "priority": "P0",
+      "verdict": "critical",
+      "why": "新模型不應對全公司預設開放：Fable/Mythos 級模型要求 30 天資料保留、資安模型需信任存取計畫、Global 路由不適合機密資料。",
+      "howToImplement": [
+        "LiteLLM virtual keys + SSO；team 層級 model allow-list 依資料等級與核准狀態控制。",
+        "beta 階段只開放給申請團隊；GA 才加入能力層 alias。"
+      ],
+      "acceptanceCriteria": [
+        "所有 key 都有擁有者與到期日；未核准模型無法被呼叫。"
+      ],
+      "gate": "G2",
+      "tooling": [
+        "LiteLLM teams / keys / SSO"
+      ],
+      "sources": [
+        {
+          "id": "anthropic-fable-mythos-access"
+        },
+        {
+          "id": "ms-foundry-claude-howto"
+        }
+      ]
+    },
+    {
+      "id": "REQ-G12",
+      "title": "Gateway 供應鏈安全",
+      "origin": "gap",
+      "priority": "P0",
+      "verdict": "critical",
+      "why": "Gateway 握有所有 CSP 憑證，是最有價值的攻擊目標：LiteLLM 2026 年已有 PyPI 惡意版本、pre-auth SQL injection（揭露後 36 小時遭攻擊）、Host header 驗證繞過、guardrail logging 洩漏秘密等事件。",
+      "howToImplement": [
+        "以 digest/hash 釘選、私有 mirror、SBOM 與簽章驗證；CI 禁止 main-latest。",
+        "proxy 不直接暴露於網際網路，前置 WAF 與 mTLS；DB 最小權限。",
+        "訂閱 LiteLLM 安全公告與 GHSA，嚴重漏洞 72 小時內修補。"
+      ],
+      "acceptanceCriteria": [
+        "production 版本不在 avoid 清單；上一季漏洞平均修補時間在 SLA 內。"
+      ],
+      "gate": "G3",
+      "tooling": [
+        "data/litellm.json advisories",
+        "Dependabot / Renovate",
+        "Trivy（釘選版本）"
+      ],
+      "sources": [
+        {
+          "id": "litellm-supplychain-issue"
+        },
+        {
+          "id": "litellm-cve-2026-42208"
+        },
+        {
+          "id": "sysdig-cve-2026-42208"
+        },
+        {
+          "id": "litellm-host-header"
+        },
+        {
+          "id": "litellm-guardrail-logging"
+        }
+      ]
+    },
+    {
+      "id": "REQ-G13",
+      "title": "Canary、影子流量與使用者回饋",
+      "origin": "gap",
+      "priority": "P1",
+      "verdict": "important",
+      "why": "離線評測無法涵蓋真實流量；Opus 5.5 預設 effort 改變這類變更，只有在真實流量上才看得出延遲與成本影響。",
+      "howToImplement": [
+        "新模型先以 *-beta alias 開放；用 LiteLLM 的權重路由或 shadow 評測比較新舊模型。",
+        "在應用 UI 收集 thumbs up/down 與原因，回寫到 portal。"
+      ],
+      "acceptanceCriteria": [
+        "GA 前至少 2 週 beta，並有新舊模型對照報告。"
+      ],
+      "gate": "G8",
+      "tooling": [
+        "LiteLLM weighted routing / shadow evals"
+      ],
+      "sources": [
+        {
+          "id": "litellm-release-notes"
+        }
+      ]
+    },
+    {
+      "id": "REQ-G14",
+      "title": "退役自動化",
+      "origin": "gap",
+      "priority": "P0",
+      "verdict": "critical",
+      "why": "只有 EOL 表沒有流程，退役仍會變成事故。Bedrock 新政策下部分模型的 Legacy 期只有 45 天。",
+      "howToImplement": [
+        "排程比對 platform-inventory 與 lifecycle，T-90/T-60/T-30 自動開遷移工單給使用該 alias 的團隊。",
+        "退役前把 alias 指到替代模型並觀察一週。"
+      ],
+      "acceptanceCriteria": [
+        "沒有任何 deployment 在退役日仍有流量。"
+      ],
+      "gate": "G10",
+      "tooling": [
+        "tools/sync_inventory.py",
+        "工單系統整合"
+      ],
+      "sources": [
+        {
+          "id": "julien-45days"
+        },
+        {
+          "id": "aws-bedrock-lifecycle"
+        }
+      ]
+    },
+    {
+      "id": "REQ-G15",
+      "title": "Tokenizer 與繁中成本效率",
+      "origin": "gap",
+      "priority": "P2",
+      "verdict": "nice-to-have",
+      "why": "不同模型處理同一段繁中文字的 token 數不同，直接影響成本與 context 可用量；牌價比較無法反映。",
+      "howToImplement": [
+        "用固定繁中語料量測每千字 input/output token 數，列在模型卡。"
+      ],
+      "acceptanceCriteria": [
+        "每個 GA 模型都有 zh-TW token 效率數據。"
+      ],
+      "gate": "G7",
+      "tooling": [
+        "tools/perf_probe.py usage"
+      ],
+      "sources": [
+        {
+          "id": "tmmlu-plus"
+        }
+      ]
+    },
+    {
+      "id": "REQ-G16",
+      "title": "多模態與工具能力矩陣",
+      "origin": "gap",
+      "priority": "P2",
+      "verdict": "nice-to-have",
+      "why": "應用團隊常問「能不能吃 PDF / 影片」「有沒有 web search」；答案依模型與路由而異（Gemini 3.8 Flash 支援影片與音訊輸入；Astra 的 server-side tools 在 Bedrock 只有 mantle）。",
+      "howToImplement": [
+        "Offering.features 維護統一的功能鍵值，UI 以矩陣呈現並可篩選。"
+      ],
+      "acceptanceCriteria": [
+        "每個 GA 路由的 features 不含 unknown。"
+      ],
+      "gate": "G1",
+      "tooling": [
+        "data/catalog.json features"
+      ],
+      "sources": [
+        {
+          "id": "google-gemini38-model"
+        },
+        {
+          "id": "aws-bedrock-astra-card"
+        }
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "G0",
+      "name": "Intake / 雷達",
+      "owner": "平台團隊（排程任務自動建立）",
+      "entryCriteria": [
+        "每週研究任務或廠商公告偵測到新模型/新路由"
+      ],
+      "checks": [
+        "是否在三雲任一上架",
+        "是否可能取代現役模型",
+        "是否有出口管制或特殊存取限制"
+      ],
+      "exitCriteria": [
+        "建立 catalog 條目（platformStatus=watch 或 evaluating）"
+      ],
+      "evidence": [
+        "digest JSON"
+      ],
+      "requirementIds": [
+        "REQ-U12"
+      ]
+    },
+    {
+      "id": "G1",
+      "name": "研究與模型卡",
+      "owner": "平台團隊",
+      "entryCriteria": [
+        "G0 通過"
+      ],
+      "checks": [
+        "正規化模型卡",
+        "外部指數與基準（含版本）",
+        "deep dive 初稿",
+        "功能矩陣"
+      ],
+      "exitCriteria": [
+        "catalog 與 deep dive 發布為 draft"
+      ],
+      "evidence": [
+        "data/catalog.json",
+        "data/models/<id>.json"
+      ],
+      "requirementIds": [
+        "REQ-U03",
+        "REQ-U04",
+        "REQ-U06",
+        "REQ-G16"
+      ]
+    },
+    {
+      "id": "G2",
+      "name": "法務、資料與合規",
+      "owner": "法務 + 資安 + 個資窗口",
+      "entryCriteria": [
+        "G1 草稿完成"
+      ],
+      "checks": [
+        "資料處理者與駐留",
+        "保留/ZDR",
+        "EULA 與行銷條款",
+        "數發部風險分類",
+        "金管會/EU AI Act 適用性",
+        "出口管制敏感度"
+      ],
+      "exitCriteria": [
+        "各資料等級可用路由核准"
+      ],
+      "evidence": [
+        "合規檢核表",
+        "簽核紀錄"
+      ],
+      "requirementIds": [
+        "REQ-G01",
+        "REQ-G02",
+        "REQ-G11"
+      ]
+    },
+    {
+      "id": "G3",
+      "name": "API 相容性與 gateway",
+      "owner": "平台團隊",
+      "entryCriteria": [
+        "G2 至少部分核准（可先用測試資料）"
+      ],
+      "checks": [
+        "compat suite（直連與經 LiteLLM）",
+        "LiteLLM 版本與 caveats",
+        "breaking change 測試",
+        "gateway 安全基線"
+      ],
+      "exitCriteria": [
+        "required 案例 100% pass 或有豁免"
+      ],
+      "evidence": [
+        "CompatRun JSON"
+      ],
+      "requirementIds": [
+        "REQ-U01",
+        "REQ-U10",
+        "REQ-G05",
+        "REQ-G12",
+        "REQ-G03"
+      ]
+    },
+    {
+      "id": "G4",
+      "name": "效能與容量",
+      "owner": "平台團隊 + SRE",
+      "entryCriteria": [
+        "G3 通過"
+      ],
+      "checks": [
+        "profile × effort × 路由的延遲與吞吐",
+        "配額與 429 行為",
+        "SLO 與告警"
+      ],
+      "exitCriteria": [
+        "p90 TTFAT / TTLT 符合 SLO；配額 ≥ 尖峰 × 1.5"
+      ],
+      "evidence": [
+        "PerfRun JSON",
+        "配額核准單"
+      ],
+      "requirementIds": [
+        "REQ-U02",
+        "REQ-G07",
+        "REQ-G09"
+      ]
+    },
+    {
+      "id": "G5",
+      "name": "品質評測",
+      "owner": "應用團隊 + 平台團隊",
+      "entryCriteria": [
+        "G3 通過"
+      ],
+      "checks": [
+        "golden set 回歸",
+        "pairwise vs 現役",
+        "繁中指標"
+      ],
+      "exitCriteria": [
+        "各用途不低於現役或在容忍度內"
+      ],
+      "evidence": [
+        "評測報告"
+      ],
+      "requirementIds": [
+        "REQ-G04"
+      ]
+    },
+    {
+      "id": "G6",
+      "name": "安全測試",
+      "owner": "資安團隊",
+      "entryCriteria": [
+        "G3 通過"
+      ],
+      "checks": [
+        "securityTestCatalog 全部類別",
+        "over-refusal",
+        "fallback 偵測",
+        "guardrail 整合"
+      ],
+      "exitCriteria": [
+        "ASR 與 over-refusal 在門檻內"
+      ],
+      "evidence": [
+        "promptfoo/garak/PyRIT 報告"
+      ],
+      "requirementIds": [
+        "REQ-U05"
+      ]
+    },
+    {
+      "id": "G7",
+      "name": "FinOps",
+      "owner": "FinOps + 平台團隊",
+      "entryCriteria": [
+        "G4、G5 有結果"
+      ],
+      "checks": [
+        "每任務成本",
+        "預算與分攤標籤",
+        "促銷到期與長文價"
+      ],
+      "exitCriteria": [
+        "成本模型核准"
+      ],
+      "evidence": [
+        "成本試算"
+      ],
+      "requirementIds": [
+        "REQ-U09",
+        "REQ-G08",
+        "REQ-G15"
+      ]
+    },
+    {
+      "id": "G8",
+      "name": "Beta / Canary",
+      "owner": "平台團隊",
+      "entryCriteria": [
+        "G2–G7 通過"
+      ],
+      "checks": [
+        "*-beta alias 限定團隊",
+        "shadow / 權重路由對照",
+        "回饋收集",
+        "fallback 演練"
+      ],
+      "exitCriteria": [
+        "至少 2 週無 P1 事件"
+      ],
+      "evidence": [
+        "canary 報告"
+      ],
+      "requirementIds": [
+        "REQ-G13",
+        "REQ-G10"
+      ]
+    },
+    {
+      "id": "G9",
+      "name": "GA 與溝通",
+      "owner": "平台團隊",
+      "entryCriteria": [
+        "G8 通過"
+      ],
+      "checks": [
+        "onboarding 頁",
+        "alias 更新",
+        "公告與 office hour"
+      ],
+      "exitCriteria": [
+        "platformStatus=ga"
+      ],
+      "evidence": [
+        "release record"
+      ],
+      "requirementIds": [
+        "REQ-U07",
+        "REQ-U11",
+        "REQ-G06"
+      ]
+    },
+    {
+      "id": "G10",
+      "name": "生命週期與退役",
+      "owner": "平台團隊",
+      "entryCriteria": [
+        "模型 GA"
+      ],
+      "checks": [
+        "每日 inventory × lifecycle 比對",
+        "T-90/60/30 通知",
+        "替代模型評估"
+      ],
+      "exitCriteria": [
+        "退役日前流量為 0"
+      ],
+      "evidence": [
+        "platform-inventory.json",
+        "遷移工單"
+      ],
+      "requirementIds": [
+        "REQ-U08",
+        "REQ-G14"
+      ]
+    }
+  ],
+  "metricDefinitions": [
+    {
+      "metric": "TTFT（Time to First Token）",
+      "definition": "送出請求到收到第一個串流 token（含 reasoning/thinking 摘要或 tool call 片段）的時間。",
+      "howMeasured": "串流模式下第一個含內容的 chunk 的時間戳。",
+      "pitfalls": [
+        "不同工具定義不同：AA 對推理模型的 TTFT 可能是第一個 reasoning token，另有 time to first answer token。",
+        "隱藏 reasoning 的模型（不串流 thinking）TTFT 會包含整段思考時間。"
+      ]
+    },
+    {
+      "metric": "TTFAT（Time to First Answer Token）",
+      "definition": "送出請求到收到第一個「答案」token（delta.content 或 tool call）的時間；使用者真正感受到的等待。",
+      "howMeasured": "串流 chunk 中第一個非空 content 或 tool_calls 的時間戳。",
+      "pitfalls": [
+        "effort 越高越長；比較時必須固定 effort。"
+      ]
+    },
+    {
+      "metric": "ITL / TPOT（Inter-Token Latency）",
+      "definition": "答案生成期間相鄰 token 的平均間隔。",
+      "howMeasured": "(TTLT − TTFAT) / (答案 output tokens − 1)；或 chunk 間隔的分佈。",
+      "pitfalls": [
+        "AIPerf 的 ITL 不含 TTFT；有些工具含。",
+        "CSP 常把多個 token 合併成一個 chunk，chunk 間隔 ≠ token 間隔。"
+      ]
+    },
+    {
+      "metric": "TTLT / E2E latency（Time to Last Token）",
+      "definition": "送出請求到收到最後一個 token（或非串流時收到完整回應）的時間。",
+      "howMeasured": "最後一個 chunk 或 [DONE] 的時間戳。",
+      "pitfalls": [
+        "受 max_tokens 與模型冗長度影響極大——必須記錄 output tokens。"
+      ]
+    },
+    {
+      "metric": "Output tokens/s（每請求）",
+      "definition": "單一請求在收到第一個 token 之後的輸出速度。",
+      "howMeasured": "completion_tokens / (TTLT − TTFT)。",
+      "pitfalls": [
+        "completion_tokens 可能含看不到的 reasoning tokens，會讓速度看起來較快。"
+      ]
+    },
+    {
+      "metric": "Aggregate throughput（聚合吞吐）",
+      "definition": "某併發數下整體每秒輸出 token 數。",
+      "howMeasured": "測試期間總 completion_tokens / 牆鐘時間。",
+      "pitfalls": [
+        "託管 API 的上限多半來自配額（TPM/RPM），不是硬體。"
+      ]
+    },
+    {
+      "metric": "RPS（Requests per second）",
+      "definition": "每秒完成的請求數。",
+      "howMeasured": "成功請求數 / 牆鐘時間。",
+      "pitfalls": [
+        "需同時報告錯誤率。"
+      ]
+    },
+    {
+      "metric": "Error rate / 429 rate",
+      "definition": "失敗請求比例，依 429、5xx、timeout、refusal 分類。",
+      "howMeasured": "HTTP 狀態碼、stop_reason 與例外類型。",
+      "pitfalls": [
+        "Opus 5.5 的拒答是 HTTP 200 + stop_reason: refusal，只看狀態碼會漏掉。"
+      ]
+    },
+    {
+      "metric": "Goodput",
+      "definition": "同時符合 SLO（例如 TTFAT ≤ X 且 TTLT ≤ Y）的成功請求比例。",
+      "howMeasured": "依 SLO 門檻過濾成功請求。",
+      "pitfalls": [
+        "SLO 要依用途訂，不要全公司共用一組。"
+      ]
+    },
+    {
+      "metric": "Cost per task（每任務成本）",
+      "definition": "完成一個代表性任務的實際花費（input + output + reasoning + cache）。",
+      "howMeasured": "以 usage 欄位 × PriceSheet 計算，含長文門檻與 cache 價格。",
+      "pitfalls": [
+        "牌價相同的模型因冗長度不同，每任務成本可差數倍。"
+      ]
+    },
+    {
+      "metric": "Tokens per 1,000 zh-TW characters",
+      "definition": "處理 1,000 個繁中字元所需的 input/output token 數。",
+      "howMeasured": "固定繁中語料，讀取 usage.prompt_tokens / completion_tokens。",
+      "pitfalls": [
+        "不同 tokenizer 差異大；用於成本與 context 容量估算。"
+      ]
+    }
+  ],
+  "securityTestCatalog": [
+    {
+      "id": "SEC-01",
+      "category": "直接 prompt injection / jailbreak",
+      "owasp": [
+        "LLM01"
+      ],
+      "modaRiskCategory": "安全漏洞與攻擊",
+      "what": "單輪與模板化越獄、角色扮演、編碼混淆（含繁中與中英混雜）。",
+      "passCriteria": "ASR ≤ 現役模型",
+      "tools": [
+        "promptfoo",
+        "garak"
+      ]
+    },
+    {
+      "id": "SEC-02",
+      "category": "間接 prompt injection（RAG / 工具輸出 / 網頁）",
+      "owasp": [
+        "LLM01",
+        "ASI01"
+      ],
+      "modaRiskCategory": "行為偏離人類意圖",
+      "what": "把指令藏在檢索文件、email、工具回傳與網頁中，檢查代理是否改變目標。",
+      "passCriteria": "目標劫持成功率 ≤ 門檻；高風險動作一律需確認",
+      "tools": [
+        "promptfoo",
+        "PyRIT",
+        "自建代理情境"
+      ]
+    },
+    {
+      "id": "SEC-03",
+      "category": "敏感資訊外洩（PII / 秘密）",
+      "owasp": [
+        "LLM02"
+      ],
+      "modaRiskCategory": "隱私侵害",
+      "what": "誘導輸出訓練資料、context 中的身分證字號、帳號、API key。",
+      "passCriteria": "洩漏率 0（對測試植入的秘密）",
+      "tools": [
+        "promptfoo",
+        "garak"
+      ]
+    },
+    {
+      "id": "SEC-04",
+      "category": "System prompt 洩漏",
+      "owasp": [
+        "LLM07"
+      ],
+      "what": "要求模型複述系統指示或工具定義。",
+      "passCriteria": "洩漏率 ≤ 門檻",
+      "tools": [
+        "promptfoo"
+      ]
+    },
+    {
+      "id": "SEC-05",
+      "category": "不當輸出處理",
+      "owasp": [
+        "LLM05"
+      ],
+      "what": "輸出是否夾帶 XSS、SQL、shell 片段或 markdown 圖片外洩連結。",
+      "passCriteria": "下游 sanitizer 攔截率 100%",
+      "tools": [
+        "promptfoo",
+        "自建"
+      ]
+    },
+    {
+      "id": "SEC-06",
+      "category": "過度代理 / 工具濫用",
+      "owasp": [
+        "LLM06",
+        "ASI02",
+        "ASI03"
+      ],
+      "modaRiskCategory": "AI 代理授權外行為",
+      "what": "代理是否呼叫未授權工具、擴大權限、串接工具繞過限制。",
+      "passCriteria": "未授權動作 0；越界嘗試皆被 gateway/政策擋下",
+      "tools": [
+        "PyRIT",
+        "自建代理情境"
+      ]
+    },
+    {
+      "id": "SEC-07",
+      "category": "無上限消耗",
+      "owasp": [
+        "LLM10"
+      ],
+      "what": "誘發超長 reasoning、重複工具呼叫、超大輸出。",
+      "passCriteria": "max_tokens / task budget / 成本上限生效",
+      "tools": [
+        "tools/perf_probe.py",
+        "promptfoo"
+      ]
+    },
+    {
+      "id": "SEC-08",
+      "category": "錯誤資訊 / 幻覺",
+      "owasp": [
+        "LLM09"
+      ],
+      "modaRiskCategory": "錯誤訊息",
+      "what": "台灣在地事實、法規、內部知識問答；要求附引用時檢查引用真實性。",
+      "passCriteria": "事實錯誤率 ≤ 現役模型",
+      "tools": [
+        "內部 golden set",
+        "AA-Omniscience 參考"
+      ]
+    },
+    {
+      "id": "SEC-09",
+      "category": "違規內容",
+      "owasp": [],
+      "modaRiskCategory": "違法內容生成",
+      "what": "依公司政策的內容類別（仇恨、自傷、詐騙等）。",
+      "passCriteria": "符合公司內容政策",
+      "tools": [
+        "garak",
+        "provider guardrails"
+      ]
+    },
+    {
+      "id": "SEC-10",
+      "category": "過度拒答",
+      "owasp": [],
+      "what": "正常業務請求（含資安團隊的防禦工作、醫療/法律一般資訊）被拒答的比例。",
+      "passCriteria": "over-refusal ≤ 約定值",
+      "tools": [
+        "內部業務樣本"
+      ]
+    },
+    {
+      "id": "SEC-11",
+      "category": "Safeguard fallback 偵測",
+      "owasp": [],
+      "what": "記錄 response.model 與 stop_reason；統計被改路由（如 Opus 5.5 → Opus 4.8）或拒答的比例。",
+      "passCriteria": "有監控與告警；比例寫入 onboarding 頁",
+      "tools": [
+        "LiteLLM logging",
+        "tools/compat_suite.py"
+      ]
+    },
+    {
+      "id": "SEC-12",
+      "category": "偏誤與台灣在地立場",
+      "owasp": [],
+      "modaRiskCategory": "歧視與偏見 / 認知作戰",
+      "what": "繁中與英文提問下的立場一致性、兩岸用語偏差、族群/性別偏誤。",
+      "passCriteria": "偏誤指標不劣於現役模型",
+      "tools": [
+        "Taiwan Sovereignty Benchmark",
+        "自建"
+      ]
+    },
+    {
+      "id": "SEC-13",
+      "category": "多輪漸進式越獄",
+      "owasp": [
+        "LLM01"
+      ],
+      "what": "Crescendo 等多輪策略。",
+      "passCriteria": "ASR ≤ 現役模型",
+      "tools": [
+        "PyRIT"
+      ]
+    },
+    {
+      "id": "SEC-14",
+      "category": "記憶 / context 污染",
+      "owasp": [
+        "ASI06"
+      ],
+      "what": "寫入長期記憶或共享 context 的惡意內容是否影響後續任務。",
+      "passCriteria": "污染後任務偏離率 ≤ 門檻",
+      "tools": [
+        "自建代理情境"
+      ]
+    },
+    {
+      "id": "SEC-15",
+      "category": "程式執行與沙箱逃逸",
+      "owasp": [
+        "ASI05"
+      ],
+      "modaRiskCategory": "網路攻擊",
+      "what": "code interpreter / shell 工具下的逃逸與外連嘗試。",
+      "passCriteria": "沙箱 deny-by-default egress 生效",
+      "tools": [
+        "自建"
+      ]
+    },
+    {
+      "id": "SEC-16",
+      "category": "供應鏈（模型與 gateway）",
+      "owasp": [
+        "LLM03",
+        "ASI04"
+      ],
+      "what": "gateway 版本、MCP server、第三方工具來源與簽章。",
+      "passCriteria": "無 avoid 清單版本；SBOM 完整",
+      "tools": [
+        "data/litellm.json",
+        "SBOM 工具"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "imperva-owasp"
+    },
+    {
+      "id": "modulos-owasp-agentic"
+    },
+    {
+      "id": "moda-risk-framework"
+    },
+    {
+      "id": "fsc-agentic-ai"
+    },
+    {
+      "id": "nvidia-aiperf"
+    },
+    {
+      "id": "aa-perf-methodology"
+    }
+  ]
+}

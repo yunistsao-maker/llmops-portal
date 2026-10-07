@@ -1,0 +1,70 @@
+{
+  "data": [
+    {
+      "model_name": "claude-opus-5-5",
+      "litellm_params": {
+        "model": "bedrock/global.anthropic.claude-opus-5-5",
+        "aws_region_name": "ap-east-2"
+      },
+      "model_info": {
+        "catalog_id": "claude-opus-5-5"
+      }
+    },
+    {
+      "model_name": "claude-sonnet-4",
+      "litellm_params": {
+        "model": "bedrock/apac.anthropic.claude-sonnet-4-20250514-v1:0"
+      },
+      "model_info": {}
+    },
+    {
+      "model_name": "claude-3-haiku",
+      "litellm_params": {
+        "model": "bedrock/anthropic.claude-3-haiku-20240307-v1:0"
+      },
+      "model_info": {}
+    },
+    {
+      "model_name": "gpt-4o-prod",
+      "litellm_params": {
+        "model": "azure/gpt-4o-prod"
+      },
+      "model_info": {
+        "base_model": "azure/gpt-4o",
+        "model_version": "2024-11-20"
+      }
+    },
+    {
+      "model_name": "o3-reasoning",
+      "litellm_params": {
+        "model": "azure/o3-team-a"
+      },
+      "model_info": {
+        "base_model": "azure/o3"
+      }
+    },
+    {
+      "model_name": "gemini-2.5-flash",
+      "litellm_params": {
+        "model": "vertex_ai/gemini-2.5-flash",
+        "vertex_location": "global"
+      },
+      "model_info": {}
+    },
+    {
+      "model_name": "gpt-6-astra@bedrock",
+      "litellm_params": {
+        "model": "bedrock/converse/global.openai.gpt-6-astra"
+      },
+      "model_info": {}
+    },
+    {
+      "model_name": "internal-finetune",
+      "litellm_params": {
+        "model": "openai/my-custom-model",
+        "api_base": "http://10.0.0.5"
+      },
+      "model_info": {}
+    }
+  ]
+}

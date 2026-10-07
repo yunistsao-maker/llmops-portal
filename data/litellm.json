@@ -1,0 +1,437 @@
+{
+  "schema": "litellm/v1",
+  "generatedAt": "2026-09-24T14:30:00Z",
+  "locale": "zh-TW",
+  "asOf": "2026-09-24",
+  "supportPolicy": "LiteLLM 只維護最近四條 stable minor 線（含其中所有 patch）；minor 約每週發布一次，因此每條線約有一個月維護期。企業客戶可洽談更長支援，重大漏洞可能例外修補。",
+  "supportedLines": [
+    "v1.102.x",
+    "v1.101.x",
+    "v1.100.x",
+    "v1.99.x"
+  ],
+  "recommended": {
+    "version": "v1.102.1",
+    "pinning": "以 image digest 釘選（ghcr.io/berriai/litellm@sha256:…），不要用 main-latest 或 *-dev；PyPI 以 hash 釘選（pip install --require-hashes）並經私有 mirror。",
+    "rationale": [
+      "支援窗口內最新的 stable 線。",
+      "包含 GPT-6 家族參數處理（≥ v1.101.0）與 retry OOM 修正。",
+      "Claude Opus 5.5、GPT-6 Astra/Sol/Luna、Gemini 3.8 Flash 都能靠 Reload Price Data 取得定價。",
+      "注意 v1.102.0 的 breaking changes，先在 staging 跑 compat suite。"
+    ]
+  },
+  "minimumBaseline": {
+    "version": "v1.101.0",
+    "rationale": [
+      "GPT-6 Sol/Luna 需要的 max_completion_tokens / reasoning 參數處理。",
+      "含 OOM 修正。",
+      "遠高於所有已知 CVE 的修正版本（≥ v1.84.0）。"
+    ]
+  },
+  "avoid": [
+    {
+      "versions": "1.82.7、1.82.8",
+      "reason": "PyPI 供應鏈攻擊的惡意版本。",
+      "sources": [
+        {
+          "id": "litellm-supplychain-issue"
+        }
+      ]
+    },
+    {
+      "versions": "v1.81.16 – v1.83.6",
+      "reason": "CVE-2026-42208 pre-auth SQL injection。",
+      "sources": [
+        {
+          "id": "litellm-cve-2026-42208"
+        }
+      ]
+    },
+    {
+      "versions": "< v1.84.0",
+      "reason": "Host header 驗證繞過（GHSA-4xpc-pv4p-pm3w）。",
+      "sources": [
+        {
+          "id": "litellm-host-header"
+        }
+      ]
+    },
+    {
+      "versions": "v1.100.0",
+      "reason": "retry/fallback 記憶體暴增導致 OOM；用 v1.100.1 以上。",
+      "sources": [
+        {
+          "id": "litellm-oom-incident"
+        }
+      ]
+    },
+    {
+      "versions": "≤ v1.98.x",
+      "reason": "已超出官方支援窗口（2026-09-24）。",
+      "sources": [
+        {
+          "id": "litellm-version-support"
+        }
+      ]
+    },
+    {
+      "versions": "main-latest、*-dev、*-rc",
+      "reason": "非穩定版，不適用正式環境。",
+      "sources": [
+        {
+          "id": "litellm-version-support"
+        }
+      ]
+    }
+  ],
+  "releases": [
+    {
+      "version": "v1.103.0-rc.1",
+      "channel": "rc",
+      "highlights": [
+        "LiteLLM 的 Claude Opus 5.5 Day-0 範例使用此 image（內建 cost map 已含 Opus 5.5）。"
+      ],
+      "supported": false,
+      "caution": "Release candidate，勿用於正式環境；等 v1.103.0 stable。",
+      "sources": [
+        {
+          "id": "litellm-opus55"
+        }
+      ]
+    },
+    {
+      "version": "v1.102.1",
+      "channel": "patch",
+      "highlights": [
+        "v1.102 線的 patch（社群 Renovate PR 已升級至此版）。"
+      ],
+      "supported": true,
+      "sources": [
+        {
+          "id": "litellm-release-notes"
+        }
+      ]
+    },
+    {
+      "version": "v1.102.0",
+      "date": "2026-09-19",
+      "channel": "stable",
+      "highlights": [
+        "Auto Router 自訂 heuristic 維度與評分權重",
+        "OCR 預設改為原生（Rust）",
+        "可選共用 PgBouncer、減少 DB/Redis 呼叫、Redis 故障處理",
+        "99 個新模型定價條目"
+      ],
+      "supported": true,
+      "caution": "Breaking：organization 相關 endpoint 需 enterprise license、response ID 授權更嚴格、Rust OCR 為預設、Auto Router 以 tier 模型上限取代 caller 的 output cap——升級前在 staging 回歸測試。",
+      "sources": [
+        {
+          "id": "litellm-v1-102-0"
+        }
+      ]
+    },
+    {
+      "version": "v1.101.0",
+      "date": "2026-09-14",
+      "channel": "stable",
+      "highlights": [
+        "Heuristic auto router、semantic MCP tool search、off-peak pricing",
+        "GPT-6 Sol/Luna 的 max_completion_tokens 與 reasoning 參數處理",
+        "含 retry breadcrumb OOM 修正",
+        "內建 cost map 含 Gemini 3.8 Flash（v1.101.0-rc.1 起）"
+      ],
+      "supported": true,
+      "sources": [
+        {
+          "id": "litellm-release-notes"
+        },
+        {
+          "id": "litellm-sol-luna"
+        },
+        {
+          "id": "litellm-v1-100-1"
+        },
+        {
+          "id": "litellm-gemini38"
+        }
+      ]
+    },
+    {
+      "version": "v1.100.1",
+      "channel": "patch",
+      "highlights": [
+        "Retry breadcrumb 記憶體修正（v1.101.0 修正回移植）"
+      ],
+      "supported": true,
+      "sources": [
+        {
+          "id": "litellm-v1-100-1"
+        }
+      ]
+    },
+    {
+      "version": "v1.100.0",
+      "date": "2026-09-06",
+      "channel": "stable",
+      "highlights": [
+        "Access group budgets、Together AI 改版、自訂 auto-router tiers"
+      ],
+      "supported": true,
+      "caution": "部署持續失敗（Redis 或上游）觸發大量 retry/fallback 時記憶體幾何成長導致 OOM——改用 v1.100.1 以上。",
+      "sources": [
+        {
+          "id": "litellm-release-notes"
+        },
+        {
+          "id": "litellm-oom-incident"
+        }
+      ]
+    },
+    {
+      "version": "v1.99.0",
+      "date": "2026-09-01",
+      "channel": "stable",
+      "highlights": [
+        "Dark mode、CLI OAuth login、端到端 batch billing"
+      ],
+      "supported": true,
+      "caution": "支援窗口最舊的一條線，下次 minor 發布後即 EOL。",
+      "sources": [
+        {
+          "id": "litellm-release-notes"
+        }
+      ]
+    },
+    {
+      "version": "v1.98.0",
+      "date": "2026-08-22",
+      "channel": "stable",
+      "highlights": [
+        "Provisioned throughput billing、auto-router shadow evals"
+      ],
+      "supported": false,
+      "caution": "已超出「最近四條 stable 線」支援窗口。",
+      "sources": [
+        {
+          "id": "litellm-release-notes"
+        },
+        {
+          "id": "litellm-version-support"
+        }
+      ]
+    },
+    {
+      "version": "v1.95.0",
+      "date": "2026-08-01",
+      "channel": "stable",
+      "highlights": [
+        "Claude Opus 5 Day-0（含 Bedrock us/eu/au/jp/global profile，geo 價 +10%）",
+        "Rust /v1/messages",
+        "SAML 2.0 SSO"
+      ],
+      "supported": false,
+      "caution": "已超出支援窗口。",
+      "sources": [
+        {
+          "id": "litellm-v1-95-0"
+        }
+      ]
+    }
+  ],
+  "advisories": [
+    {
+      "id": "PYPI-LITELLM-2026-03-24",
+      "title": "PyPI 供應鏈攻擊：litellm 1.82.7 / 1.82.8 植入竊密程式",
+      "affected": "1.82.7, 1.82.8",
+      "fixedIn": "已下架（最後乾淨版 1.82.6）",
+      "severity": "critical",
+      "published": "2026-03-24",
+      "summary": "TeamPCP 透過被入侵的 Trivy GitHub Action 取得 PyPI 發布權杖，上傳含竊取雲端憑證、SSH key、Kubernetes 橫向移動與後門的版本；1.82.8 以 .pth 檔在任何 Python 啟動時執行。SOCRadar 2026-08 分析指受影響組織超過 2,500 個。",
+      "action": "封鎖這兩個版本；檢查 CI 快取與 lockfile；曾安裝者視為主機已遭入侵並輪替所有憑證；以 hash 釘選並透過私有 mirror 取得套件。",
+      "sources": [
+        {
+          "id": "litellm-supplychain-issue"
+        },
+        {
+          "id": "zscaler-supplychain"
+        },
+        {
+          "id": "socradar-aug2026"
+        }
+      ]
+    },
+    {
+      "id": "CVE-2026-42208",
+      "title": "LiteLLM Proxy API key 驗證的 pre-auth SQL injection",
+      "affected": "v1.81.16 – v1.83.6",
+      "fixedIn": "v1.83.7（建議 v1.83.10-stable 以上）",
+      "severity": "critical",
+      "summary": "未經驗證、帶特製 Authorization: Bearer header 的請求可能觸及有漏洞的 DB 查詢；Sysdig 觀察到揭露後約 36 小時即出現針對性攻擊。",
+      "action": "升級；若 proxy 曾對不受信任網路開放，依官方提供的查詢稽核 DB 紀錄並輪替 virtual keys 與上游憑證。",
+      "sources": [
+        {
+          "id": "litellm-cve-2026-42208"
+        },
+        {
+          "id": "sysdig-cve-2026-42208"
+        }
+      ]
+    },
+    {
+      "id": "GHSA-4xpc-pv4p-pm3w",
+      "title": "Host header injection 造成驗證繞過",
+      "affected": "< v1.84.0",
+      "fixedIn": "v1.84.0",
+      "severity": "high",
+      "summary": "偽造 Host header 可能繞過驗證。",
+      "action": "升級至 v1.84.0 以上；在 ingress 層固定並驗證 Host header。",
+      "sources": [
+        {
+          "id": "litellm-host-header"
+        }
+      ]
+    },
+    {
+      "id": "CVE-2026-30623",
+      "title": "Anthropic MCP SDK 的 stdio 指令注入（影響 MCP gateway）",
+      "affected": "使用 stdio MCP server 的部署（詳見公告）",
+      "severity": "high",
+      "summary": "MCP stdio transport 的指令注入漏洞（2026 年 4 月公告），LiteLLM 發布安全公告說明影響與修正。",
+      "action": "升級至支援版本；限制可註冊的 stdio MCP server；以 allow-list 管理 MCP 工具。",
+      "sources": [
+        {
+          "id": "litellm-mcp-cve"
+        }
+      ]
+    },
+    {
+      "id": "LITELLM-INCIDENT-GUARDRAIL-LOGGING",
+      "title": "Guardrail logging 將機密 header 寫入 spend logs 與 traces",
+      "affected": "詳見事件報告",
+      "severity": "high",
+      "summary": "事件報告：guardrail 記錄流程把含秘密的 header 寫進 spend logs 與 tracing。",
+      "action": "升級；檢查並清除歷史 spend logs / traces；輪替可能外洩的金鑰；限制 observability 後端存取權。",
+      "sources": [
+        {
+          "id": "litellm-guardrail-logging"
+        }
+      ]
+    }
+  ],
+  "knownPitfalls": [
+    {
+      "title": "Bedrock 上的 GPT-6 / GPT-5.6 拒收 temperature",
+      "affects": "bedrock/converse/…openai.gpt-6-*、bedrock_mantle/openai.gpt-6-*（LiteLLM 1.102.1）",
+      "symptom": "400：This model doesn't support the temperature field / Unsupported parameter: 'temperature'；評測框架（TruLens、Opik GEval）預設送 temperature=0 而失敗。",
+      "fix": "該 deployment 設 additional_drop_params: [\"temperature\"]（或全域 drop_params: true）；評測框架改用不送 temperature 的設定。上線前用 compat suite 的 params.temperature 案例驗證。",
+      "sources": [
+        {
+          "id": "opik-8524"
+        },
+        {
+          "id": "trulens-2815"
+        },
+        {
+          "id": "litellm-drop-params"
+        }
+      ]
+    },
+    {
+      "title": "Claude Opus 5.5 的 forced tool_choice 被靜默降級",
+      "affects": "claude-opus-5-5（所有通路）",
+      "symptom": "tool_choice any/tool 原本回 400；drop_params 開啟時 LiteLLM 改成 auto 並只記 warning，請求成功但模型可能沒呼叫工具。",
+      "fix": "應用程式不要依賴 forced tool use；改用 strict tool use 或 structured outputs，並在 compat suite 斷言確實有 tool call。",
+      "sources": [
+        {
+          "id": "litellm-opus55"
+        },
+        {
+          "id": "anthropic-opus55-whatsnew"
+        }
+      ]
+    },
+    {
+      "title": "GPT-6 在 Chat Completions 上的工具呼叫限制",
+      "affects": "gpt-6-astra、gpt-6-sol、gpt-6-luna",
+      "symptom": "Astra 在 Chat Completions 只支援基本 function calling；Sol/Luna 只有 reasoning_effort=none 時能呼叫工具。",
+      "fix": "需要 reasoning + tools 的應用改走 LiteLLM /v1/responses；onboarding 頁要清楚標示。",
+      "sources": [
+        {
+          "id": "openai-latest-model-guide"
+        }
+      ]
+    },
+    {
+      "title": "Bedrock 裸 model ID 無法 on-demand 呼叫",
+      "affects": "anthropic.claude-opus-5-5、openai.gpt-6-*（bedrock-runtime）",
+      "symptom": "Invocation of model ID … with on-demand throughput isn't supported。",
+      "fix": "改用 inference profile（global.* / jp.* / us.*）；LiteLLM 設定與 inventory 對照都以 profile ID 為準。",
+      "sources": [
+        {
+          "id": "aws-bedrock-opus55-card"
+        },
+        {
+          "id": "modelsdev-7805"
+        }
+      ]
+    },
+    {
+      "title": "跨模型家族 fallback 會丟失 thinking",
+      "affects": "Claude Opus 5.5 → Sonnet/Haiku 等",
+      "symptom": "thinking block 綁定模型，fallback 後的回合看不到先前推理，品質下降且不易察覺。",
+      "fix": "fallback 優先設為同一模型的其他 CSP 路由（Bedrock → Agent Platform → Foundry），跨家族 fallback 只在最後一層。",
+      "sources": [
+        {
+          "id": "litellm-opus55"
+        },
+        {
+          "id": "anthropic-opus55-whatsnew"
+        }
+      ]
+    },
+    {
+      "title": "內建 cost map 不會自動拿到新模型價格",
+      "affects": "LITELLM_LOCAL_MODEL_COST_MAP=true 的部署",
+      "symptom": "新模型成本記為 0 或錯誤；Reload Price Data 按鈕無效。",
+      "fix": "改用 remote cost map 並在發布日 reload，或升級到包含該模型的 image；每週排程比對 cost map 與 catalog.json。",
+      "sources": [
+        {
+          "id": "litellm-opus55"
+        },
+        {
+          "id": "litellm-gemini38"
+        }
+      ]
+    },
+    {
+      "title": "促銷價到期",
+      "affects": "gemini-3.8-flash（2026-12-31 到期）",
+      "symptom": "2027-01-01 起實際帳單翻倍，但 LiteLLM spend 仍以舊價計算。",
+      "fix": "在 lifecycle.json 的 price-change 事件前一週更新 cost map 與團隊預算。",
+      "sources": [
+        {
+          "id": "google-gemini38-latest"
+        }
+      ]
+    },
+    {
+      "title": "未知金鑰的驗證失敗也會寫入 spend rows",
+      "affects": "LiteLLM proxy（issue #42689，未修正前）",
+      "symptom": "未驗證的 client 可以讓 usage 資料表無限制成長。",
+      "fix": "proxy 前加 WAF / rate limit；監控 spend 資料表大小；追蹤 issue 修正版本。",
+      "sources": [
+        {
+          "id": "litellm-issue-42689"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "litellm-version-support"
+    },
+    {
+      "id": "litellm-release-notes"
+    }
+  ]
+}

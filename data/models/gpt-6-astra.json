@@ -1,0 +1,469 @@
+{
+  "schema": "deep-dive/v1",
+  "modelId": "gpt-6-astra",
+  "title": "GPT-6 Astra 技術深度解析",
+  "locale": "zh-TW",
+  "asOf": "2026-09-24",
+  "tldr": "GPT-6 Astra 是 OpenAI 目前最強、也最貴的模型（$10/$50），定位最難的長時程代理與電腦操作工作；Azure 與 Bedrock 皆 GA，GCP 沒有。導入前要先把應用改成 Responses API（工具呼叫）、移除 temperature 與 effort=none，並把 Bedrock 上 output token 以 10 倍計入配額的規則算進容量規劃。它也是首個資安能力 Critical 的模型，代理與 computer use 情境需要更嚴格的權限與人工關卡。",
+  "whatsNew": [
+    {
+      "title": "GPT-6 首發旗艦",
+      "detail": "1.05M context、128K output、knowledge cutoff 2026-04-30；支援 functions、web search、file search、computer use。",
+      "sources": [
+        {
+          "id": "openai-models"
+        }
+      ]
+    },
+    {
+      "title": "代理與電腦操作",
+      "detail": "OpenAI 稱為最好的軟體工程模型；Terminal-Bench-Science 64.6%、AutomationBench 41.4%。",
+      "sources": [
+        {
+          "id": "anthropic-opus55-announce"
+        },
+        {
+          "id": "apidog-astra"
+        }
+      ]
+    },
+    {
+      "title": "資安能力 Critical",
+      "detail": "OpenAI Preparedness Framework 首個 Critical：可在強化系統中發現並利用 zero-day；生物仍為 High。",
+      "sources": [
+        {
+          "id": "infoq-astra-critical"
+        },
+        {
+          "id": "openai-astra-systemcard"
+        }
+      ]
+    },
+    {
+      "title": "三條企業通路",
+      "detail": "Azure Foundry（版本 2026-09-03；Global、US/EU Data Zone、Provisioned）；Bedrock（09-08 GA；bedrock-runtime 與 bedrock-mantle）；OpenAI API。",
+      "sources": [
+        {
+          "id": "ms-foundry-gpt6-blog"
+        },
+        {
+          "id": "aws-bedrock-astra-card"
+        }
+      ]
+    },
+    {
+      "title": "Token 效率",
+      "detail": "AA 評測只用 60M output tokens（中位數 88M），每任務成本 $3.26——比單價看起來便宜。",
+      "sources": [
+        {
+          "id": "aa-astra"
+        }
+      ]
+    }
+  ],
+  "vsPredecessor": {
+    "predecessorId": "gpt-5.6-sol",
+    "changes": [
+      {
+        "area": "單價",
+        "before": "$4 / $20（GPT-5.6 Sol 牌價）",
+        "after": "$10 / $50",
+        "impact": "牌價 2.5 倍；需以每任務成本評估。"
+      },
+      {
+        "area": "Reasoning effort",
+        "before": "none ～ max",
+        "after": "low ～ max（沒有 none）",
+        "impact": "送 none 或 minimal 會失敗。"
+      },
+      {
+        "area": "工具呼叫",
+        "before": "Chat Completions 可用",
+        "after": "需 Responses API；Chat Completions 僅基本 function calling",
+        "impact": "代理類應用要改 API。"
+      },
+      {
+        "area": "Prompt caching 參數",
+        "before": "prompt_cache_retention",
+        "after": "prompt_cache_options.ttl = \"30m\"",
+        "impact": "舊參數需更新。"
+      },
+      {
+        "area": "Knowledge cutoff",
+        "before": "2026-02-16",
+        "after": "2026-04-30",
+        "impact": "較新的知識。"
+      },
+      {
+        "area": "資安分級",
+        "before": "High",
+        "after": "Critical",
+        "impact": "更嚴格的監控；資安研究用途可能需信任存取。"
+      }
+    ]
+  },
+  "breakingChanges": [
+    {
+      "title": "effort 不支援 none / minimal",
+      "detail": "OpenAI migration guide：Astra 不支援 none，原本用 minimal 者從 low 開始。",
+      "migration": "預設用 low 或 medium；gateway 的 auto router 不可把 none 帶給 Astra。",
+      "severity": "high",
+      "sources": [
+        {
+          "id": "openai-latest-model-guide"
+        }
+      ]
+    },
+    {
+      "title": "reasoning 時不收取樣參數",
+      "detail": "需移除 temperature、top_p、top_logprobs；Chat Completions 另需移除 logprobs。Bedrock 路徑經 LiteLLM 仍會把 temperature 送出而被拒。",
+      "migration": "client 不送；gateway 設 additional_drop_params: [\"temperature\"]；評測框架改設定。",
+      "severity": "high",
+      "sources": [
+        {
+          "id": "openai-latest-model-guide"
+        },
+        {
+          "id": "opik-8524"
+        },
+        {
+          "id": "trulens-2815"
+        }
+      ]
+    },
+    {
+      "title": "工具呼叫要 Responses API",
+      "detail": "Chat Completions 只支援基本 function calling。",
+      "migration": "代理應用改走 gateway 的 /v1/responses。",
+      "severity": "high",
+      "sources": [
+        {
+          "id": "openai-latest-model-guide"
+        }
+      ]
+    },
+    {
+      "title": "Prompt caching 參數改名",
+      "detail": "prompt_cache_retention 改為 prompt_cache_options.ttl（\"30m\"）。",
+      "migration": "更新 SDK 呼叫；確認 cache 寫入計費。",
+      "severity": "medium",
+      "sources": [
+        {
+          "id": "openai-latest-model-guide"
+        }
+      ]
+    },
+    {
+      "title": "對 skills / context 檔更敏感",
+      "detail": "可能因 AGENTS.md 等檔案中的衝突指示而暫停等待核准。",
+      "migration": "稽核 AGENTS.md 與 skill 檔，移除互相衝突的指示。",
+      "severity": "medium",
+      "sources": [
+        {
+          "id": "openai-latest-model-guide"
+        }
+      ]
+    },
+    {
+      "title": "Bedrock 特有限制",
+      "detail": "必須用 us.* / global.* profile；runtime 不支援 structured outputs 與 count tokens；server-side tools 與 caching 只在 us-west-2 的 bedrock-mantle；output token 以 10 倍計入 TPM。",
+      "migration": "依用途選 endpoint；配額以 input + 10×output 估算。",
+      "severity": "medium",
+      "sources": [
+        {
+          "id": "aws-bedrock-astra-card"
+        }
+      ]
+    }
+  ],
+  "availabilityMatrix": [
+    {
+      "cloud": "azure",
+      "service": "foundry",
+      "status": "ga",
+      "notes": "Global Standard（APAC：Japan East、Korea Central、Australia East、South India）、US/EU Data Zone、Provisioned。"
+    },
+    {
+      "cloud": "aws",
+      "service": "bedrock",
+      "status": "ga",
+      "notes": "US geo、Global；mantle 只在 us-west-2；台北區不在清單。"
+    },
+    {
+      "cloud": "gcp",
+      "service": "agent-platform",
+      "status": "not-offered",
+      "notes": "Agent Platform 只提供 gpt-oss。"
+    },
+    {
+      "cloud": "vendor-direct",
+      "service": "openai-api",
+      "status": "ga",
+      "notes": "Batch / Flex 半價、Fast mode 2 倍價。"
+    }
+  ],
+  "apiCompatibility": [
+    {
+      "route": "gpt-6-astra@foundry（/openai/v1）",
+      "surface": "Responses",
+      "status": "supported"
+    },
+    {
+      "route": "gpt-6-astra@foundry（/openai/v1）",
+      "surface": "Chat Completions",
+      "status": "partial",
+      "note": "僅基本 function calling"
+    },
+    {
+      "route": "gpt-6-astra@bedrock（bedrock-runtime）",
+      "surface": "Responses",
+      "status": "partial",
+      "note": "同步、無 server-side tools"
+    },
+    {
+      "route": "gpt-6-astra@bedrock（bedrock-runtime）",
+      "surface": "Chat Completions / Converse",
+      "status": "supported",
+      "note": "Guardrails 只在 Converse"
+    },
+    {
+      "route": "gpt-6-astra@bedrock（bedrock-mantle, us-west-2）",
+      "surface": "Responses（server-side tools、caching）",
+      "status": "supported"
+    },
+    {
+      "route": "gpt-6-astra@bedrock",
+      "surface": "Structured outputs",
+      "status": "not-supported",
+      "note": "bedrock-runtime"
+    },
+    {
+      "route": "Google Cloud",
+      "surface": "全部",
+      "status": "not-supported",
+      "note": "未上架"
+    }
+  ],
+  "strengths": [
+    "AA Intelligence Index v4.3.2 53 分（max，#6/210），且 token 用量相對精簡（60M，中位數 88M）。",
+    "代理與科學任務強：Terminal-Bench-Science 0.1 64.6%、AutomationBench 41.4%（OpenAI 自報，引自 Anthropic 比較表）。",
+    "1.05M context、128K output；Azure 提供 Global、US/EU Data Zone 與 Provisioned Throughput。",
+    "OpenAI 稱為至今最對齊的模型：高嚴重度 misalignment 旗標約為前代一半，prompt injection 抵抗力明顯提升。",
+    "Bedrock 與 Azure 的 Global 價格與 OpenAI 一方價一致，可計入既有雲端承諾。"
+  ],
+  "weaknesses": [
+    "最貴：Global $10/$50；Data Zone / In-Region +10%（Azure EU Data Zone +20%）；長文 $20/$75。",
+    "慢：AA 測得 52.5 tok/s；max effort 的首答 token 約 352 秒。",
+    "工具呼叫要走 Responses API；Chat Completions 只支援基本 function calling；不支援 effort=none 與 temperature。",
+    "資安能力 Critical：監控更嚴；資安研究工作可能需要 Trusted Access for Cyber。",
+    "Bedrock：bedrock-mantle 只在 us-west-2；APAC 只有 Global CRIS，台北區不在模型卡清單；runtime 不支援 structured outputs；output token 以 10 倍計入 TPM 配額。",
+    "不支援 fine-tuning；Google Cloud 未上架。"
+  ],
+  "bestFor": [
+    "最高難度、需要判斷力的長時程代理任務",
+    "電腦 / 瀏覽器操作自動化",
+    "需要 1M context 的大型文件分析、研究與正式文件產出",
+    "已有 Azure 或 AWS 承諾額度、需要 OpenAI 旗艦的團隊"
+  ],
+  "avoidFor": [
+    "高併發、延遲敏感的對話",
+    "大量例行工作（改用 GPT-6 Sol / Luna）",
+    "必須部署在 Google Cloud 的工作負載",
+    "尚未改寫成 Responses API、仍依賴 Chat Completions + tools 或 temperature 的舊程式"
+  ],
+  "safetyAndCompliance": [
+    {
+      "item": "Preparedness：Cyber = Critical",
+      "detail": "首個達 Critical 的模型；可在無人介入下開發 exploit 鏈。代理類使用需最小權限與人工關卡。",
+      "sources": [
+        {
+          "id": "infoq-astra-critical"
+        }
+      ]
+    },
+    {
+      "item": "CoT 可監控性下降",
+      "detail": "system card 指出 Astra 較能控制自身 CoT、較少暴露不當意圖。依賴 CoT 監控的安全機制效果下降，需搭配行為監控。",
+      "sources": [
+        {
+          "id": "infoq-astra-critical"
+        }
+      ]
+    },
+    {
+      "item": "對齊",
+      "detail": "高嚴重度 misalignment 旗標約為前代一半；prompt injection 抵抗力明顯提升。",
+      "sources": [
+        {
+          "id": "infoq-astra-critical"
+        }
+      ]
+    },
+    {
+      "item": "資料處理（Bedrock）",
+      "detail": "推論資料不用於訓練、不需同意與 OpenAI 分享；Bedrock 模型卡列 abuse detection。",
+      "sources": [
+        {
+          "id": "aws-astra-whatsnew"
+        },
+        {
+          "id": "aws-bedrock-astra-card"
+        }
+      ]
+    },
+    {
+      "item": "Microsoft 建議控制",
+      "detail": "限縮憑證範圍、核准資源、重大動作設人工檢查點、保留活動紀錄；平台控制不取代組織自身責任。",
+      "sources": [
+        {
+          "id": "infoq-astra-critical"
+        }
+      ]
+    }
+  ],
+  "enterpriseNotes": [
+    "資料駐留：Azure APAC 只能 Global Standard（資料可能在任意區域處理），Data Zone 只有 US / EU；Bedrock APAC 只有 Global CRIS，且台北區不在清單。",
+    "成本：三雲最貴；>272K 輸入改長文價（$20 / $75）；Azure EU Data Zone +20%。建議只放在 tier/frontier 並設團隊預算。",
+    "金融業：代理 + computer use 的情境直接對應金管會對代理 AI 的要求（權限邊界、稽核軌跡、中止與回滾）。",
+    "容量：Bedrock output token 以 10 倍計入 TPM；Azure 初期 Limited Access、Tier 1 配額僅 1,000 RPM / 1M TPM（Global Standard）。"
+  ],
+  "testPlanFocus": [
+    "Chat Completions → Responses 遷移的回歸（含工具呼叫與串流）。",
+    "effort low / medium / high 的 TTFAT 與品質；max effort 首答可能數分鐘。",
+    ">272K 輸入的延遲與長文價觸發（成本試算）。",
+    "Bedrock 的 10× output 燒耗：在配額內能跑到的最大併發。",
+    "computer use / 代理的沙箱與越權測試（SEC-06、SEC-15）與間接 prompt injection（SEC-02）。",
+    "Bedrock 路徑的 temperature 丟棄設定（compat suite: params.temperature）。"
+  ],
+  "onboarding": {
+    "audience": "需要最強 OpenAI 模型的代理/研究類應用團隊",
+    "prerequisites": [
+      "gateway key 在 gpt-6-astra 允許清單中（需 FinOps 核准預算）",
+      "應用改用 Responses API（若需工具呼叫）",
+      "移除 temperature / top_p 與 effort=none"
+    ],
+    "steps": [
+      {
+        "title": "申請與預算",
+        "detail": "在 portal 申請並填寫預估流量；Astra 需團隊預算上限。"
+      },
+      {
+        "title": "選路由",
+        "detail": "預設 gpt-6-astra（Azure Global Standard）；AWS 專案用 gpt-6-astra@bedrock（global）。"
+      },
+      {
+        "title": "改用 Responses API",
+        "detail": "工具呼叫走 /v1/responses；只需文字回覆可用 /v1/chat/completions。"
+      },
+      {
+        "title": "設定 effort",
+        "detail": "low | medium | high | xhigh | max；互動用途不建議 high 以上。"
+      },
+      {
+        "title": "監控成本",
+        "detail": "注意 >272K 長文價；啟用 prompt caching（Azure 或 Bedrock mantle）。"
+      }
+    ],
+    "aliases": [
+      {
+        "alias": "gpt-6-astra",
+        "target": "azure/<gpt-6-astra deployment>（Global Standard）",
+        "note": "預設路由"
+      },
+      {
+        "alias": "gpt-6-astra@bedrock",
+        "target": "bedrock/converse/global.openai.gpt-6-astra"
+      },
+      {
+        "alias": "gpt-6-astra@azure-us",
+        "target": "azure/<US Data Zone deployment>",
+        "note": "美國境內處理"
+      }
+    ],
+    "parameterGuidance": [
+      {
+        "parameter": "reasoning_effort / reasoning.effort",
+        "guidance": "low | medium | high | xhigh | max；沒有 none。"
+      },
+      {
+        "parameter": "temperature / top_p / logprobs",
+        "guidance": "不要送（reasoning 模型拒收）。"
+      },
+      {
+        "parameter": "max_tokens",
+        "guidance": "改用 max_completion_tokens（Chat Completions）或 max_output_tokens（Responses）。"
+      },
+      {
+        "parameter": "tools",
+        "guidance": "用 Responses API；Chat Completions 只支援基本 function calling。"
+      },
+      {
+        "parameter": "prompt_cache_options.ttl",
+        "guidance": "取代 prompt_cache_retention，值為 \"30m\"。"
+      }
+    ],
+    "codeSamples": [
+      {
+        "lang": "python",
+        "title": "Responses API + function tool（經 gateway）",
+        "code": "import os\nfrom openai import OpenAI\n\nclient = OpenAI(base_url=\"https://llm-gateway.example.internal/v1\", api_key=os.environ[\"LITELLM_API_KEY\"])\n\nresp = client.responses.create(\n    model=\"gpt-6-astra\",\n    reasoning={\"effort\": \"medium\"},  # low | medium | high | xhigh | max（沒有 none）\n    tools=[{\n        \"type\": \"function\",\n        \"name\": \"get_order_status\",\n        \"description\": \"查詢訂單狀態\",\n        \"parameters\": {\n            \"type\": \"object\",\n            \"properties\": {\"order_id\": {\"type\": \"string\"}},\n            \"required\": [\"order_id\"],\n        },\n    }],\n    input=\"訂單 A123 目前的狀態？\",\n)\nfor item in resp.output:\n    if item.type == \"function_call\":\n        print(item.name, item.arguments)\n"
+      },
+      {
+        "lang": "bash",
+        "title": "curl（Chat Completions、無工具）",
+        "code": "curl -sS https://llm-gateway.example.internal/v1/chat/completions \\\n  -H \"Authorization: Bearer $LITELLM_API_KEY\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"model\": \"gpt-6-astra\",\n    \"reasoning_effort\": \"low\",\n    \"max_completion_tokens\": 4000,\n    \"messages\": [{\"role\": \"user\", \"content\": \"用三點摘要這次變更的風險。\"}]\n  }'"
+      },
+      {
+        "lang": "yaml",
+        "title": "LiteLLM 設定",
+        "code": "model_list:\n  - model_name: gpt-6-astra\n    litellm_params:\n      model: azure/gpt-6-astra            # Azure 部署名稱\n      api_base: os.environ/AZURE_OPENAI_API_BASE\n      api_key: os.environ/AZURE_OPENAI_API_KEY\n      api_version: \"v1\"                 # v1 GA API；請以你的 LiteLLM 版本驗證\n    model_info: {catalog_id: gpt-6-astra, data_residency: global}\n  - model_name: gpt-6-astra@bedrock\n    litellm_params:\n      model: bedrock/converse/global.openai.gpt-6-astra\n      aws_region_name: ap-northeast-1     # 台北區不在清單\n      additional_drop_params: [\"temperature\"]\n    model_info: {catalog_id: gpt-6-astra, data_residency: global}\n"
+      }
+    ],
+    "dataClassification": "範例政策：公開/內部資料可用任一已核准路由；機密資料只可用明確限定處理地的路由（例：Bedrock JP geo）並經法務核准；極機密資料不開放（三雲皆無台灣境內處理選項）。請依公司資料分級規範調整。",
+    "support": "Slack #llm-platform；每週四 14:00 office hour（範例，請改成你們的窗口）"
+  },
+  "openQuestions": [
+    "Azure 官方退役表何時列入 gpt-6-astra？",
+    "Bedrock 上 Astra 的資料保留與 ZDR 條件（Sol/Luna 公告為最多 30 天、ZDR 需申請）？",
+    "LiteLLM /v1/responses → Bedrock runtime Responses（同步、無 server tools）的工具呼叫行為？",
+    "APAC 何時會有 Data Zone？"
+  ],
+  "sources": [
+    {
+      "id": "openai-models"
+    },
+    {
+      "id": "openai-latest-model-guide"
+    },
+    {
+      "id": "openai-astra-systemcard"
+    },
+    {
+      "id": "aws-bedrock-astra-card"
+    },
+    {
+      "id": "ms-foundry-gpt6-blog"
+    },
+    {
+      "id": "aa-astra"
+    },
+    {
+      "id": "litellm-astra"
+    },
+    {
+      "id": "infoq-astra-critical"
+    },
+    {
+      "id": "apidog-astra"
+    },
+    {
+      "id": "opik-8524"
+    },
+    {
+      "id": "trulens-2815"
+    },
+    {
+      "id": "google-agentplatform-openai"
+    }
+  ]
+}

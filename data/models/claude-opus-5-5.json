@@ -1,0 +1,535 @@
+{
+  "schema": "deep-dive/v1",
+  "modelId": "claude-opus-5-5",
+  "title": "Claude Opus 5.5 技術深度解析",
+  "locale": "zh-TW",
+  "asOf": "2026-09-24",
+  "tldr": "Opus 5.5 是目前 AA 智慧指數最高的模型（58），價格比 Opus 5 低 20%、典型任務成本低約 40%，三雲同日 GA。但它是「行為變更很多」的升級：thinking 永遠開啟、預設 effort 由 high 改 medium、forced tool_choice 回 400、資安請求多數被改路由到 Opus 4.8、Bedrock 上沒有 structured outputs。先修程式，再做回歸，最後才切 alias。",
+  "whatsNew": [
+    {
+      "title": "Fable 5.1 等級的能力",
+      "detail": "官方稱多數工作達 Fable 5.1 水準：Terminal-Bench 4.0 66.4%（xhigh）、FrontierCode 54.4%、CursorBench 57.8%、GDPval-AA 1846、OSWorld 2.0 81.8%。官方也提醒這個能力區間 benchmark 差距已不太能代表實際差異。",
+      "sources": [
+        {
+          "id": "anthropic-opus55-announce"
+        }
+      ]
+    },
+    {
+      "title": "更便宜、更快",
+      "detail": "$4 / $20（-20%）、cache read $0.20（-60%）、cache 寫入 5 分鐘 $5 / 1 小時 $8；Batch 五折；輸出速度比 Opus 5 快 30% 以上；每任務 token 更少，典型負載總成本 -40%。",
+      "sources": [
+        {
+          "id": "anthropic-opus55-announce"
+        },
+        {
+          "id": "anthropic-opus55-whatsnew"
+        }
+      ]
+    },
+    {
+      "title": "對齊與 prompt injection",
+      "detail": "近 2,000 個情境的行為稽核分數為歷來最佳；越界（containment boundary）嘗試比 Opus 5 或 Mythos 5.1 少約 85%；Gray Swan prompt injection 測試與 Fable 5.1 並列最低攻擊成功率。",
+      "sources": [
+        {
+          "id": "anthropic-opus55-announce"
+        }
+      ]
+    },
+    {
+      "title": "Fable 等級的 safeguards",
+      "detail": "首個帶 cyber、bio、distillation safeguards 的 Opus；觸發時透明改由其他模型完成（資安 → Opus 4.8；生物與前沿 LLM 開發 → Opus 5）。",
+      "sources": [
+        {
+          "id": "anthropic-opus55-announce"
+        }
+      ]
+    },
+    {
+      "title": "溝通風格",
+      "detail": "結論先行、少術語、會遵守你給的寫作規則；長時段協作更好追蹤。",
+      "sources": [
+        {
+          "id": "anthropic-opus55-announce"
+        }
+      ]
+    },
+    {
+      "title": "新 API 能力（beta）",
+      "detail": "per-message effort、訊息內定義工具（inline-tools-2026-09-15）、compaction on demand（compact-2026-09-04）；Fast mode（Claude API 限定，$8 / $40）。",
+      "sources": [
+        {
+          "id": "anthropic-opus55-whatsnew"
+        }
+      ]
+    }
+  ],
+  "vsPredecessor": {
+    "predecessorId": "claude-opus-5",
+    "changes": [
+      {
+        "area": "單價",
+        "before": "$5 / $25",
+        "after": "$4 / $20",
+        "impact": "每 token 便宜 20%，加上 token 用量下降，典型任務約 -40%。"
+      },
+      {
+        "area": "Cache read",
+        "before": "$0.50",
+        "after": "$0.20",
+        "impact": "代理與程式工作（多為 cache read）受益最大。"
+      },
+      {
+        "area": "預設 effort",
+        "before": "high",
+        "after": "medium",
+        "impact": "沒指定 effort 的請求變快變便宜，但可能想得不夠——必須明確設定並重跑 effort sweep。"
+      },
+      {
+        "area": "Thinking",
+        "before": "預設開啟",
+        "after": "永遠開啟，disabled / budget_tokens 回 400",
+        "impact": "舊程式若送 thinking 參數會失敗。"
+      },
+      {
+        "area": "tool_choice any / tool",
+        "before": "支援",
+        "after": "400",
+        "impact": "依賴強制工具呼叫的流程需改用 strict tool use。"
+      },
+      {
+        "area": "工具呼叫之間的進度文字",
+        "before": "text block",
+        "after": "progress-update thinking block",
+        "impact": "display 預設 omitted 時，串流 UI 在工具呼叫之間會變安靜。"
+      },
+      {
+        "area": "Computer use 工具版本（Claude API / GCP）",
+        "before": "computer_20251124",
+        "after": "computer_toolset_20260801",
+        "impact": "GCP 上的 computer use 代理需改工具定義；Bedrock 不變。"
+      },
+      {
+        "area": "Safeguards",
+        "before": "cyber classifier",
+        "after": "cyber + bio + distillation，含透明 fallback",
+        "impact": "安全團隊的請求結果會來自其他模型。"
+      }
+    ]
+  },
+  "breakingChanges": [
+    {
+      "title": "Thinking 無法關閉",
+      "detail": "thinking.type=disabled 或 enabled+budget_tokens 回 400。",
+      "migration": "省略 thinking 或送 adaptive，用 effort 控制深度（預設 medium）。",
+      "severity": "high",
+      "sources": [
+        {
+          "id": "anthropic-opus55-whatsnew"
+        }
+      ]
+    },
+    {
+      "title": "不支援 forced tool use",
+      "detail": "tool_choice {type: any} 與 {type: tool} 回 400；經 LiteLLM 且 drop_params 開啟時會被靜默改成 auto。",
+      "migration": "改用 tool_choice auto + strict tool use；Claude API 可用 structured outputs（Bedrock 不支援）。compat suite 要斷言確實有 tool call。",
+      "severity": "high",
+      "sources": [
+        {
+          "id": "anthropic-opus55-whatsnew"
+        },
+        {
+          "id": "litellm-opus55"
+        }
+      ]
+    },
+    {
+      "title": "Thinking block 綁定模型與對話前綴",
+      "detail": "換模型後先前的推理會被丟棄；2026-08-31 之後建立的帳號，若 system prompt、tools 或先前訊息被改動會回 400（prefix mismatch）。",
+      "migration": "對話保持 append-only；需要改指示時用 mid-conversation system message；必要時用 thinking-binding-controls-2026-08-01 beta 改為 drop_block。",
+      "severity": "medium",
+      "sources": [
+        {
+          "id": "anthropic-opus55-whatsnew"
+        }
+      ]
+    },
+    {
+      "title": "computer_20251124 在 Claude API 與 Google Cloud 被拒",
+      "detail": "回 400：does not support tool types: computer_20251124。",
+      "migration": "改用 computer_toolset_20260801 並調整 agent loop；Bedrock 可繼續用舊版。",
+      "severity": "medium",
+      "sources": [
+        {
+          "id": "anthropic-opus55-whatsnew"
+        }
+      ]
+    },
+    {
+      "title": "預設 effort 改為 medium",
+      "detail": "同 effort 下思考量也比 Opus 5 多。",
+      "migration": "明確設定 effort，重跑 effort sweep 並加大 max_tokens。",
+      "severity": "medium",
+      "sources": [
+        {
+          "id": "anthropic-opus55-whatsnew"
+        },
+        {
+          "id": "litellm-opus55"
+        }
+      ]
+    },
+    {
+      "title": "工具之間的進度訊息改為 thinking block",
+      "detail": "display 為 omitted 時不會出現在回應文字中。",
+      "migration": "需要顯示進度的 UI 把 thinking.display 設為 partial 或 full。",
+      "severity": "low",
+      "sources": [
+        {
+          "id": "anthropic-opus55-whatsnew"
+        }
+      ]
+    }
+  ],
+  "availabilityMatrix": [
+    {
+      "cloud": "aws",
+      "service": "bedrock",
+      "status": "ga",
+      "notes": "geo：us / eu / au / jp；global；台北區僅 global。"
+    },
+    {
+      "cloud": "gcp",
+      "service": "agent-platform",
+      "status": "ga",
+      "notes": "global、us / eu multi-region。"
+    },
+    {
+      "cloud": "azure",
+      "service": "foundry",
+      "status": "ga",
+      "notes": "Global Standard、US Data Zone（Hosted on Azure）。"
+    },
+    {
+      "cloud": "vendor-direct",
+      "service": "anthropic-api",
+      "status": "ga",
+      "notes": "唯一支援 Fast mode 的通路。"
+    }
+  ],
+  "apiCompatibility": [
+    {
+      "route": "claude-opus-5-5@bedrock（bedrock-runtime）",
+      "surface": "Anthropic Messages / Converse / Invoke",
+      "status": "supported"
+    },
+    {
+      "route": "claude-opus-5-5@bedrock（bedrock-runtime）",
+      "surface": "OpenAI Chat Completions / Responses（原生）",
+      "status": "not-supported",
+      "note": "經 LiteLLM 轉譯可用"
+    },
+    {
+      "route": "claude-opus-5-5@bedrock",
+      "surface": "Structured outputs",
+      "status": "not-supported"
+    },
+    {
+      "route": "claude-opus-5-5@agent-platform",
+      "surface": "Anthropic Messages（rawPredict）",
+      "status": "supported"
+    },
+    {
+      "route": "claude-opus-5-5@agent-platform",
+      "surface": "OpenAI 相容 /chat/completions（原生）",
+      "status": "not-supported",
+      "note": "經 LiteLLM 轉譯可用"
+    },
+    {
+      "route": "claude-opus-5-5@foundry",
+      "surface": "Anthropic Messages（/anthropic）",
+      "status": "supported"
+    },
+    {
+      "route": "claude-opus-5-5@foundry",
+      "surface": "/openai/v1（原生）",
+      "status": "not-supported",
+      "note": "經 LiteLLM 轉譯可用"
+    },
+    {
+      "route": "LiteLLM gateway",
+      "surface": "/v1/chat/completions、/v1/messages",
+      "status": "supported",
+      "note": "Day-0 支援"
+    },
+    {
+      "route": "LiteLLM gateway",
+      "surface": "/v1/responses",
+      "status": "unknown",
+      "note": "以 compat suite 驗證 Anthropic 模型的 Responses 轉譯"
+    }
+  ],
+  "strengths": [
+    "代理式程式與知識工作領先：Terminal-Bench 4.0 66.4%（xhigh）、GDPval-AA v2.1 1846 Elo、OSWorld 2.0 81.8%（廠商自評）。",
+    "Artificial Analysis Intelligence Index v4.3.2 得 58 分，同級 210 個模型中排名第 1（max effort，含預設 fallback）。",
+    "成本效率：單價比 Opus 5 低 20%，cache read $0.20（-60%）；官方稱典型負載總成本 -40%、輸出速度 +30%。",
+    "Prompt injection 抵抗力：Gray Swan 測試中與 Fable 5.1 並列攻擊成功率最低；行為稽核分數為歷來最佳。",
+    "三雲同日 GA；Anthropic 與 Bedrock 皆標示退役不早於 2027-09-22。",
+    "1M context 無長文加價；prompt caching 最低 512 tokens、4 個 checkpoint、TTL 5 分鐘或 1 小時。"
+  ],
+  "weaknesses": [
+    "Thinking 永遠開啟、無法關閉；延遲敏感的簡單任務要用 effort=low 或改用較小模型。",
+    "資安類請求多數被透明改路由到 Opus 4.8、生物與前沿 LLM 開發類改由 Opus 5 完成；安全團隊拿到的結果與一般工作不一致。",
+    "產出偏長：AA 評測共產生 260M output tokens（中位數 88M），務必以「每任務成本」比較。",
+    "Bedrock 上不支援 structured outputs，也沒有 Priority/Flex/Batch/Reserved 服務層；Fast mode 只在 Claude API。",
+    "沒有台灣境內處理選項：Bedrock 台北（ap-east-2）只有 Global CRIS；最接近的是 JP geo（東京/大阪）。",
+    "System card 指出最多 36% 的稽核對話中模型察覺自己正在受測（evaluation awareness），評測結果需保守解讀。"
+  ],
+  "bestFor": [
+    "大型 codebase 遷移、重構、code review 與長時間無人值守的代理任務",
+    "財務、法律、顧問類知識工作與需要可追溯引用的研究報告",
+    "需要清楚、結論先行寫作風格的長時段協作",
+    "computer use / 多工具代理流程"
+  ],
+  "avoidFor": [
+    "低延遲即時對話（always-on thinking 會墊高首 token 延遲）",
+    "大量簡單分類/擷取（改用 GPT-6 Luna、Gemini 3.8 Flash 或 Haiku 等級）",
+    "資安研究、滲透測試類工作（會被改路由；需申請 Cyber Verification Program）",
+    "仍依賴 forced tool_choice、關閉 thinking 或 temperature 的既有程式（需先改寫）"
+  ],
+  "safetyAndCompliance": [
+    {
+      "item": "RSP 分級",
+      "detail": "生物 CB-1（未達 CB-2）；以與 Fable 5 / 5.1 相同的強化生物 safeguards 部署。",
+      "sources": [
+        {
+          "id": "anthropic-opus55-systemcard"
+        }
+      ]
+    },
+    {
+      "item": "評測覺察",
+      "detail": "最多 36% 的稽核對話中模型察覺自己在受測；官方明言長軌跡與多代理情境覆蓋不足。內部安全測試結果應保守解讀並持續監控正式流量。",
+      "sources": [
+        {
+          "id": "anthropic-opus55-systemcard"
+        }
+      ]
+    },
+    {
+      "item": "Safeguard fallback",
+      "detail": "資安類任務多數由 Opus 4.8 完成；拒答以 HTTP 200 + stop_reason: refusal 回傳，新增 reasoning_extraction 類別。",
+      "sources": [
+        {
+          "id": "anthropic-opus55-announce"
+        },
+        {
+          "id": "anthropic-opus55-whatsnew"
+        }
+      ]
+    },
+    {
+      "item": "EU AI Act 浮水印",
+      "detail": "輸出含浮水印以符合 EU AI Act；若有歐盟業務可作為第 50 條揭露的一環（仍需自行標示）。",
+      "sources": [
+        {
+          "id": "anthropic-opus55-announce"
+        },
+        {
+          "id": "eu-ai-act-omnibus"
+        }
+      ]
+    },
+    {
+      "item": "資料保留",
+      "detail": "可提供 ZDR；Foundry 上由 Anthropic 為獨立資料處理者，保留依 Anthropic DPA；Bedrock 與 Agent Platform 依各 CSP 條款。",
+      "sources": [
+        {
+          "id": "anthropic-opus55-announce"
+        },
+        {
+          "id": "ms-foundry-claude-hosting"
+        }
+      ]
+    },
+    {
+      "item": "Preserved thinking（反蒸餾）",
+      "detail": "2026-08-31 之後建立的 API 帳號預設啟用；修改先前 context 的應用（例如自行摘要歷史、改寫 system prompt）需調整。",
+      "sources": [
+        {
+          "id": "anthropic-opus55-announce"
+        },
+        {
+          "id": "anthropic-opus55-whatsnew"
+        }
+      ]
+    }
+  ],
+  "enterpriseNotes": [
+    "資料駐留：三雲都沒有台灣境內處理。Bedrock 台北區（ap-east-2）只能用 global.*；需日本境內處理用 jp.*（client 設在 ap-northeast-1/3）；Agent Platform 為 global / us / eu；Foundry 為 Global / US Data Zone。",
+    "金融業：依金管會 2026-05 對代理 AI 的方向，Opus 5 → 5.5（含預設 effort 變更）屬模型升版，應納入變更管理並保存回歸證據。",
+    "資安團隊（SOC、紅隊）用途會被改路由到 Opus 4.8；如需完整能力要申請 Cyber Verification Program，或評估其他模型。",
+    "繁中：官方未公布繁中基準；以內部 golden set 檢查簡體字混入、兩岸用語與台灣法規知識，並量測每千字 token 數。",
+    "成本：牌價下降，但 AA 評測 output tokens 偏多（260M）；以你們的代表任務量測每任務成本再決定預設 effort。"
+  ],
+  "testPlanFocus": [
+    "Effort sweep（low / medium / high / xhigh）× 品質（golden set）× TTFAT / TTLT。",
+    "forced tool_choice 與 strict tool use 的回歸；確認有 tool call 而不是只有成功回應。",
+    "資安/生物相關業務樣本的拒答率與 fallback 率（記錄 response.model 與 stop_reason）。",
+    "會改寫對話歷史的應用（記憶、摘要）是否觸發 prefix mismatch 400。",
+    "Bedrock 上依賴 JSON schema 的應用（structured outputs 不支援）。",
+    "跨雲 fallback（Bedrock → Agent Platform → Foundry）的輸出一致性與延遲。",
+    "繁中品質與 token 效率 vs Opus 5。"
+  ],
+  "onboarding": {
+    "audience": "透過公司 LiteLLM gateway 呼叫的應用開發團隊",
+    "prerequisites": [
+      "已透過 SSO 取得 gateway virtual key，且團隊在 claude-opus-5-5 的允許清單中（beta 期間需申請）。",
+      "確認資料等級與可用路由（見資料分級說明）。",
+      "程式已移除 thinking disabled / budget_tokens、forced tool_choice、temperature / top_p。"
+    ],
+    "steps": [
+      {
+        "title": "申請存取",
+        "detail": "在 portal 的模型頁按「申請 beta」，填用途與資料等級。"
+      },
+      {
+        "title": "選路由",
+        "detail": "一般用途用 claude-opus-5-5（預設 Bedrock global）；需日本境內處理用 claude-opus-5-5@bedrock-jp；GCP 專案用 @vertex；Azure 專案用 @azure。"
+      },
+      {
+        "title": "設定 effort",
+        "detail": "明確帶 reasoning_effort（Messages API 為 output_config.effort）；互動用途從 low 或 medium 開始。"
+      },
+      {
+        "title": "預留 max_tokens",
+        "detail": "thinking 計入輸出；xhigh / max 需要更大的 max_tokens。"
+      },
+      {
+        "title": "處理拒答與 fallback",
+        "detail": "記錄 finish_reason / stop_reason 與 response.model；stop_reason=refusal 時依 stop_details 決定是否改用其他模型。"
+      },
+      {
+        "title": "跑回歸",
+        "detail": "用你的 golden set 對照現役模型，結果附在申請單上。"
+      }
+    ],
+    "aliases": [
+      {
+        "alias": "claude-opus-5-5",
+        "target": "bedrock/global.anthropic.claude-opus-5-5",
+        "note": "預設路由"
+      },
+      {
+        "alias": "claude-opus-5-5@bedrock-jp",
+        "target": "bedrock/jp.anthropic.claude-opus-5-5",
+        "note": "日本境內處理"
+      },
+      {
+        "alias": "claude-opus-5-5@vertex",
+        "target": "vertex_ai/claude-opus-5-5（global）"
+      },
+      {
+        "alias": "claude-opus-5-5@azure",
+        "target": "azure_ai/claude-opus-5-5"
+      },
+      {
+        "alias": "tier/frontier",
+        "target": "GA 後指向 claude-opus-5-5",
+        "note": "能力層 alias，平台升級時會改指向"
+      }
+    ],
+    "parameterGuidance": [
+      {
+        "parameter": "reasoning_effort / output_config.effort",
+        "guidance": "low | medium（預設）| high | xhigh | max。"
+      },
+      {
+        "parameter": "thinking",
+        "guidance": "不要送 disabled 或 budget_tokens（400）；可省略或送 adaptive。"
+      },
+      {
+        "parameter": "tool_choice",
+        "guidance": "只用 auto 或 none；需要保證呼叫工具時用 strict tool use。"
+      },
+      {
+        "parameter": "temperature / top_p / top_k",
+        "guidance": "不要送；gateway 已開 drop_params，但請不要依賴。"
+      },
+      {
+        "parameter": "max_tokens",
+        "guidance": "包含 thinking；依 effort 預留空間。"
+      },
+      {
+        "parameter": "speed: fast",
+        "guidance": "僅 Claude API 支援；本平台的 CSP 路由不支援。"
+      }
+    ],
+    "codeSamples": [
+      {
+        "lang": "bash",
+        "title": "curl（OpenAI 相容，經 gateway）",
+        "code": "curl -sS https://llm-gateway.example.internal/v1/chat/completions \\\n  -H \"Authorization: Bearer $LITELLM_API_KEY\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"model\": \"claude-opus-5-5\",\n    \"reasoning_effort\": \"medium\",\n    \"max_tokens\": 8000,\n    \"messages\": [{\"role\": \"user\", \"content\": \"用三點摘要這次變更的風險。\"}]\n  }'"
+      },
+      {
+        "lang": "python",
+        "title": "OpenAI SDK（經 gateway）",
+        "code": "import os\nfrom openai import OpenAI\n\nclient = OpenAI(base_url=\"https://llm-gateway.example.internal/v1\", api_key=os.environ[\"LITELLM_API_KEY\"])\n\nresp = client.chat.completions.create(\n    model=\"claude-opus-5-5\",\n    reasoning_effort=\"medium\",  # low | medium | high | xhigh | max\n    max_tokens=8000,             # 含 thinking\n    messages=[{\"role\": \"user\", \"content\": \"用三點摘要這次變更的風險。\"}],\n)\nchoice = resp.choices[0]\n# 記錄實際回應模型：safeguard 介入時可能不是 Opus 5.5\nprint(resp.model, choice.finish_reason)\nprint(choice.message.content)\n"
+      },
+      {
+        "lang": "python",
+        "title": "Anthropic SDK（經 gateway 的 /v1/messages）",
+        "code": "import os\nfrom anthropic import Anthropic\n\nclient = Anthropic(base_url=\"https://llm-gateway.example.internal\", auth_token=os.environ[\"LITELLM_API_KEY\"])\n\nmsg = client.messages.create(\n    model=\"claude-opus-5-5\",\n    max_tokens=8000,\n    extra_body={\"output_config\": {\"effort\": \"medium\"}},\n    messages=[{\"role\": \"user\", \"content\": \"用三點摘要這次變更的風險。\"}],\n)\nif msg.stop_reason == \"refusal\":\n    print(\"refused:\", getattr(msg, \"stop_details\", None))\nelse:\n    print(msg.content[-1].text)\n"
+      },
+      {
+        "lang": "yaml",
+        "title": "LiteLLM 設定（四條路由 + 同模型跨雲 fallback）",
+        "code": "model_list:\n  - model_name: claude-opus-5-5\n    litellm_params:\n      model: bedrock/global.anthropic.claude-opus-5-5\n      aws_region_name: ap-east-2\n    model_info: {catalog_id: claude-opus-5-5, data_residency: global}\n  - model_name: claude-opus-5-5@bedrock-jp\n    litellm_params:\n      model: bedrock/jp.anthropic.claude-opus-5-5\n      aws_region_name: ap-northeast-1\n    model_info: {catalog_id: claude-opus-5-5, data_residency: jp}\n  - model_name: claude-opus-5-5@vertex\n    litellm_params:\n      model: vertex_ai/claude-opus-5-5\n      vertex_project: os.environ/VERTEX_PROJECT\n      vertex_location: global\n    model_info: {catalog_id: claude-opus-5-5, data_residency: global}\n  - model_name: claude-opus-5-5@azure\n    litellm_params:\n      model: azure_ai/claude-opus-5-5\n      api_base: os.environ/AZURE_AI_CLAUDE_API_BASE  # https://<resource>.services.ai.azure.com/anthropic\n      api_key: os.environ/AZURE_AI_CLAUDE_API_KEY\n    model_info: {catalog_id: claude-opus-5-5, data_residency: global}\nrouter_settings:\n  fallbacks:\n    - claude-opus-5-5: [\"claude-opus-5-5@vertex\", \"claude-opus-5-5@azure\"]\n"
+      }
+    ],
+    "dataClassification": "範例政策：公開/內部資料可用任一已核准路由；機密資料只可用明確限定處理地的路由（例：Bedrock JP geo）並經法務核准；極機密資料不開放（三雲皆無台灣境內處理選項）。請依公司資料分級規範調整。",
+    "support": "Slack #llm-platform；每週四 14:00 office hour（範例，請改成你們的窗口）"
+  },
+  "openQuestions": [
+    "Bedrock 上的 Opus 5.5 是否支援 PDF（document block）與批次推論？模型卡未列。",
+    "Foundry US Data Zone 的官方價格與 cache 價格？",
+    "Agent Platform 上的退役日與 ZDR 條件？",
+    "Safeguard fallback 在三雲是否同樣發生？response.model 如何標示？",
+    "Preserved thinking 是否適用於 CSP 帳號（官方說明針對 API 帳號）？"
+  ],
+  "sources": [
+    {
+      "id": "anthropic-opus55-announce"
+    },
+    {
+      "id": "anthropic-opus55-whatsnew"
+    },
+    {
+      "id": "anthropic-opus55-systemcard"
+    },
+    {
+      "id": "anthropic-release-notes"
+    },
+    {
+      "id": "aws-bedrock-opus55-card"
+    },
+    {
+      "id": "google-agentplatform-opus55"
+    },
+    {
+      "id": "ms-foundry-claude-models"
+    },
+    {
+      "id": "aa-opus55"
+    },
+    {
+      "id": "litellm-opus55"
+    },
+    {
+      "id": "eu-ai-act-omnibus"
+    },
+    {
+      "id": "fsc-agentic-ai"
+    }
+  ]
+}
