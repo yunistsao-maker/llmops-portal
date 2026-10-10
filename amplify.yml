@@ -3,6 +3,8 @@ frontend:
   phases:
     preBuild:
       commands:
+        # with PORTAL_DATA_BASE_URL set (Amplify env var), use the release the research pipeline has live
+        - node tools/fetch_release.mjs
         - python3 tools/validate_data.py
     build:
       commands:
