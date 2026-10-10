@@ -1,6 +1,6 @@
 {
   "schema": "lifecycle/v1",
-  "generatedAt": "2026-10-06T16:30:00Z",
+  "generatedAt": "2026-10-10T08:53:04Z",
   "locale": "zh-TW",
   "asOf": "2026-10-06",
   "policies": [
@@ -475,7 +475,7 @@
       "cloud": "azure",
       "service": "foundry",
       "event": "retirement",
-      "date": "2026-10-14",
+      "date": "2027-04-14",
       "sources": [
         {
           "id": "ms-foundry-retirement-schedule"
@@ -489,6 +489,18 @@
       "notes": [
         "Lifecycle：Deprecated；官方退役表（2026-09-21 更新）已列出。",
         "2026-10-05 複查：gpt-4.1-nano | 2025-04-14 | Deprecated | 2026-10-14，表中未列替代。"
+      ],
+      "conflicts": [
+        {
+          "date": "2026-10-14",
+          "kind": "superseded",
+          "note": "舊版官方退役表的日期；現行表已延至 2027-04-14",
+          "sources": [
+            {
+              "id": "ms-foundry-retirement-schedule"
+            }
+          ]
+        }
       ]
     },
     {
@@ -1228,7 +1240,8 @@
       "date": "2026-11-30",
       "replacement": "claude-sonnet-5-5",
       "notes": [
-        "適用 Claude API、Claude Platform on AWS 與 Foundry（Foundry 退役表 2026-10-02 起同為 11-30）；Bedrock 與 Google Cloud 自訂時程，目前未見公告：Bedrock Legacy 表 10-05 查沒有 Sonnet 4.5，模型卡仍為 Active。"
+        "適用 Claude API、Claude Platform on AWS 與 Foundry（Foundry 退役表 2026-10-02 起同為 11-30）；Bedrock 與 Google Cloud 自訂時程，目前未見公告：Bedrock Legacy 表 10-05 查沒有 Sonnet 4.5，模型卡仍為 Active。",
+        "2026-10-10 更新：Bedrock Legacy 表已列出 Claude Sonnet 4.5（Legacy 2026-10-08、EOL 2027-04-08），先前「Bedrock 未見公告」的說法已過時；詳見 Bedrock 事件。"
       ],
       "sources": [
         {
@@ -2064,6 +2077,84 @@
         }
       ],
       "verification": "official"
+    },
+    {
+      "cloud": "aws",
+      "date": "2027-04-08",
+      "event": "retirement",
+      "id": "bedrock-claude-sonnet-4-5-eol",
+      "modelName": "Claude Sonnet 4.5",
+      "notes": [
+        "Bedrock Legacy 表列出：Legacy 2026-10-08、public extended access 2027-01-08、EOL 2027-04-08；Bedrock 日期與 Anthropic API 不同，Bedrock 僅適用本頁日期。"
+      ],
+      "providerModelId": "anthropic.claude-sonnet-4-5-20250929-v1:0",
+      "scopeNote": "Legacy 表所列區域（含 ap-northeast-1、us-east-1 等）",
+      "service": "bedrock",
+      "sources": [
+        {
+          "id": "aws-bedrock-lifecycle-legacy"
+        }
+      ],
+      "vendor": "anthropic",
+      "verification": "official"
+    },
+    {
+      "cloud": "aws",
+      "date": "2027-01-08",
+      "event": "extended-access",
+      "id": "bedrock-claude-sonnet-4-5-ext",
+      "modelName": "Claude Sonnet 4.5",
+      "notes": [
+        "進入 public extended access 後價格可能上調；Legacy 起始日為 2026-10-08。"
+      ],
+      "providerModelId": "anthropic.claude-sonnet-4-5-20250929-v1:0",
+      "scopeNote": "Legacy 表所列區域（含 ap-northeast-1、us-east-1 等）",
+      "service": "bedrock",
+      "sources": [
+        {
+          "id": "aws-bedrock-lifecycle-legacy"
+        }
+      ],
+      "vendor": "anthropic",
+      "verification": "official"
+    },
+    {
+      "id": "agent-platform-opus-5-5-nst",
+      "modelName": "Claude Opus 5.5",
+      "vendor": "anthropic",
+      "providerModelId": "claude-opus-5-5",
+      "cloud": "gcp",
+      "service": "agent-platform",
+      "event": "eol-no-sooner-than",
+      "date": "2027-09-22",
+      "sources": [
+        {
+          "id": "google-agentplatform-opus55"
+        }
+      ],
+      "verification": "official",
+      "notes": [
+        "Google Cloud 模型頁：Retirement Date 為 Not sooner than 2027-09-22。"
+      ]
+    },
+    {
+      "id": "agent-platform-sonnet-5-5-nst",
+      "modelName": "Claude Sonnet 5.5",
+      "vendor": "anthropic",
+      "providerModelId": "claude-sonnet-5-5",
+      "cloud": "gcp",
+      "service": "agent-platform",
+      "event": "eol-no-sooner-than",
+      "date": "2027-09-28",
+      "sources": [
+        {
+          "id": "google-agentplatform-sonnet55"
+        }
+      ],
+      "verification": "official",
+      "notes": [
+        "Google Cloud 模型頁：Retirement Date 為 Not sooner than 2027-09-28。"
+      ]
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
   "schema": "litellm/v1",
-  "generatedAt": "2026-10-06T16:30:00Z",
+  "generatedAt": "2026-10-10T08:40:27Z",
   "locale": "zh-TW",
   "asOf": "2026-10-06",
   "supportPolicy": "LiteLLM 只維護最近四條 stable minor 線（含其中所有 patch）；自 1.84.0 起每週的 stable 升 MINOR、PATCH 只用於 hotfix，因此每條線約有一個月維護期。企業客戶可洽談更長支援，重大漏洞可能例外修補。注意：官方政策頁（2026-06-20，2026-10-06 複查未改）列的仍是 1.86–1.89，下方 supportedLines 是依政策與 1.104.0 stable 發布（PyPI 2026-10-03）推導：v1.101–v1.104，v1.100 線已移出窗口。與 1.104.0 同時切出的回移植 patch 只有 1.103.3，與此推導一致。 2026-10-06 複查：PyPI 最新 stable 仍是 1.104.0，窗口不變；v1.105.0 還只有 rc.1。",
@@ -497,6 +497,74 @@
           "id": "litellm-v1-95-0"
         }
       ]
+    },
+    {
+      "caution": "官方 release notes 頁（docs）沒有 v1.104.2；內容取自 GitHub release 的 What's Changed。回移植的是新功能，升級前先在 staging 驗證。",
+      "channel": "patch",
+      "highlights": [
+        "PyPI 2026-10-08 上傳（GitHub 標為 Latest）。GitHub release 唯一一項變更：把 /v1/systemone、OpenAI 格式的 /v1/decisions 與 OpenAI Decisions provider 回移植到 stable/1.104.x（#44236、#45184、#45214，合併於 #45190）。是新功能回移植，不是安全修正。"
+      ],
+      "sources": [
+        {
+          "id": "pypi-litellm-1-104-2"
+        },
+        {
+          "id": "litellm-github-releases"
+        }
+      ],
+      "supported": true,
+      "version": "v1.104.2"
+    },
+    {
+      "caution": "官方 release notes 頁（docs）沒有 v1.104.1；內容取自 GitHub release 的 What's Changed。",
+      "channel": "patch",
+      "highlights": [
+        "PyPI 2026-10-07 上傳。GitHub release 的變更：stable/1.104.x 刷新相依套件並切出 1.104.1（#44777）。"
+      ],
+      "sources": [
+        {
+          "id": "pypi-litellm-json"
+        },
+        {
+          "id": "litellm-github-releases"
+        }
+      ],
+      "supported": true,
+      "version": "v1.104.1"
+    },
+    {
+      "caution": "官方 release notes 頁（docs）沒有 v1.103.4；內容取自 GitHub release 的 What's Changed。",
+      "channel": "patch",
+      "highlights": [
+        "PyPI 2026-10-07 上傳。GitHub release 的變更：stable/1.103.x 刷新相依套件並切出 1.103.4（#44776）。"
+      ],
+      "sources": [
+        {
+          "id": "pypi-litellm-1-103-4"
+        },
+        {
+          "id": "litellm-github-releases"
+        }
+      ],
+      "supported": true,
+      "version": "v1.103.4"
+    },
+    {
+      "caution": "官方 release notes 頁（docs）沒有 v1.102.4；#44508 的內容未讀到。",
+      "channel": "patch",
+      "highlights": [
+        "PyPI 2026-10-08 上傳。GitHub release 的變更：把 #44508 回移植到 stable/1.102.x 並切出 1.102.4（#45215）。release 沒有說明 #44508 的內容。"
+      ],
+      "sources": [
+        {
+          "id": "pypi-litellm-1-102-4"
+        },
+        {
+          "id": "litellm-github-releases"
+        }
+      ],
+      "supported": true,
+      "version": "v1.102.4"
     }
   ],
   "advisories": [
@@ -680,6 +748,20 @@
           "id": "litellm-v1-105-0-rc1"
         }
       ]
+    },
+    {
+      "action": "確認所有環境 ≥ 1.83.7（支援窗口 v1.101–v1.104 都符合）；仍在舊版者直接升級。",
+      "affected": "≤ 1.82.4",
+      "fixedIn": "1.83.7",
+      "id": "GHSA-6wvf-77m9-58rm",
+      "severity": "critical",
+      "sources": [
+        {
+          "id": "osv-ghsa-6wvf-77m9-58rm"
+        }
+      ],
+      "summary": "OSV：BerriAI litellm <=1.82.4 的 /prompts/test endpoint 因使用未沙箱化的 jinja2.Environment，未經驗證的遠端攻擊者可透過特製的 dotprompt_content 參數執行任意 OS 指令（server-side template injection）。受影響範圍遠早於支援窗口，已落在既有 avoid 的「< v1.84.0」內。",
+      "title": "/prompts/test 的 server-side template injection（unauthenticated RCE）"
     }
   ],
   "knownPitfalls": [

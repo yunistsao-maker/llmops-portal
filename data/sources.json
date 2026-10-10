@@ -1,6 +1,6 @@
 {
   "schema": "sources/v1",
-  "generatedAt": "2026-10-07T08:14:26Z",
+  "generatedAt": "2026-10-10T09:01:23Z",
   "sources": [
     {
       "id": "anthropic-opus55-announce",
@@ -96,7 +96,7 @@
       "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-opus-5-5.html",
       "publisher": "AWS",
       "type": "csp-doc",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-10"
     },
     {
       "id": "aws-bedrock-astra-card",
@@ -104,7 +104,7 @@
       "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-openai-gpt-6-astra.html",
       "publisher": "AWS",
       "type": "csp-doc",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-10"
     },
     {
       "id": "aws-bedrock-openai-cards",
@@ -152,7 +152,7 @@
       "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-lifecycle-legacy.html",
       "publisher": "AWS",
       "type": "csp-doc",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-10"
     },
     {
       "id": "aws-bedrock-endpoints",
@@ -192,7 +192,7 @@
       "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/model-retirement-schedule",
       "publisher": "Microsoft",
       "type": "csp-doc",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-10"
     },
     {
       "id": "ms-foundry-models-sold-by-azure",
@@ -312,7 +312,7 @@
       "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/partner-models/claude/opus-5-5",
       "publisher": "Google Cloud",
       "type": "csp-doc",
-      "accessed": "2026-09-24"
+      "accessed": "2026-10-10"
     },
     {
       "id": "google-agentplatform-claude-quotas",
@@ -1008,7 +1008,7 @@
       "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-openai-gpt-6-sol.html",
       "publisher": "AWS",
       "type": "csp-doc",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-10"
     },
     {
       "id": "aws-bedrock-luna-card",
@@ -1016,7 +1016,7 @@
       "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-openai-gpt-6-luna.html",
       "publisher": "AWS",
       "type": "csp-doc",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-10"
     },
     {
       "id": "ms-foundry-sept24-blog",
@@ -1048,7 +1048,7 @@
       "url": "https://cloud.google.com/gemini-enterprise-agent-platform/generative-ai/pricing",
       "publisher": "Google Cloud",
       "type": "csp-doc",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-10"
     },
     {
       "id": "google-gemini-api-deprecations",
@@ -1248,7 +1248,7 @@
       "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-sonnet-5-5.html",
       "publisher": "AWS",
       "type": "csp-doc",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-10"
     },
     {
       "id": "aws-sonnet55-whatsnew",
@@ -1264,7 +1264,7 @@
       "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-openai-gpt-6-1-sol.html",
       "publisher": "AWS",
       "type": "csp-doc",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-10"
     },
     {
       "id": "aws-gpt61-sol-whatsnew",
@@ -1408,7 +1408,7 @@
       "url": "https://pypi.org/pypi/litellm/json",
       "publisher": "PyPI",
       "type": "vendor-doc",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-10"
     },
     {
       "id": "litellm-sonnet55",
@@ -1824,7 +1824,7 @@
       "url": "https://aws.amazon.com/bedrock/pricing/",
       "publisher": "AWS",
       "type": "csp-doc",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-10"
     },
     {
       "id": "aws-bedrock-model-cards",
@@ -2201,6 +2201,78 @@
       "type": "community",
       "url": "https://huggingface.co/reflection",
       "accessed": "2026-10-07"
+    },
+    {
+      "id": "aws-bedrock-haiku55-card",
+      "title": "Claude Haiku 5.5 - Amazon Bedrock",
+      "publisher": "AWS",
+      "type": "csp-doc",
+      "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-haiku-5-5.html",
+      "accessed": "2026-10-10"
+    },
+    {
+      "id": "pypi-litellm-1-104-2",
+      "title": "litellm · PyPI",
+      "publisher": "PyPI",
+      "type": "vendor-doc",
+      "url": "https://pypi.org/project/litellm/1.104.2/",
+      "accessed": "2026-10-10"
+    },
+    {
+      "id": "pypi-litellm-1-103-4",
+      "title": "litellm · PyPI",
+      "publisher": "PyPI",
+      "type": "vendor-doc",
+      "url": "https://pypi.org/project/litellm/1.103.4/",
+      "accessed": "2026-10-10"
+    },
+    {
+      "id": "pypi-litellm-1-102-4",
+      "title": "litellm · PyPI",
+      "publisher": "PyPI",
+      "type": "vendor-doc",
+      "url": "https://pypi.org/project/litellm/1.102.4/",
+      "accessed": "2026-10-10"
+    },
+    {
+      "id": "litellm-github-releases",
+      "title": "Releases · BerriAI/litellm · GitHub",
+      "publisher": "GitHub / BerriAI",
+      "type": "github",
+      "url": "https://github.com/BerriAI/litellm/releases",
+      "accessed": "2026-10-10"
+    },
+    {
+      "id": "osv-ghsa-6wvf-77m9-58rm",
+      "title": "OSV - Open Source Vulnerabilities",
+      "publisher": "OSV",
+      "type": "security-advisory",
+      "url": "https://osv.dev/vulnerability/GHSA-6wvf-77m9-58rm",
+      "accessed": "2026-10-10"
+    },
+    {
+      "id": "google-agentplatform-sonnet55",
+      "title": "Claude Sonnet 5.5 on Google Cloud | Gemini Enterprise Agent Platform | Google Cloud Documentation",
+      "publisher": "Google Cloud",
+      "type": "csp-doc",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/partner-models/claude/sonnet-5-5",
+      "accessed": "2026-10-10"
+    },
+    {
+      "id": "anthropic-haiku55-announce",
+      "title": "Introducing Claude Haiku 5.5 \\ Anthropic",
+      "publisher": "Anthropic",
+      "type": "vendor-blog",
+      "url": "https://www.anthropic.com/claude-haiku-5-5",
+      "accessed": "2026-10-10"
+    },
+    {
+      "id": "hf-qwen38-flash-next",
+      "title": "Qwen/Qwen3.8-Flash-Next · Hugging Face",
+      "publisher": "Hugging Face",
+      "type": "community",
+      "url": "https://huggingface.co/Qwen/Qwen3.8-Flash-Next",
+      "accessed": "2026-10-10"
     }
   ]
 }

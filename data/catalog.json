@@ -1,6 +1,6 @@
 {
   "schema": "catalog/v1",
-  "generatedAt": "2026-10-06T16:30:00Z",
+  "generatedAt": "2026-10-10T08:53:04Z",
   "locale": "zh-TW",
   "asOf": "2026-10-06",
   "models": [
@@ -687,7 +687,10 @@
                   "id": "anthropic-claude-on-gcp"
                 }
               ],
-              "verification": "derived"
+              "verification": "derived",
+              "cacheRead": 0.22,
+              "cacheWrite": 5.5,
+              "cacheWrite1h": 8.8
             }
           ],
           "quotas": [
@@ -719,7 +722,8 @@
           ],
           "lifecycle": {
             "notes": [
-              "Google Cloud 自訂合作夥伴模型退役時程（Anthropic 日期不適用）；2026-09-28 仍未找到公開退役日（模型頁為 JS 渲染，無法直接讀取）。"
+              "Google Cloud 自訂合作夥伴模型退役時程（Anthropic 日期不適用）；2026-09-28 仍未找到公開退役日（模型頁為 JS 渲染，無法直接讀取）。",
+              "模型頁已公布：Retirement Date 為 Not sooner than 2027-09-22（見 lifecycle 事件 agent-platform-opus-5-5-nst）；先前「尚未找到公開退役日」的註記已過時。"
             ]
           },
           "litellmModel": "vertex_ai/claude-opus-5-5",
@@ -1172,7 +1176,7 @@
           "id": "ms-techcommunity-opus55-foundry"
         }
       ],
-      "lastVerified": "2026-10-06"
+      "lastVerified": "2026-10-10"
     },
     {
       "id": "claude-sonnet-5-5",
@@ -1275,6 +1279,11 @@
               "scope": "geo",
               "id": "eu.anthropic.claude-sonnet-5-5",
               "geography": "EU"
+            },
+            {
+              "geography": "Australia（雪梨、墨爾本）",
+              "id": "au.anthropic.claude-sonnet-5-5",
+              "scope": "geo"
             }
           ],
           "endpoints": [
@@ -1394,7 +1403,7 @@
             }
           ],
           "regionNotes": [
-            "與 Opus 5.5 不同：Sonnet 5.5 沒有 jp. / au. profile，所有 ap-* 區域（含台北、東京、大阪）只有 Global CRIS（模型卡 2026-10-06 複查：Geo inference details 只有 us. 與 eu.）。"
+            "與 Opus 5.5 不同：Sonnet 5.5 沒有 jp. profile，台北、東京、大阪只有 Global CRIS；模型卡複查時 Geo inference details 有 us.、eu.、au.（au.* 只在雪梨與墨爾本之間路由）。"
           ],
           "dataProcessing": {
             "processor": "AWS Bedrock（Anthropic 模型，透過 AWS Marketplace 計費）",
@@ -1550,7 +1559,8 @@
               "output": 10.0,
               "notes": [
                 "不是 AWS 公布的價格：取自 LiteLLM v1.105.0rc1 release notes 的內建 cost map（global.anthropic.claude-sonnet-5-5），與 Anthropic 一方價相同。Bedrock 模型卡與 pricing 頁到 2026-10-06 都沒有可讀的 Sonnet 5.5 價格——以 Bedrock console 與帳單為準。",
-                "Cache 價格未列；Anthropic 一方價為 cache read $0.20。"
+                "Cache 價格未列；Anthropic 一方價為 cache read $0.20。",
+                "AWS Bedrock pricing 頁註記：自 October 7 起 Sonnet 5.5 的 cache read 價格比先前降低 50%（頁面沒有列出金額，實際價格以 Bedrock console 與帳單為準）。"
               ],
               "sources": [
                 {
@@ -1608,6 +1618,9 @@
             },
             {
               "id": "litellm-v1-105-0-rc1"
+            },
+            {
+              "id": "aws-bedrock-pricing"
             }
           ],
           "verification": "official"
@@ -1716,11 +1729,12 @@
               "unit": "per_1m_tokens",
               "input": 2.0,
               "output": 10.0,
-              "cacheRead": 0.2,
+              "cacheRead": 0.1,
               "cacheWrite": 2.5,
               "cacheWrite1h": 4.0,
               "notes": [
-                "Agent Platform 定價頁（2026-10-02 查）：global $2 / $10、cache hit $0.20、5 分鐘寫入 $2.50、1 小時寫入 $4.00；Batch 為五折。"
+                "Agent Platform 定價頁（2026-10-02 查）：global $2 / $10、cache hit $0.20、5 分鐘寫入 $2.50、1 小時寫入 $4.00；Batch 為五折。",
+                "本次複查定價頁：Sonnet 5.5 global Cache Hit 為 $0.10（5 分鐘寫入 $2.50、1 小時寫入 $4.00 不變）；上方註記的 cache hit $0.20 已過時。multi-region 的 cache hit 為 $0.11，不是 $0.22。"
               ],
               "sources": [
                 {
@@ -1748,17 +1762,44 @@
                 }
               ],
               "verification": "official",
-              "cacheRead": 0.22,
+              "cacheRead": 0.11,
               "cacheWrite": 2.75,
               "cacheWrite1h": 4.4,
               "batchDiscountPct": 50
             }
           ],
-          "quotas": [],
+          "quotas": [
+            {
+              "scope": "global endpoint",
+              "rpm": 2500,
+              "inputTpm": 25000000,
+              "outputTpm": 2500000,
+              "note": "QPM 2,500；input TPM 含 uncached 與 cache write",
+              "sources": [
+                {
+                  "id": "google-agentplatform-sonnet55"
+                }
+              ],
+              "verification": "official"
+            },
+            {
+              "scope": "multi-region（us / eu 各自）",
+              "rpm": 1250,
+              "inputTpm": 12500000,
+              "outputTpm": 1250000,
+              "sources": [
+                {
+                  "id": "google-agentplatform-sonnet55"
+                }
+              ],
+              "verification": "official"
+            }
+          ],
           "lifecycle": {
             "notes": [
               "Google Cloud 自訂合作夥伴模型退役時程；尚未公布。",
-              "Agent Platform release note（2026-09-28）：Claude Sonnet 5.5 is available in Model Garden。"
+              "Agent Platform release note（2026-09-28）：Claude Sonnet 5.5 is available in Model Garden。",
+              "模型頁已公布：Retirement Date 為 Not sooner than 2027-09-28（見 lifecycle 事件 agent-platform-sonnet-5-5-nst）；上方「尚未公布」的註記已過時。"
             ]
           },
           "litellmModel": "vertex_ai/claude-sonnet-5-5",
@@ -2061,7 +2102,7 @@
           "id": "litellm-sonnet55"
         }
       ],
-      "lastVerified": "2026-10-06"
+      "lastVerified": "2026-10-10"
     },
     {
       "id": "gpt-6-astra",
@@ -3035,7 +3076,7 @@
           "id": "litellm-astra"
         }
       ],
-      "lastVerified": "2026-10-06"
+      "lastVerified": "2026-10-10"
     },
     {
       "id": "gpt-6-sol",
@@ -3838,7 +3879,7 @@
           "id": "aws-bedrock-sol-card"
         }
       ],
-      "lastVerified": "2026-10-06"
+      "lastVerified": "2026-10-10"
     },
     {
       "id": "gpt-6-1-sol",
@@ -4530,7 +4571,7 @@
           "id": "litellm-gpt61-sol"
         }
       ],
-      "lastVerified": "2026-10-06"
+      "lastVerified": "2026-10-10"
     },
     {
       "id": "gpt-6-luna",
@@ -5286,7 +5327,7 @@
           "id": "openai-models"
         }
       ],
-      "lastVerified": "2026-10-06",
+      "lastVerified": "2026-10-10",
       "knowledgeCutoff": "2026-05-18"
     },
     {
@@ -5826,7 +5867,7 @@
           "id": "google-agentplatform-model-versions"
         }
       ],
-      "lastVerified": "2026-10-06"
+      "lastVerified": "2026-10-10"
     }
   ],
   "watchlist": [
@@ -5871,7 +5912,7 @@
       "vendor": "anthropic",
       "status": "coming-soon",
       "expected": "2026 年 10 月（官方：coming weeks）",
-      "note": "Claude Haiku 4.5 在 Anthropic 平台「不早於 2026-10-15」、Foundry 表為 2026-11-15；Haiku 5.5 可能是其替代。 2026-10-06 查：仍未發布。Anthropic release notes 最新是 10-01 的 Models API 欄位更新；deprecations、pricing、models overview 與 news 頁都沒有 Haiku 5.5，Bedrock 模型卡索引與 Foundry 的 Claude 頁也只有 Haiku 4.5。Sonnet 5.5 發布文（09-28）寫的是「coming weeks」，Haiku 4.5 在 Anthropic 頁面仍為 Active。",
+      "note": "Bedrock 模型卡已上架 Claude Haiku 5.5，發布日 2026-10-07（模型卡索引頁與模型卡皆有）；Bedrock 模型卡未列價格，Anthropic 一方頁本期未查，尚未建立 catalog 紀錄。Claude Haiku 4.5 的退役日期見模型頁與 lifecycle 記錄；Haiku 5.5 可能是其替代。",
       "sources": [
         {
           "id": "anthropic-opus55-announce"
@@ -5896,6 +5937,9 @@
         },
         {
           "id": "aws-bedrock-model-cards"
+        },
+        {
+          "id": "aws-bedrock-haiku55-card"
         }
       ]
     },

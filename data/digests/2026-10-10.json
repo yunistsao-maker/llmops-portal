@@ -1,0 +1,182 @@
+{
+  "actionItems": [
+    {
+      "action": "盤點仍使用 Bedrock Claude Sonnet 4.5 的服務：已於 2026-10-08 進入 Legacy，EOL 為 2027-04-08；規劃改用 Claude Sonnet 5.5。",
+      "due": "2027-01-08",
+      "priority": "P1",
+      "relatedModelIds": [
+        "claude-sonnet-5-5"
+      ]
+    },
+    {
+      "action": "評估 Claude Haiku 5.5 是否納入 catalog（需補 Azure / Google 的 model ID、區域與價格）。",
+      "priority": "P2"
+    },
+    {
+      "action": "整理 lifecycle.json 中 azure-gpt-4-1-nano-eol 的 notes：退役日為 2027-04-14，notes 內舊的複查描述已過時。",
+      "priority": "P2"
+    },
+    {
+      "action": "升級 LiteLLM 前先在 staging 驗證 v1.104.x patch；v1.105.0 仍是 rc。",
+      "priority": "P2"
+    }
+  ],
+  "headline": "Claude Haiku 5.5 於 2026-10-07 上架 Bedrock；Bedrock 的 Claude Sonnet 4.5 自 2026-10-08 進入 Legacy",
+  "id": "2026-10-10",
+  "lifecycleChanges": [
+    {
+      "clouds": [
+        "aws"
+      ],
+      "date": "2026-10-08",
+      "detail": "Bedrock Legacy 表（anthropic.claude-sonnet-4-5-20250929-v1:0，含 ap-northeast-1、ap-east-2、us-east-1 等區域）：Legacy 2026-10-08、public extended access 2027-01-08、EOL 2027-04-08。與 portal 現有記錄一致。Bedrock 日期與 Anthropic API 不同，Bedrock 只適用 Legacy 表的日期。",
+      "impact": "high",
+      "sources": [
+        {
+          "id": "aws-bedrock-lifecycle-legacy",
+          "note": "Legacy and EOL table"
+        }
+      ],
+      "title": "Bedrock：Claude Sonnet 4.5 進入 Legacy",
+      "vendor": "anthropic"
+    },
+    {
+      "clouds": [
+        "azure"
+      ],
+      "date": "2027-04-14",
+      "detail": "Foundry 退役表（Azure OpenAI 段）：gpt-4.1-nano 版本 2025-04-14，Lifecycle 為 Deprecated，退役日 2027-04-14，未列替代。舊表的日期已被取代。portal 記錄 azure-gpt-4-1-nano-eol 的日期已是 2027-04-14，但其 notes 的複查一行仍寫舊日期，與現行表不一致，需人工整理。",
+      "impact": "medium",
+      "sources": [
+        {
+          "id": "ms-foundry-retirement-schedule",
+          "note": "Azure OpenAI 表"
+        }
+      ],
+      "title": "Azure：gpt-4.1-nano 退役日延至 2027-04-14",
+      "vendor": "openai"
+    }
+  ],
+  "litellm": [
+    {
+      "detail": "GitHub Releases 頁標 v1.104.2 為 Latest，同頁並列 v1.104.1、v1.103.4、v1.102.4，另有 v1.105.0-rc.3 與 v1.106.0-dev 系列 pre-release（不要用於正式環境）。portal 記錄：v1.104.2 只把 /v1/systemone、/v1/decisions 與 OpenAI Decisions provider 回移植到 stable/1.104.x，是新功能不是安全修正；v1.104.1 為相依套件刷新。兩者官方 docs 的 release notes 都沒有對應頁，升級前先在 staging 驗證。v1.103.4 與 v1.102.4 的內容本次未讀。",
+      "impact": "low",
+      "sources": [
+        {
+          "id": "litellm-github-releases"
+        },
+        {
+          "id": "pypi-litellm-1-104-2"
+        }
+      ],
+      "title": "LiteLLM patch：v1.104.2、v1.104.1、v1.103.4、v1.102.4",
+      "vendor": "other"
+    }
+  ],
+  "locale": "zh-TW",
+  "newModels": [
+    {
+      "clouds": [
+        "aws",
+        "azure",
+        "gcp",
+        "vendor-direct"
+      ],
+      "date": "2026-10-07",
+      "detail": "Bedrock 模型卡：launch date 2026-10-07，EOL no sooner than 2027-10-07，定位為 Claude 5.5 家族中最快、最有效率的高量低延遲模型。Anthropic 發表頁稱 Haiku 5.5 已在 AWS、Google Cloud 與 Microsoft Azure 上提供，平均執行成本約比 Haiku 4.5 低 75%（廠商自述）。上期 watchlist 的 Haiku 5.5「coming-soon」已解除。尚未列入 catalog：Azure / Google 上的 model ID、區域與價格本期未讀，Bedrock 模型卡也只指向 Pricing 頁。",
+      "impact": "medium",
+      "sources": [
+        {
+          "id": "aws-bedrock-haiku55-card",
+          "note": "Model Details"
+        },
+        {
+          "id": "anthropic-haiku55-announce",
+          "note": "Availability / 開頭段落"
+        }
+      ],
+      "title": "Claude Haiku 5.5 發布，Bedrock 模型卡已上線",
+      "vendor": "anthropic"
+    },
+    {
+      "clouds": [
+        "vendor-direct"
+      ],
+      "detail": "Qwen 官方 org 的 Hugging Face 模型頁提供 Qwen3.8-Flash-Next 權重；頁面說明 Qwen3.8-Flash 是以它為基礎、含 1M context 與內建工具的正式版，託管 API 在 Qwen Cloud。該頁屬 community tier、沒有載明發布日期，無法確認是否落在本期；授權條款、雲端代管情況也未確認，因此不進 catalog。",
+      "impact": "low",
+      "sources": [
+        {
+          "id": "hf-qwen38-flash-next",
+          "note": "Model card"
+        }
+      ],
+      "title": "Qwen3.8-Flash-Next 權重出現在 Qwen 的 Hugging Face org（發布日期未確認）",
+      "vendor": "other"
+    }
+  ],
+  "periodEnd": "2026-10-10",
+  "periodStart": "2026-10-08",
+  "pricingChanges": [
+    {
+      "clouds": [
+        "aws",
+        "gcp",
+        "vendor-direct"
+      ],
+      "detail": "Anthropic 隨 Haiku 5.5 發表宣布 Sonnet 5.5 的 cache reads 價格減半，稱大部分 agentic 工作約便宜 20%（廠商自述）。今日 AWS run 已更新 Bedrock 的 cache-read 價格，Google run 已修正 Agent Platform 的 Sonnet 5.5 cache-read 價；各雲實際金額請看 catalog，本次週報沒有重讀 Bedrock 與 Google 價格頁。",
+      "impact": "medium",
+      "sources": [
+        {
+          "id": "anthropic-haiku55-announce",
+          "note": "開頭段落"
+        }
+      ],
+      "title": "Claude Sonnet 5.5 的 cache-read 價格減半",
+      "vendor": "anthropic"
+    }
+  ],
+  "regulatory": [
+    {
+      "detail": "數位發展部新聞發布索引的最新幾筆都是 MyData、智慧政府等，沒有 AI 基本法或治理新公告；歐盟執委會 digital-strategy 新聞索引中與 AI 最接近的是前沿 AI 安全風險 Scientific panel 的特別會議，發布早於本期，沒有 AI Act 條文或時程變動。金管會新聞稿索引本次連線失敗（憑證錯誤），沒有讀到。",
+      "impact": "low",
+      "sources": [
+        {
+          "id": "moda-press-index"
+        },
+        {
+          "id": "eu-digital-strategy-news"
+        }
+      ],
+      "title": "本期官方來源未見新的 AI 法規變動"
+    }
+  ],
+  "security": [],
+  "unverified": [
+    "金管會新聞稿索引本次連線失敗（SSL 憑證錯誤），金融業 AI 相關新公告未能檢查。",
+    "Moonshot Kimi K3.1 可能在 10 月中旬發布：只有社群轉載的券商報告說法，沒有官方頁面，未列入 watchlist。",
+    "Qwen3.8-Flash-Next 的發布日期、授權與雲端代管情況：只讀到 Hugging Face 模型頁（community tier），頁面沒有日期。",
+    "JetBrains Mellum2.1、Liquid AI d1 系列、Microsoft-Decision-1 等小型 / 專用 open-weight 模型：只見於搜尋結果與社群日報，沒有讀官方頁，也與 gateway 主力用途無關，未收錄。",
+    "Azure、Google 上 Claude Haiku 5.5 的 model ID、區域與價格：只有 Anthropic 發表頁稱已在三雲提供，沒有讀到各雲自己的頁面。",
+    "Google Agent Platform 的 Opus 5.5 / Sonnet 5.5 退役日與配額、Bedrock cache-read 價格的實際金額、LiteLLM v1.103.4 / v1.102.4 的內容、GHSA-6wvf-77m9-58rm 的 OSV 頁面：本次沿用 portal 今日已更新的記錄，沒有重讀來源，因此不在週報條目內。",
+    "azure-gpt-4-1-nano-eol 的 notes 仍有過時的複查描述，未在本次修改（僅 digest 提示）。",
+    "Qwen3.8-Flash-Next 的發布日期（只讀到 Hugging Face 模型頁（community tier），頁面沒有日期。）",
+    "金管會本期是否有新的 AI 公告（金管會新聞稿索引連線失敗（SSL 憑證錯誤）。）",
+    "Moonshot Kimi K3.1 可能在 10 月中旬發布（只有社群轉載的報導，沒有官方頁面。）"
+  ],
+  "watchlist": [
+    {
+      "expected": "權重：官方稱本月底前釋出；三雲上架未公布",
+      "name": "Mistral Large 4",
+      "note": "public preview 仍只有 Mistral Studio 的 preview API；發表頁重申權重在本月底前釋出，並將提供涵蓋多個區域的部署，包括 Mistral 自營的歐洲部署，沒有提到 Bedrock、Foundry 或 Agent Platform。發表頁現在寫 active 參數為 52B，上期週報記為 49B，請以官方頁為準。追蹤重點：權重與授權條款何時釋出、是否由三雲代管。",
+      "sources": [
+        {
+          "id": "mistral-large-4-announce"
+        }
+      ],
+      "status": "limited-preview",
+      "vendor": "mistral"
+    }
+  ],
+  "schema": "digest/v1",
+  "generatedAt": "2026-10-10T09:01:23Z"
+}
