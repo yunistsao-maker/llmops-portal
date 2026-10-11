@@ -19,3 +19,6 @@ __pycache__/
 
 # local virtual environment
 .venv/
+
+# local credentials for test runs (never commit)
+.env
