@@ -116,6 +116,7 @@ python3 tools/perf_probe.py --gateway https://llm-gateway.example.internal/v1 \
 AI 安全測試（G6；securityTestCatalog 的 SEC-01 … SEC-16，每項抽樣後看方法、樣本、指標與通過準則）：
 
 ```bash
+python3 -m venv .venv && source .venv/bin/activate && pip install -r tools/secsuite/requirements.txt
 python3 tools/sec_suite.py plan                  # 先看資料集的大小、授權與內容風險
 python3 tools/sec_suite.py fetch --approve all   # 核准後才下載到 .cache/secsuite/（不進版控）
 python3 tools/sec_suite.py ui                    # http://127.0.0.1:8765

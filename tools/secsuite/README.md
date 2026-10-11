@@ -7,7 +7,11 @@
 ## 快速開始
 
 ```bash
-pip install httpx                 # Bedrock 另需 boto3
+# 先建立虛擬環境（在 repo 根目錄；.venv/ 已列入 .gitignore）
+python3 -m venv .venv
+source .venv/bin/activate         # Windows PowerShell：.venv\Scripts\Activate.ps1
+pip install -r tools/secsuite/requirements.txt   # httpx；boto3 只有走 Bedrock 時需要
+
 python3 tools/sec_suite.py plan   # 先看要下載什麼：大小、授權、內容風險
 python3 tools/sec_suite.py fetch --approve all        # 核准後才下載（約 12 MB）
 python3 tools/sec_suite.py ui     # http://127.0.0.1:8765
@@ -85,3 +89,4 @@ python3 tools/sec_suite.py report --out sec-report.html --redact
 | `secsuite/run.py` | 執行、彙總、判定；SEC-16 的 OSV／PyPI／avoid 清單檢查 |
 | `secsuite/server.py`、`ui.html` | 本機 UI（只綁 127.0.0.1；金鑰不經過頁面） |
 | `secsuite/twtext.py` | 簡體字與大陸用語偵測、台灣證號產生與驗證 |
+| `secsuite/requirements.txt` | 相依套件（httpx；boto3 為 Bedrock 選用） |

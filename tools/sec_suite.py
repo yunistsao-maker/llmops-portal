@@ -11,7 +11,7 @@
 
 資料集與含 prompt／回應的完整結果都放在 .cache/secsuite/（已列入 .gitignore）。不要放進 runs/：
 portal 的 build 會把 runs/ 原樣發布。要給 portal 用的只有不含文字的彙總（run --publish-summary）。
-需要：pip install httpx（Bedrock 另需 boto3）。
+需要：先建立虛擬環境，再 pip install -r tools/secsuite/requirements.txt（httpx；Bedrock 另需 boto3）。
 """
 from __future__ import annotations
 

@@ -16,3 +16,6 @@ __pycache__/
 
 # security test datasets and transcripts (downloaded at run time; never commit)
 .cache/
+
+# local virtual environment
+.venv/
