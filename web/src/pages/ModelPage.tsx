@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { Model } from "../../../schema/types";
 import { go } from "../App";
-import { daysFrom, fmt, loaders, money, useData } from "../data";
+import { daysFrom, fmt, linkTo, loaders, money, useData } from "../data";
 import { Bullets, Empty, PageHead, Sources, Status, Tabs, Verif } from "../ui";
 
 const TABS = ["概覽", "Deep dive", "三雲與 API", "效能與指數", "價格與試算", "安全與合規", "LiteLLM", "內部測試", "生命週期", "Onboarding"] as const;
@@ -24,7 +24,7 @@ export default function ModelPage({ id }: { id: string }) {
 
   return (
     <>
-      <PageHead eyebrow={<><a href="#/models">模型目錄</a> / {m.vendor} · {m.tier} · {m.releaseDate} 發布 · 資料查核 {m.lastVerified}</>} title={m.name}
+      <PageHead eyebrow={<><a href={linkTo("models")}>模型目錄</a> / {m.vendor} · {m.tier} · {m.releaseDate} 發布 · 資料查核 {m.lastVerified}</>} title={m.name}
         right={<>
           <span className="pill">平台狀態：{m.platformStatus}</span>
           {noTw && <span className="pill warn">無台灣境內處理</span>}
@@ -148,7 +148,7 @@ export default function ModelPage({ id }: { id: string }) {
             {m.litellm.providerStrings.map((p) => <tr key={p.model}><td>{p.service}</td><td className="mono">{p.model}</td><td className="note">{p.note}</td></tr>)}
           </tbody></table>
           <h2 style={{ marginTop: 24 }}>已知陷阱</h2><Bullets items={m.litellm.caveats} />
-          <p><a href="#/gateway">平台層級的 LiteLLM 版本、公告與陷阱 →</a></p>
+          <p><a href={linkTo("gateway")}>平台層級的 LiteLLM 版本、公告與陷阱 →</a></p>
         </section>)}
 
       {tab === "內部測試" && <ModelRuns m={m} />}
@@ -228,7 +228,7 @@ function ModelRuns({ m }: { m: Model }) {
     <Empty>還沒有 {m.name} 的內部測試。在 gateway 上執行：
       <pre className="code">{`python3 tools/compat_suite.py --gateway <GW>/v1 --routes ${m.id} --out runs/compat/$(date +%F)-${m.id}.json\npython3 tools/perf_probe.py --gateway <GW>/v1 --route ${m.id} --profile zh-tw --effort medium --out runs/perf/$(date +%F)-${m.id}.json`}</pre>
       重新 build 後，結果會自動出現在這裡與「測試結果」頁。</Empty>);
-  return <p><a href="#/tests">到測試結果頁查看 {c.length} 筆相容性與 {p.length} 筆效能紀錄 →</a></p>;
+  return <p><a href={linkTo("tests")}>到測試結果頁查看 {c.length} 筆相容性與 {p.length} 筆效能紀錄 →</a></p>;
 }
 
 function ModelLifecycle({ m }: { m: Model }) {

@@ -20,7 +20,7 @@ Rules (also written into the file, so the page can show them):
   * Unverified: the lines of the digests of the last UNVERIFIED_DAYS, de-duplicated.
 Deterministic: the same digests and curation give the same file (generatedAt = the newest digest's generatedAt).
 
-usage: build_radar.py [--root DIR] [--out FILE] [--as-of YYYY-MM-DD] [--check]
+usage: build_radar.py [--root DIR] [--out FILE] [--as-of YYYY-MM-DD] [--curation FILE] [--check]
   --check   exit 1 when the written file would differ from the one on disk (CI: the committed roll-up is current)
 """
 from __future__ import annotations
@@ -111,7 +111,9 @@ class Merger:
         return cur
 
 
-def build(root: Path, as_of: str | None = None) -> dict:
+def build(root: Path, as_of: str | None = None, curation_path: Path | None = None) -> dict:
+    """``root``: a folder with data/digests/ (a checkout, or one daily version of the site build). ``curation_path``:
+    default ``<root>/radar/curation.json``; a daily version uses the repo's file (its entries carry their own dates)."""
     digests = []
     for p in sorted((root / "data/digests").glob("*.json")):
         digests.append(json.loads(p.read_text(encoding="utf-8")))
@@ -124,7 +126,7 @@ def build(root: Path, as_of: str | None = None) -> dict:
     as_of = newest["id"]
     today = day(as_of)
 
-    cur_path = root / "radar/curation.json"
+    cur_path = curation_path or root / "radar/curation.json"
     curation = json.loads(cur_path.read_text(encoding="utf-8")) if cur_path.exists() else {"merge": [], "close": []}
     alias = {i: m["keep"] for m in curation.get("merge", []) for i in m["ids"] if i != m["keep"]}
     closed = {c["id"]: c for c in curation.get("close", []) if day(c["on"]) <= today}
@@ -232,11 +234,12 @@ def main() -> int:
     ap.add_argument("--root", default=str(Path(__file__).resolve().parent.parent))
     ap.add_argument("--out", default=None, help="default: <root>/data/radar.json")
     ap.add_argument("--as-of", default=None, help="build the view as it was on this digest date")
+    ap.add_argument("--curation", default=None, help="default: <root>/radar/curation.json")
     ap.add_argument("--check", action="store_true")
     args = ap.parse_args()
     root = Path(args.root)
     out = Path(args.out) if args.out else root / "data/radar.json"
-    radar = build(root, args.as_of)
+    radar = build(root, args.as_of, Path(args.curation) if args.curation else None)
     text = json.dumps(radar, ensure_ascii=False, indent=2) + "\n"
     if args.check:
         same = out.exists() and out.read_text(encoding="utf-8") == text

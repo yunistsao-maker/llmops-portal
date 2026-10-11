@@ -10,6 +10,8 @@ frontend:
       commands:
         # one merged Release Radar from every digest of the release (+ radar/curation.json)
         - python3 tools/build_radar.py
+        # the same for each of the 6 days before today (versions/<date>/, fetched by fetch_release.mjs)
+        - python3 tools/build_versions.py
         # site/ is the prebuilt app; this adds data/, runs/, config/ and generates data/manifest.json
         - node tools/build_site.mjs
   artifacts:

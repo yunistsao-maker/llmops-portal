@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { LifecycleEvent } from "../../../schema/types";
-import { daysFrom, loaders, useData } from "../data";
+import { daysFrom, linkTo, loaders, useData } from "../data";
 import { Bullets, Filters, PageHead, Sources, Status, Verif } from "../ui";
 
 const RISKS = [["all", "全部"], ["retired", "已退役"], ["act-now", "30 天內"], ["watch", "90 天內"], ["unknown", "未對應"], ["ok", "正常"]] as const;
@@ -49,7 +49,7 @@ export default function Eol() {
                 <td><span className={`tag risk-${d.risk}`}>{RISK_LABEL[d.risk]}</span></td>
                 <td className="mono">{d.modelName}</td>
                 <td className="mono note">{d.litellmModel}</td>
-                <td>{d.catalogModelId ? <a href={`#/models/${d.catalogModelId}`}>{d.catalogModelId}</a> : <span className="note">{d.matchedProviderModelId ?? "—"}</span>}</td>
+                <td>{d.catalogModelId ? <a href={linkTo(`models/${d.catalogModelId}`)}>{d.catalogModelId}</a> : <span className="note">{d.matchedProviderModelId ?? "—"}</span>}</td>
                 <td>{d.lifecycle?.nextEvent ? EVENT_LABEL[d.lifecycle.nextEvent] ?? d.lifecycle.nextEvent : "—"}</td>
                 <td className="mono">{d.lifecycle?.nextEventDate ?? "—"}</td>
                 <td className="mono">{d.daysToNextEvent ?? "—"}</td>

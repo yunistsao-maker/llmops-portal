@@ -22,3 +22,8 @@ __pycache__/
 
 # local credentials for test runs (never commit)
 .env
+
+# written by the Amplify build (tools/fetch_release.mjs): the live release and the daily versions
+.portal-release.json
+.portal-versions.json
+versions/
