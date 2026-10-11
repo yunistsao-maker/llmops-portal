@@ -8,6 +8,7 @@
         --region us-east-1 --judge bedrock:global.anthropic.claude-opus-5-5 --n 10
   python3 tools/sec_suite.py run --mock                # 不呼叫任何模型，用內建模擬器驗證流程
   python3 tools/sec_suite.py report --out sec-report.html --redact   # 把最近一次結果輸出成單一 HTML
+  python3 tools/sec_suite.py report --out site/security-tests.html --public   # 發布到 portal 的靜態頁
 
 資料集與含 prompt／回應的完整結果都放在 .cache/secsuite/（已列入 .gitignore）。不要放進 runs/：
 portal 的 build 會把 runs/ 原樣發布。要給 portal 用的只有不含文字的彙總（run --publish-summary）。
@@ -114,9 +115,9 @@ def cmd_run(args):
             sys.exit(f"A 級項目未通過：{bad}")
 
 
-def build_report(doc: dict, redact: bool) -> str:
-    if redact:
-        doc = runner.redact(doc)
+def build_report(doc: dict, redact: bool, public: bool = False) -> str:
+    if redact or public:
+        doc = runner.redact(doc, public=public)
     embed = {"catalog": runner.CATALOG, "plan": fetch.plan(), "results": doc, "presets": {}, "runs": []}
     blob = json.dumps(embed, ensure_ascii=False).replace("</", "<\\/").replace("\u2028", "\\u2028").replace("\u2029", "\\u2029")
     html = (Path(__file__).resolve().parent / "secsuite" / "ui.html").read_text(encoding="utf-8")
@@ -127,8 +128,10 @@ def cmd_report(args):
     doc = runner.load_run(args.run)
     if not doc:
         sys.exit("找不到測試結果，請先執行 run。")
-    Path(args.out).write_text(build_report(doc, args.redact), encoding="utf-8")
-    print(f"已輸出 {args.out}" + ("（高風險樣本的內容已遮蔽）" if args.redact else "（含全部樣本內容，請勿對外分享或放進 runs/）"))
+    Path(args.out).write_text(build_report(doc, args.redact, args.public), encoding="utf-8")
+    note = ("（公開版：高風險、中風險與授權不允許再散布的樣本內容已遮蔽）" if args.public else
+            "（高風險樣本的內容已遮蔽）" if args.redact else "（含全部樣本內容，請勿對外分享或放進 runs/）")
+    print(f"已輸出 {args.out}" + note)
 
 
 def cmd_ui(args):
@@ -168,6 +171,7 @@ def main():
     p.add_argument("--run", default="latest")
     p.add_argument("--out", default="sec-report.html")
     p.add_argument("--redact", action="store_true", help="遮蔽高風險資料集的樣本內容")
+    p.add_argument("--public", action="store_true", help="公開頁面用：另外遮蔽中風險與授權不允許再散布的資料集樣本")
     p.set_defaults(fn=cmd_report)
     u = sub.add_parser("ui", help="啟動本機 UI")
     u.add_argument("--port", type=int, default=8765)

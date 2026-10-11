@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AI 安全測試（G6）</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 :root{--bg:#f5f6f8;--card:#fff;--ink:#1e2228;--muted:#5f6570;--line:#eceef2;--line2:#dde1e7;--brand:#0b3c7a;--brand-d:#072a57;
 --danger:#b3261e;--danger-bg:#fbe9e7;--warn-bg:#f6e7c3;--warn:#5c4200;--ok-bg:#e3f0e8;--ok:#1e5b3a;--chip:#e6ecf5;--info-bg:#e9eef6}
@@ -143,7 +144,8 @@ window.addEventListener("hashchange", () => { S.tab = "方法"; render(); window
 function render() {
   const [page, arg] = route();
   const nav = document.getElementById("nav");
-  nav.replaceChildren(...[["", "總覽"], ["datasets", "資料集"]].map(([h, t]) => $("a", { href: "#/" + h, "aria-current": (page || "") === h || (h === "" && page === "item") ? "page" : null, text: t })));
+  nav.replaceChildren(...[["", "總覽"], ["datasets", "資料集"]].map(([h, t]) => $("a", { href: "#/" + h, "aria-current": (page || "") === h || (h === "" && page === "item") ? "page" : null, text: t })),
+    S.live ? "" : $("a", { href: "./", text: "← 回 Portal" }));
   document.getElementById("asof").textContent = S.results ? "測試時間 " + S.results.startedAt.slice(0, 16).replace("T", " ") + " UTC" : "尚未執行測試";
   const app = document.getElementById("app");
   if (page === "item" && S.catalog.items.find((i) => i.id === arg)) app.replaceChildren(...itemPage(arg));
@@ -158,7 +160,7 @@ const targetsOf = (id) => { const r = itemRes(id); return r ? Object.keys(r.resu
 /* ---------- overview ---------- */
 function overviewPage() {
   const out = [head("G6 安全測試 · 每項 " + (S.results ? S.results.config.n : CFG.n) + " 筆抽樣", "AI 安全測試"), simBanner()];
-  if (!S.live) out.push($("div", { class: "banner plain", text: "這是靜態報告。要選項目、調整抽樣並重新執行，請在 repo 內執行 python3 tools/sec_suite.py ui。" }));
+  if (!S.live) out.push($("div", { class: "banner plain", text: "這是靜態頁面，用來展示每個安全測試項目的方法、樣本、指標與通過準則。要選項目、調整抽樣並對真實模型執行，請在 repo 內執行 python3 tools/sec_suite.py ui。" }));
   out.push(matrixCard());
   if (S.live) out.push(runCard());
   return out.filter(Boolean);
@@ -293,7 +295,7 @@ function samplesTab(it, res, labels) {
       r.stopReason ? $("span", { class: "note mono", text: "stop_reason=" + r.stopReason }) : null, r.outputTokens ? $("span", { class: "note", text: r.outputTokens + " output tokens" }) : null),
       r.detail ? $("div", { class: "note", text: r.detail }) : null, hide ? null : $("pre", { text: r.response })));
     return $("div", { class: "sample" }, $("header", {}, worst ? $("span", { class: "pill " + worst, text: OUTCOME[worst] }) : null, $("span", { class: "mono", text: c.caseId }), $("span", { class: "chip", text: c.dataset }), $("span", { class: "chip", text: c.category }), c.lang ? $("span", { class: "note", text: c.lang }) : null),
-      $("div", { class: "body" }, hide ? $("div", { class: "hidden-content" }, $("span", { text: c.redacted ? "這筆樣本來自高風險資料集，內容不隨靜態報告輸出。" : "這筆樣本來自高風險資料集，內容預設隱藏。" }), c.redacted ? null : $("button", { class: "btn ghost", onclick: () => { S.shown.add(c.caseId); render(); }, text: "顯示內容" })) : msgBlocks(c), ...responses));
+      $("div", { class: "body" }, hide ? $("div", { class: "hidden-content" }, $("span", { text: c.redacted ? "這筆樣本的內容不隨靜態報告輸出（內容風險較高，或資料集授權不允許再散布）。判定結果仍列在下方；要看內容請在本機工具檢視。" : "這筆樣本來自高風險資料集，內容預設隱藏。" }), c.redacted ? null : $("button", { class: "btn ghost", onclick: () => { S.shown.add(c.caseId); render(); }, text: "顯示內容" })) : msgBlocks(c), ...responses));
   });
   const note = res ? "每筆樣本下方是各模型的回應與判定。" : "這是依目前的樣本數與亂數種子抽到的樣本；執行測試後，這裡會加上各模型的回應與判定。";
   return [$("section", { class: "card" }, $("p", { class: "note", style: "margin-top:0", text: note + "同一個種子永遠抽到同一批，方便不同模型與不同版本互相比較。" }), ...cards)];

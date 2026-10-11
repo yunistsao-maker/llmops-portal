@@ -132,7 +132,8 @@
      "url": "https://raw.githubusercontent.com/HumanCompatibleAI/tensor-trust-data/main/benchmarks/extraction-robustness/v1/extraction_robustness_dataset.jsonl",
      "bytes": 685113
     }
-   ]
+   ],
+   "publish": false
   },
   {
    "id": "cse-instruct",
@@ -170,7 +171,8 @@
      "url": "https://huggingface.co/datasets/ai-safety-institute/AgentHarm/resolve/main/benchmark/harmful_behaviors_test_public.json",
      "bytes": 134140
     }
-   ]
+   ],
+   "publish": false
   },
   {
    "id": "agentharm-benign",
@@ -189,7 +191,8 @@
      "url": "https://huggingface.co/datasets/ai-safety-institute/AgentHarm/resolve/main/benchmark/benign_behaviors_test_public.json",
      "bytes": 138721
     }
-   ]
+   ],
+   "publish": false
   },
   {
    "id": "overthink",

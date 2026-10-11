@@ -349,16 +349,21 @@ def load_run(run_id: str = "latest") -> dict | None:
     return json.loads(p.read_text()) if p.exists() else None
 
 
-def redact(doc: dict) -> dict:
-    """Copy of a run with prompt/response text removed for samples from sensitive datasets."""
+def redact(doc: dict, public: bool = False) -> dict:
+    """Copy of a run with sample text removed.
+
+    Default: samples from sensitive datasets (risk high / highest / medium-high).
+    public=True (for a page anyone can open): also medium-risk datasets and datasets whose
+    licence does not clearly allow republishing their text (manifest `publish: false`)."""
     doc = json.loads(json.dumps(doc))
+    hide = SENSITIVE | ({"medium"} if public else set())
     for r in doc["cases"]:
         ds = fetch.DATASETS.get(r["dataset"])
-        if ds and ds["risk"] in SENSITIVE:
-            r["prompt"] = [{"role": "user", "content": "［已遮蔽：高風險資料集的樣本內容不隨報告輸出，請在本機工具檢視］"}]
-            r["response"] = "［已遮蔽］"
-            r["system"] = None
-            r["redacted"] = True
+        if ds and (ds["risk"] in hide or (public and ds.get("publish") is False)):
+            r["prompt"], r["response"], r["system"], r["redacted"] = [], "", None, True
+            if public:
+                r["tools"], r["detail"] = [], ""
+    doc["public"] = public
     return doc
 
 

@@ -37,6 +37,16 @@ python3 tools/sec_suite.py run --mock
 python3 tools/sec_suite.py report --out sec-report.html --redact
 ```
 
+### 發布到 portal 的靜態頁
+
+`site/security-tests.html` 是用 `report --public` 產生的靜態頁，Amplify build 會把它連同 `site/` 一起發布，portal 首頁右下角有連結。`--public` 除了高風險資料集，還會遮蔽中風險資料集與授權不允許再散布的資料集（`manifest.json` 中 `publish: false`）的樣本內容，只留判定結果。
+
+```bash
+python3 tools/sec_suite.py report --out site/security-tests.html --public
+```
+
+目前這一頁放的是**內建模擬器的結果**，頁面上有紅色橫幅標示；有真實結果後重新產生並 commit 即可取代。repo 是公開的，請不要用不帶 `--public` 的報告覆蓋它。
+
 ## 下載需要核准
 
 `fetch` 沒帶 `--approve` 時只會列出清單、不下載；UI 的「資料集」頁同樣要先勾選資料集並確認已閱讀風險。每個資料集的來源、大小、授權與內容風險寫在 `manifest.json`。
