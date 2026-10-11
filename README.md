@@ -31,6 +31,7 @@ tools/
   mock_gateway.py          不花 token 的模擬 gateway
   selftest.py              端到端自測（mock → compat → perf → inventory → schema）
   build_site.mjs           組出 dist/：site/ + data/ + runs/ + config/，並產生 data/manifest.json
+  sec_suite.py + secsuite/ AI 安全測試（G6）：核准後下載公開資料集、抽樣、執行、本機 UI（見 tools/secsuite/README.md）
 runs/compat, runs/perf    測試結果（UI「測試結果」頁讀取，由 manifest 列出）
 site/                     已 build 好的 portal UI（2026-10-06 portal-dist；只有編譯後的 JS）
 web/                      舊版 React 原型原始碼（Amplify 已不再使用）
@@ -111,6 +112,17 @@ python3 tools/perf_probe.py --gateway https://llm-gateway.example.internal/v1 \
   --slo-ttfat-ms 8000 --slo-ttlt-ms 60000 --client-location "Taipei HQ" \
   --out runs/perf/$(date +%F)-opus55-zh-tw-medium.json
 ```
+
+AI 安全測試（G6；securityTestCatalog 的 SEC-01 … SEC-16，每項抽樣後看方法、樣本、指標與通過準則）：
+
+```bash
+python3 -m venv .venv && source .venv/bin/activate && pip install -r tools/secsuite/requirements.txt
+python3 tools/sec_suite.py plan                  # 先看資料集的大小、授權與內容風險
+python3 tools/sec_suite.py fetch --approve all   # 核准後才下載到 .cache/secsuite/（不進版控）
+python3 tools/sec_suite.py ui                    # http://127.0.0.1:8765
+```
+
+資料集與含 prompt／回應的結果只放在 `.cache/`；`runs/` 會被發布，只能放 `run --publish-summary` 產生的彙總。
 
 平台清單（「我們平台上有哪些模型、何時退役」）：
 

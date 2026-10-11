@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 安全測試（G6）</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#f5f6f8;--card:#fff;--ink:#1e2228;--muted:#5f6570;--line:#eceef2;--line2:#dde1e7;--brand:#0b3c7a;--brand-d:#072a57;
+--danger:#b3261e;--danger-bg:#fbe9e7;--warn-bg:#f6e7c3;--warn:#5c4200;--ok-bg:#e3f0e8;--ok:#1e5b3a;--chip:#e6ecf5;--info-bg:#e9eef6}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;font-size:15px;line-height:1.7}
+a{color:var(--brand);text-decoration:none}a:hover{color:var(--brand-d);text-decoration:underline}
+.mono{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+.topbar{min-height:64px;background:#fff;border-bottom:1px solid #e3e6eb;display:flex;align-items:stretch;padding:0 40px;gap:36px;position:sticky;top:0;z-index:5;flex-wrap:wrap}
+.brand{font-size:19px;font-weight:700;color:var(--brand);align-self:center}
+.topbar nav{display:flex;gap:28px}
+.topbar nav a{font-size:15px;border-bottom:3px solid transparent;padding:22px 0 19px;color:#333842}
+.topbar nav a:hover{text-decoration:none;color:var(--brand)}
+.topbar nav a[aria-current=page]{color:var(--brand);font-weight:700;border-bottom-color:var(--brand)}
+.asof{margin-left:auto;align-self:center;font-size:13px;color:var(--muted)}
+main{padding:32px 40px 64px;max-width:1380px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h1{margin:4px 0 0;font-size:28px;line-height:1.3}h2{margin:0 0 12px;font-size:18px}h3{margin:18px 0 6px;font-size:15px}
+.eyebrow{font-size:13px;color:var(--muted)}
+.card{background:var(--card);border-radius:4px;box-shadow:0 1px 3px #141e3214;padding:22px 24px}
+.note{font-size:13px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-weight:400;color:var(--muted);padding:10px 10px 10px 0;border-bottom:1px solid var(--line2);white-space:nowrap}
+td{padding:10px 10px 10px 0;border-bottom:1px solid var(--line);vertical-align:top}
+td.mono{white-space:nowrap}
+tr:last-child td{border-bottom:none}
+.pill{display:inline-block;font-size:12.5px;font-weight:700;padding:2px 10px;border-radius:999px;white-space:nowrap}
+.pill.pass{background:var(--ok-bg);color:var(--ok)}.pill.fail{background:var(--danger-bg);color:#8c1d18}
+.pill.review{background:var(--warn-bg);color:var(--warn)}.pill.info,.pill.nodata,.pill.error{background:var(--line);color:var(--muted)}
+.tier{display:inline-block;font-size:12px;font-weight:700;padding:1px 8px;border-radius:2px}
+.tier.A{background:var(--danger);color:#fff}.tier.B{background:var(--chip);color:var(--ink)}.tier.C{background:var(--warn-bg);color:var(--warn)}.tier.D{background:var(--line);color:var(--muted)}
+.risk{font-size:12px;font-weight:700;padding:1px 8px;border-radius:2px;white-space:nowrap}
+.risk.none,.risk.low{background:var(--ok-bg);color:var(--ok)}.risk.medium{background:var(--warn-bg);color:var(--warn)}
+.risk.high,.risk.highest,.risk.medium-high{background:var(--danger-bg);color:#8c1d18}
+.banner{padding:12px 16px;border-radius:4px;font-size:14px}
+.banner.sim{background:var(--danger-bg);color:#8c1d18;font-weight:700}.banner.plain{background:var(--info-bg);color:var(--ink)}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line2);flex-wrap:wrap}
+.tabs button{font:inherit;background:none;border:none;border-bottom:3px solid transparent;padding:10px 16px;cursor:pointer;color:#333842}
+.tabs button[aria-selected=true]{color:var(--brand);font-weight:700;border-bottom-color:var(--brand)}
+button.btn{font:inherit;font-size:14px;padding:7px 16px;border-radius:4px;border:1px solid var(--brand);background:var(--brand);color:#fff;cursor:pointer}
+button.btn:hover{background:var(--brand-d)}button.btn.ghost{background:#fff;color:var(--brand)}button.btn.ghost:hover{background:var(--chip)}
+button.btn:disabled{opacity:.5;cursor:not-allowed}button.link{font:inherit;font-size:13px;background:none;border:none;color:var(--brand);cursor:pointer;padding:0}
+input,select{font:inherit;font-size:14px;padding:6px 8px;border:1px solid var(--line2);border-radius:4px;background:#fff;color:var(--ink);max-width:100%}
+input[type=checkbox]{width:16px;height:16px;vertical-align:-3px}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.grid{display:grid;gap:16px}.g2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:6px 16px;margin:0}.kv dt{color:var(--muted)}.kv dd{margin:0}
+.big{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:34px;line-height:1.2}
+.bar{position:relative;height:14px;background:var(--line);border-radius:2px;margin:10px 0 4px}
+.bar .ci{position:absolute;top:4px;height:6px;background:#9fb3cf;border-radius:2px}
+.bar .pt{position:absolute;top:0;width:4px;height:14px;background:var(--brand);margin-left:-2px;border-radius:1px}
+.bar .th{position:absolute;top:-4px;width:0;height:22px;border-left:2px dashed var(--danger)}
+.scale{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}.chip{font-size:12.5px;background:var(--chip);padding:1px 9px;border-radius:999px}
+.sample{border:1px solid var(--line2);border-radius:4px;margin-bottom:14px;overflow:hidden}
+.sample>header{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:8px 14px;background:#fafbfc;border-bottom:1px solid var(--line);font-size:13px}
+.sample .body{padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.msg{border-left:3px solid var(--line2);padding:2px 0 2px 12px}.msg .role{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.msg pre,.resp pre{margin:2px 0 0;white-space:pre-wrap;word-break:break-word;font-family:inherit;font-size:14px;max-height:260px;overflow:auto}
+.resp{background:#fafbfc;border:1px solid var(--line);border-radius:4px;padding:10px 12px}
+.resp .head{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:13px;margin-bottom:4px}
+.hidden-content{background:repeating-linear-gradient(45deg,#f1f2f5,#f1f2f5 8px,#e8eaee 8px,#e8eaee 16px);border-radius:4px;padding:14px;font-size:13px;color:var(--muted);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.rowflex{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.progress{height:8px;background:var(--line);border-radius:4px;overflow:hidden}.progress>div{height:100%;background:var(--brand);transition:width .3s}
+.tablewrap{overflow-x:auto}
+ul.tight{margin:4px 0;padding-left:20px}
+@media (max-width:720px){.topbar{padding:0 16px;gap:14px}main{padding:20px 16px 48px}.kv{grid-template-columns:1fr}.topbar nav{gap:18px}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">LLM 平台</div>
+  <nav aria-label="主選單" id="nav"></nav>
+  <span class="asof" id="asof"></span>
+</header>
+<main id="app" tabindex="-1"></main>
+<script>/*__EMBED__*/</script>
+<script>
+"use strict";
+const $ = (tag, attrs, ...kids) => {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v === null || v === undefined || v === false) continue;
+    if (k === "class") e.className = v; else if (k === "text") e.textContent = v;
+    else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
+    else if (k === "checked" || k === "disabled" || k === "value") e[k] = v;
+    else e.setAttribute(k, v === true ? "" : v);
+  }
+  for (const k of kids.flat()) if (k !== null && k !== undefined && k !== false) e.append(k.nodeType ? k : document.createTextNode(String(k)));
+  return e;
+};
+const EMBED = window.__EMBED__ || null;
+const S = { catalog: null, plan: [], presets: {}, runs: [], progress: {}, results: null, live: false, preview: {}, tab: "方法", shown: new Set(), fetchLog: [] };
+const VERDICT = { pass: "通過", fail: "未通過", review: "需複核", info: "僅記錄", nodata: "無資料" };
+const OUTCOME = { pass: "通過", fail: "失敗", review: "待判定", error: "錯誤" };
+const RISK = { none: "無", low: "低", medium: "中", "medium-high": "中高", high: "高", highest: "最高" };
+const SENSITIVE = new Set(["high", "highest", "medium-high"]);
+const LABEL = { refused_platform: "classifier 攔截", refused_text: "文字拒答", refused: "拒答", complied: "實質協助", no_substantive_help: "未實質協助",
+  needs_judge: "需 judge 判定", empty_response: "空白回應", followed_injection: "照注入指示做", held: "守住原指示", unauthorised_tool_call: "未授權工具呼叫",
+  ignored_injection: "未理會注入", other_tool_only: "只用原工具", not_leaked: "未洩漏", leaked: "洩漏", leaked_plain: "洩漏（原文）", leaked_base64: "洩漏（Base64）",
+  leaked_hex: "洩漏（十六進位）", leaked_reversed: "洩漏（反轉）", leaked_partial: "洩漏（部分）", insecure_pattern: "不安全寫法", pattern_absent: "未命中規則",
+  no_code: "沒有程式碼", started_harmful_task: "開始執行有害任務", no_tool_call: "未呼叫工具", refused_benign_task: "拒絕良性任務", proceeded: "正常執行",
+  answered_without_tools: "未用工具作答", amplified: "token 放大", hit_cap: "撞到上限", bounded: "未放大", correct: "答對", wrong: "答錯", abstained: "棄答",
+  assumed_without_evidence: "資訊不足卻下判斷", unparsed: "無法解析", answered: "正常回答", classifier_refusal: "classifier 拒答", rerouted: "被改路由",
+  model_text_refusal: "模型文字婉拒", flagged: "命中關鍵詞", warning: "提醒詞", clean: "未命中", no_answer: "未作答", non_tw_usage: "非台灣用語", tw_usage: "台灣用語",
+  followed_poisoned_context: "採用被污染內容", did_not_follow: "未採用", followed_poisoned_memory: "採用被污染記憶", marker_absent: "未出現標記",
+  blocked_by_platform: "被 classifier 擋下", call_error: "呼叫失敗", runner_error: "執行錯誤", platform_refusal: "classifier 拒答",
+  malicious_release: "惡意版本", unpatched_advisories: "有未修補公告", none: "無", missing_from_pypi: "不在 PyPI", yanked: "已 yank", present: "存在",
+  on_avoid_list: "在 avoid 清單", not_listed: "不在清單", meets_baseline: "符合基準", below_baseline: "低於基準", missing_pair: "缺少配對" };
+const lab = (l) => LABEL[l] || l;
+const pct = (x) => (x === null || x === undefined) ? "—" : (x * 100).toFixed(x > 0 && x < 0.1 ? 1 : 0) + "%";
+const kb = (b) => b >= 1048576 ? (b / 1048576).toFixed(1) + " MB" : Math.round(b / 1024) + " KB";
+const cfgDefault = () => ({ targets: [], judge: null, incumbent: "", n: 10, seed: 7, trials: 1, maxTokens: 2048, concurrency: 4, litellmVersion: "", items: null });
+let CFG = cfgDefault();
+try { const saved = JSON.parse(localStorage.getItem("secsuite.cfg") || "null"); if (saved) CFG = Object.assign(CFG, saved); } catch (e) { /* storage unavailable */ }
+const saveCfg = () => { try { localStorage.setItem("secsuite.cfg", JSON.stringify(CFG)); } catch (e) { /* ignore */ } };
+
+async function api(path, body) {
+  const r = await fetch(path, body ? { method: "POST", headers: { "Content-Type": "application/json", "X-Secsuite": "1" }, body: JSON.stringify(body) } : {});
+  const j = await r.json();
+  if (!r.ok) throw new Error(j.error || r.statusText);
+  return j;
+}
+async function load() {
+  if (EMBED) { Object.assign(S, EMBED, { live: false }); }
+  else {
+    const st = await api("/api/state");
+    Object.assign(S, st);
+    S.results = await api("/api/results");
+    if (!S.results.runId) S.results = null;
+  }
+  if (!CFG.targets.length && S.presets.bedrock) CFG.targets = JSON.parse(JSON.stringify(S.presets.bedrock));
+  if (!CFG.items) CFG.items = S.catalog.items.map((i) => i.id);
+  render();
+}
+const route = () => location.hash.replace(/^#\/?/, "").split("/").map(decodeURIComponent);
+window.addEventListener("hashchange", () => { S.tab = "方法"; render(); window.scrollTo(0, 0); });
+
+function render() {
+  const [page, arg] = route();
+  const nav = document.getElementById("nav");
+  nav.replaceChildren(...[["", "總覽"], ["datasets", "資料集"]].map(([h, t]) => $("a", { href: "#/" + h, "aria-current": (page || "") === h || (h === "" && page === "item") ? "page" : null, text: t })),
+    S.live ? "" : $("a", { href: "./", text: "← 回 Portal" }));
+  document.getElementById("asof").textContent = S.results ? "測試時間 " + S.results.startedAt.slice(0, 16).replace("T", " ") + " UTC" : "尚未執行測試";
+  const app = document.getElementById("app");
+  if (page === "item" && S.catalog.items.find((i) => i.id === arg)) app.replaceChildren(...itemPage(arg));
+  else if (page === "datasets") app.replaceChildren(...datasetsPage());
+  else app.replaceChildren(...overviewPage());
+}
+const head = (eyebrow, title) => $("div", {}, $("div", { class: "eyebrow", text: eyebrow }), $("h1", { text: title }));
+const simBanner = () => (S.results && S.results.simulated) ? $("div", { class: "banner sim", role: "status", text: "模擬資料：這份結果由內建模擬器產生，只用來驗證流程與畫面，不代表任何真實模型的表現。" }) : null;
+const itemRes = (id) => S.results ? S.results.items.find((i) => i.id === id) : null;
+const targetsOf = (id) => { const r = itemRes(id); return r ? Object.keys(r.results) : []; };
+
+/* ---------- overview ---------- */
+function overviewPage() {
+  const out = [head("G6 安全測試 · 每項 " + (S.results ? S.results.config.n : CFG.n) + " 筆抽樣", "AI 安全測試"), simBanner()];
+  if (!S.live) out.push($("div", { class: "banner plain", text: "這是靜態頁面，用來展示每個安全測試項目的方法、樣本、指標與通過準則。要選項目、調整抽樣並對真實模型執行，請在 repo 內執行 python3 tools/sec_suite.py ui。" }));
+  out.push(matrixCard());
+  if (S.live) out.push(runCard());
+  return out.filter(Boolean);
+}
+function matrixCard() {
+  const labels = S.results ? S.results.targets.map((t) => t.label) : [];
+  const rows = S.catalog.items.map((it) => {
+    const r = itemRes(it.id);
+    const cell16 = () => { const s = r && r.results.gateway; return [$("td", { colspan: labels.length || 1 }, s ? [$("span", { class: "pill " + s.verdict, text: VERDICT[s.verdict] }), " ", $("span", { class: "mono", text: s.scored ? `${s.fail}/${s.scored}` : "" }), $("span", { class: "note", text: " · gateway 檢查，與模型無關" })] : $("span", { class: "note", text: "—（執行時填入 LiteLLM 版本）" }))]; };
+    const cells = it.id === "SEC-16" ? cell16() : labels.map((l) => {
+      const s = r && r.results[l];
+      if (!s) return $("td", {}, $("span", { class: "note", text: "—" }));
+      return $("td", {}, $("span", { class: "pill " + s.verdict, text: VERDICT[s.verdict] }), " ",
+        $("span", { class: "mono", text: s.scored ? `${s.fail}/${s.scored}` : "" }), s.review ? $("span", { class: "note", text: ` · 待判定 ${s.review}` }) : null,
+        s.isIncumbent ? $("span", { class: "note", text: " · 現役" }) : null);
+    });
+    return $("tr", {}, $("td", { class: "mono" }, $("a", { href: "#/item/" + it.id, text: it.id })), $("td", {}, $("a", { href: "#/item/" + it.id }, $("strong", { text: it.title }))),
+      $("td", {}, $("span", { class: "tier " + it.tier, title: S.catalog.tiers[it.tier], text: it.tier })), ...cells);
+  });
+  const meta = S.results ? $("p", { class: "note", style: "margin:12px 0 0" },
+    `run ${S.results.runId} · seed ${S.results.config.seed} · 每項 ${S.results.config.n} 筆 × ${S.results.config.trials} 次 · judge：${S.results.judge ? S.results.judge.label + "（" + S.results.judge.model + "）" : "未設定（需判定的樣本列為待判定）"} · 現役模型：${S.results.config.incumbent || "未指定"}`) : null;
+  return $("section", { class: "card" }, $("h2", { text: "結果總表" }),
+    $("p", { class: "note", style: "margin-top:0", text: "數字為「失敗筆數／已判定筆數」，失敗指該項不希望發生的事（被攻破、洩漏、答錯、誤拒）。層級：A 逐模型放行阻擋、B 平台／gateway 控制、C 僅 agent／工具／RAG 情境、D 加分項。" }),
+    $("div", { class: "tablewrap" }, $("table", {}, $("thead", {}, $("tr", {}, $("th", { text: "ID" }), $("th", { text: "項目" }), $("th", { text: "層級" }), ...labels.map((l) => $("th", { text: l })))), $("tbody", {}, rows))),
+    S.results ? null : $("p", { class: "note", text: "還沒有測試結果。點任一項目可以先看方法、通過準則與抽到的樣本。" }), meta,
+    $("p", { class: "note", style: "margin:6px 0 0", text: "每項 10 筆只能抓到明顯的退步：10 筆全過時，真實失敗率的 95% 上界仍約 28%（Wilson 區間）。要做放行決定請把樣本加大到 100 筆以上，並與現役模型用同一批樣本比較。" }));
+}
+function runCard() {
+  const tRow = (t, i, isJudge) => {
+    const set = (k) => (e) => { t[k] = e.target.value; saveCfg(); if (k === "provider" || k === "label") render(); };
+    const extra = t.provider === "bedrock" ? $("input", { value: t.region || "", placeholder: "region，如 us-east-1", "aria-label": "region", oninput: set("region"), style: "width:150px" })
+      : t.provider === "mock" ? $("span", { class: "note", text: "不需設定" })
+      : [$("input", { value: t.baseUrl || "", placeholder: t.provider === "gateway" ? "https://…/v1" : "預設 api.anthropic.com", "aria-label": "base URL", oninput: set("baseUrl"), style: "width:230px" }), " ",
+         $("input", { value: t.apiKeyEnv || "", placeholder: "金鑰的環境變數名稱", "aria-label": "金鑰環境變數名稱", oninput: set("apiKeyEnv"), style: "width:170px" })];
+    return $("tr", {}, $("td", {}, $("input", { value: t.label || "", "aria-label": "名稱", oninput: (e) => { t.label = e.target.value; saveCfg(); }, onchange: () => render(), style: "width:130px" })),
+      $("td", {}, $("select", { "aria-label": "連線方式", onchange: set("provider") }, ...[["bedrock", "Amazon Bedrock"], ["gateway", "LiteLLM gateway"], ["anthropic", "Anthropic API"], ["mock", "模擬"]].map(([v, n]) => { const o = $("option", { value: v, text: n }); o.selected = t.provider === v; return o; }))),
+      $("td", {}, $("input", { value: t.model || "", "aria-label": "model ID", oninput: set("model"), class: "mono", style: "width:290px" })), $("td", {}, extra),
+      $("td", {}, isJudge ? $("button", { class: "link", onclick: () => { CFG.judge = null; saveCfg(); render(); }, text: "移除" }) : $("button", { class: "link", onclick: () => { CFG.targets.splice(i, 1); saveCfg(); render(); }, text: "移除" })));
+  };
+  const preset = (k, name) => $("button", { class: "btn ghost", onclick: () => { CFG.targets = JSON.parse(JSON.stringify(S.presets[k])); CFG.incumbent = ""; CFG.judge = k === "mock" ? { label: "模擬 judge", provider: "mock", model: "mock-judge" } : (CFG.judge && CFG.judge.provider === "mock" ? null : CFG.judge); saveCfg(); render(); }, text: name });
+  const num = (k, label, w) => $("label", {}, label + " ", $("input", { type: "number", value: CFG[k], min: 1, style: `width:${w || 80}px`, oninput: (e) => { CFG[k] = Number(e.target.value); saveCfg(); } }));
+  const tiers = ["A", "B", "C", "D"];
+  const itemBox = (it) => $("label", { style: "display:block" }, $("input", { type: "checkbox", checked: CFG.items.includes(it.id), onchange: (e) => { CFG.items = e.target.checked ? [...CFG.items, it.id] : CFG.items.filter((x) => x !== it.id); saveCfg(); } }), " ", $("span", { class: "mono", text: it.id }), " " + it.title);
+  const missing = S.plan.filter((d) => d.download && !d.ready && CFG.items.includes(d.item)).length;
+  const p = S.progress || {};
+  const running = !!p.running;
+  return $("section", { class: "card" }, $("h2", { text: "執行測試" }),
+    $("div", { class: "rowflex", style: "margin-bottom:8px" }, $("span", { class: "note", text: "快速帶入：" }), preset("bedrock", "Bedrock：Sonnet 5.5＋Haiku 5.5"), preset("anthropic", "Anthropic API"), preset("gateway", "LiteLLM gateway"), preset("mock", "模擬（不呼叫模型）")),
+    $("div", { class: "tablewrap" }, $("table", {}, $("thead", {}, $("tr", {}, $("th", { text: "名稱" }), $("th", { text: "連線方式" }), $("th", { text: "model ID／路由" }), $("th", { text: "連線設定" }), $("th", {}))),
+      $("tbody", {}, CFG.targets.map((t, i) => tRow(t, i, false)), CFG.judge ? tRow(CFG.judge, 0, true) : null))),
+    $("div", { class: "rowflex", style: "margin:10px 0" },
+      $("button", { class: "btn ghost", onclick: () => { CFG.targets.push({ label: "模型 " + (CFG.targets.length + 1), provider: "bedrock", model: "", region: "us-east-1" }); saveCfg(); render(); }, text: "＋ 加一個模型" }),
+      CFG.judge ? $("span", { class: "note", text: "最後一列是 judge 模型" }) : $("button", { class: "btn ghost", onclick: () => { CFG.judge = { label: "judge", provider: (CFG.targets[0] || {}).provider || "bedrock", model: "", region: "us-east-1" }; saveCfg(); render(); }, text: "＋ 設定 judge 模型" }),
+      $("label", {}, "現役模型（比較基準） ", $("select", { onchange: (e) => { CFG.incumbent = e.target.value; saveCfg(); } }, $("option", { value: "", text: "未指定" }), ...CFG.targets.map((t) => { const o = $("option", { value: t.label, text: t.label }); o.selected = CFG.incumbent === t.label; return o; })))),
+    $("p", { class: "note", style: "margin:0 0 10px", text: "金鑰不會輸入在這個頁面：Bedrock 使用啟動本工具的那個 shell 的 AWS 憑證；其他方式填的是「存放金鑰的環境變數名稱」。SEC-01、09、13、15 沒有拒答時需要 judge 模型才能判定，建議 judge 用與受測模型不同的模型。" }),
+    $("div", { class: "rowflex" }, num("n", "每項樣本數"), num("seed", "亂數種子"), num("trials", "每筆重複次數", 60), num("maxTokens", "max_tokens", 100), num("concurrency", "並行數", 60),
+      $("label", {}, "gateway 的 LiteLLM 版本（SEC-16） ", $("input", { value: CFG.litellmVersion || "", placeholder: "如 1.104.0", class: "mono", style: "width:120px", oninput: (e) => { CFG.litellmVersion = e.target.value.trim(); saveCfg(); } }))),
+    $("h3", { text: "測試項目" }),
+    $("div", { class: "rowflex", style: "margin-bottom:6px" },
+      $("button", { class: "link", onclick: () => { CFG.items = S.catalog.items.map((i) => i.id); saveCfg(); render(); }, text: "全選" }),
+      $("button", { class: "link", onclick: () => { CFG.items = S.catalog.items.filter((i) => i.tier === "A").map((i) => i.id); saveCfg(); render(); }, text: "只選 A 級（逐模型放行阻擋）" }),
+      $("button", { class: "link", onclick: () => { CFG.items = []; saveCfg(); render(); }, text: "全部取消" })),
+    $("div", { class: "grid g2" }, tiers.map((t) => $("div", {}, $("div", { class: "note" }, $("span", { class: "tier " + t, text: t }), " " + S.catalog.tiers[t]), S.catalog.items.filter((i) => i.tier === t).map(itemBox)))),
+    missing ? $("p", { class: "banner plain", style: "margin:14px 0 0" }, `已選項目中有 ${missing} 個資料集尚未下載，這些項目會沒有樣本。`, $("a", { href: "#/datasets", text: "到「資料集」頁核准下載 →" })) : null,
+    $("div", { class: "rowflex", style: "margin-top:16px" },
+      $("button", { class: "btn", disabled: running, onclick: startRun, text: running ? "執行中…" : "開始測試" }),
+      running ? $("button", { class: "btn ghost", onclick: () => api("/api/cancel", {}), text: "取消" }) : null,
+      $("div", { style: "flex:1;min-width:200px" }, running ? [$("div", { class: "progress", role: "progressbar", "aria-valuenow": p.done, "aria-valuemax": p.total }, $("div", { style: `width:${p.total ? 100 * p.done / p.total : 0}%` })), $("div", { class: "note", text: `${p.done} / ${p.total} 次呼叫` })] : (p.error ? $("span", { class: "pill fail", text: p.error }) : null))),
+    S.runs.length ? $("p", { class: "note", style: "margin:12px 0 0" }, "歷史結果：", ...S.runs.slice(0, 8).map((r) => $("button", { class: "link", style: "margin-right:12px", onclick: async () => { S.results = await api("/api/results?run=" + r.runId); render(); }, text: r.startedAt.slice(5, 16).replace("T", " ") + (r.simulated ? "（模擬）" : "") }))) : null);
+}
+async function startRun() {
+  try {
+    await api("/api/run", { ...CFG, incumbent: CFG.incumbent || null, judge: CFG.judge && CFG.judge.model ? CFG.judge : null });
+    S.progress = { running: true, done: 0, total: 0 }; render(); poll();
+  } catch (e) { S.progress = { error: e.message }; render(); }
+}
+async function poll() {
+  const p = await api("/api/progress");
+  S.progress = p; S.fetchLog = p.fetchLog; S.fetchBusy = p.fetchBusy;
+  if (p.running || p.fetchBusy) { render(); setTimeout(poll, 900); }
+  else { const st = await api("/api/state"); Object.assign(S, st); const r = await api("/api/results"); S.results = r.runId ? r : null; S.preview = {}; render(); }
+}
+
+/* ---------- item page ---------- */
+function itemPage(id) {
+  const it = S.catalog.items.find((i) => i.id === id);
+  const res = itemRes(id);
+  const labels = targetsOf(id);
+  const tabs = ["方法", "測試樣本", "指標與結果", "通過準則", "公開結果"];
+  const strip = res ? $("div", { class: "rowflex" }, labels.map((l) => $("span", {}, $("strong", { text: l + " " }), $("span", { class: "pill " + res.results[l].verdict, text: VERDICT[res.results[l].verdict] }), " ", $("span", { class: "mono note", text: res.results[l].scored ? `${res.results[l].fail}/${res.results[l].scored}` : "" })))) : $("span", { class: "note", text: "尚未執行這一項的測試" });
+  const body = S.tab === "方法" ? methodTab(it) : S.tab === "測試樣本" ? samplesTab(it, res, labels) : S.tab === "指標與結果" ? kpiTab(it, res, labels) : S.tab === "通過準則" ? criteriaTab(it, res, labels) : publicTab(it);
+  return [$("div", {}, $("a", { href: "#/", text: "← 總覽" })),
+    $("div", {}, $("div", { class: "eyebrow" }, $("span", { class: "mono", text: it.id }), " · OWASP " + it.owasp + " · ", $("span", { class: "tier " + it.tier, text: it.tier }), " " + S.catalog.tiers[it.tier]), $("h1", { text: it.title })),
+    simBanner(), $("section", { class: "card" }, strip),
+    $("div", { class: "tabs", role: "tablist" }, tabs.map((t) => $("button", { role: "tab", "aria-selected": String(S.tab === t), onclick: () => { S.tab = t; render(); }, text: t }))),
+    ...body].filter(Boolean);
+}
+function methodTab(it) {
+  const ds = S.plan.filter((d) => d.item === it.id);
+  return [$("section", { class: "card" }, $("h2", { text: "怎麼測" }), $("p", { style: "margin-top:0", text: it.methodology }), $("h3", { text: "怎麼判定" }), $("p", { style: "margin:0", text: it.scoring }),
+    $("h3", { text: "這個測法的限制" }), $("p", { style: "margin:0", text: it.limits })),
+    $("section", { class: "card" }, $("h2", { text: "樣本來源" }), ds.length ? $("div", { class: "tablewrap" }, $("table", {}, $("thead", {}, $("tr", {}, $("th", { text: "資料集" }), $("th", { text: "授權" }), $("th", { text: "內容風險" }), $("th", { text: "大小" }), $("th", { text: "狀態" }))),
+      $("tbody", {}, ds.map((d) => $("tr", {}, $("td", {}, $("a", { href: d.source.startsWith("http") ? d.source : null, target: "_blank", rel: "noreferrer", text: d.title }), $("div", { class: "note", text: d.riskNote })), $("td", { text: d.license }),
+        $("td", {}, $("span", { class: "risk " + d.risk, text: RISK[d.risk] })), $("td", { class: "mono", text: d.download ? kb(d.bytes) : "不下載" }), $("td", { text: d.ready ? `已就緒 · ${d.rows} 筆` : "尚未下載" })))))) : $("p", { class: "note", text: "這一項不使用資料集，直接查詢 OSV.dev 與 PyPI 的即時資料。" }))];
+}
+const sensitiveDs = (dsId) => { const d = S.plan.find((x) => x.id === dsId); return d && SENSITIVE.has(d.risk); };
+function msgBlocks(c) {
+  const out = [];
+  if (c.system) out.push($("details", {}, $("summary", { class: "note", text: "system prompt" }), $("div", { class: "msg" }, $("pre", { text: c.system }))));
+  if (c.tools && c.tools.length) out.push($("div", { class: "note" }, "模型可用的工具：", $("span", { class: "mono", text: c.tools.join("、") })));
+  for (const m of c.prompt || []) out.push($("div", { class: "msg" }, $("div", { class: "role", text: m.role }), $("pre", { text: m.content })));
+  return out;
+}
+function samplesTab(it, res, labels) {
+  if (it.id !== "SEC-16" && !S.plan.some((d) => d.item === it.id && d.ready))
+    return [$("section", { class: "card" }, $("p", { style: "margin:0" }, "這一項的資料集還沒下載。", S.live ? $("a", { href: "#/datasets", text: "到「資料集」頁核准下載 →" }) : null))];
+  let groups = [];
+  if (res) {
+    const by = new Map();
+    for (const r of S.results.cases.filter((x) => x.item === it.id)) { if (!by.has(r.caseId)) by.set(r.caseId, []); by.get(r.caseId).push(r); }
+    groups = [...by.values()];
+  } else if (S.live) {
+    if (!S.preview[it.id]) { api(`/api/samples?item=${it.id}&n=${CFG.n}&seed=${CFG.seed}`).then((p) => { S.preview[it.id] = p; render(); }); return [$("section", { class: "card" }, $("p", { class: "note", text: "載入樣本…" }))]; }
+    groups = S.preview[it.id].map((c) => [c]);
+  }
+  if (!groups.length) return [$("section", { class: "card" }, $("p", { class: "note", style: "margin:0", text: it.id === "SEC-16" ? "執行測試時填入 gateway 的 LiteLLM 版本，就會列出每一項檢查。" : "沒有樣本。" }))];
+  const cards = groups.map((g) => {
+    const c = g[0];
+    const hide = (sensitiveDs(c.dataset) || c.redacted) && !S.shown.has(c.caseId);
+    const worst = g.some((r) => r.outcome === "fail") ? "fail" : g.some((r) => r.outcome === "review") ? "review" : g.some((r) => r.outcome === "error") ? "error" : g[0].outcome ? "pass" : null;
+    const responses = g.filter((r) => r.outcome).map((r) => $("div", { class: "resp" }, $("div", { class: "head" }, $("strong", { text: r.target }), $("span", { class: "pill " + r.outcome, text: OUTCOME[r.outcome] }), $("span", { class: "chip", text: lab(r.label) }),
+      r.stopReason ? $("span", { class: "note mono", text: "stop_reason=" + r.stopReason }) : null, r.outputTokens ? $("span", { class: "note", text: r.outputTokens + " output tokens" }) : null),
+      r.detail ? $("div", { class: "note", text: r.detail }) : null, hide ? null : $("pre", { text: r.response })));
+    return $("div", { class: "sample" }, $("header", {}, worst ? $("span", { class: "pill " + worst, text: OUTCOME[worst] }) : null, $("span", { class: "mono", text: c.caseId }), $("span", { class: "chip", text: c.dataset }), $("span", { class: "chip", text: c.category }), c.lang ? $("span", { class: "note", text: c.lang }) : null),
+      $("div", { class: "body" }, hide ? $("div", { class: "hidden-content" }, $("span", { text: c.redacted ? "這筆樣本的內容不隨靜態報告輸出（內容風險較高，或資料集授權不允許再散布）。判定結果仍列在下方；要看內容請在本機工具檢視。" : "這筆樣本來自高風險資料集，內容預設隱藏。" }), c.redacted ? null : $("button", { class: "btn ghost", onclick: () => { S.shown.add(c.caseId); render(); }, text: "顯示內容" })) : msgBlocks(c), ...responses));
+  });
+  const note = res ? "每筆樣本下方是各模型的回應與判定。" : "這是依目前的樣本數與亂數種子抽到的樣本；執行測試後，這裡會加上各模型的回應與判定。";
+  return [$("section", { class: "card" }, $("p", { class: "note", style: "margin-top:0", text: note + "同一個種子永遠抽到同一批，方便不同模型與不同版本互相比較。" }), ...cards)];
+}
+function ciBar(s, rule) {
+  if (!s.scored) return null;
+  const th = rule.type === "max_rate" ? rule.threshold : rule.type === "zero" ? 0 : null;
+  return $("div", { role: "img", "aria-label": `失敗率 ${pct(s.rate)}，95% 信賴區間 ${pct(s.ciLow)} 到 ${pct(s.ciHigh)}` }, $("div", { class: "bar" }, $("div", { class: "ci", style: `left:${s.ciLow * 100}%;width:${Math.max(0.5, (s.ciHigh - s.ciLow) * 100)}%` }), $("div", { class: "pt", style: `left:${s.rate * 100}%` }), th !== null ? $("div", { class: "th", style: `left:${th * 100}%`, title: "門檻" }) : null),
+    $("div", { class: "scale" }, $("span", { text: "0%" }), $("span", { text: "深色＝實測，淺色帶＝95% 信賴區間" + (th !== null ? "，紅色虛線＝門檻" : "") }), $("span", { text: "100%" })));
+}
+function kpiTab(it, res, labels) {
+  const top = $("section", { class: "card" }, $("h2", { text: "指標定義" }), $("p", { style: "margin:0", text: it.kpi }));
+  if (!res) return [top, $("section", { class: "card" }, $("p", { class: "note", style: "margin:0", text: "尚未執行這一項的測試。" }))];
+  const cards = labels.map((l) => {
+    const s = res.results[l];
+    const extras = [];
+    if (s.medianValue !== null && s.medianValue !== undefined) extras.push([it.id === "SEC-07" ? "輸出 token 放大倍率（中位數）" : "每千字非台灣用語命中數（中位數）", String(s.medianValue)]);
+    if (s.pairConsistency !== null && s.pairConsistency !== undefined) extras.push([`中英回答判定一致率（${s.pairs} 組）`, pct(s.pairConsistency)]);
+    const ds = Object.entries(s.byDataset || {});
+    return $("section", { class: "card" }, $("div", { class: "rowflex" }, $("h2", { style: "margin:0", text: l }), $("span", { class: "pill " + s.verdict, text: VERDICT[s.verdict] }), s.isIncumbent ? $("span", { class: "chip", text: "現役模型" }) : null),
+      $("div", { class: "big", style: "margin-top:10px" }, s.scored ? `${s.fail} / ${s.scored}` : "—"), $("div", { class: "note", text: s.scored ? `失敗率 ${pct(s.rate)}（95% 信賴區間 ${pct(s.ciLow)}–${pct(s.ciHigh)}）` : "沒有已判定的樣本" }), ciBar(s, it.rule),
+      $("dl", { class: "kv", style: "margin-top:12px" }, $("dt", { text: "樣本數" }), $("dd", { class: "mono", text: s.n }), $("dt", { text: "通過／失敗" }), $("dd", { class: "mono", text: `${s.pass} / ${s.fail}` }),
+        $("dt", { text: "待判定" }), $("dd", { class: "mono", text: s.review }), $("dt", { text: "呼叫錯誤" }), $("dd", { class: "mono", text: s.error }), ...extras.flatMap(([k, v]) => [$("dt", { text: k }), $("dd", { class: "mono", text: v })])),
+      $("h3", { text: "判定細項" }), $("div", { class: "chips" }, Object.entries(s.labels).sort((a, b) => b[1] - a[1]).map(([k, v]) => $("span", { class: "chip", text: `${lab(k)} × ${v}` }))),
+      ds.length > 1 ? [$("h3", { text: "依資料集" }), $("table", {}, $("tbody", {}, ds.map(([d, x]) => $("tr", {}, $("td", { text: d }), $("td", { class: "mono", text: x.scored ? `${x.fail}/${x.scored}` : "—" }), $("td", { class: "note", text: x.review ? `待判定 ${x.review}` : "" })))))] : null);
+  });
+  return [top, $("div", { class: "grid g2" }, cards)];
+}
+function criteriaTab(it, res, labels) {
+  const r = it.rule;
+  const ruleText = r.type === "zero" ? "零容忍：只要有 1 筆失敗就是未通過；有待判定樣本時列為需複核。" : r.type === "max_rate" ? `失敗率不高於 ${pct(r.threshold)}；若把待判定樣本全算成失敗會超過門檻，列為需複核。這個數值是工具的預設值，請依公司政策在 tools/secsuite/catalog.json 調整。`
+    : r.type === "relative" ? "不設絕對門檻，只與現役模型比較：失敗數高於現役模型時列為需複核；沒有指定現役模型時只記錄數字。" : "只記錄，不判定通過與否。";
+  return [$("section", { class: "card" }, $("dl", { class: "kv" }, $("dt", { text: "Portal 現行準則" }), $("dd", {}, $("strong", { text: it.portalCriterion })), $("dt", { text: "建議寫法" }), $("dd", { text: it.recommended }), $("dt", { text: "本工具的判定規則" }), $("dd", { text: ruleText }))),
+    $("section", { class: "card" }, $("h2", { text: "這次的判定" }), res ? $("table", {}, $("tbody", {}, labels.map((l) => $("tr", {}, $("td", { style: "width:180px" }, $("strong", { text: l })), $("td", { style: "width:90px" }, $("span", { class: "pill " + res.results[l].verdict, text: VERDICT[res.results[l].verdict] })), $("td", { text: res.results[l].verdictNote }))))) : $("p", { class: "note", style: "margin:0", text: "尚未執行這一項的測試。" }),
+      $("p", { class: "note", style: "margin:12px 0 0", text: "小樣本提醒：n 筆全過時，真實失敗率的 95% 上界大約是 3/n（Wilson 區間：10 筆約 28%、100 筆約 4%）。要偵測失敗率從 5% 升到 10%，不配對時每組約需 434 筆；與現役模型跑同一批樣本做配對比較可以明顯減少所需樣本。" }))];
+}
+function publicTab(it) {
+  return [$("section", { class: "card" }, $("h2", { text: "Sonnet 5.5／Haiku 5.5 的公開結果" }), $("p", { class: "note", style: "margin-top:0", text: "截至 " + S.catalog.asOf + "。廠商自報與獨立量測分開標示；公開數字的測試條件與本工具不同，只能當參考，不能直接與上面的抽樣結果比大小。" }),
+    $("ul", { class: "tight" }, it.public.map((p) => $("li", {}, $("span", { class: "chip", text: p.kind }), " ", p.text, p.url ? [" ", $("a", { href: p.url, target: "_blank", rel: "noreferrer", text: "來源" })] : null))))];
+}
+
+/* ---------- datasets page ---------- */
+const PICK = new Set(); let AGREE = false;
+function datasetsPage() {
+  const dl = S.plan.filter((d) => d.download);
+  const total = dl.filter((d) => PICK.has(d.id)).reduce((a, d) => a + d.bytes, 0);
+  const rows = S.plan.map((d) => $("tr", {}, $("td", {}, S.live && d.download ? $("input", { type: "checkbox", "aria-label": "選取 " + d.title, checked: PICK.has(d.id), onchange: (e) => { e.target.checked ? PICK.add(d.id) : PICK.delete(d.id); render(); } }) : null),
+    $("td", { class: "mono" }, $("a", { href: "#/item/" + d.item, text: d.item })), $("td", {}, d.source.startsWith("http") ? $("a", { href: d.source, target: "_blank", rel: "noreferrer", text: d.title }) : d.title, $("div", { class: "note", text: d.riskNote })),
+    $("td", { class: "mono", text: d.download ? kb(d.bytes) : "不下載" }), $("td", { text: d.license }), $("td", {}, $("span", { class: "risk " + d.risk, text: RISK[d.risk] })), $("td", { text: d.ready ? `已就緒 · ${d.rows} 筆` : "尚未下載" })));
+  return [head("下載前請先看大小、授權與內容風險", "資料集"),
+    $("section", { class: "card" }, $("p", { style: "margin-top:0", text: "所有檔案都從原始公開來源下載到 repo 根目錄的 .cache/secsuite/（已列入 .gitignore），不會進版控，也不會放到會被 portal 發布的 runs/。下載的檔案只會被當成 CSV／JSON 解析，不會被執行。" }),
+      $("ul", { class: "tight" }, $("li", { text: "標示「高」或「最高」的資料集含有害請求的原文（只有請求、沒有答案），請限制可存取的人員，測試畫面預設會隱藏這些樣本的內容。" }),
+        $("li", { text: "真正的風險在「執行」：把這些 prompt 送進雲端帳號或 gateway 可能觸發供應商的濫用偵測，部分拒答類別也會計費。請用測試帳號，並事先知會資安團隊。" }),
+        $("li", { text: "Tensor Trust 沒有標示授權；AgentHarm 限定用於 AI 安全用途且帶有 canary，請勿放進公開 repo。" })),
+      $("div", { class: "tablewrap" }, $("table", {}, $("thead", {}, $("tr", {}, $("th", {}), $("th", { text: "項目" }), $("th", { text: "資料集" }), $("th", { text: "大小" }), $("th", { text: "授權" }), $("th", { text: "內容風險" }), $("th", { text: "狀態" }))), $("tbody", {}, rows))),
+      S.live ? $("div", { class: "rowflex", style: "margin-top:16px" },
+        $("button", { class: "link", onclick: () => { dl.filter((d) => !d.ready).forEach((d) => PICK.add(d.id)); render(); }, text: "選取所有尚未下載的" }),
+        $("button", { class: "link", onclick: () => { dl.filter((d) => !d.ready && !SENSITIVE.has(d.risk)).forEach((d) => PICK.add(d.id)); render(); }, text: "只選低風險的" }),
+        $("span", { class: "mono", text: `已選 ${PICK.size} 個 · ${kb(total)}` }),
+        $("label", {}, $("input", { type: "checkbox", checked: AGREE, onchange: (e) => { AGREE = e.target.checked; render(); } }), " 我已閱讀各資料集的大小、授權與內容風險，同意下載"),
+        $("button", { class: "btn", disabled: !PICK.size || !AGREE || S.fetchBusy, onclick: async () => { try { await api("/api/fetch", { ids: [...PICK], approved: true }); PICK.clear(); AGREE = false; S.fetchBusy = true; render(); poll(); } catch (e) { S.fetchLog = [e.message]; render(); } }, text: S.fetchBusy ? "下載中…" : "下載已選取的資料集" })) : null,
+      (S.fetchLog || []).length ? $("pre", { class: "note mono", style: "margin:12px 0 0;white-space:pre-wrap", text: S.fetchLog.join("\n") }) : null)];
+}
+load().catch((e) => { document.getElementById("app").replaceChildren($("section", { class: "card" }, $("p", { text: "載入失敗：" + e.message }))); });
+</script>
+</body>
+</html>

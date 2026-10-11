@@ -13,3 +13,12 @@ data/internal/platform-inventory.json
 __pycache__/
 *.pyc
 .pytest_cache/
+
+# security test datasets and transcripts (downloaded at run time; never commit)
+.cache/
+
+# local virtual environment
+.venv/
+
+# local credentials for test runs (never commit)
+.env
