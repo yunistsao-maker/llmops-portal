@@ -5,8 +5,9 @@
   "scripts": {
     "schema": "ts-json-schema-generator -p schema/types.ts -t '*' -o schema/llmops.schema.json --no-type-check",
     "typecheck": "tsc --noEmit --strict schema/types.ts",
-    "validate": "node tools/validate.mjs && python3 tools/validate_data.py",
-    "selftest": "python3 tools/selftest.py"
+    "validate": "node tools/validate.mjs && python3 tools/validate_data.py && python3 tools/build_radar.py --check",
+    "selftest": "python3 tools/selftest.py",
+    "radar": "python3 tools/build_radar.py"
   },
   "dependencies": {
     "ajv": "^8.20.0",

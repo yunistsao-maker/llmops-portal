@@ -1,25 +1,41 @@
-import { useEffect, useState } from "react";
-import type { CatalogFile, DeepDive, DigestFile, LifecycleFile, PlatformInventory } from "../../schema/types";
+import { createContext, useContext, useEffect, useState } from "react";
+import type {
+  CatalogFile, CompatRun, DeepDive, DigestFile, LifecycleFile, LiteLLMFile, OpenModelsFile, PerfRun,
+  PlatformInventory, RadarFile, RequirementsFile, Source, SourceRef, SourcesFile,
+} from "../../schema/types";
+
+export interface Manifest { generatedAt: string; digests: string[]; models: string[]; compatRuns: string[]; perfRuns: string[]; hasInventory: boolean }
 
 async function getJson<T>(path: string): Promise<T> {
   const r = await fetch(path);
   if (!r.ok) throw new Error(`${path}: HTTP ${r.status}`);
   return r.json() as Promise<T>;
 }
-
-/** Digest file names are dates; the index is hard-coded until a manifest exists. */
-export const DIGESTS = ["2026-09-24"];
+const cache = new Map<string, Promise<unknown>>();
+function cached<T>(path: string): Promise<T> {
+  if (!cache.has(path)) cache.set(path, getJson<T>(path).catch((e) => { cache.delete(path); throw e; }));
+  return cache.get(path) as Promise<T>;
+}
 
 export const loaders = {
-  catalog: () => getJson<CatalogFile>("data/catalog.json"),
-  lifecycle: () => getJson<LifecycleFile>("data/lifecycle.json"),
-  digest: (id = DIGESTS[DIGESTS.length - 1]) => getJson<DigestFile>(`data/digests/${id}.json`),
-  deepDive: (id: string) => getJson<DeepDive>(`data/models/${id}.json`),
-  /** Real inventory (from sync_inventory.py) if present, else the example. */
-  inventory: () =>
-    getJson<PlatformInventory>("data/internal/platform-inventory.json").catch(() =>
-      getJson<PlatformInventory>("data/internal/platform-inventory.example.json"),
-    ),
+  manifest: () => cached<Manifest>("data/manifest.json"),
+  catalog: () => cached<CatalogFile>("data/catalog.json"),
+  lifecycle: () => cached<LifecycleFile>("data/lifecycle.json"),
+  litellm: () => cached<LiteLLMFile>("data/litellm.json"),
+  requirements: () => cached<RequirementsFile>("data/requirements.json"),
+  /** Optional file: the open-weight model radar. Rejects when the file is not there; pages show an empty state. */
+  openModels: () => cached<OpenModelsFile>("data/open-models.json"),
+  /** Optional file: the merged Release Radar (tools/build_radar.py). Without it the Radar page falls back to the newest digest. */
+  radar: () => cached<RadarFile>("data/radar.json"),
+  sources: () => cached<SourcesFile>("data/sources.json"),
+  digest: (id: string) => cached<DigestFile>(`data/digests/${id}.json`),
+  deepDive: (id: string) => cached<DeepDive>(`data/models/${id}.json`),
+  inventory: async () => {
+    const m = await loaders.manifest();
+    return cached<PlatformInventory>(m.hasInventory ? "data/internal/platform-inventory.json" : "data/internal/platform-inventory.example.json");
+  },
+  compatRuns: async () => { const m = await loaders.manifest(); return Promise.all(m.compatRuns.map((f) => cached<CompatRun>(`runs/compat/${f}`))); },
+  perfRuns: async () => { const m = await loaders.manifest(); return Promise.all(m.perfRuns.map((f) => cached<PerfRun>(`runs/perf/${f}`))); },
 };
 
 export function useData<T>(load: () => Promise<T>, deps: unknown[] = []) {
@@ -34,7 +50,22 @@ export function useData<T>(load: () => Promise<T>, deps: unknown[] = []) {
   return state;
 }
 
-export const daysFrom = (iso: string, today = new Date()) =>
-  Math.round((new Date(iso + "T00:00:00").getTime() - new Date(today.toDateString()).getTime()) / 86400000);
+/** Sources are loaded once at the top and shared so any page can render SourceRefs as links. */
+export const SourcesCtx = createContext<Map<string, Source>>(new Map());
+export const useSources = () => useContext(SourcesCtx);
+export type { SourceRef };
 
-export const money = (n?: number) => (n === undefined ? "—" : `$${n < 1 ? n.toFixed(2) : n % 1 ? n.toFixed(2) : n}`);
+export const TODAY = new Date();
+export const daysFrom = (iso: string, today = TODAY) =>
+  Math.round((new Date(iso + "T00:00:00").getTime() - new Date(today.toDateString()).getTime()) / 86400000);
+export const money = (n?: number) => (n === undefined ? "—" : `$${Number.isInteger(n) ? n : n < 0.1 ? n.toFixed(3).replace(/0$/, "") : n.toFixed(2)}`);
+export const fmt = (n: number | null | undefined, d = 0) => (n === null || n === undefined ? "—" : n.toLocaleString("en-US", { maximumFractionDigits: d }));
+
+/** Browser-local store (per viewer). Used for gate checklists; wrapped so private windows still work. */
+export function useLocal<T>(key: string, initial: T): [T, (v: T) => void] {
+  const [v, setV] = useState<T>(() => {
+    try { const s = localStorage.getItem(key); return s ? (JSON.parse(s) as T) : initial; } catch { return initial; }
+  });
+  const set = (nv: T) => { setV(nv); try { localStorage.setItem(key, JSON.stringify(nv)); } catch { /* ignore */ } };
+  return [v, set];
+}

@@ -3,7 +3,7 @@
 
 Also runs cross-file checks the JSON Schema cannot express:
   * every SourceRef id exists in data/sources.json
-  * model / offering / lifecycle-event ids are unique
+  * model / offering / lifecycle-event / open-model ids are unique
   * each deep dive points at a model in the catalog
   * dates are real calendar dates
 
@@ -30,12 +30,18 @@ FILE_TYPES = [
     ("data/lifecycle.json", "LifecycleFile"),
     ("data/litellm.json", "LiteLLMFile"),
     ("data/requirements.json", "RequirementsFile"),
+    ("data/open-models.json", "OpenModelsFile"),  # optional: open-weight model radar
+    ("data/radar.json", "RadarFile"),  # optional: Release Radar roll-up (tools/build_radar.py)
+    ("radar/curation.json", "RadarCuration"),  # optional: merges / closures the roll-up applies
     ("data/digests/*.json", "DigestFile"),
     ("data/models/*.json", "DeepDive"),
     ("data/internal/platform-inventory*.json", "PlatformInventory"),
     ("runs/perf/*.json", "PerfRun"),
     ("runs/compat/*.json", "CompatRun"),
 ]
+
+
+OPTIONAL_TYPES = {"OpenModelsFile", "RadarFile", "RadarCuration"}
 
 
 def load(path):
@@ -83,6 +89,11 @@ def main():
     docs: dict[str, object] = {}
 
     for pattern, definition in FILE_TYPES:
+        if definition in OPTIONAL_TYPES and definition not in schema["definitions"]:
+            # e.g. a pipeline release whose schema predates the file: say so instead of failing the build
+            if glob.glob(os.path.join(root, pattern)):
+                print(f"! {pattern}: the schema has no {definition} yet (publish the new schema to the data location) - not validated")
+            continue
         v = validator_for(schema, definition)
         for path in sorted(glob.glob(os.path.join(root, pattern))):
             rel = os.path.relpath(path, root)
@@ -131,6 +142,19 @@ def main():
         dup = {i for i in eids if eids.count(i) > 1}
         if dup:
             problems.append(f"data/lifecycle.json: duplicate event ids: {sorted(dup)}")
+
+    open_models = docs.get("data/open-models.json")
+    if open_models:
+        oids = [m["id"] for m in open_models["models"]]
+        dup = {i for i in oids if oids.count(i) > 1}
+        if dup:
+            problems.append(f"data/open-models.json: duplicate model ids: {sorted(dup)}")
+        for m in open_models["models"]:
+            # weights that are "available" must say where; a promised release must not claim a repo
+            if m["weights"]["available"] and not m["weights"].get("repos"):
+                problems.append(f"data/open-models.json: {m['id']}: weights.available is true but no repos listed")
+            if m["status"] == "released" and not m["weights"]["available"]:
+                problems.append(f"data/open-models.json: {m['id']}: status 'released' requires weights.available = true")
 
     if problems:
         print(f"✗ {len(problems)} problem(s) in {checked} file(s):")

@@ -380,6 +380,95 @@ export interface WatchItem {
 }
 
 // ---------------------------------------------------------------------------
+// Open-weight model radar (data/open-models.json)
+// Models whose weights can be downloaded (or have been promised), tracked for
+// market traction and for where the three CSPs host them. Separate from the
+// catalog: an entry here is not an onboarding candidate until the platform
+// team says so.
+// ---------------------------------------------------------------------------
+
+/**
+ * Market traction, judged by the rules published in OpenModelsFile.method.
+ * hit = already heavily used; rising = new and gaining; watch = tracked for another reason.
+ */
+export type OpenModelHeat = "hit" | "rising" | "watch";
+
+export interface OpenModelSignal {
+  kind: "openrouter-usage" | "hf-likes" | "hf-downloads" | "hf-trending" | "aa-index" | "press" | "other";
+  /** Short human-readable value, e.g. "週用量第 2（28.4T tokens，+36%）". */
+  value: string;
+  asOf: ISODate;
+  sources: SourceRef[];
+}
+
+/** One row per CSP service we track. "not-offered" rows are kept on purpose: absence is information. */
+export interface OpenModelHosting {
+  cloud: Cloud;
+  service: Service;
+  status: "ga" | "preview" | "restricted" | "not-offered" | "unknown";
+  /** Model or inference-profile id on that service, when offered. */
+  modelId?: string;
+  note?: string;
+  sources: SourceRef[];
+}
+
+export interface OpenModelWeights {
+  /** true when the weights can be downloaded today. */
+  available: boolean;
+  /** Hugging Face repo ids (or another download location). */
+  repos?: string[];
+  /** SPDX-style id when standard ("apache-2.0", "mit"), otherwise the vendor's licence name. */
+  license?: string;
+  /** true when the licence is a vendor-specific text that legal must read before any use. */
+  customLicense?: boolean;
+  note?: string;
+}
+
+export interface OpenModel {
+  /** Stable slug, e.g. "reflection-beam". */
+  id: string;
+  name: string;
+  developer: string;
+  vendor: Vendor;
+  /** Where the developer is headquartered, as commonly reported (matters for procurement rules). */
+  origin: string;
+  /** First public release or announcement of this version. */
+  releaseDate?: ISODate;
+  /** released = weights downloadable now; preview = API or early access only, weights promised; announced = neither yet. */
+  status: "released" | "preview" | "announced";
+  weights: OpenModelWeights;
+  /** e.g. "501B（23B active）MoE". */
+  size?: string;
+  contextWindow?: number;
+  modalities: Modality[];
+  heat: OpenModelHeat;
+  /** One sentence: why this heat level, quoting the signals. */
+  heatReason: string;
+  summary: string;
+  signals: OpenModelSignal[];
+  hosting: OpenModelHosting[];
+  /** Price points that help compare (CSP list price, vendor API, cost per benchmark task). Free text with units. */
+  priceNotes?: string[];
+  /** What a platform team should know before saying yes: licence, origin, safety, serving cost. */
+  enterpriseNotes: string[];
+  sources: SourceRef[];
+  verification: Verification;
+  lastVerified: ISODate;
+}
+
+export interface OpenModelsFile {
+  schema: "open-models/v1";
+  generatedAt: ISODateTime;
+  locale: Locale;
+  asOf: ISODate;
+  /** How heat is judged and what each signal means; shown on the page. */
+  method: string[];
+  /** Short market read for this period. */
+  marketNotes: string[];
+  models: OpenModel[];
+}
+
+// ---------------------------------------------------------------------------
 // LiteLLM compatibility & gateway security
 // ---------------------------------------------------------------------------
 
@@ -628,6 +717,73 @@ export interface DigestFile {
   watchlist: WatchItem[];
   /** Facts the research job could not verify from a primary source. */
   unverified: string[];
+}
+
+// ---------------------------------------------------------------------------
+// Release Radar roll-up (data/radar.json) — built by tools/build_radar.py, never by hand
+// One current view merged from every digest: the daily digests stay as the immutable
+// record of what each run found; the Radar page shows this file only, stamped with the
+// newest digest date (the date is the version).
+// ---------------------------------------------------------------------------
+
+/** Where a merged entry came from. */
+export interface RadarProvenance {
+  /** Stable id: a hash of the normalised text (curation merges can point several texts at one id). */
+  id: string;
+  /** Digest id (date) where the entry first appeared. */
+  firstSeen: ISODate;
+  /** Newest digest that restated it. */
+  lastSeen: ISODate;
+  /** Every digest that carried it (oldest first). */
+  seenIn: string[];
+  /** true when firstSeen equals the roll-up's asOf. */
+  isNew: boolean;
+}
+
+export interface RadarActionItem extends RadarProvenance {
+  priority: Priority;
+  action: string;
+  due?: ISODate;
+  relatedModelIds?: string[];
+  /** "due" = has a due date not yet passed; "open" = no due date, still within the carry window. */
+  state: "due" | "open";
+}
+
+export interface RadarItem extends DigestItem, RadarProvenance {}
+
+export interface RadarFile {
+  schema: "radar/v1";
+  generatedAt: ISODateTime;
+  locale: Locale;
+  /** The version of this view = the newest digest id. */
+  asOf: ISODate;
+  headline: string;
+  /** Earliest periodStart and newest periodEnd of the digests merged. */
+  coverage: { start: ISODate; end: ISODate; digests: string[] };
+  /** The merge rules in force (shown on the page). */
+  rules: string[];
+  actionItems: RadarActionItem[];
+  /** Action items that dropped out in the last 14 days (expired due date, closed or stale) — shown collapsed. */
+  retired: (RadarActionItem & { reason: "expired" | "closed" | "stale"; retiredOn: ISODate; note?: string })[];
+  newModels: RadarItem[];
+  lifecycleChanges: RadarItem[];
+  pricingChanges: RadarItem[];
+  litellm: RadarItem[];
+  security: RadarItem[];
+  regulatory: RadarItem[];
+  watchlist: WatchItem[];
+  unverified: string[];
+}
+
+/** Human / agent decisions the roll-up applies (radar/curation.json — outside data/, which a release replaces). */
+export interface RadarCuration {
+  schema: "radar-curation/v1";
+  /** Several texts that say the same thing: the entries listed in `ids` become one entry with the id `keep` (newest wording wins). */
+  merge: { keep: string; ids: string[]; reason: string }[];
+  /** Action items done or no longer relevant before their due date. */
+  close: { id: string; on: ISODate; reason: string }[];
+  /** New wording for an action item (e.g. a merged tracker without the models that launched). Ignored once a newer digest restates the item. */
+  rewrite?: { id: string; on: ISODate; action: string; priority?: Priority; due?: ISODate | null; reason: string }[];
 }
 
 // ---------------------------------------------------------------------------

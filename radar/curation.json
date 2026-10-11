@@ -1,0 +1,235 @@
+{
+  "schema": "radar-curation/v1",
+  "merge": [
+    {
+      "keep": "ai-dbb5d1d62e",
+      "ids": [
+        "ai-449813a6a5",
+        "ai-cdba836057",
+        "ai-87176f3570",
+        "ai-ecc0ec423e",
+        "ai-f75b44ab20"
+      ],
+      "reason": "同一項任務：Agent Platform gemini-2.5-pro / flash / flash-lite 10-20 停止服務，10-13 前盤點並切換所有 GCP 專案（含 DR / fallback）。"
+    },
+    {
+      "keep": "ai-51e21a0563",
+      "ids": [
+        "ai-407154db42"
+      ],
+      "reason": "同一項確認：開源模型 MaaS 端點（10-21）與 veo-3.1 preview（10-22）的使用，10-05 起併入 Cohere / gpt-image-1 的同一清單。"
+    },
+    {
+      "keep": "ai-d3b94938bd",
+      "ids": [
+        "ai-92f3c0643d",
+        "ai-916385855f",
+        "ai-bac690a759",
+        "ai-79ca0bfdf0",
+        "ai-ebf5ef9ad2",
+        "ai-05e06eba46",
+        "ai-2af10f3081"
+      ],
+      "reason": "同一項遷移排程：Foundry / Anthropic API 的 Claude 4.5（含 Sonnet 4.5 11-30）與 Azure o 系列（11-19）、codex-mini（11-15），10-06 版已合寫為一項。"
+    },
+    {
+      "keep": "ai-0bc93971d2",
+      "ids": [
+        "ai-93281155e7"
+      ],
+      "reason": "同一項任務：在 staging 驗證 v1.104.x patch 後升級 LiteLLM，10-11 版明確指定 v1.104.2。"
+    },
+    {
+      "keep": "ai-2c41e818f4",
+      "ids": [
+        "ai-c180ba9fff"
+      ],
+      "reason": "同一項任務：LiteLLM #44500 重複記帳的 workaround（MAX_BASE64_LENGTH_FOR_LOGGING=0）與 FinOps 去重對帳。"
+    },
+    {
+      "keep": "ai-070b253b30",
+      "ids": [
+        "ai-1dadda9b97",
+        "ai-d5aabafe0b",
+        "ai-4a465cd66c",
+        "ai-4871c66cbf",
+        "ai-6a9808806c"
+      ],
+      "reason": "同一項任務的重述：Claude Sonnet 5.5 與 GPT-6.1 Sol 的 G1–G6 評估，以及 Foundry GPT-6.1 Sol APAC Data Zone 的法務 / 資安評估。"
+    },
+    {
+      "keep": "ai-2cba7af3aa",
+      "ids": [
+        "ai-a733dc43e5",
+        "ai-a2d8281a9f"
+      ],
+      "reason": "同一項決策：gateway 是否允許 client 送 service_tier: \"ultrafast\"，10-11 版擴及 GPT-6.1 Sol。"
+    },
+    {
+      "keep": "ai-19c3862cd4",
+      "ids": [
+        "ai-cd7921c69b",
+        "ai-e74a6fe546"
+      ],
+      "reason": "同一項 FinOps 任務的重述：Data Zone 部署（GPT-6.1 Sol、Claude on Foundry）的自訂價格與帳單核對。"
+    },
+    {
+      "keep": "ai-7c9897c136",
+      "ids": [
+        "ai-2178493517"
+      ],
+      "reason": "同一項任務：EU AI 生成內容標示寬限至 2026-12-02，11-25 前確認標示做法。"
+    },
+    {
+      "keep": "ai-25ad8ccff8",
+      "ids": [
+        "ai-4b1d6e42f5",
+        "ai-090bb5c5c4",
+        "ai-67583f5d64"
+      ],
+      "reason": "同一份追蹤清單（Haiku 5.5、GPT-6 Cyber、GPT-6.1 Sol Ultrafast、Gemini 3.5 Pro、數發部指引），10-06 版涵蓋舊版全部項目。"
+    },
+    {
+      "keep": "it-ed221434fd",
+      "ids": [
+        "it-084db110c6"
+      ],
+      "reason": "同一事件：Claude Haiku 5.5 於 2026-10-07 發布（10-10 只確認 Bedrock，10-11 補齊三雲並加入 catalog）。"
+    },
+    {
+      "keep": "it-4b0dbef056",
+      "ids": [
+        "it-6e8ace45f1"
+      ],
+      "reason": "同一則追蹤狀態的重述：watchlist 模型仍未發布。"
+    },
+    {
+      "keep": "it-7c74644992",
+      "ids": [
+        "it-9c48d0d817",
+        "it-7deafe40f0",
+        "it-e60ca02964"
+      ],
+      "reason": "同一事件：Agent Platform gemini-2.5-pro / flash / flash-lite 的 10-20 退役，各期為補充與更正。"
+    },
+    {
+      "keep": "it-ddd5de8224",
+      "ids": [
+        "it-403972a693"
+      ],
+      "reason": "同一則近期退役日複查（10-14 至 10-23 的同一組項目）。"
+    },
+    {
+      "keep": "it-ea109268b4",
+      "ids": [
+        "it-ae9fb29351",
+        "it-0af9f7ccaf"
+      ],
+      "reason": "同一事件：Gemini API gemini-2.5-flash-image 的 10-02 關閉日。"
+    },
+    {
+      "keep": "it-61d17f86ac",
+      "ids": [
+        "it-a1efcec502",
+        "it-410e5cb4f1"
+      ],
+      "reason": "同一事件：Foundry Claude Sonnet / Haiku / Opus 4.5 退役日，後兩期為更正。"
+    },
+    {
+      "keep": "it-620d619d56",
+      "ids": [
+        "it-3e4791a199"
+      ],
+      "reason": "同一個問題：LiteLLM 在 Bedrock GPT-6 上不會丟棄 temperature（issue #42725）。"
+    },
+    {
+      "keep": "it-eb6f50f9c0",
+      "ids": [
+        "it-4636733936"
+      ],
+      "reason": "同一事件：LiteLLM v1.103.0 stable 發布（09-27 PyPI，之後補上官方 release notes）。"
+    },
+    {
+      "keep": "ai-25ad8ccff8",
+      "ids": [
+        "ai-517121bee5",
+        "ai-07a1c2bc54",
+        "ai-f32f30b26d"
+      ],
+      "reason": "四則追蹤項目（尚未發布的模型、開放權重的權重釋出）合併成一份追蹤清單，已上線的模型由 rewrite 拿掉。"
+    },
+    {
+      "keep": "ai-b6b64b2278",
+      "ids": [
+        "ai-931cf19a02"
+      ],
+      "reason": "同一項遷移（Bedrock Claude Sonnet 4 10-14 EOL），10-05 與 10-06 的重述。"
+    }
+  ],
+  "close": [
+    {
+      "id": "ai-e2a83cf9ce",
+      "on": "2026-10-11",
+      "reason": "已被取代：data/litellm.json 的 recommended 已改為 v1.104.2，staging 驗證與升級由 ai-0bc93971d2 接手。"
+    },
+    {
+      "id": "ai-f12a4e055f",
+      "on": "2026-10-11",
+      "reason": "已被取代：data/litellm.json 推薦 v1.104.2，v1.104.2 驗證與 1.105 的 bedrock/converse 準備由 ai-0bc93971d2 接手。"
+    },
+    {
+      "id": "ai-9bf00b3cb3",
+      "on": "2026-10-11",
+      "reason": "已完成：catalog.json 於 2026-10-11 加入 claude-haiku-5-5（platformStatus: evaluating），後續評估由 ai-c9ed91e6e4 接手。"
+    },
+    {
+      "id": "ai-640423ff1a",
+      "on": "2026-10-11",
+      "reason": "已完成：lifecycle.json 的 azure-gpt-4-1-nano-eol notes 已於 2026-10-11 複查改寫（退役日 2027-04-14）。"
+    },
+    {
+      "id": "ai-4b3783daa6",
+      "on": "2026-10-11",
+      "reason": "前提已變：lifecycle.json 的 gemini-api-gemini-3-1-flash-image-eol 顯示 10-29 關閉日已撤回（no shutdown date announced）。"
+    },
+    {
+      "id": "ai-61e46319a5",
+      "on": "2026-10-11",
+      "reason": "已完成：Sonnet 5.5（09-28）與 Haiku 5.5（10-07）都已上線並在 catalog.json；Haiku 4.5 退役由 lifecycle.json 的 azure-claude-haiku-4-5-eol / anthropic-haiku-4-5-nst 與 ai-d3b94938bd 追蹤。"
+    }
+  ],
+  "rewrite": [
+    {
+      "id": "ai-25ad8ccff8",
+      "on": "2026-10-11",
+      "priority": "P2",
+      "due": null,
+      "reason": "Claude Haiku 5.5、Sonnet 5.5 與 GPT-6.1 Sol Ultrafast 已上線，從追蹤清單拿掉；併入 Step 5 / Beam / Mistral Large 4 的權重追蹤。",
+      "action": "追蹤清單：GPT-6 Cyber、Gemini 4 Argon 的一般開放、Gemini 3.5 Pro、DeepSeek-V4.1-Flash（Foundry Direct from Azure）GA；開放權重的 Reflection Beam、Mistral Large 4（都說 10 月內）與 StepFun Step 5（媒體轉述 10-15）——權重釋出後確認 Hugging Face repo、授權條款與三雲上架，再決定是否進 catalog；LiteLLM v1.105.0 / v1.104.3 的官方 notes；數發部的「AI 代理」資安參考指引與機關 AI 內控範本。"
+    },
+    {
+      "id": "ai-b6b64b2278",
+      "on": "2026-10-11",
+      "reason": "Azure gpt-4.1-nano 的退役日已延至 2027-04-14（lifecycle.json），這一項只剩 Bedrock Claude Sonnet 4。",
+      "action": "Bedrock Claude Sonnet 4（anthropic.claude-sonnet-4-20250514-v1:0，含台北區）10-14 EOL：完成遷移並從 gateway 與 fallback 移除（10-11 複查日期不變；Azure gpt-4.1-nano 已延至 2027-04-14，不在此列）。"
+    },
+    {
+      "id": "ai-d3b94938bd",
+      "on": "2026-10-11",
+      "reason": "Claude Haiku 5.5 已在 10-07 GA，替代候選要更新。",
+      "action": "Foundry 的 Claude 4.5：Haiku 4.5（11-15）、Opus 4.5（11-24）、Sonnet 4.5（11-30，Anthropic API 同日）排定遷移；Haiku 4.5 的替代優先評估 Claude Haiku 5.5（10-07 GA），其次 GPT-6 Luna / Gemini 3.8 Flash。Azure o 系列（11-19）與 codex-mini（11-15）同樣排入。"
+    },
+    {
+      "id": "ai-070b253b30",
+      "on": "2026-10-11",
+      "reason": "ultrafast 的決策已由另一項（GPT-6.1 Sol 與 GPT-6 Astra 一起決定）涵蓋。",
+      "action": "對 Claude Sonnet 5.5 與 GPT-6.1 Sol 進行 G1–G6 評估（tier/general 候選）；法務 / 資安評估 Foundry GPT-6.1 Sol 的 APAC Data Zone（沒有台灣）。"
+    },
+    {
+      "id": "ai-2c41e818f4",
+      "on": "2026-10-11",
+      "reason": "v1.102.4 已在 1.102 線修正 Chat→Responses bridge 的重複記帳（litellm.json）。",
+      "action": "LiteLLM #44500（Chat→Responses bridge 重複記帳，v1.102.0 起）：1.102 線已在 v1.102.4 修正，1.103 / 1.104 線的 notes 尚未見修正。修正版上線前，FinOps 以 litellm_call_id 去重並對照 CSP 帳單檢查 10 月以來的 spend 與團隊預算。"
+    }
+  ]
+}
