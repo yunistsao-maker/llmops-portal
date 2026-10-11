@@ -18,8 +18,10 @@ data/
   lifecycle.json           三雲 + Anthropic 的 EOL / 退役行事曆（含日期衝突與來源）
   litellm.json             LiteLLM 支援窗口、建議版本、避免版本、安全公告、已知陷阱
   requirements.json        需求驗證（你的 12 項 + 16 項缺口）、G0–G10 發布關卡、指標定義、安全測試目錄
-  digests/2026-09-24.json  第一份雷達摘要（每週排程任務會新增）
-  sources.json             所有來源（125 筆），其他檔以 id 引用
+  digests/<日期>.json      每次研究的原始紀錄（不可改寫；每日研究任務新增）
+  radar.json               Release Radar 的合併版本：所有 digest 合併、去重，未到期的行動項目全部保留（tools/build_radar.py 產生，不手改）
+  open-models.json         開放權重模型的市場雷達（熱度 hit / rising / watch、三雲託管、授權）
+  sources.json             所有來源，其他檔以 id 引用
   internal/platform-inventory.example.json   平台清單範例（sync_inventory 產生）
 config/litellm.example.yaml   新模型的 LiteLLM 設定範例（路由命名、fallback、能力層 alias）
 tools/
@@ -30,11 +32,14 @@ tools/
   validate.mjs             Node/ajv：schema 檢查（給前端 CI）
   mock_gateway.py          不花 token 的模擬 gateway
   selftest.py              端到端自測（mock → compat → perf → inventory → schema）
-  build_site.mjs           組出 dist/：site/ + data/ + runs/ + config/，並產生 data/manifest.json
+  build_site.mjs           組出 dist/：site/ + data/ + runs/ + config/，並產生 data/manifest.json（含 radarAsOf 與 release，供部署後檢查）
+  build_radar.py           產生 data/radar.json；--check 檢查是否最新（npm run validate 會跑）
+  fetch_release.mjs        Amplify build 時抓 pipeline 上線中的 release（release 還沒有的 open-models.json 沿用 repo 的版本）
   sec_suite.py + secsuite/ AI 安全測試（G6）：核准後下載公開資料集、抽樣、執行、本機 UI（見 tools/secsuite/README.md）
 runs/compat, runs/perf    測試結果（UI「測試結果」頁讀取，由 manifest 列出）
-site/                     已 build 好的 portal UI（2026-10-06 portal-dist；只有編譯後的 JS）
-web/                      舊版 React 原型原始碼（Amplify 已不再使用）
+radar/curation.json       合併 Release Radar 時套用的人工決定：合併同義項目、關閉已完成的行動項目、改寫過時的說法
+site/                     由 web/ build 出來的 portal UI（Amplify 直接使用，不在雲端 build JS）
+web/                      portal UI 原始碼（React + Vite）；改畫面後 `cd web && npm run build`，再把 dist 的 index.html、assets/、security-tests.html 複製到 site/
 amplify.yml               Amplify：validate_data.py → build_site.mjs → 發布 dist/
 ```
 
@@ -56,7 +61,8 @@ npm run selftest                  # 不需憑證，約 20 秒
 
 | 頁面 | 讀取 | 重點 |
 |---|---|---|
-| 首頁 / Release Radar | `digests/*.json`（最新一份）、`lifecycle.json` | headline、行動項目、最近 90 天退役倒數 |
+| 首頁 / Release Radar | `radar.json`（合併版本；沒有時退回最新一份 digest）、`lifecycle.json` | 版本選單只有最新日期；未到期的行動項目全部列出（今天新增的有標示）、最近 14 天移出的項目、各類新聞合併去重。原始紀錄在 `#/digest/<日期>`（稽核用） |
+| 開源模型 | `open-models.json` | 熱度判定依據、三雲託管、授權與導入注意事項 |
 | 模型目錄 | `catalog.json` → `models[]` | 依 vendor、tier、雲、platformStatus、`taiwanResidency`、價格篩選 |
 | 模型頁 · 概覽 | `catalog.json` + `models/<id>.json` | tldr、strengths / weaknesses、bestFor / avoidFor |
 | 模型頁 · 三雲與 API | `offerings[]`、deep dive `apiCompatibility`、`runs/compat` | 路由 × API 面矩陣；官方支援表與實測並列 |
@@ -132,6 +138,20 @@ python3 tools/sync_inventory.py --gateway https://llm-gateway.example.internal
 ```
 
 Azure 部署名稱是自訂的，請在 LiteLLM 設定的 `model_info` 加 `base_model`（例：`azure/gpt-4o`）與 `model_version`（例：`2024-11-20`），否則會被標成 `unknown` 或以最早日期保守計算。
+
+## Release Radar 的版本與合併規則
+
+每一次研究產生一份 digest（`data/digests/<日期>.json`），寫入後不再修改——它是「那一天查到什麼」的稽核紀錄。
+Release Radar 頁讀的是 `data/radar.json`：`tools/build_radar.py` 把所有 digest 合併成一份目前狀態，日期就是版本（Amplify 每次 build 都重新產生；舊版本留在 pipeline 的 release 與 git 歷史）。
+
+- 行動項目：文字相同或幾乎相同的視為同一項；有到期日的在到期前都顯示，沒有到期日的在最後一次被提到後 30 天內顯示。
+- `radar/curation.json` 放人（或整理用的 agent）做的決定：`merge`（同一件事的不同說法）、`close`（已完成或被取代，附理由）、`rewrite`（改寫過時的說法；之後的 digest 又提到時以 digest 為準）。
+- 新聞類（新模型、價格、LiteLLM、資安、法規）依標題合併，30 天後移出；生命週期變動在它自己的日期之前一直顯示。
+
+```bash
+python3 tools/build_radar.py            # 產生 data/radar.json
+python3 tools/build_radar.py --as-of 2026-10-10 --out /tmp/radar-1010.json   # 重建某一天的版本
+```
 
 ## 資料更新流程（建議）
 

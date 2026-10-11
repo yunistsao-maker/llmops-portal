@@ -1,8 +1,8 @@
 {
   "schema": "catalog/v1",
-  "generatedAt": "2026-10-10T08:53:04Z",
+  "generatedAt": "2026-10-11T13:30:00Z",
   "locale": "zh-TW",
-  "asOf": "2026-10-06",
+  "asOf": "2026-10-11",
   "models": [
     {
       "id": "claude-opus-5-5",
@@ -2105,6 +2105,827 @@
       "lastVerified": "2026-10-10"
     },
     {
+      "id": "claude-haiku-5-5",
+      "name": "Claude Haiku 5.5",
+      "vendor": "anthropic",
+      "family": "Claude Haiku",
+      "tier": "efficient",
+      "releaseDate": "2026-10-07",
+      "platformStatus": "evaluating",
+      "predecessorId": "claude-haiku-4-5",
+      "modalities": {
+        "input": [
+          "text",
+          "image"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "knowledgeCutoff": "2026-06",
+      "reasoning": {
+        "supported": true,
+        "effortLevels": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ],
+        "defaultEffort": "medium",
+        "parameter": "output_config.effort（Messages API）；經 LiteLLM 以 reasoning_effort 傳入",
+        "notes": [
+          "Bedrock 模型卡：adaptive thinking 預設開啟、可以關閉；關閉時 effort 最高只能到 high。這是第一個有 effort 控制的 Haiku。",
+          "Microsoft 的兩份文件對 thinking={type: enabled}（手動 thinking）是否支援說法不一（models-from-partners 頁寫不支援、Claude 模型頁寫支援）——上線前實測。"
+        ]
+      },
+      "vendorModelId": "claude-haiku-5-5",
+      "summary": "Anthropic 2026-10-07 發布的 Claude 5.5 家族最快、最省的模型，定位高流量、低延遲的工作（程式、sub-agent）。1M context、128K output，第一個有 effort 控制的 Haiku。發布當天在 Anthropic API、Bedrock、Microsoft Foundry 與 Agent Platform 同步 GA，價格 $0.10 / $0.50（每 1M tokens，prompt 100K 以內；超過 100K 為 $0.50 / $2.50）。三雲都沒有台灣境內處理：Bedrock 台北區只能用 global profile，Foundry 與 Agent Platform 沒有亞太區域。",
+      "strengths": [
+        "Artificial Analysis Intelligence Index v4.3.2：43 分（max effort），每項任務成本 $0.21——Claude Sonnet 5.5 是 56 分、$5.46。",
+        "短 prompt 單價 $0.10 / $0.50，是 Sonnet 5.5 的二十分之一；cache read $0.01。",
+        "1M context、128K output，effort 可調（預設 medium）。",
+        "三雲與 Anthropic API 同日 GA，model ID 一致（Bedrock 為 anthropic.claude-haiku-5-5）。"
+      ],
+      "weaknesses": [
+        "prompt 超過 100K tokens 後單價變為五倍（$0.50 / $2.50），長文件工作負載要另外估算。",
+        "Bedrock 沒有 In-Region、沒有 Batch / Priority / Flex，也不支援 structured outputs。",
+        "三雲都沒有台灣境內處理；Foundry 只有美國與 Sweden Central，Agent Platform 只有 US / EU multi-region 與 global。",
+        "內部 compat / perf 測試尚未執行。"
+      ],
+      "bestFor": [
+        "分類、擷取、路由、guardrail 判斷等高流量工作",
+        "agent 的 sub-agent 與工具呼叫密集的流程",
+        "Claude Haiku 4.5（Foundry 2026-11-15 退役）的替代候選"
+      ],
+      "avoidFor": [
+        "需要 structured outputs（Bedrock）的流程",
+        "資料等級要求亞太或台灣境內處理的工作",
+        "以超長 prompt 為主的工作（超過 100K 單價五倍）"
+      ],
+      "safety": {
+        "classifications": [],
+        "behaviours": [],
+        "programmes": [],
+        "sources": [
+          {
+            "id": "anthropic-haiku55-announce"
+          }
+        ]
+      },
+      "offerings": [
+        {
+          "id": "claude-haiku-5-5@bedrock",
+          "cloud": "aws",
+          "service": "bedrock",
+          "status": "ga",
+          "availableSince": "2026-10-07",
+          "providerModelId": "anthropic.claude-haiku-5-5",
+          "inferenceTargets": [
+            {
+              "scope": "global",
+              "id": "global.anthropic.claude-haiku-5-5",
+              "geography": "全球動態路由（無駐留保證）"
+            },
+            {
+              "scope": "geo",
+              "id": "jp.anthropic.claude-haiku-5-5",
+              "geography": "日本（東京、大阪）"
+            },
+            {
+              "scope": "geo",
+              "id": "au.anthropic.claude-haiku-5-5",
+              "geography": "澳洲"
+            },
+            {
+              "scope": "geo",
+              "id": "us.anthropic.claude-haiku-5-5",
+              "geography": "美國"
+            },
+            {
+              "scope": "geo",
+              "id": "eu.anthropic.claude-haiku-5-5",
+              "geography": "歐盟"
+            }
+          ],
+          "endpoints": [
+            {
+              "endpoint": "bedrock-runtime",
+              "apis": [
+                "anthropic-messages",
+                "bedrock-converse",
+                "bedrock-invoke"
+              ],
+              "notes": [
+                "沒有 In-Region：所有區域都要用 inference profile。",
+                "Responses 與 Chat Completions 不支援。"
+              ]
+            },
+            {
+              "endpoint": "bedrock-mantle",
+              "apis": [
+                "anthropic-messages"
+              ],
+              "notes": [
+                "https://bedrock-mantle.{region}.api.aws/anthropic/v1/messages"
+              ]
+            }
+          ],
+          "apacAvailability": [
+            {
+              "region": "ap-east-2",
+              "label": "Taipei",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-northeast-1",
+              "label": "Tokyo",
+              "scopes": [
+                "geo",
+                "global"
+              ]
+            },
+            {
+              "region": "ap-northeast-2",
+              "label": "Seoul",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-northeast-3",
+              "label": "Osaka",
+              "scopes": [
+                "geo",
+                "global"
+              ]
+            },
+            {
+              "region": "ap-southeast-1",
+              "label": "Singapore",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-southeast-2",
+              "label": "Sydney",
+              "scopes": [
+                "geo",
+                "global"
+              ]
+            },
+            {
+              "region": "ap-south-1",
+              "label": "Mumbai",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-southeast-3",
+              "label": "Jakarta",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-southeast-4",
+              "label": "Melbourne",
+              "scopes": [
+                "geo",
+                "global"
+              ]
+            },
+            {
+              "region": "ap-southeast-5",
+              "label": "Malaysia",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-southeast-7",
+              "label": "Thailand",
+              "scopes": [
+                "global"
+              ]
+            }
+          ],
+          "regionNotes": [
+            "台北（ap-east-2）、新加坡、首爾只有 Global；東京與大阪另有 jp. Geo profile（資料留在日本）。"
+          ],
+          "dataProcessing": {
+            "processor": "AWS Bedrock（Anthropic 模型，透過 AWS Marketplace 計費）",
+            "residencyOptions": [
+              "global（無駐留保證）",
+              "jp. / au. / us. / eu. Geo profile"
+            ],
+            "taiwanResidency": "no",
+            "zdr": "unknown",
+            "retentionNotes": [
+              "費用列在 AWS 帳單的模型供應商（不在 Amazon Bedrock 項下）。"
+            ],
+            "sources": [
+              {
+                "id": "aws-bedrock-haiku55-card"
+              }
+            ]
+          },
+          "features": [
+            {
+              "feature": "streaming",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "aws-bedrock-haiku55-card"
+                }
+              ]
+            },
+            {
+              "feature": "vision",
+              "status": "supported",
+              "note": "模型卡輸入：Text、Image",
+              "sources": [
+                {
+                  "id": "aws-bedrock-haiku55-card"
+                }
+              ]
+            },
+            {
+              "feature": "structured-outputs",
+              "status": "not-supported",
+              "note": "模型卡：bedrock-runtime 與 bedrock-mantle 都不支援",
+              "sources": [
+                {
+                  "id": "aws-bedrock-haiku55-card"
+                }
+              ]
+            },
+            {
+              "feature": "count-tokens",
+              "status": "partial",
+              "note": "只有 bedrock-mantle 支援",
+              "sources": [
+                {
+                  "id": "aws-bedrock-haiku55-card"
+                }
+              ]
+            },
+            {
+              "feature": "prompt-caching",
+              "status": "supported",
+              "note": "implicit + explicit；最少 512 tokens、4 個 checkpoint、TTL 5 分鐘或 1 小時",
+              "sources": [
+                {
+                  "id": "aws-bedrock-haiku55-card"
+                }
+              ]
+            },
+            {
+              "feature": "guardrails",
+              "status": "partial",
+              "note": "bedrock-runtime 支援、bedrock-mantle 不支援",
+              "sources": [
+                {
+                  "id": "aws-bedrock-haiku55-card"
+                }
+              ]
+            },
+            {
+              "feature": "computer-use",
+              "status": "supported",
+              "note": "computer_20251124（beta header computer-use-2025-11-24）",
+              "sources": [
+                {
+                  "id": "aws-bedrock-haiku55-card"
+                }
+              ]
+            },
+            {
+              "feature": "batch",
+              "status": "not-supported",
+              "note": "Service tiers 表只有 Standard",
+              "sources": [
+                {
+                  "id": "aws-bedrock-haiku55-card"
+                }
+              ]
+            },
+            {
+              "feature": "priority-tier",
+              "status": "not-supported",
+              "sources": [
+                {
+                  "id": "aws-bedrock-haiku55-card"
+                }
+              ]
+            },
+            {
+              "feature": "flex-tier",
+              "status": "not-supported",
+              "sources": [
+                {
+                  "id": "aws-bedrock-haiku55-card"
+                }
+              ]
+            },
+            {
+              "feature": "reasoning-control",
+              "status": "supported",
+              "note": "effort：low / medium / high / xhigh / max，預設 medium；關閉 thinking 時 effort 最高到 high",
+              "sources": [
+                {
+                  "id": "aws-bedrock-haiku55-card"
+                }
+              ]
+            }
+          ],
+          "pricing": [
+            {
+              "scope": "global",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 0.1,
+              "output": 0.5,
+              "cacheRead": 0.01,
+              "cacheWrite": 0.125,
+              "cacheWrite1h": 0.2,
+              "longContext": {
+                "thresholdInputTokens": 100000,
+                "input": 0.5,
+                "output": 2.5,
+                "cacheRead": 0.05,
+                "cacheWrite": 0.625
+              },
+              "notes": [
+                "pricing 頁的表格以佔位字元呈現；數字取自頁面載入的 AWS 價格資料（Asia Pacific (Taipei) 的 Global 列同價）。上線前在 Bedrock console 確認。",
+                "Batch：N/A。"
+              ],
+              "sources": [
+                {
+                  "id": "aws-bedrock-pricing"
+                },
+                {
+                  "id": "aws-bedrock-haiku55-card"
+                }
+              ],
+              "verification": "official"
+            },
+            {
+              "scope": "geo",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 0.11,
+              "output": 0.55,
+              "cacheRead": 0.011,
+              "cacheWrite": 0.1375,
+              "cacheWrite1h": 0.22,
+              "longContext": {
+                "thresholdInputTokens": 100000,
+                "input": 0.55,
+                "output": 2.75,
+                "cacheRead": 0.055,
+                "cacheWrite": 0.6875
+              },
+              "notes": [
+                "Geo（jp. / au. / us. / eu.）比 Global 高 10%。"
+              ],
+              "sources": [
+                {
+                  "id": "aws-bedrock-pricing"
+                }
+              ],
+              "verification": "official"
+            }
+          ],
+          "quotas": [],
+          "lifecycle": {
+            "eolNoSoonerThan": "2027-10-07",
+            "legacyPeriod": "6 個月"
+          },
+          "litellmModel": "bedrock/converse/global.anthropic.claude-haiku-5-5",
+          "onboardingNotes": [
+            "台灣團隊：從 ap-east-2 只能用 global.anthropic.claude-haiku-5-5；需要資料留在日本時，從東京或大阪呼叫 jp. profile。",
+            "預設配額（Service Quotas）本次未讀，上線前在帳號內確認。"
+          ],
+          "sources": [
+            {
+              "id": "aws-bedrock-haiku55-card"
+            },
+            {
+              "id": "aws-bedrock-pricing"
+            },
+            {
+              "id": "aws-bedrock-model-cards"
+            }
+          ],
+          "verification": "official"
+        },
+        {
+          "id": "claude-haiku-5-5@foundry",
+          "cloud": "azure",
+          "service": "foundry",
+          "status": "ga",
+          "availableSince": "2026-10-07",
+          "providerModelId": "claude-haiku-5-5",
+          "inferenceTargets": [
+            {
+              "scope": "global",
+              "id": "Global Standard",
+              "geography": "Hosted on Anthropic（version 1）：8 個美國區域 + swedencentral"
+            },
+            {
+              "scope": "data-zone",
+              "id": "Data Zone Standard (US)",
+              "geography": "Hosted on Azure（version 2）：8 個美國區域"
+            }
+          ],
+          "endpoints": [
+            {
+              "endpoint": "/anthropic",
+              "apis": [
+                "anthropic-messages"
+              ]
+            }
+          ],
+          "apacAvailability": [],
+          "regionNotes": [
+            "沒有任何亞太區域。部署名稱預設 claude-haiku-5-5。"
+          ],
+          "dataProcessing": {
+            "processor": "Global Standard 由 Anthropic 代管；Data Zone Standard 由 Azure 代管（資料留在美國）",
+            "residencyOptions": [
+              "Global Standard",
+              "Data Zone Standard (US)"
+            ],
+            "taiwanResidency": "no",
+            "zdr": "unknown",
+            "retentionNotes": [],
+            "sources": [
+              {
+                "id": "ms-foundry-claude-models"
+              },
+              {
+                "id": "ms-foundry-models-from-partners"
+              }
+            ]
+          },
+          "features": [
+            {
+              "feature": "reasoning-control",
+              "status": "unknown",
+              "note": "Microsoft 兩份文件對手動 thinking 的支援說法不一",
+              "sources": [
+                {
+                  "id": "ms-foundry-claude-models"
+                },
+                {
+                  "id": "ms-foundry-models-from-partners"
+                }
+              ]
+            }
+          ],
+          "pricing": [
+            {
+              "scope": "global",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 0.1,
+              "output": 0.5,
+              "cacheRead": 0.01,
+              "longContext": {
+                "thresholdInputTokens": 100000,
+                "input": 0.5,
+                "output": 2.5,
+                "cacheRead": 0.05
+              },
+              "notes": [
+                "不是 Azure 公布的價格：Anthropic 的 pricing 頁說 Foundry 以 Claude Consumption Units（100 CCU = $1）按 Claude API 標準價計費；Azure 端的價格頁本次未讀。"
+              ],
+              "sources": [
+                {
+                  "id": "anthropic-pricing"
+                }
+              ],
+              "verification": "derived"
+            },
+            {
+              "scope": "data-zone-us",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 0.11,
+              "output": 0.55,
+              "notes": [
+                "US Data Zone Standard 與 Claude API 的 inference_geo: us 相同，乘以 1.1 倍（Anthropic pricing 頁）。"
+              ],
+              "sources": [
+                {
+                  "id": "anthropic-pricing"
+                }
+              ],
+              "verification": "derived"
+            }
+          ],
+          "quotas": [],
+          "lifecycle": {
+            "eolNoSoonerThan": "2027-10-07",
+            "notes": [
+              "Foundry 跟隨 Claude API 的生命週期；Foundry 退役表尚未列入。"
+            ]
+          },
+          "litellmModel": "azure_ai/claude-haiku-5-5",
+          "onboardingNotes": [
+            "Foundry 配額頁本次未讀。"
+          ],
+          "sources": [
+            {
+              "id": "ms-foundry-claude-models"
+            },
+            {
+              "id": "ms-foundry-models-from-partners"
+            },
+            {
+              "id": "anthropic-pricing"
+            }
+          ],
+          "verification": "official"
+        },
+        {
+          "id": "claude-haiku-5-5@agent-platform",
+          "cloud": "gcp",
+          "service": "agent-platform",
+          "status": "ga",
+          "availableSince": "2026-10-07",
+          "providerModelId": "claude-haiku-5-5",
+          "inferenceTargets": [
+            {
+              "scope": "global",
+              "id": "global",
+              "geography": "global endpoint（ML 處理地點含 asia-southeast1）"
+            },
+            {
+              "scope": "multi-region",
+              "id": "us",
+              "geography": "US multi-region"
+            },
+            {
+              "scope": "multi-region",
+              "id": "eu",
+              "geography": "EU multi-region"
+            }
+          ],
+          "endpoints": [
+            {
+              "endpoint": "aiplatform（global / us / eu）",
+              "apis": [
+                "anthropic-messages"
+              ]
+            }
+          ],
+          "apacAvailability": [],
+          "regionNotes": [
+            "沒有單一區域端點，也沒有亞太區域；global endpoint 的處理地點可能包含 asia-southeast1。"
+          ],
+          "dataProcessing": {
+            "processor": "Google Cloud（Agent Platform Model Garden 的 Claude）",
+            "residencyOptions": [
+              "global",
+              "US multi-region",
+              "EU multi-region"
+            ],
+            "taiwanResidency": "no",
+            "zdr": "unknown",
+            "retentionNotes": [],
+            "sources": [
+              {
+                "id": "agentplatform-claude-haiku55"
+              }
+            ]
+          },
+          "features": [
+            {
+              "feature": "batch",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "agentplatform-claude-haiku55"
+                }
+              ]
+            },
+            {
+              "feature": "prompt-caching",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "agentplatform-claude-haiku55"
+                }
+              ]
+            }
+          ],
+          "pricing": [
+            {
+              "scope": "global",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 0.1,
+              "output": 0.5,
+              "cacheRead": 0.01,
+              "cacheWrite": 0.125,
+              "cacheWrite1h": 0.2,
+              "batchDiscountPct": 50,
+              "longContext": {
+                "thresholdInputTokens": 100000,
+                "input": 0.5,
+                "output": 2.5,
+                "cacheRead": 0.05,
+                "cacheWrite": 0.625
+              },
+              "notes": [
+                "Batch $0.05 / $0.25。"
+              ],
+              "sources": [
+                {
+                  "id": "google-agentplatform-pricing"
+                }
+              ],
+              "verification": "official"
+            },
+            {
+              "scope": "multi-region",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 0.11,
+              "output": 0.55,
+              "cacheRead": 0.011,
+              "longContext": {
+                "thresholdInputTokens": 100000,
+                "input": 0.55,
+                "output": 2.75
+              },
+              "notes": [
+                "US / EU multi-region。pricing 頁第四個區域分頁（依順序推測為 us-east5）也列出 Haiku 5.5，但模型頁沒有單一區域可用——以模型頁為準。"
+              ],
+              "sources": [
+                {
+                  "id": "google-agentplatform-pricing"
+                },
+                {
+                  "id": "agentplatform-claude-haiku55"
+                }
+              ],
+              "verification": "official"
+            }
+          ],
+          "quotas": [
+            {
+              "scope": "global",
+              "rpm": 3000,
+              "inputTpm": 30000000,
+              "outputTpm": 3000000,
+              "note": "預設配額（QPM 3,000）",
+              "sources": [
+                {
+                  "id": "agentplatform-claude-haiku55"
+                }
+              ],
+              "verification": "official"
+            },
+            {
+              "scope": "multi-region",
+              "rpm": 1500,
+              "inputTpm": 15000000,
+              "outputTpm": 1500000,
+              "note": "預設配額（QPM 1,500）",
+              "sources": [
+                {
+                  "id": "agentplatform-claude-haiku55"
+                }
+              ],
+              "verification": "official"
+            }
+          ],
+          "lifecycle": {
+            "eolNoSoonerThan": "2027-10-07"
+          },
+          "litellmModel": "vertex_ai/claude-haiku-5-5",
+          "onboardingNotes": [
+            "支援 Provisioned Throughput（模型頁）。"
+          ],
+          "sources": [
+            {
+              "id": "agentplatform-claude-haiku55"
+            },
+            {
+              "id": "google-agentplatform-pricing"
+            },
+            {
+              "id": "google-agentplatform-release-notes"
+            }
+          ],
+          "verification": "official"
+        }
+      ],
+      "benchmarks": [
+        {
+          "name": "Artificial Analysis Intelligence Index",
+          "version": "v4.3.2",
+          "variant": "max effort",
+          "score": 43,
+          "unit": "index",
+          "measuredBy": "independent",
+          "date": "2026-10-11",
+          "notes": "同頁另有 xhigh 41（$0.12/task）、high 38（$0.08/task）。數字取自排行榜頁的擷取結果。",
+          "sources": [
+            {
+              "id": "aa-leaderboard-models"
+            }
+          ]
+        }
+      ],
+      "performanceReference": [
+        {
+          "provider": "Anthropic API（Artificial Analysis）",
+          "variant": "max effort",
+          "costPerIndexTaskUsd": 0.21,
+          "date": "2026-10-11",
+          "notes": "Artificial Analysis 排行榜的 Cost per Task 欄位（v4.3.2）。",
+          "sources": [
+            {
+              "id": "aa-leaderboard-models"
+            }
+          ]
+        }
+      ],
+      "litellm": {
+        "providerStrings": [
+          {
+            "service": "anthropic-api",
+            "model": "anthropic/claude-haiku-5-5"
+          },
+          {
+            "service": "bedrock",
+            "model": "bedrock/converse/global.anthropic.claude-haiku-5-5",
+            "note": "另有 jp. / au. / us. / eu."
+          },
+          {
+            "service": "agent-platform",
+            "model": "vertex_ai/claude-haiku-5-5",
+            "note": "vertex_location: global | us | eu"
+          },
+          {
+            "service": "foundry",
+            "model": "azure_ai/claude-haiku-5-5"
+          }
+        ],
+        "minVersionRouting": "v1.76.0（Reload Price Data；依 LiteLLM Day-0 文章，不需要升級）",
+        "recommendedVersion": "v1.104.2（見 LiteLLM 頁）；cost map 以 remote reload 取得 claude-haiku-5-5 的價格",
+        "caveats": [
+          "LiteLLM main 的 cost map 已有 claude-haiku-5-5（含 >100K 的長 context 價），在 v1.76.0 以上執行 POST /reload/model_cost_map 即可。",
+          "cost map 有 apac. 前綴的 Bedrock 列，但 Bedrock 模型卡沒有 apac. profile——cost map 有列不代表 profile 存在。",
+          "Bedrock 不支援 structured outputs，response_format 不要依賴。"
+        ],
+        "configSnippet": "- model_name: claude-haiku-5-5\n  litellm_params:\n    model: bedrock/converse/global.anthropic.claude-haiku-5-5\n    aws_region_name: ap-east-2\n",
+        "status": "researched",
+        "sources": [
+          {
+            "id": "litellm-haiku55-day0"
+          },
+          {
+            "id": "litellm-cost-map-main"
+          }
+        ]
+      },
+      "tags": [
+        "efficient",
+        "high-volume",
+        "1m-context",
+        "three-cloud"
+      ],
+      "sources": [
+        {
+          "id": "anthropic-haiku55-announce"
+        },
+        {
+          "id": "anthropic-models-overview"
+        },
+        {
+          "id": "anthropic-pricing"
+        },
+        {
+          "id": "anthropic-deprecations"
+        },
+        {
+          "id": "aws-bedrock-haiku55-card"
+        }
+      ],
+      "lastVerified": "2026-10-11"
+    },
+    {
       "id": "gpt-6-astra",
       "name": "GPT-6 Astra",
       "vendor": "openai",
@@ -4172,6 +4993,34 @@
                 }
               ],
               "verification": "official"
+            },
+            {
+              "scope": "global-ultrafast",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 12.0,
+              "output": 60.0,
+              "cacheRead": 0.6,
+              "cacheWrite": 15.0,
+              "longContext": {
+                "thresholdInputTokens": 272000,
+                "input": 24.0,
+                "output": 90.0,
+                "cacheRead": 1.2,
+                "cacheWrite": 30.0
+              },
+              "notes": [
+                "Ultrafast 模式（2026-10-08 上線）：Standard 的 6 倍。US CRIS 與 bedrock-mantle us-east-1 為 $13.20 / $66.00（cache write $16.50、cache read $0.66）。"
+              ],
+              "sources": [
+                {
+                  "id": "aws-bedrock-gpt61-sol-card"
+                },
+                {
+                  "id": "aws-whats-new-feed"
+                }
+              ],
+              "verification": "official"
             }
           ],
           "quotas": [
@@ -4571,7 +5420,7 @@
           "id": "litellm-gpt61-sol"
         }
       ],
-      "lastVerified": "2026-10-10"
+      "lastVerified": "2026-10-11"
     },
     {
       "id": "gpt-6-luna",
@@ -5908,42 +6757,6 @@
       ]
     },
     {
-      "name": "Claude Haiku 5.5",
-      "vendor": "anthropic",
-      "status": "coming-soon",
-      "expected": "2026 年 10 月（官方：coming weeks）",
-      "note": "Bedrock 模型卡已上架 Claude Haiku 5.5，發布日 2026-10-07（模型卡索引頁與模型卡皆有）；Bedrock 模型卡未列價格，Anthropic 一方頁本期未查，尚未建立 catalog 紀錄。Claude Haiku 4.5 的退役日期見模型頁與 lifecycle 記錄；Haiku 5.5 可能是其替代。",
-      "sources": [
-        {
-          "id": "anthropic-opus55-announce"
-        },
-        {
-          "id": "anthropic-deprecations"
-        },
-        {
-          "id": "anthropic-models-overview"
-        },
-        {
-          "id": "anthropic-release-notes"
-        },
-        {
-          "id": "anthropic-sonnet55-announce"
-        },
-        {
-          "id": "anthropic-newsroom"
-        },
-        {
-          "id": "ms-foundry-models-from-partners"
-        },
-        {
-          "id": "aws-bedrock-model-cards"
-        },
-        {
-          "id": "aws-bedrock-haiku55-card"
-        }
-      ]
-    },
-    {
       "name": "Gemini 3.5 Pro",
       "vendor": "google",
       "status": "limited-preview",
@@ -5972,7 +6785,7 @@
       "vendor": "deepseek",
       "status": "limited-preview",
       "expected": "未公布",
-      "note": "Microsoft 貼文（2026-09-23，09-25 修訂）：Direct from Azure 為 public preview、Fireworks on Foundry 為 GA；文字 + 影像輸入、1M context、reasoning effort 1–100。價格（input / output / cache，每百萬 token）：Direct Global Standard $0.3 / $1.2 / $0.006、Fireworks $0.37 / $1.50 / $0.007。模型目錄（2026-10-02 查）：兩種部署都只有 Global Standard，29 個區域，APAC 為 australiaeast、japaneast、japanwest、koreacentral、southindia，沒有 Data Zone；中繼資料 inferenceDeprecationDate 為 Direct 2026-12-15、Fireworks 2027-09-15。退役表沒有這個模型的列。 2026-10-06 查：Foundry 模型目錄頁仍為 version 2026-09-10、Lifecycle Preview、Direct from Azure；退役表、Azure 直售模型頁與夥伴模型頁都沒有這個模型的列。LiteLLM v1.105.0rc1 的 release notes 列有 Azure 直售價的 cost map 修正（PR #43566）；issue #43473（兩條 Foundry 路徑都以 $0.375 / $1.50 計價）的狀態本期讀不到。",
+      "note": "Microsoft 貼文（2026-09-23，09-25 修訂）：Direct from Azure 為 public preview、Fireworks on Foundry 為 GA；文字 + 影像輸入、1M context、reasoning effort 1–100。價格（input / output / cache，每百萬 token）：Direct Global Standard $0.3 / $1.2 / $0.006、Fireworks $0.37 / $1.50 / $0.007。模型目錄（2026-10-02 查）：兩種部署都只有 Global Standard，29 個區域，APAC 為 australiaeast、japaneast、japanwest、koreacentral、southindia，沒有 Data Zone；中繼資料 inferenceDeprecationDate 為 Direct 2026-12-15、Fireworks 2027-09-15。退役表沒有這個模型的列。 2026-10-06 查：Foundry 模型目錄頁仍為 version 2026-09-10、Lifecycle Preview、Direct from Azure；退役表、Azure 直售模型頁與夥伴模型頁都沒有這個模型的列。LiteLLM v1.105.0rc1 的 release notes 列有 Azure 直售價的 cost map 修正（PR #43566）；issue #43473（兩條 Foundry 路徑都以 $0.375 / $1.50 計價）的狀態本期讀不到。 2026-10-11 複查：Direct from Azure 的目錄頁仍是 Lifecycle Preview（version 2026-09-10）；Fireworks on Foundry 的 FW-DeepSeek-V4.1-Flash 已是 GA（按 token 計費，見「開源模型」頁）。",
       "sources": [
         {
           "id": "ms-techcommunity-deepseek-v41"
@@ -5991,6 +6804,9 @@
         },
         {
           "id": "ms-foundry-models-sold-by-azure"
+        },
+        {
+          "id": "ms-foundry-catalog-deepseek-v41"
         }
       ]
     },
@@ -6022,38 +6838,11 @@
       ]
     },
     {
-      "name": "GPT-6.1 Sol Ultrafast",
-      "vendor": "openai",
-      "status": "coming-soon",
-      "expected": "官方：coming days（2026-09-29 起）",
-      "note": "OpenAI 發表 GPT-6.1 Sol 時預告；2026-10-06 查 models、changelog 與 pricing 頁仍未出現（距 09-29 的「coming days」已一週）；pricing 頁的 Ultrafast 列只有 gpt-6-astra（$60 / $300，cached $6、cache write $75）。已上線的是 GPT-6 Astra Ultrafast：Responses API 的 service_tier: \"ultrafast\"（global processing、US data residency，不支援 EU 等區域駐留），Bedrock 09-30 也推出 Astra Ultrafast，模型卡列價為 Standard 的 6 倍（Global CRIS $60 / $300）。",
-      "sources": [
-        {
-          "id": "openai-gpt61-sol-announce"
-        },
-        {
-          "id": "openai-devday-2026"
-        },
-        {
-          "id": "aws-astra-ultrafast"
-        },
-        {
-          "id": "openai-changelog"
-        },
-        {
-          "id": "aws-bedrock-astra-card"
-        },
-        {
-          "id": "openai-pricing"
-        }
-      ]
-    },
-    {
       "name": "Mistral Large 4",
       "vendor": "mistral",
       "status": "limited-preview",
       "expected": "權重：官方稱 2026 年 10 月底前釋出；三雲上架未公布",
-      "note": "Mistral 2026-10-06 發表的 public preview（官方暱稱 le Chonk）：1 兆參數、49B active 的原生多模態 open-weight 模型。目前只有 Mistral Studio 的 preview API，權重「by the end of the month」釋出；發表頁的模型卡列價為 input $1.36、output $4.18（每百萬 token，Mistral 自家 API）。發表文沒有提到 Bedrock、Foundry 或 Agent Platform。官方自述強項是資安（稱在 Artificial Analysis Cyber Index 進全球前五、其中重現並修補真實漏洞的測試得 82%）、agentic coding 與視覺 grounding，並稱訓練與 preview 都在自家歐洲資料中心——以上都是廠商自報。Artificial Analysis 10-06 的評測紀錄為 Mistral Large 4 Preview：Intelligence Index 38（GPT-6 Luna 為 38、Gemini 3.8 Flash 為 41）。追蹤重點：權重釋出後是否由 Bedrock / Foundry / Agent Platform 代管，以及授權條款。2026-10-06 首次收錄。",
+      "note": "Mistral 2026-10-06 發表的 public preview（官方暱稱 le Chonk）：1 兆參數、49B active 的原生多模態 open-weight 模型。目前只有 Mistral Studio 的 preview API，權重「by the end of the month」釋出；發表頁的模型卡列價為 input $1.36、output $4.18（每百萬 token，Mistral 自家 API）。發表文沒有提到 Bedrock、Foundry 或 Agent Platform。官方自述強項是資安（稱在 Artificial Analysis Cyber Index 進全球前五、其中重現並修補真實漏洞的測試得 82%）、agentic coding 與視覺 grounding，並稱訓練與 preview 都在自家歐洲資料中心——以上都是廠商自報。Artificial Analysis 10-06 的評測紀錄為 Mistral Large 4 Preview：Intelligence Index 38（GPT-6 Luna 為 38、Gemini 3.8 Flash 為 41）。追蹤重點：權重釋出後是否由 Bedrock / Foundry / Agent Platform 代管，以及授權條款。2026-10-06 首次收錄。 2026-10-11：Hugging Face 仍沒有權重；OpenRouter 已上架 preview API（mistralai/mistral-large-4-0）。",
       "sources": [
         {
           "id": "mistral-large-4-announce"
@@ -6066,6 +6855,27 @@
         },
         {
           "id": "ms-techcommunity-foundry-blog-index"
+        },
+        {
+          "id": "openrouter-models-api"
+        }
+      ]
+    },
+    {
+      "name": "Reflection AI Beam",
+      "vendor": "other",
+      "status": "limited-preview",
+      "expected": "權重：官方稱 2026 年 10 月內釋出（Apache 2.0）；三雲代管未公布",
+      "note": "501B（23B active）text-only MoE、1M context，2026-10-05 發表，目前只有 early access API。2026-10-11 複查：Hugging Face 仍查不到權重，Bedrock、Foundry、Agent Platform 都沒有。官方 benchmark 為廠商自述、未經獨立驗證；市場訊號見「開源模型」頁。",
+      "sources": [
+        {
+          "id": "reflection-beam-announce"
+        },
+        {
+          "id": "techcrunch-reflection-beam-2026-10-05"
+        },
+        {
+          "id": "aws-bedrock-model-cards"
         }
       ]
     }

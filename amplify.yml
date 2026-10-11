@@ -8,6 +8,8 @@ frontend:
         - python3 tools/validate_data.py
     build:
       commands:
+        # one merged Release Radar from every digest of the release (+ radar/curation.json)
+        - python3 tools/build_radar.py
         # site/ is the prebuilt app; this adds data/, runs/, config/ and generates data/manifest.json
         - node tools/build_site.mjs
   artifacts:

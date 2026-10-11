@@ -1898,6 +1898,292 @@
       ],
       "type": "object"
     },
+    "OpenModel": {
+      "additionalProperties": false,
+      "properties": {
+        "contextWindow": {
+          "type": "number"
+        },
+        "developer": {
+          "type": "string"
+        },
+        "enterpriseNotes": {
+          "description": "What a platform team should know before saying yes: licence, origin, safety, serving cost.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "heat": {
+          "$ref": "#/definitions/OpenModelHeat"
+        },
+        "heatReason": {
+          "description": "One sentence: why this heat level, quoting the signals.",
+          "type": "string"
+        },
+        "hosting": {
+          "items": {
+            "$ref": "#/definitions/OpenModelHosting"
+          },
+          "type": "array"
+        },
+        "id": {
+          "description": "Stable slug, e.g. \"reflection-beam\".",
+          "type": "string"
+        },
+        "lastVerified": {
+          "$ref": "#/definitions/ISODate"
+        },
+        "modalities": {
+          "items": {
+            "$ref": "#/definitions/Modality"
+          },
+          "type": "array"
+        },
+        "name": {
+          "type": "string"
+        },
+        "origin": {
+          "description": "Where the developer is headquartered, as commonly reported (matters for procurement rules).",
+          "type": "string"
+        },
+        "priceNotes": {
+          "description": "Price points that help compare (CSP list price, vendor API, cost per benchmark task). Free text with units.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "releaseDate": {
+          "$ref": "#/definitions/ISODate",
+          "description": "First public release or announcement of this version."
+        },
+        "signals": {
+          "items": {
+            "$ref": "#/definitions/OpenModelSignal"
+          },
+          "type": "array"
+        },
+        "size": {
+          "description": "e.g. \"501B（23B active）MoE\".",
+          "type": "string"
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/definitions/SourceRef"
+          },
+          "type": "array"
+        },
+        "status": {
+          "description": "released = weights downloadable now; preview = API or early access only, weights promised; announced = neither yet.",
+          "enum": [
+            "released",
+            "preview",
+            "announced"
+          ],
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "vendor": {
+          "$ref": "#/definitions/Vendor"
+        },
+        "verification": {
+          "$ref": "#/definitions/Verification"
+        },
+        "weights": {
+          "$ref": "#/definitions/OpenModelWeights"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "developer",
+        "vendor",
+        "origin",
+        "status",
+        "weights",
+        "modalities",
+        "heat",
+        "heatReason",
+        "summary",
+        "signals",
+        "hosting",
+        "enterpriseNotes",
+        "sources",
+        "verification",
+        "lastVerified"
+      ],
+      "type": "object"
+    },
+    "OpenModelHeat": {
+      "description": "Market traction, judged by the rules published in OpenModelsFile.method. hit = already heavily used; rising = new and gaining; watch = tracked for another reason.",
+      "enum": [
+        "hit",
+        "rising",
+        "watch"
+      ],
+      "type": "string"
+    },
+    "OpenModelHosting": {
+      "additionalProperties": false,
+      "description": "One row per CSP service we track. \"not-offered\" rows are kept on purpose: absence is information.",
+      "properties": {
+        "cloud": {
+          "$ref": "#/definitions/Cloud"
+        },
+        "modelId": {
+          "description": "Model or inference-profile id on that service, when offered.",
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        },
+        "service": {
+          "$ref": "#/definitions/Service"
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/definitions/SourceRef"
+          },
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "ga",
+            "preview",
+            "restricted",
+            "not-offered",
+            "unknown"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "cloud",
+        "service",
+        "status",
+        "sources"
+      ],
+      "type": "object"
+    },
+    "OpenModelSignal": {
+      "additionalProperties": false,
+      "properties": {
+        "asOf": {
+          "$ref": "#/definitions/ISODate"
+        },
+        "kind": {
+          "enum": [
+            "openrouter-usage",
+            "hf-likes",
+            "hf-downloads",
+            "hf-trending",
+            "aa-index",
+            "press",
+            "other"
+          ],
+          "type": "string"
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/definitions/SourceRef"
+          },
+          "type": "array"
+        },
+        "value": {
+          "description": "Short human-readable value, e.g. \"週用量第 2（28.4T tokens，+36%）\".",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "value",
+        "asOf",
+        "sources"
+      ],
+      "type": "object"
+    },
+    "OpenModelWeights": {
+      "additionalProperties": false,
+      "properties": {
+        "available": {
+          "description": "true when the weights can be downloaded today.",
+          "type": "boolean"
+        },
+        "customLicense": {
+          "description": "true when the licence is a vendor-specific text that legal must read before any use.",
+          "type": "boolean"
+        },
+        "license": {
+          "description": "SPDX-style id when standard (\"apache-2.0\", \"mit\"), otherwise the vendor's licence name.",
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        },
+        "repos": {
+          "description": "Hugging Face repo ids (or another download location).",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "available"
+      ],
+      "type": "object"
+    },
+    "OpenModelsFile": {
+      "additionalProperties": false,
+      "properties": {
+        "asOf": {
+          "$ref": "#/definitions/ISODate"
+        },
+        "generatedAt": {
+          "$ref": "#/definitions/ISODateTime"
+        },
+        "locale": {
+          "$ref": "#/definitions/Locale"
+        },
+        "marketNotes": {
+          "description": "Short market read for this period.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "method": {
+          "description": "How heat is judged and what each signal means; shown on the page.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "models": {
+          "items": {
+            "$ref": "#/definitions/OpenModel"
+          },
+          "type": "array"
+        },
+        "schema": {
+          "const": "open-models/v1",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema",
+        "generatedAt",
+        "locale",
+        "asOf",
+        "method",
+        "marketNotes",
+        "models"
+      ],
+      "type": "object"
+    },
     "Percentiles": {
       "additionalProperties": false,
       "properties": {
@@ -2367,6 +2653,494 @@
         "scope",
         "sources",
         "verification"
+      ],
+      "type": "object"
+    },
+    "RadarActionItem": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "type": "string"
+        },
+        "due": {
+          "$ref": "#/definitions/ISODate"
+        },
+        "firstSeen": {
+          "$ref": "#/definitions/ISODate",
+          "description": "Digest id (date) where the entry first appeared."
+        },
+        "id": {
+          "description": "Stable id: a hash of the normalised text (curation merges can point several texts at one id).",
+          "type": "string"
+        },
+        "isNew": {
+          "description": "true when firstSeen equals the roll-up's asOf.",
+          "type": "boolean"
+        },
+        "lastSeen": {
+          "$ref": "#/definitions/ISODate",
+          "description": "Newest digest that restated it."
+        },
+        "priority": {
+          "$ref": "#/definitions/Priority"
+        },
+        "relatedModelIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "seenIn": {
+          "description": "Every digest that carried it (oldest first).",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "state": {
+          "description": "\"due\" = has a due date not yet passed; \"open\" = no due date, still within the carry window.",
+          "enum": [
+            "due",
+            "open"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "action",
+        "firstSeen",
+        "id",
+        "isNew",
+        "lastSeen",
+        "priority",
+        "seenIn",
+        "state"
+      ],
+      "type": "object"
+    },
+    "RadarCuration": {
+      "additionalProperties": false,
+      "description": "Human / agent decisions the roll-up applies (radar/curation.json — outside data/, which a release replaces).",
+      "properties": {
+        "close": {
+          "description": "Action items done or no longer relevant before their due date.",
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "on": {
+                "$ref": "#/definitions/ISODate"
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "on",
+              "reason"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "merge": {
+          "description": "Several texts that say the same thing: the entries listed in `ids` become one entry with the id `keep` (newest wording wins).",
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "ids": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "keep": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "keep",
+              "ids",
+              "reason"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "rewrite": {
+          "description": "New wording for an action item (e.g. a merged tracker without the models that launched). Ignored once a newer digest restates the item.",
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "action": {
+                "type": "string"
+              },
+              "due": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/ISODate"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "id": {
+                "type": "string"
+              },
+              "on": {
+                "$ref": "#/definitions/ISODate"
+              },
+              "priority": {
+                "$ref": "#/definitions/Priority"
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "on",
+              "action",
+              "reason"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "schema": {
+          "const": "radar-curation/v1",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema",
+        "merge",
+        "close"
+      ],
+      "type": "object"
+    },
+    "RadarFile": {
+      "additionalProperties": false,
+      "properties": {
+        "actionItems": {
+          "items": {
+            "$ref": "#/definitions/RadarActionItem"
+          },
+          "type": "array"
+        },
+        "asOf": {
+          "$ref": "#/definitions/ISODate",
+          "description": "The version of this view = the newest digest id."
+        },
+        "coverage": {
+          "additionalProperties": false,
+          "description": "Earliest periodStart and newest periodEnd of the digests merged.",
+          "properties": {
+            "digests": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "end": {
+              "$ref": "#/definitions/ISODate"
+            },
+            "start": {
+              "$ref": "#/definitions/ISODate"
+            }
+          },
+          "required": [
+            "start",
+            "end",
+            "digests"
+          ],
+          "type": "object"
+        },
+        "generatedAt": {
+          "$ref": "#/definitions/ISODateTime"
+        },
+        "headline": {
+          "type": "string"
+        },
+        "lifecycleChanges": {
+          "items": {
+            "$ref": "#/definitions/RadarItem"
+          },
+          "type": "array"
+        },
+        "litellm": {
+          "items": {
+            "$ref": "#/definitions/RadarItem"
+          },
+          "type": "array"
+        },
+        "locale": {
+          "$ref": "#/definitions/Locale"
+        },
+        "newModels": {
+          "items": {
+            "$ref": "#/definitions/RadarItem"
+          },
+          "type": "array"
+        },
+        "pricingChanges": {
+          "items": {
+            "$ref": "#/definitions/RadarItem"
+          },
+          "type": "array"
+        },
+        "regulatory": {
+          "items": {
+            "$ref": "#/definitions/RadarItem"
+          },
+          "type": "array"
+        },
+        "retired": {
+          "description": "Action items that dropped out in the last 14 days (expired due date, closed or stale) — shown collapsed.",
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "action": {
+                "type": "string"
+              },
+              "due": {
+                "$ref": "#/definitions/ISODate"
+              },
+              "firstSeen": {
+                "$ref": "#/definitions/ISODate",
+                "description": "Digest id (date) where the entry first appeared."
+              },
+              "id": {
+                "description": "Stable id: a hash of the normalised text (curation merges can point several texts at one id).",
+                "type": "string"
+              },
+              "isNew": {
+                "description": "true when firstSeen equals the roll-up's asOf.",
+                "type": "boolean"
+              },
+              "lastSeen": {
+                "$ref": "#/definitions/ISODate",
+                "description": "Newest digest that restated it."
+              },
+              "note": {
+                "type": "string"
+              },
+              "priority": {
+                "$ref": "#/definitions/Priority"
+              },
+              "reason": {
+                "enum": [
+                  "expired",
+                  "closed",
+                  "stale"
+                ],
+                "type": "string"
+              },
+              "relatedModelIds": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "retiredOn": {
+                "$ref": "#/definitions/ISODate"
+              },
+              "seenIn": {
+                "description": "Every digest that carried it (oldest first).",
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "state": {
+                "description": "\"due\" = has a due date not yet passed; \"open\" = no due date, still within the carry window.",
+                "enum": [
+                  "due",
+                  "open"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "action",
+              "firstSeen",
+              "id",
+              "isNew",
+              "lastSeen",
+              "priority",
+              "reason",
+              "retiredOn",
+              "seenIn",
+              "state"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "rules": {
+          "description": "The merge rules in force (shown on the page).",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "schema": {
+          "const": "radar/v1",
+          "type": "string"
+        },
+        "security": {
+          "items": {
+            "$ref": "#/definitions/RadarItem"
+          },
+          "type": "array"
+        },
+        "unverified": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "watchlist": {
+          "items": {
+            "$ref": "#/definitions/WatchItem"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema",
+        "generatedAt",
+        "locale",
+        "asOf",
+        "headline",
+        "coverage",
+        "rules",
+        "actionItems",
+        "retired",
+        "newModels",
+        "lifecycleChanges",
+        "pricingChanges",
+        "litellm",
+        "security",
+        "regulatory",
+        "watchlist",
+        "unverified"
+      ],
+      "type": "object"
+    },
+    "RadarItem": {
+      "additionalProperties": false,
+      "properties": {
+        "clouds": {
+          "items": {
+            "$ref": "#/definitions/Cloud"
+          },
+          "type": "array"
+        },
+        "date": {
+          "$ref": "#/definitions/ISODate"
+        },
+        "detail": {
+          "type": "string"
+        },
+        "firstSeen": {
+          "$ref": "#/definitions/ISODate",
+          "description": "Digest id (date) where the entry first appeared."
+        },
+        "id": {
+          "description": "Stable id: a hash of the normalised text (curation merges can point several texts at one id).",
+          "type": "string"
+        },
+        "impact": {
+          "enum": [
+            "high",
+            "medium",
+            "low"
+          ],
+          "type": "string"
+        },
+        "isNew": {
+          "description": "true when firstSeen equals the roll-up's asOf.",
+          "type": "boolean"
+        },
+        "lastSeen": {
+          "$ref": "#/definitions/ISODate",
+          "description": "Newest digest that restated it."
+        },
+        "seenIn": {
+          "description": "Every digest that carried it (oldest first).",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/definitions/SourceRef"
+          },
+          "type": "array"
+        },
+        "title": {
+          "type": "string"
+        },
+        "vendor": {
+          "$ref": "#/definitions/Vendor"
+        }
+      },
+      "required": [
+        "detail",
+        "firstSeen",
+        "id",
+        "impact",
+        "isNew",
+        "lastSeen",
+        "seenIn",
+        "sources",
+        "title"
+      ],
+      "type": "object"
+    },
+    "RadarProvenance": {
+      "additionalProperties": false,
+      "description": "Where a merged entry came from.",
+      "properties": {
+        "firstSeen": {
+          "$ref": "#/definitions/ISODate",
+          "description": "Digest id (date) where the entry first appeared."
+        },
+        "id": {
+          "description": "Stable id: a hash of the normalised text (curation merges can point several texts at one id).",
+          "type": "string"
+        },
+        "isNew": {
+          "description": "true when firstSeen equals the roll-up's asOf.",
+          "type": "boolean"
+        },
+        "lastSeen": {
+          "$ref": "#/definitions/ISODate",
+          "description": "Newest digest that restated it."
+        },
+        "seenIn": {
+          "description": "Every digest that carried it (oldest first).",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "firstSeen",
+        "lastSeen",
+        "seenIn",
+        "isNew"
       ],
       "type": "object"
     },

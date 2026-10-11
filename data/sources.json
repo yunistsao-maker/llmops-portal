@@ -1,6 +1,6 @@
 {
   "schema": "sources/v1",
-  "generatedAt": "2026-10-10T09:01:23Z",
+  "generatedAt": "2026-10-11T13:30:00Z",
   "sources": [
     {
       "id": "anthropic-opus55-announce",
@@ -32,7 +32,7 @@
       "url": "https://platform.claude.com/docs/en/about-claude/model-deprecations",
       "publisher": "Anthropic",
       "type": "vendor-doc",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-11"
     },
     {
       "id": "anthropic-pricing",
@@ -40,7 +40,7 @@
       "url": "https://platform.claude.com/docs/en/about-claude/pricing",
       "publisher": "Anthropic",
       "type": "vendor-doc",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-11"
     },
     {
       "id": "anthropic-release-notes",
@@ -152,7 +152,7 @@
       "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-lifecycle-legacy.html",
       "publisher": "AWS",
       "type": "csp-doc",
-      "accessed": "2026-10-10"
+      "accessed": "2026-10-11"
     },
     {
       "id": "aws-bedrock-endpoints",
@@ -192,7 +192,7 @@
       "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/model-retirement-schedule",
       "publisher": "Microsoft",
       "type": "csp-doc",
-      "accessed": "2026-10-10"
+      "accessed": "2026-10-11"
     },
     {
       "id": "ms-foundry-models-sold-by-azure",
@@ -208,7 +208,7 @@
       "url": "https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/claude-models",
       "publisher": "Microsoft",
       "type": "csp-doc",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-11"
     },
     {
       "id": "ms-foundry-claude-hosting",
@@ -336,7 +336,7 @@
       "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/model-versions",
       "publisher": "Google Cloud",
       "type": "csp-doc",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-11"
     },
     {
       "id": "google-agentplatform-release-notes",
@@ -344,7 +344,7 @@
       "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/release-notes",
       "publisher": "Google Cloud",
       "type": "csp-doc",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-11"
     },
     {
       "id": "google-vertex-release-notes",
@@ -416,7 +416,7 @@
       "url": "https://docs.litellm.ai/release_notes/",
       "publisher": "LiteLLM",
       "type": "vendor-doc",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-11"
     },
     {
       "id": "litellm-v1-102-0",
@@ -448,7 +448,7 @@
       "url": "https://docs.litellm.ai/blog/version-support",
       "publisher": "LiteLLM",
       "type": "vendor-blog",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-11"
     },
     {
       "id": "litellm-v1-95-0",
@@ -632,7 +632,7 @@
       "url": "https://artificialanalysis.ai/methodology/intelligence-benchmarking",
       "publisher": "Artificial Analysis",
       "type": "benchmark",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-11"
     },
     {
       "id": "aa-index-v43",
@@ -1048,7 +1048,7 @@
       "url": "https://cloud.google.com/gemini-enterprise-agent-platform/generative-ai/pricing",
       "publisher": "Google Cloud",
       "type": "csp-doc",
-      "accessed": "2026-10-10"
+      "accessed": "2026-10-11"
     },
     {
       "id": "google-gemini-api-deprecations",
@@ -1056,7 +1056,7 @@
       "url": "https://ai.google.dev/gemini-api/docs/deprecations",
       "publisher": "Google",
       "type": "vendor-doc",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-11"
     },
     {
       "id": "google-gemini-api-changelog",
@@ -1064,7 +1064,7 @@
       "url": "https://ai.google.dev/gemini-api/docs/changelog",
       "publisher": "Google",
       "type": "vendor-doc",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-11"
     },
     {
       "id": "digitalapplied-flash-image",
@@ -1240,7 +1240,7 @@
       "url": "https://platform.claude.com/docs/en/about-claude/models/overview",
       "publisher": "Anthropic",
       "type": "vendor-doc",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-11"
     },
     {
       "id": "aws-bedrock-sonnet55-card",
@@ -1264,7 +1264,7 @@
       "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-openai-gpt-6-1-sol.html",
       "publisher": "AWS",
       "type": "csp-doc",
-      "accessed": "2026-10-10"
+      "accessed": "2026-10-11"
     },
     {
       "id": "aws-gpt61-sol-whatsnew",
@@ -1408,7 +1408,7 @@
       "url": "https://pypi.org/pypi/litellm/json",
       "publisher": "PyPI",
       "type": "vendor-doc",
-      "accessed": "2026-10-10"
+      "accessed": "2026-10-11"
     },
     {
       "id": "litellm-sonnet55",
@@ -1512,7 +1512,7 @@
       "url": "https://developers.openai.com/api/docs/changelog",
       "publisher": "OpenAI",
       "type": "vendor-doc",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-11"
     },
     {
       "id": "aws-whats-new-feed",
@@ -1520,7 +1520,7 @@
       "url": "https://aws.amazon.com/about-aws/whats-new/recent/feed/",
       "publisher": "AWS",
       "type": "csp-blog",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-11"
     },
     {
       "id": "ms-foundry-region-availability",
@@ -1824,7 +1824,7 @@
       "url": "https://aws.amazon.com/bedrock/pricing/",
       "publisher": "AWS",
       "type": "csp-doc",
-      "accessed": "2026-10-10"
+      "accessed": "2026-10-11"
     },
     {
       "id": "aws-bedrock-model-cards",
@@ -1832,7 +1832,7 @@
       "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-cards.html",
       "publisher": "AWS",
       "type": "csp-doc",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-11"
     },
     {
       "id": "ms-azure-openai-pricing",
@@ -1856,7 +1856,7 @@
       "url": "https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/models-from-partners",
       "publisher": "Microsoft",
       "type": "csp-doc",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-11"
     },
     {
       "id": "ms-techcommunity-foundry-blog-index",
@@ -1920,7 +1920,7 @@
       "url": "https://www.anthropic.com/news",
       "publisher": "Anthropic",
       "type": "vendor-blog",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-11"
     },
     {
       "id": "anthropic-sonnet55-announce",
@@ -1936,7 +1936,7 @@
       "url": "https://developers.openai.com/api/docs/pricing",
       "publisher": "OpenAI",
       "type": "vendor-doc",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-11"
     },
     {
       "id": "openai-gpt6-family-guide",
@@ -2144,7 +2144,7 @@
       "url": "https://docs.litellm.ai/release_notes/v1.105.0rc1/v1-105-0-rc-1",
       "publisher": "LiteLLM",
       "type": "vendor-doc",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-11"
     },
     {
       "id": "osv-litellm-list",
@@ -2208,7 +2208,7 @@
       "publisher": "AWS",
       "type": "csp-doc",
       "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-haiku-5-5.html",
-      "accessed": "2026-10-10"
+      "accessed": "2026-10-11"
     },
     {
       "id": "pypi-litellm-1-104-2",
@@ -2272,7 +2272,447 @@
       "publisher": "Hugging Face",
       "type": "community",
       "url": "https://huggingface.co/Qwen/Qwen3.8-Flash-Next",
-      "accessed": "2026-10-10"
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "aa-leaderboard-models",
+      "title": "LLM Leaderboard: Intelligence Index v4.3.2, cost per task, speed and context window",
+      "url": "https://artificialanalysis.ai/leaderboards/models",
+      "publisher": "Artificial Analysis",
+      "type": "benchmark",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "aa-open-source-models",
+      "title": "Comparison of Open Source Models (open weights): intelligence, size, openness index, release dates",
+      "url": "https://artificialanalysis.ai/models/open-source",
+      "publisher": "Artificial Analysis",
+      "type": "benchmark",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "aws-bedrock-kimi-k3-card",
+      "title": "Amazon Bedrock model card: Moonshot AI Kimi K3",
+      "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-moonshot-ai-kimi-k3.html",
+      "publisher": "AWS",
+      "type": "csp-doc",
+      "accessed": "2026-10-06"
+    },
+    {
+      "id": "cloudflare-clef-blog",
+      "title": "Introducing Clef: our open-source decision models, and new RL fine-tuning platform",
+      "url": "https://blog.cloudflare.com/clef-decision-models/",
+      "publisher": "Cloudflare",
+      "type": "vendor-blog",
+      "accessed": "2026-10-06"
+    },
+    {
+      "id": "google-agentplatform-open-models",
+      "title": "Open models offered as managed APIs (MaaS) on Gemini Enterprise Agent Platform",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/maas/use-open-models",
+      "publisher": "Google Cloud",
+      "type": "csp-doc",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "hf-cloudflare-clef",
+      "title": "Cloudflare/clef and Cloudflare/clef-flash: model cards, licence (Apache 2.0) and Hub statistics",
+      "url": "https://huggingface.co/Cloudflare/clef",
+      "publisher": "Cloudflare (Hugging Face)",
+      "type": "vendor-doc",
+      "accessed": "2026-10-06"
+    },
+    {
+      "id": "hf-deepseek-v4-flash-0731",
+      "title": "deepseek-ai/DeepSeek-V4-Flash-0731: Hub statistics and licence (MIT)",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash-0731",
+      "publisher": "DeepSeek (Hugging Face)",
+      "type": "vendor-doc",
+      "accessed": "2026-10-06"
+    },
+    {
+      "id": "hf-deepseek-v41-flash",
+      "title": "deepseek-ai/DeepSeek-V4.1-Flash: model card, licence (MIT) and Hub statistics",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash",
+      "publisher": "DeepSeek (Hugging Face)",
+      "type": "vendor-doc",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "hf-glm-53",
+      "title": "zai-org/GLM-5.3: model card, GLM-5.3 License and Hub statistics",
+      "url": "https://huggingface.co/zai-org/GLM-5.3",
+      "publisher": "Z.ai (Hugging Face)",
+      "type": "vendor-doc",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "hf-glm-53-flash",
+      "title": "zai-org/GLM-5.3-Flash: model card, licence (MIT) and Hub statistics",
+      "url": "https://huggingface.co/zai-org/GLM-5.3-Flash",
+      "publisher": "Z.ai (Hugging Face)",
+      "type": "vendor-doc",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "hf-hy4-preview",
+      "title": "tencent/Hy4-preview: model card, licence (Apache 2.0) and Hub statistics",
+      "url": "https://huggingface.co/tencent/Hy4-preview",
+      "publisher": "Tencent (Hugging Face)",
+      "type": "vendor-doc",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "hf-inkling",
+      "title": "thinkingmachines/Inkling: model card, licence (Apache 2.0) and Hub statistics",
+      "url": "https://huggingface.co/thinkingmachines/Inkling",
+      "publisher": "Thinking Machines Lab (Hugging Face)",
+      "type": "vendor-doc",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "hf-jev-27b-vl",
+      "title": "autotrust/JEV-27B-VL: model card (System 1 typed decisions on Qwen3.8-27B) and Hub statistics",
+      "url": "https://huggingface.co/autotrust/JEV-27B-VL",
+      "publisher": "autotrust (Hugging Face)",
+      "type": "community",
+      "accessed": "2026-10-06"
+    },
+    {
+      "id": "hf-kimi-k3",
+      "title": "moonshotai/Kimi-K3: model card, Kimi K3 License and Hub statistics",
+      "url": "https://huggingface.co/moonshotai/Kimi-K3",
+      "publisher": "Moonshot AI (Hugging Face)",
+      "type": "vendor-doc",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "hf-kolibri-1",
+      "title": "Aleph-Alpha/Kolibri-1: model card, licence (Apache 2.0) and Hub statistics",
+      "url": "https://huggingface.co/Aleph-Alpha/Kolibri-1",
+      "publisher": "Aleph Alpha (Hugging Face)",
+      "type": "vendor-doc",
+      "accessed": "2026-10-06"
+    },
+    {
+      "id": "hf-mimo-v26-flash",
+      "title": "XiaomiMiMo/MiMo-V2.6-Flash-RL: Hub statistics and licence (MIT)",
+      "url": "https://huggingface.co/XiaomiMiMo/MiMo-V2.6-Flash-RL",
+      "publisher": "Xiaomi MiMo (Hugging Face)",
+      "type": "vendor-doc",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "hf-mimo-v26-pro",
+      "title": "XiaomiMiMo/MiMo-V2.6-Pro-RL: model card, licence (MIT) and Hub statistics",
+      "url": "https://huggingface.co/XiaomiMiMo/MiMo-V2.6-Pro-RL",
+      "publisher": "Xiaomi MiMo (Hugging Face)",
+      "type": "vendor-doc",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "hf-muse-glimmer",
+      "title": "meta-models/Muse-Glimmer-30B: model card, licence (Apache 2.0) and Hub statistics",
+      "url": "https://huggingface.co/meta-models/Muse-Glimmer-30B",
+      "publisher": "Meta (Hugging Face)",
+      "type": "vendor-doc",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "hf-nemotron-3-ultra",
+      "title": "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-BF16: model card, licence (OpenMDW-1.1) and Hub statistics",
+      "url": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-BF16",
+      "publisher": "NVIDIA (Hugging Face)",
+      "type": "vendor-doc",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "hf-qwen38-2-4t",
+      "title": "Qwen/Qwen3.8-2.4T-A95B: Qwen3.8-Max License and Hub statistics",
+      "url": "https://huggingface.co/Qwen/Qwen3.8-2.4T-A95B",
+      "publisher": "Alibaba Qwen (Hugging Face)",
+      "type": "vendor-doc",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "hf-qwen38-27b",
+      "title": "Qwen/Qwen3.8-27B: model card, licence (Apache 2.0) and Hub statistics",
+      "url": "https://huggingface.co/Qwen/Qwen3.8-27B",
+      "publisher": "Alibaba Qwen (Hugging Face)",
+      "type": "vendor-doc",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "hf-trending-models",
+      "title": "Hugging Face Hub: models sorted by trending score (API, top 60 and top 200)",
+      "url": "https://huggingface.co/models?sort=trending",
+      "publisher": "Hugging Face",
+      "type": "community",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "ms-foundry-catalog-deepseek-v41",
+      "title": "Foundry model catalog: DeepSeek-V4.1-Flash (Direct from Azure)",
+      "url": "https://ai.azure.com/catalog/models/DeepSeek-V4.1-Flash",
+      "publisher": "Microsoft Foundry",
+      "type": "csp-doc",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "ms-foundry-catalog-fw-deepseek-v41",
+      "title": "Foundry model catalog: FW-DeepSeek-V4.1-Flash (Fireworks on Foundry)",
+      "url": "https://ai.azure.com/catalog/models/FW-DeepSeek-V4.1-Flash",
+      "publisher": "Microsoft Foundry",
+      "type": "csp-doc",
+      "accessed": "2026-10-06"
+    },
+    {
+      "id": "ms-foundry-catalog-fw-glm53",
+      "title": "Foundry model catalog: FW-GLM-5.3 (Fireworks on Foundry)",
+      "url": "https://ai.azure.com/catalog/models/FW-GLM-5.3",
+      "publisher": "Microsoft Foundry",
+      "type": "csp-doc",
+      "accessed": "2026-10-06"
+    },
+    {
+      "id": "ms-foundry-catalog-fw-glm53-flash",
+      "title": "Foundry model catalog: FW-GLM-5.3-Flash (Fireworks on Foundry)",
+      "url": "https://ai.azure.com/catalog/models/FW-GLM-5.3-Flash",
+      "publisher": "Microsoft Foundry",
+      "type": "csp-doc",
+      "accessed": "2026-10-06"
+    },
+    {
+      "id": "ms-foundry-catalog-fw-inkling",
+      "title": "Foundry model catalog: FW-Inkling (Fireworks on Foundry)",
+      "url": "https://ai.azure.com/catalog/models/FW-Inkling",
+      "publisher": "Microsoft Foundry",
+      "type": "csp-doc",
+      "accessed": "2026-10-06"
+    },
+    {
+      "id": "ms-foundry-catalog-fw-kimi-k3",
+      "title": "Foundry model catalog: FW-Kimi-K3 (Fireworks on Foundry)",
+      "url": "https://ai.azure.com/catalog/models/FW-Kimi-K3",
+      "publisher": "Microsoft Foundry",
+      "type": "csp-doc",
+      "accessed": "2026-10-06"
+    },
+    {
+      "id": "ms-foundry-catalog-fw-muse-glimmer",
+      "title": "Foundry model catalog: FW-Muse-Glimmer-30B (Fireworks on Foundry)",
+      "url": "https://ai.azure.com/catalog/models/FW-Muse-Glimmer-30B",
+      "publisher": "Microsoft Foundry",
+      "type": "csp-doc",
+      "accessed": "2026-10-06"
+    },
+    {
+      "id": "ms-foundry-catalog-fw-nemotron-3-ultra",
+      "title": "Foundry model catalog: FW-Nemotron-3-Ultra-NVFP4 (Fireworks on Foundry)",
+      "url": "https://ai.azure.com/catalog/models/FW-Nemotron-3-Ultra-NVFP4",
+      "publisher": "Microsoft Foundry",
+      "type": "csp-doc",
+      "accessed": "2026-10-06"
+    },
+    {
+      "id": "ms-foundry-catalog-fw-qwen38-27b",
+      "title": "Foundry model catalog: FW-Qwen3.8-27B (Fireworks on Foundry)",
+      "url": "https://ai.azure.com/catalog/models/FW-Qwen3.8-27B",
+      "publisher": "Microsoft Foundry",
+      "type": "csp-doc",
+      "accessed": "2026-10-06"
+    },
+    {
+      "id": "ms-foundry-fireworks-models",
+      "title": "Fireworks models on Microsoft Foundry: catalog models, supported offers, regions, retirement notice and data privacy",
+      "url": "https://learn.microsoft.com/en-us/azure/foundry/how-to/fireworks/enable-fireworks-models",
+      "publisher": "Microsoft Learn",
+      "type": "csp-doc",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "openmdw-license",
+      "title": "OpenMDW License Agreement, version 1.1",
+      "url": "https://openmdw.ai/license/1-1/",
+      "publisher": "OpenMDW (The Linux Foundation)",
+      "type": "community",
+      "accessed": "2026-10-06"
+    },
+    {
+      "id": "openrouter-data",
+      "title": "OpenRouter Data: datasets and notes (incl. \"Ox Alpha revealed: GLM-5.3-Flash\")",
+      "url": "https://openrouter.ai/data",
+      "publisher": "OpenRouter",
+      "type": "benchmark",
+      "accessed": "2026-10-06"
+    },
+    {
+      "id": "openrouter-models-api",
+      "title": "Models API: model list, descriptions, context length and list prices",
+      "url": "https://openrouter.ai/api/v1/models",
+      "publisher": "OpenRouter",
+      "type": "vendor-doc",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "openrouter-rankings",
+      "title": "LLM Rankings: weekly model usage by tokens (usage data through 2026-10-05; rankings data licensed CC BY 4.0)",
+      "url": "https://openrouter.ai/rankings",
+      "publisher": "OpenRouter",
+      "type": "benchmark",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "reflection-beam-announce",
+      "title": "Introducing Beam: Reflection's 501B open-weight model",
+      "url": "https://reflection.ai/blog/introducing-beam",
+      "publisher": "Reflection AI",
+      "type": "vendor-blog",
+      "accessed": "2026-10-06"
+    },
+    {
+      "id": "siliconangle-reflection-beam",
+      "title": "Reflection AI debuts open-source Beam model with 501B parameters",
+      "url": "https://siliconangle.com/2026/10/05/reflection-ai-debuts-open-source-beam-model-with-501b-parameters/",
+      "publisher": "SiliconANGLE",
+      "type": "news",
+      "accessed": "2026-10-06"
+    },
+    {
+      "id": "agentplatform-claude-haiku55",
+      "title": "Claude Haiku 5.5 on Gemini Enterprise Agent Platform: model ID, launch stage, regions and quotas",
+      "publisher": "Google Cloud",
+      "type": "csp-doc",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/partner-models/claude/haiku-5-5",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "google-agentplatform-open-model-deprecations",
+      "title": "Open model deprecations (MaaS endpoints) - Gemini Enterprise Agent Platform",
+      "publisher": "Google Cloud",
+      "type": "csp-doc",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/deprecations/open-models",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "litellm-v1-104-1",
+      "title": "LiteLLM v1.104.1 release notes (patch: pgbouncer 1.26.0, dependency refresh)",
+      "publisher": "LiteLLM",
+      "type": "vendor-doc",
+      "url": "https://docs.litellm.ai/release_notes/v1.104.1/v1-104-1/",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "litellm-v1-104-2",
+      "title": "LiteLLM v1.104.2 release notes (patch: Decisions API backport)",
+      "publisher": "LiteLLM",
+      "type": "vendor-doc",
+      "url": "https://docs.litellm.ai/release_notes/v1.104.2/v1-104-2/",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "litellm-v1-103-4",
+      "title": "LiteLLM v1.103.4 release notes (patch: pgbouncer 1.26.0, dependency refresh)",
+      "publisher": "LiteLLM",
+      "type": "vendor-doc",
+      "url": "https://docs.litellm.ai/release_notes/v1.103.4/v1-103-4/",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "litellm-v1-102-4",
+      "title": "LiteLLM v1.102.4 release notes (fix: double-counted spend on the Chat-to-Responses bridge)",
+      "publisher": "LiteLLM",
+      "type": "vendor-doc",
+      "url": "https://docs.litellm.ai/release_notes/v1.102.4/v1-102-4/",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "litellm-v1-101-6",
+      "title": "LiteLLM v1.101.6 release notes (fix: Codex CLI tools on the Responses-to-Chat bridge)",
+      "publisher": "LiteLLM",
+      "type": "vendor-doc",
+      "url": "https://docs.litellm.ai/release_notes/v1.101.6/v1-101-6/",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "litellm-v1-105-0-rc3",
+      "title": "LiteLLM v1.105.0-rc.3 release notes (Decisions API)",
+      "publisher": "LiteLLM",
+      "type": "vendor-doc",
+      "url": "https://docs.litellm.ai/release_notes/v1.105.0rc3/v1-105-0-rc-3/",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "litellm-haiku55-day0",
+      "title": "Day 0 support: Claude Haiku 5.5 on LiteLLM",
+      "publisher": "LiteLLM",
+      "type": "vendor-blog",
+      "url": "https://docs.litellm.ai/blog/claude-haiku-5-5",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "litellm-cost-map-main",
+      "title": "LiteLLM model_prices_and_context_window.json (main branch)",
+      "publisher": "LiteLLM (GitHub)",
+      "type": "github",
+      "url": "https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "osv-api-litellm",
+      "title": "OSV API query: PyPI package litellm",
+      "publisher": "OSV (Google)",
+      "type": "security-advisory",
+      "url": "https://api.osv.dev/v1/query",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "openrouter-step5-preview",
+      "title": "StepFun: Step 5 Preview on OpenRouter (release date, context, price)",
+      "publisher": "OpenRouter",
+      "type": "community",
+      "url": "https://openrouter.ai/stepfun/step-5-preview",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "ifanr-step5-preview",
+      "title": "ifanr digest: StepFun Step 5 Preview (open-source plan for October 15)",
+      "publisher": "ifanr",
+      "type": "news",
+      "url": "https://www.ifanr.com/digest/1681205",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "hf-cloudflare-clef-omni",
+      "title": "Cloudflare/clef-omni: model card (30B-A3B decision model, Apache 2.0)",
+      "publisher": "Cloudflare (Hugging Face)",
+      "type": "vendor-doc",
+      "url": "https://huggingface.co/Cloudflare/clef-omni",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "hf-pplx-decider-v1-1",
+      "title": "perplexity-ai/pplx-decider-v1.1-27b: model card (Apache 2.0)",
+      "publisher": "Perplexity (Hugging Face)",
+      "type": "vendor-doc",
+      "url": "https://huggingface.co/perplexity-ai/pplx-decider-v1.1-27b",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "scmp-reflection-beam",
+      "title": "Nvidia-backed Reflection AI challenges Chinese dominance in open-weight models",
+      "publisher": "South China Morning Post",
+      "type": "news",
+      "url": "https://scmp.com/tech/tech-trends/article/3369885/nvidia-backed-reflection-ai-challenges-chinese-dominance-open-weight-models",
+      "accessed": "2026-10-11"
+    },
+    {
+      "id": "natlawreview-eu-digital-omnibus",
+      "title": "EU Digital Omnibus on AI enters into force",
+      "publisher": "The National Law Review",
+      "type": "news",
+      "url": "https://natlawreview.com/article/eu-digital-omnibus-ai-enters-force",
+      "accessed": "2026-10-11"
     }
   ]
 }

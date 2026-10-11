@@ -27,6 +27,11 @@ if (pointer.schema !== "portal-manifest/v1" || !/^[A-Za-z0-9][A-Za-z0-9._-]{0,99
 const release = JSON.parse(await get(`${pointer.basePath}release.json`));
 
 const OWNED = ["data", "runs", "config"]; // replaced wholesale, so files a release removed go away too
+// Files the portal reads that the research pipeline's release does not carry yet (its data contract lists them
+// once the pipeline supports them). Until then the copy committed to this repo is kept; a release copy always wins.
+const REPO_FALLBACK = ["data/open-models.json"];
+const { existsSync, readFileSync } = await import("node:fs");
+const repoCopies = new Map(REPO_FALLBACK.filter((p) => existsSync(`${root}${p}`)).map((p) => [p, readFileSync(`${root}${p}`)]));
 const files = new Map();
 for (const [path, { sha256 }] of Object.entries(release.files)) {
   if (path.split("/").includes("..")) throw new Error(`bad path in release: ${path}`);
@@ -42,4 +47,13 @@ for (const [path, body] of files) {
   mkdirSync(dirname(`${root}${path}`), { recursive: true });
   writeFileSync(`${root}${path}`, body);
 }
+for (const [path, body] of repoCopies) {
+  if (files.has(path)) continue;
+  mkdirSync(dirname(`${root}${path}`), { recursive: true });
+  writeFileSync(`${root}${path}`, body);
+  console.log(`kept the repo copy of ${path}: the release does not carry it`);
+}
+// what this build shows: build_site.mjs copies it into data/manifest.json (release), so a post-deploy check can compare
+// it with the pointer on the data location. No URL here: the data location's path carries the access token.
+writeFileSync(`${root}.portal-release.json`, JSON.stringify({ releaseId: pointer.releaseId, publishedAt: pointer.publishedAt ?? null, fetchedAt: new Date().toISOString() }, null, 2) + "\n");
 console.log(`fetched release ${pointer.releaseId} (${pointer.publishedAt}) from ${host}: ${files.size} files`);

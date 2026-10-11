@@ -1,8 +1,8 @@
 {
   "schema": "lifecycle/v1",
-  "generatedAt": "2026-10-10T08:53:04Z",
+  "generatedAt": "2026-10-11T13:30:00Z",
   "locale": "zh-TW",
-  "asOf": "2026-10-06",
+  "asOf": "2026-10-11",
   "policies": [
     {
       "service": "bedrock",
@@ -376,8 +376,9 @@
       "cloud": "vendor-direct",
       "service": "gemini-api",
       "event": "retirement",
-      "date": "2026-10-02",
+      "date": "2027-03-15",
       "notes": [
+        "2026-10-11 複查：Gemini API 棄用頁（Last updated 2026-10-09）改為 gemini-2.5-flash-image | October 2, 2025 | March 15, 2027 | gemini-3.1-flash-lite-image——10-02 的關閉日不再出現，與 Agent Platform 同日。",
         "Gemini API 棄用頁（2026-10-01 更新，10-05 複查）仍列 2026-10-02 關閉；關閉日過後該列沒有變化，頁面沒有說明是否已實際停止服務（第三方 10-03 的更新也說無法確認）。Firebase AI Logic 的模型頁同樣寫「will shut down on October 02, 2026」。",
         "2026-10-06：棄用頁的建議替代改為 gemini-nano-banana-2.1（同日 GA）。先前建議的 gemini-3.1-flash-image 自己也在 10-06 被宣布 2026-10-29 關閉——上週才換過去的應用要再換一次；gemini-3.1-flash-lite-image 仍沒有關閉日。",
         "Agent Platform 同名模型為 2027-03-15。"
@@ -397,7 +398,19 @@
         }
       ],
       "verification": "official",
-      "replacement": "gemini-nano-banana-2.1"
+      "replacement": "gemini-3.1-flash-lite-image",
+      "conflicts": [
+        {
+          "date": "2026-10-02",
+          "kind": "superseded",
+          "note": "2026-10-09 以前的 Gemini API 棄用頁日期；現行頁改為 2027-03-15",
+          "sources": [
+            {
+              "id": "google-gemini-api-deprecations"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "azure-kimi-k2-7-code-eol",
@@ -487,8 +500,8 @@
       "verification": "official",
       "version": "2025-04-14",
       "notes": [
-        "Lifecycle：Deprecated；官方退役表（2026-09-21 更新）已列出。",
-        "2026-10-05 複查：gpt-4.1-nano | 2025-04-14 | Deprecated | 2026-10-14，表中未列替代。"
+        "Lifecycle：Deprecated；官方退役表已列出。",
+        "2026-10-11 複查：gpt-4.1-nano | 2025-04-14 | Deprecated | 2027-04-14，表中未列替代（10-14 是被取代的舊日期，見 conflicts）。"
       ],
       "conflicts": [
         {
@@ -522,7 +535,8 @@
       "notes": [
         "2026-07-14 已進入 public extended access（價格可能較高）。",
         "替代：評估 Claude Sonnet 5 或 Sonnet 5.5（2026-09-28 已上 Bedrock；APAC 含台北只有 Global CRIS，沒有 jp. profile）。",
-        "2026-10-06 複查 Legacy 表：EOL 2026-10-14 未變，區域含 ap-east-2（台北）。"
+        "2026-10-06 複查 Legacy 表：EOL 2026-10-14 未變，區域含 ap-east-2（台北）。",
+        "2026-10-11 複查：官方頁面日期不變。"
       ]
     },
     {
@@ -563,7 +577,10 @@
         }
       ],
       "verification": "official",
-      "version": "2025-03-20"
+      "version": "2025-03-20",
+      "notes": [
+        "2026-10-11 複查：官方頁面日期不變。"
+      ]
     },
     {
       "id": "azure-gpt-4o-mini-transcribe-tts-eol",
@@ -576,7 +593,8 @@
       "event": "retirement",
       "date": "2026-10-15",
       "notes": [
-        "2025-12-15 版本為 2027-06-15。2026-09-28 首次收錄。"
+        "2025-12-15 版本為 2027-06-15。2026-09-28 首次收錄。",
+        "2026-10-11 複查：官方頁面日期不變。"
       ],
       "sources": [
         {
@@ -596,7 +614,8 @@
       "event": "retirement",
       "date": "2026-10-15",
       "notes": [
-        "Preview。2026-09-28 首次收錄。"
+        "Preview。2026-09-28 首次收錄。",
+        "2026-10-11 複查：官方頁面日期不變。"
       ],
       "sources": [
         {
@@ -634,7 +653,8 @@
         }
       ],
       "notes": [
-        "Preview 版本。"
+        "Preview 版本。",
+        "2026-10-11 複查：官方頁面日期不變。"
       ]
     },
     {
@@ -668,7 +688,8 @@
         "社群轉述的 Google 2026-09-15 客戶通知寫法不同：10-20 只封鎖新專案與 2026-07-22～10-20 沒有呼叫過的專案，使用中的專案到 2027-01-28 才停止服務。兩個公開的 GitHub issue 都是轉述者自己的摘要、不是通知原文，本期也沒有找到更新的通知；官方模型版本頁、release notes 與 Firebase 模型頁都沒有這段文字——在帳號通知確認前，請當作 10-20 停止服務來規劃。",
         "平常沒有流量的 DR / fallback 專案最可能先被封鎖。",
         "Gemini API（ai.google.dev）對同一模型是「No shutdown date announced」——兩個通路時程不同。",
-        "建議替代中的 gemini-3.8-flash 屬於「短期提供」類模型，退役只保證至少 45 天通知；同類的 gemini-3.6-flash 發布四個月就排定退役（2026-11-19）。要較長的可用期可選 gemini-3.5-flash（不早於 2027-05-19）或 gemini-3.5-flash-lite（不早於 2027-07-21）。"
+        "建議替代中的 gemini-3.8-flash 屬於「短期提供」類模型，退役只保證至少 45 天通知；同類的 gemini-3.6-flash 發布四個月就排定退役（2026-11-19）。要較長的可用期可選 gemini-3.5-flash（不早於 2027-05-19）或 gemini-3.5-flash-lite（不早於 2027-07-21）。",
+        "2026-10-11 複查：官方頁面日期不變。"
       ],
       "conflicts": [
         {
@@ -721,7 +742,8 @@
         "平常沒有流量的 DR / fallback 專案最可能先被封鎖。",
         "Gemini API（ai.google.dev）對同一模型是「No shutdown date announced」——兩個通路時程不同。",
         "建議替代中的 gemini-3.8-flash 屬於「短期提供」類模型，退役只保證至少 45 天通知；同類的 gemini-3.6-flash 發布四個月就排定退役（2026-11-19）。要較長的可用期可選 gemini-3.5-flash（不早於 2027-05-19）或 gemini-3.5-flash-lite（不早於 2027-07-21）。",
-        "Agent Search（原 Vertex AI Search）的 answer generation 模型 gemini-2.5-flash/answer_gen/v1 在自己的官方頁列為 October 16, 2026（頁面 2026-09-30 更新，單次讀取）——是不同產品的模型 ID；有使用 Answer API 的團隊請另外確認。"
+        "Agent Search（原 Vertex AI Search）的 answer generation 模型 gemini-2.5-flash/answer_gen/v1 在自己的官方頁列為 October 16, 2026（頁面 2026-09-30 更新，單次讀取）——是不同產品的模型 ID；有使用 Answer API 的團隊請另外確認。",
+        "2026-10-11 複查：官方頁面日期不變。"
       ],
       "conflicts": [
         {
@@ -770,7 +792,8 @@
         "社群轉述的 Google 2026-09-15 客戶通知寫法不同：10-20 只封鎖新專案與 2026-07-22～10-20 沒有呼叫過的專案，使用中的專案到 2027-03-31 才停止服務（韓國、巴西、法國為 2027-08-06）。兩個公開的 GitHub issue 都是轉述者自己的摘要、不是通知原文，本期也沒有找到更新的通知；官方模型版本頁、release notes 與 Firebase 模型頁都沒有這段文字——在帳號通知確認前，請當作 10-20 停止服務來規劃。",
         "平常沒有流量的 DR / fallback 專案最可能先被封鎖。",
         "Gemini API（ai.google.dev）對同一模型是「No shutdown date announced」——兩個通路時程不同。",
-        "建議替代中的 gemini-3.8-flash 屬於「短期提供」類模型，退役只保證至少 45 天通知；同類的 gemini-3.6-flash 發布四個月就排定退役（2026-11-19）。要較長的可用期可選 gemini-3.5-flash（不早於 2027-05-19）或 gemini-3.5-flash-lite（不早於 2027-07-21）。"
+        "建議替代中的 gemini-3.8-flash 屬於「短期提供」類模型，退役只保證至少 45 天通知；同類的 gemini-3.6-flash 發布四個月就排定退役（2026-11-19）。要較長的可用期可選 gemini-3.5-flash（不早於 2027-05-19）或 gemini-3.5-flash-lite（不早於 2027-07-21）。",
+        "2026-10-11 複查：官方頁面日期不變。"
       ],
       "conflicts": [
         {
@@ -798,11 +821,15 @@
       "event": "retirement",
       "date": "2026-10-21",
       "notes": [
-        "Agent Platform release note（2026-07-21）：這些開源模型端點已 deprecated，2026-10-21 退役；替代請看官方的 Open model deprecations 頁（未讀）。2026-10-02 首次收錄（官方 release notes 這次才能直接讀取）。"
+        "Agent Platform release note（2026-07-21）：這些開源模型端點已 deprecated，2026-10-21 退役；替代請看官方的 Open model deprecations 頁（未讀）。2026-10-02 首次收錄（官方 release notes 這次才能直接讀取）。",
+        "2026-10-11 複查：官方頁面日期不變。"
       ],
       "sources": [
         {
           "id": "google-agentplatform-release-notes"
+        },
+        {
+          "id": "google-agentplatform-open-model-deprecations"
         }
       ],
       "verification": "official"
@@ -837,7 +864,8 @@
       "event": "retirement",
       "date": "2026-10-23",
       "notes": [
-        "Preview。2026-09-28 首次收錄。"
+        "Preview。2026-09-28 首次收錄。",
+        "2026-10-11 複查：官方頁面日期不變。"
       ],
       "sources": [
         {
@@ -2053,10 +2081,11 @@
       "providerModelId": "gemini-3.1-flash-image",
       "cloud": "vendor-direct",
       "service": "gemini-api",
-      "event": "retirement",
-      "date": "2026-10-29",
+      "event": "deprecation",
+      "date": "2026-10-06",
       "replacement": "gemini-nano-banana-2.1",
       "notes": [
+        "2026-10-11 複查：棄用頁（2026-10-09）寫「deprecated (no shutdown date announced)」，changelog 10-06 那一則也改成同樣的措辭——10-29 的倒數取消，改以棄用公告日 2026-10-06 記錄；替代仍是 gemini-nano-banana-2.1。",
         "Gemini API changelog 2026-10-06：「The gemini-3.1-flash-image model is deprecated and will be shut down on October 29, 2026. Migrate to gemini-nano-banana-2.1.」棄用頁同日更新：gemini-3.1-flash-image | May 28, 2026 | October 29, 2026 | gemini-nano-banana-2.1。公告到關閉只有 23 天。",
         "替代的 gemini-nano-banana-2.1 同日 GA：Standard input $1.50、output $7.50（文字與 thinking）/ $30（影像）每百萬 token；Batch 為半價。影像輸出價與 3.1 Flash Image 不同，換模型前先重算單張成本。",
         "Agent Platform 的同一個 model ID 是「May 28, 2027 or later」（模型版本頁 2026-10-06）——兩個通路相差七個月以上，經 Agent Platform 呼叫的不受這次關閉影響。",
@@ -2076,7 +2105,22 @@
           "id": "google-agentplatform-model-versions"
         }
       ],
-      "verification": "official"
+      "verification": "official",
+      "conflicts": [
+        {
+          "date": "2026-10-29",
+          "kind": "superseded",
+          "note": "10-06 公告的關閉日；現行棄用頁改為「No shutdown date announced」",
+          "sources": [
+            {
+              "id": "google-gemini-api-deprecations"
+            },
+            {
+              "id": "google-gemini-api-changelog"
+            }
+          ]
+        }
+      ]
     },
     {
       "cloud": "aws",
@@ -2155,6 +2199,139 @@
       "notes": [
         "Google Cloud 模型頁：Retirement Date 為 Not sooner than 2027-09-28。"
       ]
+    },
+    {
+      "id": "gemini-api-gemini-3-7-flash-deprecation",
+      "modelName": "gemini-3.7-flash（Gemini API）",
+      "vendor": "google",
+      "providerModelId": "gemini-3.7-flash",
+      "cloud": "vendor-direct",
+      "service": "gemini-api",
+      "event": "deprecation",
+      "date": "2026-10-08",
+      "replacement": "gemini-3.8-flash",
+      "notes": [
+        "Gemini API changelog 2026-10-08：gemini-3.7-flash 棄用，所有請求自動導向 gemini-3.8-flash；棄用頁寫「No shutdown date announced」。只適用 Gemini API——Agent Platform 的 gemini-3.7-flash 仍是 2027-01-28 退役。",
+        "自動導向代表直接呼叫 Gemini API 的應用已在用 3.8 Flash（價格與輸出行為不同）。"
+      ],
+      "sources": [
+        {
+          "id": "google-gemini-api-changelog"
+        },
+        {
+          "id": "google-gemini-api-deprecations"
+        },
+        {
+          "id": "google-agentplatform-model-versions"
+        }
+      ],
+      "verification": "official"
+    },
+    {
+      "id": "gemini-api-gemini-3-5-flash-deprecation",
+      "modelName": "gemini-3.5-flash（Gemini API）",
+      "vendor": "google",
+      "providerModelId": "gemini-3.5-flash",
+      "cloud": "vendor-direct",
+      "service": "gemini-api",
+      "event": "deprecation",
+      "date": "2026-10-08",
+      "replacement": "gemini-3.6-flash",
+      "notes": [
+        "Gemini API changelog 2026-10-08：gemini-3.5-flash 棄用，請求自動導向 gemini-3.6-flash；沒有關閉日。Agent Platform 仍是「May 19, 2027 or later」。注意 gemini-3.6-flash 在 Agent Platform 2026-11-19 退役。"
+      ],
+      "sources": [
+        {
+          "id": "google-gemini-api-changelog"
+        },
+        {
+          "id": "google-gemini-api-deprecations"
+        },
+        {
+          "id": "google-agentplatform-model-versions"
+        }
+      ],
+      "verification": "official"
+    },
+    {
+      "id": "gemini-api-deep-research-pro-preview-eol",
+      "modelName": "deep-research-pro-preview-12-2025（Gemini API agent）",
+      "vendor": "google",
+      "providerModelId": "deep-research-pro-preview-12-2025",
+      "cloud": "vendor-direct",
+      "service": "gemini-api",
+      "event": "retirement",
+      "date": "2026-10-23",
+      "replacement": "deep-research-preview-04-2026",
+      "notes": [
+        "2026-10-08 公告；棄用頁 agent 表同日期。也可改用 deep-research-max-preview-04-2026。"
+      ],
+      "sources": [
+        {
+          "id": "google-gemini-api-deprecations"
+        },
+        {
+          "id": "google-gemini-api-changelog"
+        }
+      ],
+      "verification": "official"
+    },
+    {
+      "id": "bedrock-haiku-5-5-nst",
+      "modelName": "Claude Haiku 5.5",
+      "vendor": "anthropic",
+      "providerModelId": "anthropic.claude-haiku-5-5",
+      "cloud": "aws",
+      "service": "bedrock",
+      "event": "eol-no-sooner-than",
+      "date": "2027-10-07",
+      "notes": [
+        "Legacy 期 6 個月。"
+      ],
+      "sources": [
+        {
+          "id": "aws-bedrock-haiku55-card"
+        }
+      ],
+      "verification": "official"
+    },
+    {
+      "id": "anthropic-haiku-5-5-nst",
+      "modelName": "Claude Haiku 5.5",
+      "vendor": "anthropic",
+      "providerModelId": "claude-haiku-5-5",
+      "cloud": "vendor-direct",
+      "service": "anthropic-api",
+      "event": "eol-no-sooner-than",
+      "date": "2027-10-07",
+      "notes": [
+        "Foundry 跟隨 Claude API 的時程。"
+      ],
+      "sources": [
+        {
+          "id": "anthropic-deprecations"
+        },
+        {
+          "id": "anthropic-models-overview"
+        }
+      ],
+      "verification": "official"
+    },
+    {
+      "id": "agent-platform-haiku-5-5-nst",
+      "modelName": "Claude Haiku 5.5",
+      "vendor": "anthropic",
+      "providerModelId": "claude-haiku-5-5",
+      "cloud": "gcp",
+      "service": "agent-platform",
+      "event": "eol-no-sooner-than",
+      "date": "2027-10-07",
+      "sources": [
+        {
+          "id": "agentplatform-claude-haiku55"
+        }
+      ],
+      "verification": "official"
     }
   ]
 }
