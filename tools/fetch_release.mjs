@@ -2,6 +2,11 @@
 // location (PORTAL_DATA_BASE_URL, the data-plane stack's DataBaseUrl output). Each file is checked
 // against the sha256 in the release record. Without PORTAL_DATA_BASE_URL nothing changes and the
 // build uses the data committed to this repo.
+//
+// Daily versions: the pointer's `versions` (or, for an older pointer, its history) says which release
+// was live at the end of each day (Asia/Taipei). For each of the 6 days before today the release of
+// that day goes to versions/<date>/ (its data/ only); today is the live release above. The list of
+// the 7 days is written to .portal-versions.json for tools/build_versions.py and build_site.mjs.
 import { createHash } from "node:crypto";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
@@ -42,7 +47,51 @@ for (const [path, { sha256 }] of Object.entries(release.files)) {
 }
 if (!files.has("data/catalog.json")) throw new Error("release has no data/catalog.json");
 
+// ---- daily versions (read before anything is replaced: a failure here leaves the checkout as it was)
+const DAYS = 7;
+const RELEASE_ID = /^[0-9]{8}T[0-9]{6}Z-[0-9a-f]{8}$/;
+const DAY = /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/;
+const taipeiDay = (iso) => new Date(Date.parse(iso) + 8 * 3600_000).toISOString().slice(0, 10); // UTC+8, no DST
+const today = taipeiDay(new Date().toISOString());
+let entries = Array.isArray(pointer.versions)
+  ? pointer.versions.filter((v) => v && DAY.test(v.date) && RELEASE_ID.test(v.releaseId))
+  : (Array.isArray(pointer.history) ? pointer.history : [])
+      .filter((h) => h && RELEASE_ID.test(h.releaseId) && !Number.isNaN(Date.parse(h.publishedAt)))
+      .map((h) => ({ date: taipeiDay(h.publishedAt), releaseId: h.releaseId, publishedAt: h.publishedAt }));
+entries = entries.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0)); // newest day first (history: first of a day = last)
+const days = [];
+for (let i = 0; i < DAYS; i++) {
+  const date = taipeiDay(new Date(Date.parse(today + "T12:00:00+08:00") - i * 86400_000).toISOString());
+  const live = i === 0 ? { releaseId: pointer.releaseId, publishedAt: pointer.publishedAt ?? null } : entries.find((v) => v.date <= date);
+  if (live) days.push({ date, releaseId: live.releaseId, publishedAt: live.publishedAt ?? null });
+}
+const past = new Map(); // releaseId -> files (data/ only), fetched once however many days show it
+for (const d of days.slice(1)) {
+  if (past.has(d.releaseId)) continue;
+  const base = `releases/${d.releaseId}/`;
+  const rec = JSON.parse(await get(`${base}release.json`));
+  const got = new Map();
+  for (const [path, { sha256 }] of Object.entries(rec.files)) {
+    if (path.split("/").includes("..") || path.split("/")[0] !== "data") continue;
+    const body = await get(`${base}${path}`);
+    if (createHash("sha256").update(body).digest("hex") !== sha256) throw new Error(`sha256 mismatch: ${d.releaseId}/${path}`);
+    got.set(path, body);
+  }
+  past.set(d.releaseId, got);
+}
+
 for (const dir of OWNED) rmSync(`${root}${dir}`, { recursive: true, force: true });
+rmSync(`${root}versions`, { recursive: true, force: true });
+for (const d of days.slice(1)) {
+  const got = new Map(past.get(d.releaseId));
+  // a day that shows the live release shows what today shows - the repo's copy of a file the release lacks included
+  if (d.releaseId === pointer.releaseId) for (const [path, body] of repoCopies) if (!got.has(path)) got.set(path, body);
+  for (const [path, body] of got) {
+    mkdirSync(dirname(`${root}versions/${d.date}/${path}`), { recursive: true });
+    writeFileSync(`${root}versions/${d.date}/${path}`, body);
+  }
+}
+writeFileSync(`${root}.portal-versions.json`, JSON.stringify({ today, days }, null, 2) + "\n");
 for (const [path, body] of files) {
   mkdirSync(dirname(`${root}${path}`), { recursive: true });
   writeFileSync(`${root}${path}`, body);
@@ -57,3 +106,4 @@ for (const [path, body] of repoCopies) {
 // it with the pointer on the data location. No URL here: the data location's path carries the access token.
 writeFileSync(`${root}.portal-release.json`, JSON.stringify({ releaseId: pointer.releaseId, publishedAt: pointer.publishedAt ?? null, fetchedAt: new Date().toISOString() }, null, 2) + "\n");
 console.log(`fetched release ${pointer.releaseId} (${pointer.publishedAt}) from ${host}: ${files.size} files`);
+console.log(`daily versions: ${days.map((d) => `${d.date}=${d.releaseId}`).join(", ")}`);

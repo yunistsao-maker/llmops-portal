@@ -1,5 +1,5 @@
 import { go } from "../App";
-import { loaders, money, useData } from "../data";
+import { linkTo, loaders, money, useData } from "../data";
 import { Empty, PageHead, Status } from "../ui";
 import type { Model } from "../../../schema/types";
 
@@ -36,7 +36,7 @@ export default function Compare({ ids }: { ids: string[] }) {
       {models.length < 2 ? <Empty>選兩到三個模型開始比較。價格、效能與分數都來自外部參考，上線決策請搭配內部實測（測試結果頁）。</Empty> : (
         <section className="card">
           <table>
-            <thead><tr><th style={{ width: 180 }}></th>{models.map((m) => <th key={m.id}><a href={`#/models/${m.id}`} style={{ fontWeight: 700, fontSize: 16 }}>{m.name}</a></th>)}</tr></thead>
+            <thead><tr><th style={{ width: 180 }}></th>{models.map((m) => <th key={m.id}><a href={linkTo(`models/${m.id}`)} style={{ fontWeight: 700, fontSize: 16 }}>{m.name}</a></th>)}</tr></thead>
             <tbody>{rows.map(([label, f]) => <tr key={label}><td className="note">{label}</td>{models.map((m) => <td key={m.id}>{f(m)}</td>)}</tr>)}</tbody>
           </table>
           <p className="note">智慧指數只在相同版本（v4.3.2）比較；延遲依 effort 差異極大，請看各模型的效能頁。</p>

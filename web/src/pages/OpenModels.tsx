@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { OpenModel, OpenModelHosting, OpenModelSignal } from "../../../schema/types";
-import { loaders, useData } from "../data";
+import { linkTo, loaders, selectedVersion, useData } from "../data";
 import { Bullets, Empty, Filters, PageHead, Sources, Status, Verif } from "../ui";
 
 export const HEAT_LABEL: Record<OpenModel["heat"], string> = { hit: "Hit 熱門", rising: "Rising 竄升", watch: "Watch 觀察" };
@@ -46,7 +46,7 @@ export default function OpenModels({ id }: { id?: string }) {
     return (
       <>
         <PageHead eyebrow="市場雷達" title="開源模型（open-weight）" />
-        <Empty>還沒有開放權重模型的資料。這一頁讀取 <span className="mono">data/open-models.json</span>（選用檔）；每週研究任務產出後就會出現在這裡。</Empty>
+        <Empty>{selectedVersion() ? `${selectedVersion()} 這一版沒有開放權重模型的資料（當時的發布還不包含 data/open-models.json）。` : <>還沒有開放權重模型的資料。這一頁讀取 <span className="mono">data/open-models.json</span>（選用檔）；每日的開源模型研究（open-model-scout）產出並核准後就會出現在這裡。</>}</Empty>
       </>
     );
   }
@@ -86,7 +86,7 @@ export default function OpenModels({ id }: { id?: string }) {
             <tbody>
               {list.map((m) => (
                 <tr key={m.id}>
-                  <td><a href={`#/open/${m.id}`} style={{ fontWeight: 500 }}>{m.name}</a><div className="note">{m.size}</div></td>
+                  <td><a href={linkTo(`open/${m.id}`)} style={{ fontWeight: 500 }}>{m.name}</a><div className="note">{m.size}</div></td>
                   <td><span className={`tag heat-${m.heat}`}>{HEAT_LABEL[m.heat]}</span></td>
                   <td>{m.developer}<div className="note">{m.origin}</div></td>
                   <td className="mono">{m.releaseDate ?? "—"}<div className="note" style={{ fontFamily: "inherit" }}>{STATUS_LABEL[m.status]}</div></td>

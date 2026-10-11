@@ -34,6 +34,7 @@ tools/
   selftest.py              端到端自測（mock → compat → perf → inventory → schema）
   build_site.mjs           組出 dist/：site/ + data/ + runs/ + config/，並產生 data/manifest.json（含 radarAsOf 與 release，供部署後檢查）
   build_radar.py           產生 data/radar.json；--check 檢查是否最新（npm run validate 會跑）
+  build_versions.py        Amplify build：替最近 6 天的每日版本各建一份 Radar（versions/<日期>/，由 fetch_release.mjs 抓下）
   fetch_release.mjs        Amplify build 時抓 pipeline 上線中的 release（release 還沒有的 open-models.json 沿用 repo 的版本）
   sec_suite.py + secsuite/ AI 安全測試（G6）：核准後下載公開資料集、抽樣、執行、本機 UI（見 tools/secsuite/README.md）
 runs/compat, runs/perf    測試結果（UI「測試結果」頁讀取，由 manifest 列出）
@@ -61,7 +62,7 @@ npm run selftest                  # 不需憑證，約 20 秒
 
 | 頁面 | 讀取 | 重點 |
 |---|---|---|
-| 首頁 / Release Radar | `radar.json`（合併版本；沒有時退回最新一份 digest）、`lifecycle.json` | 版本選單只有最新日期；未到期的行動項目全部列出（今天新增的有標示）、最近 14 天移出的項目、各類新聞合併去重。原始紀錄在 `#/digest/<日期>`（稽核用） |
+| 首頁 / Release Radar | `radar.json`（合併版本；沒有時退回最新一份 digest）、`lifecycle.json` | 頁面上方的「資料版本」選單（每個研究頁面都有）切換最近 7 天；未到期的行動項目全部列出（當天新增的有標示）、最近 14 天移出的項目、各類新聞合併去重。原始紀錄在 `#/digest/<日期>`（稽核用） |
 | 開源模型 | `open-models.json` | 熱度判定依據、三雲託管、授權與導入注意事項 |
 | 模型目錄 | `catalog.json` → `models[]` | 依 vendor、tier、雲、platformStatus、`taiwanResidency`、價格篩選 |
 | 模型頁 · 概覽 | `catalog.json` + `models/<id>.json` | tldr、strengths / weaknesses、bestFor / avoidFor |
@@ -153,9 +154,21 @@ python3 tools/build_radar.py            # 產生 data/radar.json
 python3 tools/build_radar.py --as-of 2026-10-10 --out /tmp/radar-1010.json   # 重建某一天的版本
 ```
 
+### 每日版本（每一頁的日期選單）
+
+日期就是版本，每一版都是「那一天結束時上線的完整資料」——仍然有效的舊項目加上當天新增的，不是當天的變動。
+
+- 資料來源：research pipeline 的 `manifest.json` 有 `versions`（每天一筆：那天最後上線的 release，保留 7 天；
+  llmops-research-agent 的 `releases.dated_versions`）。舊的 pointer 沒有這個欄位時，從發布紀錄推算。
+- Amplify build：`tools/fetch_release.mjs` 抓今天（上線版本 → `data/`）與之前 6 個日曆天（各自的 release → `versions/<日期>/data/`；
+  沒有發布的日子沿用前一天）；`tools/build_versions.py` 替每一天建當天的 Radar；`tools/build_site.mjs` 把它們放到
+  `dist/data/versions/<日期>/`，並寫 `dist/data/versions.json`（選單的內容）。
+- UI：`?v=<日期>` 寫在網址裡（例如 `#/models?v=2026-10-10`），切換頁面時保留；看舊版本時剩餘天數以那一天為準。
+  `測試結果`、`發布流程` 不分版本。沒有設定 `PORTAL_DATA_BASE_URL`（用 repo 的資料 build）時只有今天一版。
+
 ## 資料更新流程（建議）
 
-每週排程研究任務（週一 09:00 台北）會產出新的 digest 與資料更新草稿，並寫回 claude.ai Project「3P New Model Release Research」。建議流程：
+正式流程是每天的 research agents（llmops-research-agent 的 `docs/daily-agents-design.md`：GitHub Actions 每天 07:17 啟動，7 個 role 依序研究、驗證、發布，Amplify 自動重新 build）。以下是沒有 pipeline 時的手動流程：
 
 1. 排程任務產出 → 2. 開 PR 到 portal repo 的 `data/` → 3. 平台團隊審核（特別是 community / unverified）→ 4. `npm run validate` 通過後合併 → 5. UI 自動更新。
 

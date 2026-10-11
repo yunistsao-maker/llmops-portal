@@ -1,5 +1,5 @@
 import type { DeepDive } from "../../../schema/types";
-import { loaders, useData } from "../data";
+import { linkTo, loaders, useData } from "../data";
 import { PageHead, Status } from "../ui";
 
 export default function Onboarding() {
@@ -53,7 +53,7 @@ print(resp.choices[0].message.content, resp.model)`}</pre>
         <h2>所有路由名稱</h2>
         <table><thead><tr><th>模型</th><th>呼叫名稱（model）</th><th>實際目標</th><th>說明</th></tr></thead><tbody>
           {aliases.filter((a) => !a.alias.startsWith("tier/")).map((a) => (
-            <tr key={a.alias}><td><a href={`#/models/${a.model}`}>{name(a.model)}</a></td><td className="mono">{a.alias}</td><td className="mono note">{a.target}</td><td className="note">{a.note}</td></tr>))}
+            <tr key={a.alias}><td><a href={linkTo(`models/${a.model}`)}>{name(a.model)}</a></td><td className="mono">{a.alias}</td><td className="mono note">{a.target}</td><td className="note">{a.note}</td></tr>))}
         </tbody></table>
       </section>
       <section className="card">
@@ -62,7 +62,7 @@ print(resp.choices[0].message.content, resp.model)`}</pre>
           <details key={d.modelId}>
             <summary>{name(d.modelId)}</summary>
             <table><tbody>{d.onboarding.parameterGuidance.map((p) => <tr key={p.parameter}><td className="mono" style={{ width: 240 }}>{p.parameter}</td><td>{p.guidance}</td></tr>)}</tbody></table>
-            <p><a href={`#/models/${d.modelId}`}>完整 onboarding 步驟與程式範例 →</a></p>
+            <p><a href={linkTo(`models/${d.modelId}`)}>完整 onboarding 步驟與程式範例 →</a></p>
           </details>))}
       </section>
       {example && (

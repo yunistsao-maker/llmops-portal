@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { go } from "../App";
-import { loaders, money, useData } from "../data";
+import { linkTo, loaders, money, useData } from "../data";
 import { Filters, PageHead, Status } from "../ui";
 
 const CLOUDS = [["all", "全部雲端"], ["aws", "AWS Bedrock"], ["azure", "Azure Foundry"], ["gcp", "GCP Agent Platform"]] as const;
@@ -37,7 +37,7 @@ export default function Catalog() {
               return (
                 <tr key={m.id}>
                   <td><input type="checkbox" aria-label={`比較 ${m.name}`} checked={pick.includes(m.id)} onChange={() => toggle(m.id)} style={{ width: 18, height: 18 }} /></td>
-                  <td><a href={`#/models/${m.id}`} style={{ fontWeight: 700 }}>{m.name}</a><div className="note">{m.vendor}</div></td>
+                  <td><a href={linkTo(`models/${m.id}`)} style={{ fontWeight: 700 }}>{m.name}</a><div className="note">{m.vendor}</div></td>
                   <td>{m.tier}</td><td className="mono">{m.releaseDate}</td>
                   <td>{[...new Set(m.offerings.map((o) => o.cloud.toUpperCase()))].join("、")}</td>
                   <td className="mono">{(m.contextWindow / 1000).toFixed(0)}K</td>
