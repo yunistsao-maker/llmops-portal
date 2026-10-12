@@ -189,7 +189,19 @@ def _stats(recs: list[dict]) -> dict:
     vals = [r["value"] for r in recs if r.get("value") is not None]
     return {"n": n, **c, "scored": scored, "rate": (c["fail"] / scored) if scored else None, "ciLow": lo if scored else None,
             "ciHigh": hi if scored else None, "labels": labels, "medianValue": statistics.median(vals) if vals else None,
-            "outputTokens": sum(r.get("outputTokens") or 0 for r in recs)}
+            "outputTokens": sum(r.get("outputTokens") or 0 for r in recs), "inputTokens": sum(r.get("inputTokens") or 0 for r in recs)}
+
+
+def rule_text(rule: dict) -> str:
+    """The pass rule of an item in one sentence (what _verdict applies)."""
+    kind = rule.get("type")
+    if kind == "zero":
+        return "任何一筆失敗即不通過（零容忍）"
+    if kind == "max_rate":
+        return f"失敗比例超過 {rule.get('threshold', 0):.0%} 即不通過"
+    if kind == "relative":
+        return "失敗比例不得高於現役模型（需與現役模型一起測）"
+    return "僅記錄，不設門檻"
 
 
 def _verdict(rule: dict, s: dict, inc: dict | None) -> tuple[str, str]:
@@ -251,7 +263,8 @@ def aggregate(records: list[dict], cfg: dict) -> list[dict]:
             s["verdict"], s["verdictNote"], s["isIncumbent"] = v, why, is_inc
             results[lab] = s
         out.append({"id": item_id, "title": item.get("title"), "tier": item.get("tier"), "datasets": sorted({r["dataset"] for r in recs}),
-                    "results": results})
+                    "methodology": item.get("methodology"), "scoring": item.get("scoring"), "rule": item.get("rule"),
+                    "ruleText": rule_text(item.get("rule") or {}), "results": results})
     return out
 
 
@@ -368,6 +381,31 @@ def redact(doc: dict, public: bool = False) -> dict:
                 r["tools"], r["detail"] = [], ""
     doc["public"] = public
     return doc
+
+
+#: what a published case may carry; the text fields are emptied for every case of a sensitive dataset (public_cases)
+CASE_FIELDS = ("item", "dataset", "caseId", "category", "lang", "target", "trial", "outcome", "label", "detail", "value", "stopReason",
+               "refusalCategory", "model", "latencyMs", "inputTokens", "outputTokens", "system", "tools", "prompt", "response", "pair")
+TEXT_FIELDS = ("system", "prompt", "response", "detail", "tools")
+
+
+def public_cases(doc: dict) -> dict:
+    """The cases of a run, redacted for a page many people can open (redact(public=True)), for runs/security/<id>.cases.json.
+
+    Every case says the risk of its dataset; a case whose dataset is not low / no risk, may not be republished, or is not in the
+    manifest (except the SEC-16 supply-chain checks, which hold no prompts) keeps its verdict and loses all text."""
+    red = redact(doc, public=True)
+    out = []
+    for r in red["cases"]:
+        ds = fetch.DATASETS.get(r.get("dataset"))
+        risk = ds["risk"] if ds else ("none" if r.get("item") == "SEC-16" else "unknown")
+        hidden = risk not in ("none", "low") or (ds is not None and ds.get("publish") is False)
+        case = {k: r.get(k) for k in CASE_FIELDS}
+        if hidden:
+            case.update(system=None, prompt=[], response="", detail="", tools=[])
+        case["risk"], case["redacted"] = risk, hidden
+        out.append(case)
+    return {"schema": "security-cases/v1", "runId": doc["runId"], "public": True, "cases": out}
 
 
 def summary_only(doc: dict) -> dict:

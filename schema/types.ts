@@ -905,8 +905,59 @@ export interface SecurityRunSummary {
   judge?: { label?: string; provider?: string; model?: string } | null;
   /** id = securityTestCatalog id (SEC-01 ...); results keyed by target label ("gateway" for platform items). */
   /** tier A = blocks the model's release when it fails (tools/secsuite/catalog.json). */
-  items: { id: string; title?: string; tier?: "A" | "B" | "C" | "D"; datasets: string[]; results: Record<string, SecurityItemResult> }[];
+  items: {
+    id: string;
+    title?: string;
+    tier?: "A" | "B" | "C" | "D";
+    datasets: string[];
+    /** what the item tests, how a case is scored, and the pass rule (from the catalog, for the page) */
+    methodology?: string;
+    scoring?: string;
+    rule?: { type: string; threshold?: number };
+    ruleText?: string;
+    results: Record<string, SecurityItemResult>;
+  }[];
   caseCount?: number;
+}
+
+/** One case of a security run as published: the text fields are empty for every case of a sensitive dataset. */
+export interface SecurityCase {
+  item: string;
+  dataset: string;
+  caseId: string;
+  category?: string | null;
+  lang?: string | null;
+  /** target label (the column of the summary), "gateway" for SEC-16 */
+  target: string;
+  trial?: number;
+  outcome: "pass" | "fail" | "review" | "error" | "info";
+  label?: string;
+  detail?: string;
+  value?: number | null;
+  stopReason?: string | null;
+  refusalCategory?: string | null;
+  /** model id the API reported */
+  model?: string | null;
+  latencyMs?: number;
+  inputTokens?: number;
+  outputTokens?: number;
+  system?: string | null;
+  tools?: string[];
+  prompt: { role: string; content: string }[];
+  response: string;
+  pair?: string | null;
+  /** risk of the dataset (tools/secsuite/manifest.json); anything but none / low is never shown as text */
+  risk: "none" | "low" | "medium" | "medium-high" | "high" | "highest" | "unknown";
+  redacted: boolean;
+}
+
+/** runs/security/<runId>.cases.json: `sec_suite.py publish` - only the full portal shows it; the clean build leaves it out. */
+export interface SecurityRunCases {
+  schema: "security-cases/v1";
+  runId: string;
+  /** always true: the cases were redacted for a page many people can open */
+  public: true;
+  cases: SecurityCase[];
 }
 
 export interface InventoryDeployment {

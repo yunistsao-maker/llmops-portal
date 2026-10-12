@@ -30,7 +30,9 @@ const manifest = {
   models: jsonIn(`${root}data/models`).map((f) => f.replace(/\.json$/, "")),
   compatRuns: jsonIn(`${root}runs/compat`),
   perfRuns: jsonIn(`${root}runs/perf`),
-  securityRuns: jsonIn(`${root}runs/security`),
+  securityRuns: jsonIn(`${root}runs/security`).filter((f) => !f.endsWith(".cases.json")),
+  // the redacted case-by-case results: the full portal only (the clean build removes the files below)
+  securityCases: edition === "clean" ? [] : jsonIn(`${root}runs/security`).filter((f) => f.endsWith(".cases.json")),
   hasInventory: existsSync(`${root}data/internal/platform-inventory.json`),
   // what the build put on the site, so a post-deploy check can confirm the live site shows this version
   radarAsOf: existsSync(`${root}data/radar.json`) ? JSON.parse(readFileSync(`${root}data/radar.json`, "utf8")).asOf : null,
@@ -56,7 +58,7 @@ days.forEach((d, i) => {
       generatedAt: manifest.generatedAt,
       digests: jsonIn(`${src}/digests`).map((f) => f.replace(/\.json$/, "")),
       models: jsonIn(`${src}/models`).map((f) => f.replace(/\.json$/, "")),
-      compatRuns: manifest.compatRuns, perfRuns: manifest.perfRuns, securityRuns: manifest.securityRuns, // test results are not versioned
+      compatRuns: manifest.compatRuns, perfRuns: manifest.perfRuns, securityRuns: manifest.securityRuns, securityCases: manifest.securityCases, // test results are not versioned
       hasInventory: existsSync(`${src}/internal/platform-inventory.json`),
       radarAsOf: existsSync(`${src}/radar.json`) ? JSON.parse(readFileSync(`${src}/radar.json`, "utf8")).asOf : null,
       release: d.releaseId, version: d.date,
@@ -86,5 +88,7 @@ if (edition === "clean") {
   // data/litellm.json is the LiteLLM 與安全 page (a model's own LiteLLM facts are in catalog.json and stay)
   for (const dir of [`${dist}/data`, ...versions.map((d) => `${dist}/data/versions/${d}`)]) rmSync(`${dir}/litellm.json`, { force: true });
   rmSync(`${dist}/security-tests.html`, { force: true });
-  console.log(`clean edition: onboarding removed from ${stripped} deep dive file(s); no data/litellm.json, config/ or security-tests.html`);
+  // security test cases (even redacted, they are case-by-case results): the clean portal shows only the totals
+  for (const f of jsonIn(`${dist}/runs/security`)) if (f.endsWith(".cases.json")) rmSync(`${dist}/runs/security/${f}`, { force: true });
+  console.log(`clean edition: onboarding removed from ${stripped} deep dive file(s); no data/litellm.json, config/, security-tests.html or security test cases`);
 }

@@ -38,11 +38,12 @@ FILE_TYPES = [
     ("data/internal/platform-inventory*.json", "PlatformInventory"),
     ("runs/perf/*.json", "PerfRun"),
     ("runs/compat/*.json", "CompatRun"),
-    ("runs/security/*.json", "SecurityRunSummary"),
+    ("runs/security/*.json", "SecurityRunSummary"),  # (not *.cases.json: see below)
+    ("runs/security/*.cases.json", "SecurityRunCases"),
 ]
 
 
-OPTIONAL_TYPES = {"OpenModelsFile", "RadarFile", "RadarCuration", "SecurityRunSummary"}
+OPTIONAL_TYPES = {"OpenModelsFile", "RadarFile", "RadarCuration", "SecurityRunSummary", "SecurityRunCases"}
 
 
 def load(path):
@@ -98,6 +99,8 @@ def main():
         v = validator_for(schema, definition)
         for path in sorted(glob.glob(os.path.join(root, pattern))):
             rel = os.path.relpath(path, root)
+            if definition == "SecurityRunSummary" and rel.endswith(".cases.json"):
+                continue
             try:
                 doc = load(path)
             except json.JSONDecodeError as e:

@@ -1,6 +1,7 @@
 import type { CompatRun, Model, PerfRun, SecurityRunSummary, TestPurpose } from "../../../schema/types";
 import { fmt, loaders, useData } from "../data";
 import { Empty, Status } from "../ui";
+import SecurityPanel from "./SecurityPanel";
 
 /**
  * 模型頁的「內部測試」：這個模型在平台 gateway 上的每一層測試（發布關卡 G3 相容性、G4 效能、G5 品質、G6 AI 安全），
@@ -139,6 +140,7 @@ export default function ModelTests({ m }: { m: Model }) {
   const pre = all.filter((r) => r.purpose === "pre-release");
   const other = all.filter((r) => r.purpose !== "pre-release");
   const latestPre = (layer: Layer) => pre.find((r) => r.layer === layer);
+  const secRuns = sec.data.filter((r) => securityTargets(r, m).length > 0);
 
   return (
     <>
@@ -166,6 +168,8 @@ export default function ModelTests({ m }: { m: Model }) {
           })}
         </div>
       </section>
+
+      {secRuns.length > 0 && <SecurityPanel runs={secRuns} labelOf={(r) => securityTargets(r, m)[0]} />}
 
       {pre.length > 0 && <section className="card"><h2>上線前測試紀錄（{pre.length}）</h2><RunList rows={pre} /></section>}
       {other.length > 0 && <section className="card"><h2>其他測試紀錄（{other.length}）</h2><p className="note" style={{ marginTop: -6 }}>回歸、臨時或未標示目的的測試。</p><RunList rows={other} /></section>}
