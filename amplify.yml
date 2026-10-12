@@ -12,7 +12,7 @@ frontend:
         - python3 tools/build_radar.py
         # the same for each of the 6 days before today (versions/<date>/, fetched by fetch_release.mjs)
         - python3 tools/build_versions.py
-        # site/ is the prebuilt app; this adds data/, runs/, config/ and generates data/manifest.json
+        # site/ (or site-clean/ with PORTAL_EDITION=clean) is the prebuilt app; this adds data/, runs/, config/ and data/manifest.json
         - node tools/build_site.mjs
   artifacts:
     baseDirectory: dist

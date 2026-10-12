@@ -15,6 +15,7 @@ const manifest = {
   models: list("data/models").map((f) => f.replace(/\.json$/, "")),
   compatRuns: list("runs/compat"),
   perfRuns: list("runs/perf"),
+  securityRuns: list("runs/security"),
   hasInventory: existsSync(pub + "data/internal/platform-inventory.json"),
 };
 writeFileSync(pub + "data/manifest.json", JSON.stringify(manifest, null, 2));

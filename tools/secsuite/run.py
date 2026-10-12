@@ -250,7 +250,8 @@ def aggregate(records: list[dict], cfg: dict) -> list[dict]:
             v, why = _verdict(item["rule"], s, None if is_inc else inc_stats)
             s["verdict"], s["verdictNote"], s["isIncumbent"] = v, why, is_inc
             results[lab] = s
-        out.append({"id": item_id, "datasets": sorted({r["dataset"] for r in recs}), "results": results})
+        out.append({"id": item_id, "title": item.get("title"), "tier": item.get("tier"), "datasets": sorted({r["dataset"] for r in recs}),
+                    "results": results})
     return out
 
 
@@ -318,8 +319,10 @@ def run(cfg: dict, progress: Progress | None = None) -> dict:
         "finishedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "tool": {"name": "secsuite", "version": __version__},
         "simulated": any(t["provider"] == "mock" for t in cfg["targets"]),
+        **({"purpose": cfg["purpose"]} if cfg.get("purpose") else {}),
         "config": {k: cfg[k] for k in ("n", "seed", "trials", "maxTokens", "incumbent", "litellmVersion", "items")},
-        "targets": [{k: t.get(k) for k in ("label", "provider", "model", "region", "effort")} for t in cfg["targets"]],
+        "targets": [{k: t.get(k) for k in ("label", "provider", "model", "region", "effort", "modelId") if k != "modelId" or t.get(k)}
+                    for t in cfg["targets"]],
         "judge": {k: cfg["judge"].get(k) for k in ("label", "provider", "model")} if cfg.get("judge") else None,
         "items": aggregate(records, cfg),
         "cases": records,

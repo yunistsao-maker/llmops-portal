@@ -800,12 +800,22 @@ export interface Percentiles {
   max: number | null;
 }
 
+/**
+ * Why a test was run. "pre-release" = evidence for a release gate before a model (or a gateway change) goes live;
+ * the model page's 內部測試 tab shows those first. Older run files have no purpose (shown as 未標示).
+ */
+export type TestPurpose = "pre-release" | "regression" | "adhoc";
+
 export interface PerfRun {
   schema: "perf-run/v1";
   runId: string;
   startedAt: ISODateTime;
   finishedAt: ISODateTime;
   gateway: string;
+  purpose?: TestPurpose;
+  /** Catalog model id the run is about (otherwise matched from the route: "<modelId>" or "<modelId>@..."). */
+  modelId?: string;
+  litellmVersion?: string;
   /** Gateway alias that was called, e.g. "claude-opus-5-5@bedrock-jp". */
   route: string;
   clientLocation?: string;
@@ -851,11 +861,52 @@ export interface CompatRun {
   startedAt: ISODateTime;
   finishedAt: ISODateTime;
   gateway: string;
+  purpose?: TestPurpose;
+  /** Catalog model ids the run is about (otherwise matched from the routes). */
+  modelIds?: string[];
   litellmVersion?: string;
   routes: string[];
   cases: { id: string; title: string; required: boolean }[];
   results: CompatResult[];
   summary: { route: string; pass: number; fail: number; error: number; skip: number; requiredFailures: string[] }[];
+}
+
+/** One target's result for one security test item (tools/secsuite: aggregate counts only, never prompt or response text). */
+export interface SecurityItemResult {
+  n: number;
+  pass: number;
+  fail: number;
+  review: number;
+  error: number;
+  scored: number;
+  /** fail / scored (attack success rate or failure rate, per the item's KPI). */
+  rate: number | null;
+  ciLow?: number | null;
+  ciHigh?: number | null;
+  verdict: "pass" | "fail" | "review" | "nodata" | "info";
+  verdictNote?: string;
+  isIncumbent?: boolean;
+  [extra: string]: unknown;
+}
+
+/** runs/security/<runId>.json: what `sec_suite.py run --publish-summary` writes (G6 AI 安全測試). */
+export interface SecurityRunSummary {
+  schema: "security-run/v1";
+  runId: string;
+  startedAt: ISODateTime;
+  finishedAt: ISODateTime;
+  purpose?: TestPurpose;
+  tool?: { name: string; version?: string };
+  /** true when the built-in simulator answered instead of a model. */
+  simulated: boolean;
+  config?: Record<string, unknown>;
+  /** label: the column name in results; modelId: the catalog model it stands for (else matched from label / model). */
+  targets: { label: string; provider: string; model: string; region?: string | null; effort?: string | null; modelId?: string }[];
+  judge?: { label?: string; provider?: string; model?: string } | null;
+  /** id = securityTestCatalog id (SEC-01 ...); results keyed by target label ("gateway" for platform items). */
+  /** tier A = blocks the model's release when it fails (tools/secsuite/catalog.json). */
+  items: { id: string; title?: string; tier?: "A" | "B" | "C" | "D"; datasets: string[]; results: Record<string, SecurityItemResult> }[];
+  caseCount?: number;
 }
 
 export interface InventoryDeployment {

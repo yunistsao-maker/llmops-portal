@@ -166,6 +166,31 @@ python3 tools/build_radar.py --as-of 2026-10-10 --out /tmp/radar-1010.json   # �
 - UI：`?v=<日期>` 寫在網址裡（例如 `#/models?v=2026-10-10`），切換頁面時保留；看舊版本時剩餘天數以那一天為準。
   `測試結果`、`發布流程` 不分版本。沒有設定 `PORTAL_DATA_BASE_URL`（用 repo 的資料 build）時只有今天一版。
 
+## 兩個版本：完整版與乾淨版
+
+同一個 repo、同一個 main，Amplify 環境變數 `PORTAL_EDITION` 決定是哪一個（`tools/build_site.mjs`）：
+
+| | 完整版（`full`，預設） | 乾淨版（`clean`） |
+| --- | --- | --- |
+| 給誰 | 平台團隊 | 公司裡需要知道最新 LLM 資訊的所有人 |
+| 沒有的頁面 | — | 測試結果、發布流程、LiteLLM 與安全、上手指南（網址會導回 Release Radar）；模型頁的 Onboarding 分頁與「發布關卡紀錄」按鈕；「AI 安全測試（示範・模擬資料）」 |
+| 沒有的資料 | — | deep dive 的 `onboarding`、`data/litellm.json`、`config/`、`security-tests.html` |
+| App 外殼 | `site/` | `site-clean/` |
+
+改了 `web/` 之後重建兩個外殼：`cd web && npm install && npm run site`（`npm run build` 是完整版、`npm run build:clean` 是乾淨版，
+`scripts/prebuilt-site.mjs` 把它們放進 `site/`、`site-clean/`）。部署方式（第二個 Amplify app、兩個 webhook、兩份 ui-verify）見
+llmops-research-agent 的 `docs/portal-editions-and-tests.md`。
+
+## 上線前測試結果（模型頁的「內部測試」，兩個版本都有）
+
+模型頁的「內部測試」分頁依發布關卡分層顯示這個模型的實測：G3 API 相容性（`runs/compat`）、G4 效能（`runs/perf`）、G5 品質評測（尚無工具）、
+G6 AI 安全測試（`runs/security`，`sec_suite.py run --publish-summary` 的彙總）。`--purpose pre-release` 的測試置頂，每層顯示最近一次的結論；
+其他紀錄在下面。三個工具都有 `--purpose` 與 `--model-id`（`sec_suite.py` 是 `--model-ids <label>=<id>`），不給時以路由名稱比對模型。
+
+有 data plane（`PORTAL_DATA_BASE_URL`）時，網站讀的是 pipeline 的 release：測試結果要用 llmops-research-agent 的
+`portalctl push --portal <這個 repo> --only runs` 發布，只 commit 到 `runs/` 不會出現在網站上。`runs/security/` 只能放彙總，含 prompt
+與回應全文的檔案（有 `cases`）會被 schema 與 pipeline 擋下。
+
 ## 資料更新流程（建議）
 
 正式流程是每天的 research agents（llmops-research-agent 的 `docs/daily-agents-design.md`：GitHub Actions 每天 07:17 啟動，7 個 role 依序研究、驗證、發布，Amplify 自動重新 build）。以下是沒有 pipeline 時的手動流程：
