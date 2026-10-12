@@ -1,10 +1,20 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import type {
   CatalogFile, CompatRun, DeepDive, DigestFile, LifecycleFile, LiteLLMFile, OpenModelsFile, PerfRun,
-  PlatformInventory, RadarFile, RequirementsFile, Source, SourceRef, SourcesFile,
+  PlatformInventory, RadarFile, RequirementsFile, SecurityRunSummary, Source, SourceRef, SourcesFile,
 } from "../../schema/types";
 
-export interface Manifest { generatedAt: string; digests: string[]; models: string[]; compatRuns: string[]; perfRuns: string[]; hasInventory: boolean }
+export interface Manifest { generatedAt: string; digests: string[]; models: string[]; compatRuns: string[]; perfRuns: string[]; securityRuns?: string[]; hasInventory: boolean }
+
+/**
+ * Which portal this build is (VITE_EDITION, set by `npm run build:clean`): "full" for the platform team, "clean" for
+ * everyone who needs the latest LLM information - without 測試結果, 發布流程, LiteLLM 與安全, 上手指南, the model
+ * page's Onboarding tab and the AI security test demo.
+ */
+export const EDITION: "full" | "clean" = import.meta.env.VITE_EDITION === "clean" ? "clean" : "full";
+/** Pages the clean edition does not have (their routes fall back to the Release Radar). */
+export const CLEAN_HIDDEN = new Set(["tests", "release", "gateway", "onboarding"]);
+export const hasPage = (section: string) => EDITION === "full" || !CLEAN_HIDDEN.has(section);
 
 /** One daily version of the site's data: the release that was live at the end of that day (Asia/Taipei). */
 export interface VersionInfo { date: string; releaseId: string | null; publishedAt: string | null; latest: boolean; radarAsOf?: string | null }
@@ -60,6 +70,8 @@ export const loaders = {
   },
   compatRuns: async () => { const m = await loaders.manifest(); return Promise.all(m.compatRuns.map((f) => cached<CompatRun>(`runs/compat/${f}`))); },
   perfRuns: async () => { const m = await loaders.manifest(); return Promise.all(m.perfRuns.map((f) => cached<PerfRun>(`runs/perf/${f}`))); },
+  /** runs/security: aggregate results of tools/sec_suite.py (no prompt or response text). */
+  securityRuns: async () => { const m = await loaders.manifest(); return Promise.all((m.securityRuns ?? []).map((f) => cached<SecurityRunSummary>(`runs/security/${f}`))); },
 };
 
 export function useData<T>(load: () => Promise<T>, deps: unknown[] = []) {

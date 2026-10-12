@@ -1,17 +1,28 @@
 // Assemble the static portal into dist/: prebuilt app shell (site/) + validated data (data/),
 // test runs (runs/) and example config (config/), then write data/manifest.json, which the
 // app reads to discover digests, models and runs. Data-only changes need no JS rebuild.
+//
+// PORTAL_EDITION (Amplify environment variable): "full" (default) = the platform team's portal (site/);
+// "clean" = the portal for everyone who needs the latest LLM information (site-clean/): no 測試結果, 發布流程,
+// LiteLLM 與安全, 上手指南, Onboarding tab or AI security test demo - and none of their data: the deep dives lose
+// `onboarding`; data/litellm.json and config/ (the gateway example) are left out. Test results (runs/) stay: the
+// model page's 內部測試 tab shows them.
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 
 const root = new URL("..", import.meta.url).pathname;
 const dist = `${root}dist`;
 const jsonIn = (dir) =>
   existsSync(dir) ? readdirSync(dir).filter((f) => f.endsWith(".json")).sort() : [];
+const edition = (process.env.PORTAL_EDITION || "full").trim();
+if (!["full", "clean"].includes(edition)) throw new Error(`PORTAL_EDITION must be full or clean, not ${JSON.stringify(edition)}`);
+const app = edition === "clean" ? "site-clean" : "site";
 
 rmSync(dist, { recursive: true, force: true });
 mkdirSync(dist, { recursive: true });
-cpSync(`${root}site`, dist, { recursive: true });
-for (const dir of ["data", "runs", "config"]) cpSync(`${root}${dir}`, `${dist}/${dir}`, { recursive: true });
+cpSync(`${root}${app}`, dist, { recursive: true });
+for (const dir of edition === "clean" ? ["data", "runs"] : ["data", "runs", "config"]) {
+  if (existsSync(`${root}${dir}`)) cpSync(`${root}${dir}`, `${dist}/${dir}`, { recursive: true });
+}
 
 const manifest = {
   generatedAt: new Date().toISOString(),
@@ -19,10 +30,12 @@ const manifest = {
   models: jsonIn(`${root}data/models`).map((f) => f.replace(/\.json$/, "")),
   compatRuns: jsonIn(`${root}runs/compat`),
   perfRuns: jsonIn(`${root}runs/perf`),
+  securityRuns: jsonIn(`${root}runs/security`),
   hasInventory: existsSync(`${root}data/internal/platform-inventory.json`),
   // what the build put on the site, so a post-deploy check can confirm the live site shows this version
   radarAsOf: existsSync(`${root}data/radar.json`) ? JSON.parse(readFileSync(`${root}data/radar.json`, "utf8")).asOf : null,
   release: existsSync(`${root}.portal-release.json`) ? JSON.parse(readFileSync(`${root}.portal-release.json`, "utf8")).releaseId : null,
+  edition,
 };
 writeFileSync(`${dist}/data/manifest.json`, JSON.stringify(manifest, null, 2) + "\n");
 
@@ -43,7 +56,7 @@ days.forEach((d, i) => {
       generatedAt: manifest.generatedAt,
       digests: jsonIn(`${src}/digests`).map((f) => f.replace(/\.json$/, "")),
       models: jsonIn(`${src}/models`).map((f) => f.replace(/\.json$/, "")),
-      compatRuns: manifest.compatRuns, perfRuns: manifest.perfRuns, // test results are not versioned
+      compatRuns: manifest.compatRuns, perfRuns: manifest.perfRuns, securityRuns: manifest.securityRuns, // test results are not versioned
       hasInventory: existsSync(`${src}/internal/platform-inventory.json`),
       radarAsOf: existsSync(`${src}/radar.json`) ? JSON.parse(readFileSync(`${src}/radar.json`, "utf8")).asOf : null,
       release: d.releaseId, version: d.date,
@@ -57,3 +70,21 @@ days.forEach((d, i) => {
 });
 writeFileSync(`${dist}/data/versions.json`, JSON.stringify({ schema: "portal-versions/v1", today: index[0]?.date ?? taipeiToday, versions: index }, null, 2) + "\n");
 console.log(`built dist/: ${manifest.digests.length} digests, ${manifest.models.length} models; versions ${index.map((v) => v.date).join(", ")}`);
+
+// The clean edition: what its pages do not show is not in its files either.
+if (edition === "clean") {
+  const versions = existsSync(`${dist}/data/versions`) ? readdirSync(`${dist}/data/versions`) : [];
+  const deepDiveDirs = [`${dist}/data/models`, ...versions.map((d) => `${dist}/data/versions/${d}/models`)];
+  let stripped = 0;
+  for (const dir of deepDiveDirs) {
+    for (const f of jsonIn(dir)) {
+      const doc = JSON.parse(readFileSync(`${dir}/${f}`, "utf8"));
+      if ("onboarding" in doc) { delete doc.onboarding; stripped++; }
+      writeFileSync(`${dir}/${f}`, JSON.stringify(doc, null, 2) + "\n");
+    }
+  }
+  // data/litellm.json is the LiteLLM 與安全 page (a model's own LiteLLM facts are in catalog.json and stay)
+  for (const dir of [`${dist}/data`, ...versions.map((d) => `${dist}/data/versions/${d}`)]) rmSync(`${dir}/litellm.json`, { force: true });
+  rmSync(`${dist}/security-tests.html`, { force: true });
+  console.log(`clean edition: onboarding removed from ${stripped} deep dive file(s); no data/litellm.json, config/ or security-tests.html`);
+}

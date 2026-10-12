@@ -85,6 +85,15 @@ def cmd_run(args):
             targets.append(_target("anthropic:" + m.strip(), args))
     if not targets:
         sys.exit("請指定受測模型：--bedrock / --gateway + --routes / --anthropic，或 --mock")
+    for pair in (args.model_ids or "").split(","):
+        key, _, mid = pair.partition("=")
+        if not pair.strip():
+            continue
+        hit = [t for t in targets if key.strip() in (t["label"], t["model"])]
+        if not mid.strip() or not hit:
+            sys.exit(f"--model-ids 的 {pair!r} 對不到任何受測模型（要寫 <label 或 model>=<catalog id>）")
+        for t in hit:
+            t["modelId"] = mid.strip()
     judge = None
     if args.judge:
         judge = _target(args.judge, args, "judge")
@@ -95,7 +104,8 @@ def cmd_run(args):
     if missing:
         print(f"注意：尚未下載 {missing}，相關項目會沒有樣本（先執行 fetch --approve …）。", file=sys.stderr)
     cfg = {"targets": targets, "judge": judge, "items": items, "n": args.n, "seed": args.seed, "trials": args.trials,
-           "concurrency": args.concurrency, "maxTokens": args.max_tokens, "incumbent": args.incumbent, "litellmVersion": args.litellm_version}
+           "concurrency": args.concurrency, "maxTokens": args.max_tokens, "incumbent": args.incumbent, "litellmVersion": args.litellm_version,
+           "purpose": args.purpose}
     doc = runner.run(cfg)
     print(f"run {doc['runId']}{'（模擬資料）' if doc['simulated'] else ''}")
     for it in doc["items"]:
@@ -165,6 +175,8 @@ def main():
     r.add_argument("--effort", help="low / medium / high；兩個模型預設不同，要比較請明確指定")
     r.add_argument("--litellm-version", help="gateway 的 LiteLLM 版本，供 SEC-16 檢查")
     r.add_argument("--publish-summary", action="store_true", help="另存不含文字的彙總到 runs/security/")
+    r.add_argument("--purpose", choices=["pre-release", "regression", "adhoc"], help="測試目的：pre-release＝上線前的發布關卡證據（模型頁的內部測試優先顯示）")
+    r.add_argument("--model-ids", help="受測模型對應的 catalog 模型 id：<label 或 model>=<id>，逗號分隔（沒給時由名稱比對）")
     r.add_argument("--fail-on-blocker", action="store_true", help="A 級項目未通過時以非零狀態結束（CI 用）")
     r.set_defaults(fn=cmd_run)
     p = sub.add_parser("report", help="把結果輸出成單一 HTML")

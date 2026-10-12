@@ -38,10 +38,11 @@ FILE_TYPES = [
     ("data/internal/platform-inventory*.json", "PlatformInventory"),
     ("runs/perf/*.json", "PerfRun"),
     ("runs/compat/*.json", "CompatRun"),
+    ("runs/security/*.json", "SecurityRunSummary"),
 ]
 
 
-OPTIONAL_TYPES = {"OpenModelsFile", "RadarFile", "RadarCuration"}
+OPTIONAL_TYPES = {"OpenModelsFile", "RadarFile", "RadarCuration", "SecurityRunSummary"}
 
 
 def load(path):

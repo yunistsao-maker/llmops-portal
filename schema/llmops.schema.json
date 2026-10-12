@@ -244,6 +244,16 @@
         "litellmVersion": {
           "type": "string"
         },
+        "modelIds": {
+          "description": "Catalog model ids the run is about (otherwise matched from the routes).",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "purpose": {
+          "$ref": "#/definitions/TestPurpose"
+        },
         "results": {
           "items": {
             "$ref": "#/definitions/CompatResult"
@@ -2250,6 +2260,9 @@
         "gateway": {
           "type": "string"
         },
+        "litellmVersion": {
+          "type": "string"
+        },
         "metrics": {
           "additionalProperties": false,
           "description": "All latency values are milliseconds; throughput is tokens/second.",
@@ -2301,6 +2314,10 @@
           ],
           "type": "object"
         },
+        "modelId": {
+          "description": "Catalog model id the run is about (otherwise matched from the route: \"<modelId>\" or \"<modelId>@...\").",
+          "type": "string"
+        },
         "notes": {
           "items": {
             "type": "string"
@@ -2341,6 +2358,9 @@
             "stream"
           ],
           "type": "object"
+        },
+        "purpose": {
+          "$ref": "#/definitions/TestPurpose"
         },
         "route": {
           "description": "Gateway alias that was called, e.g. \"claude-opus-5-5@bedrock-jp\".",
@@ -3546,6 +3566,237 @@
       ],
       "type": "object"
     },
+    "SecurityItemResult": {
+      "additionalProperties": {},
+      "description": "One target's result for one security test item (tools/secsuite: aggregate counts only, never prompt or response text).",
+      "properties": {
+        "ciHigh": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "ciLow": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "error": {
+          "type": "number"
+        },
+        "fail": {
+          "type": "number"
+        },
+        "isIncumbent": {
+          "type": "boolean"
+        },
+        "n": {
+          "type": "number"
+        },
+        "pass": {
+          "type": "number"
+        },
+        "rate": {
+          "description": "fail / scored (attack success rate or failure rate, per the item's KPI).",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "review": {
+          "type": "number"
+        },
+        "scored": {
+          "type": "number"
+        },
+        "verdict": {
+          "enum": [
+            "pass",
+            "fail",
+            "review",
+            "nodata",
+            "info"
+          ],
+          "type": "string"
+        },
+        "verdictNote": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "n",
+        "pass",
+        "fail",
+        "review",
+        "error",
+        "scored",
+        "rate",
+        "verdict"
+      ],
+      "type": "object"
+    },
+    "SecurityRunSummary": {
+      "additionalProperties": false,
+      "description": "runs/security/<runId>.json: what `sec_suite.py run --publish-summary` writes (G6 AI 安全測試).",
+      "properties": {
+        "caseCount": {
+          "type": "number"
+        },
+        "config": {
+          "additionalProperties": {},
+          "type": "object"
+        },
+        "finishedAt": {
+          "$ref": "#/definitions/ISODateTime"
+        },
+        "items": {
+          "description": "tier A = blocks the model's release when it fails (tools/secsuite/catalog.json).",
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "datasets": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "id": {
+                "type": "string"
+              },
+              "results": {
+                "additionalProperties": {
+                  "$ref": "#/definitions/SecurityItemResult"
+                },
+                "type": "object"
+              },
+              "tier": {
+                "enum": [
+                  "A",
+                  "B",
+                  "C",
+                  "D"
+                ],
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "datasets",
+              "results"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "judge": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "label": {
+                  "type": "string"
+                },
+                "model": {
+                  "type": "string"
+                },
+                "provider": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "purpose": {
+          "$ref": "#/definitions/TestPurpose"
+        },
+        "runId": {
+          "type": "string"
+        },
+        "schema": {
+          "const": "security-run/v1",
+          "type": "string"
+        },
+        "simulated": {
+          "description": "true when the built-in simulator answered instead of a model.",
+          "type": "boolean"
+        },
+        "startedAt": {
+          "$ref": "#/definitions/ISODateTime"
+        },
+        "targets": {
+          "description": "label: the column name in results; modelId: the catalog model it stands for (else matched from label / model).",
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "effort": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "label": {
+                "type": "string"
+              },
+              "model": {
+                "type": "string"
+              },
+              "modelId": {
+                "type": "string"
+              },
+              "provider": {
+                "type": "string"
+              },
+              "region": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "label",
+              "provider",
+              "model"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "tool": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "name"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "schema",
+        "runId",
+        "startedAt",
+        "finishedAt",
+        "simulated",
+        "targets",
+        "items"
+      ],
+      "type": "object"
+    },
     "Service": {
       "enum": [
         "bedrock",
@@ -3641,6 +3892,15 @@
         "sources"
       ],
       "type": "object"
+    },
+    "TestPurpose": {
+      "description": "Why a test was run. \"pre-release\" = evidence for a release gate before a model (or a gateway change) goes live; the model page's 內部測試 tab shows those first. Older run files have no purpose (shown as 未標示).",
+      "enum": [
+        "pre-release",
+        "regression",
+        "adhoc"
+      ],
+      "type": "string"
     },
     "Vendor": {
       "enum": [

@@ -29,6 +29,7 @@ const targets = [
   ...list("data/internal", (f) => f.startsWith("platform-inventory")).map((f) => [f, "PlatformInventory"]),
   ...list("runs/perf").map((f) => [f, "PerfRun"]),
   ...list("runs/compat").map((f) => [f, "CompatRun"]),
+  ...list("runs/security").map((f) => [f, "SecurityRunSummary"]),
 ];
 
 let bad = 0;

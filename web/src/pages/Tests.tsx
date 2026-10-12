@@ -17,7 +17,7 @@ export default function Tests() {
     <>
       <PageHead eyebrow="runs/compat 與 runs/perf（由 tools/ 產生）" title="測試結果" />
       <Empty>
-        內部實測是發布關卡 G2（相容性）與 G3（效能）的證據。在你們的 gateway 上執行後把 JSON 放進 <span className="mono">runs/</span>，重新 build 就會出現在這裡：
+        內部實測是發布關卡 G3（API 相容性）與 G4（效能）的證據（G6 AI 安全測試的彙總見各模型頁的「內部測試」）。上線前的測試請加 --purpose pre-release，模型頁會置頂顯示。在你們的 gateway 上執行後把 JSON 放進 <span className="mono">runs/</span>，重新 build 就會出現在這裡：
         <pre className="code">{`python3 tools/compat_suite.py --gateway <GW>/v1 --routes claude-opus-5-5,claude-opus-5-5@vertex \\
   --litellm-version v1.102.1 --out runs/compat/$(date +%F)-opus55.json
 python3 tools/perf_probe.py --gateway <GW>/v1 --route claude-opus-5-5 --profile zh-tw \\

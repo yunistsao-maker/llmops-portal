@@ -261,6 +261,9 @@ async def run(args) -> dict:
         "startedAt": started.isoformat().replace("+00:00", "Z"),
         "finishedAt": finished.isoformat().replace("+00:00", "Z"),
         "gateway": args.gateway,
+        **({"purpose": args.purpose} if args.purpose else {}),
+        **({"modelId": args.model_id} if args.model_id else {}),
+        **({"litellmVersion": args.litellm_version} if args.litellm_version else {}),
         "route": args.route,
         "clientLocation": args.client_location,
         "profile": {
@@ -324,6 +327,9 @@ def main():
     ap.add_argument("--client-location")
     ap.add_argument("--extra-json", help="JSON object merged into the request body")
     ap.add_argument("--run-id")
+    ap.add_argument("--purpose", choices=["pre-release", "regression", "adhoc"], help="why the test was run: pre-release = evidence for a release gate (shown first on the model page)")
+    ap.add_argument("--model-id", help="catalog model id the route stands for (else matched from the route name)")
+    ap.add_argument("--litellm-version", help="LiteLLM version of the gateway under test")
     ap.add_argument("--out", help="Write PerfRun JSON here (directories are created)")
     args = ap.parse_args()
     if args.concurrency < 1 or args.requests < 1:

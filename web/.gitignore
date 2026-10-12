@@ -4,3 +4,4 @@ public/data
 public/runs
 public/config
 *.tsbuildinfo
+dist-clean

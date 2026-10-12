@@ -1,11 +1,14 @@
 import { useState } from "react";
 import type { Model } from "../../../schema/types";
 import { go } from "../App";
-import { daysFrom, fmt, linkTo, loaders, money, useData } from "../data";
+import { daysFrom, EDITION, fmt, hasPage, linkTo, loaders, money, useData } from "../data";
 import { Bullets, Empty, PageHead, Sources, Status, Tabs, Verif } from "../ui";
+import ModelTests from "./ModelTests";
 
-const TABS = ["概覽", "Deep dive", "三雲與 API", "效能與指數", "價格與試算", "安全與合規", "LiteLLM", "內部測試", "生命週期", "Onboarding"] as const;
-type Tab = (typeof TABS)[number];
+const ALL_TABS = ["概覽", "Deep dive", "三雲與 API", "效能與指數", "價格與試算", "安全與合規", "LiteLLM", "內部測試", "生命週期", "Onboarding"] as const;
+type Tab = (typeof ALL_TABS)[number];
+/** the clean edition has no Onboarding (its content is not even in that build's data) */
+const TABS: readonly Tab[] = EDITION === "clean" ? ALL_TABS.filter((t) => t !== "Onboarding") : ALL_TABS;
 const TW: Record<string, string> = { yes: "有", no: "無", unknown: "未知" };
 const ZDR: Record<string, string> = { available: "可用", "on-request": "需申請", "not-available": "不提供", unknown: "未知" };
 const ST = { supported: ["支援", "pass"], partial: ["部分", "error"], "not-supported": ["不支援", "fail"], unknown: ["待驗證", "skipped"] } as const;
@@ -28,7 +31,7 @@ export default function ModelPage({ id }: { id: string }) {
         right={<>
           <span className="pill">平台狀態：{m.platformStatus}</span>
           {noTw && <span className="pill warn">無台灣境內處理</span>}
-          <button className="btn" onClick={() => go(`release/${m.id}`)}>發布關卡紀錄</button>
+          {hasPage("release") && <button className="btn" onClick={() => go(`release/${m.id}`)}>發布關卡紀錄</button>}
           <button className="btn" onClick={() => go(`compare/${m.id}`)}>比較</button>
         </>} />
       <Tabs tabs={TABS} value={tab} onChange={setTab} />
@@ -148,13 +151,13 @@ export default function ModelPage({ id }: { id: string }) {
             {m.litellm.providerStrings.map((p) => <tr key={p.model}><td>{p.service}</td><td className="mono">{p.model}</td><td className="note">{p.note}</td></tr>)}
           </tbody></table>
           <h2 style={{ marginTop: 24 }}>已知陷阱</h2><Bullets items={m.litellm.caveats} />
-          <p><a href={linkTo("gateway")}>平台層級的 LiteLLM 版本、公告與陷阱 →</a></p>
+          {hasPage("gateway") && <p><a href={linkTo("gateway")}>平台層級的 LiteLLM 版本、公告與陷阱 →</a></p>}
         </section>)}
 
-      {tab === "內部測試" && <ModelRuns m={m} />}
+      {tab === "內部測試" && <ModelTests m={m} />}
       {tab === "生命週期" && <ModelLifecycle m={m} />}
 
-      {tab === "Onboarding" && needDeep(deep && (
+      {tab === "Onboarding" && EDITION === "full" && needDeep(deep?.onboarding && (
         <div className="row">
           <section className="card grow">
             <p className="note">對象：{deep.onboarding.audience}</p>
@@ -215,20 +218,6 @@ function Pricing({ m }: { m: Model }) {
       </section>
     </>
   );
-}
-
-function ModelRuns({ m }: { m: Model }) {
-  const compat = useData(loaders.compatRuns);
-  const perf = useData(loaders.perfRuns);
-  if (!compat.data || !perf.data) return <Status error={compat.error || perf.error} />;
-  const match = (route: string) => route === m.id || route.startsWith(m.id + "@");
-  const c = compat.data.flatMap((r) => r.summary.filter((s) => match(s.route)).map((s) => ({ r, s })));
-  const p = perf.data.filter((r) => match(r.route));
-  if (!c.length && !p.length) return (
-    <Empty>還沒有 {m.name} 的內部測試。在 gateway 上執行：
-      <pre className="code">{`python3 tools/compat_suite.py --gateway <GW>/v1 --routes ${m.id} --out runs/compat/$(date +%F)-${m.id}.json\npython3 tools/perf_probe.py --gateway <GW>/v1 --route ${m.id} --profile zh-tw --effort medium --out runs/perf/$(date +%F)-${m.id}.json`}</pre>
-      重新 build 後，結果會自動出現在這裡與「測試結果」頁。</Empty>);
-  return <p><a href={linkTo("tests")}>到測試結果頁查看 {c.length} 筆相容性與 {p.length} 筆效能紀錄 →</a></p>;
 }
 
 function ModelLifecycle({ m }: { m: Model }) {

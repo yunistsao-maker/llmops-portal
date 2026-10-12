@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { addressVersion, loaders, selectedVersion, SourcesCtx, UNVERSIONED, useData, type VersionsFile } from "./data";
+import { addressVersion, EDITION, hasPage, loaders, selectedVersion, SourcesCtx, UNVERSIONED, useData, type VersionsFile } from "./data";
 import Radar from "./pages/Radar";
 import Catalog from "./pages/Catalog";
 import Compare from "./pages/Compare";
@@ -39,7 +39,8 @@ export default function App() {
   }, [version, versions.data, parts]);
   const sources = useData(loaders.sources, [version]);
   const srcMap = useMemo(() => new Map((sources.data?.sources ?? []).map((s) => [s.id, s])), [sources.data]);
-  const [p, a] = parts;
+  const [p0, a] = parts;
+  const p = hasPage(p0 ?? "") ? p0 : ""; // a page this edition does not have opens the Release Radar
   const section = p === "models" && a ? "models" : p ?? "";
   let page;
   switch (p) {
@@ -60,7 +61,7 @@ export default function App() {
       <header className="topbar">
         <div className="brand">LLM 平台</div>
         <nav aria-label="主選單">
-          {NAV.map(([path, label]) => (
+          {NAV.filter(([path]) => hasPage(path)).map(([path, label]) => (
             <button key={label} aria-current={(section === path || (path === "" && p === "digest")) ? "page" : undefined} onClick={() => go(path)}>{label}</button>
           ))}
         </nav>
@@ -70,6 +71,9 @@ export default function App() {
         {/* a named version waits for the list of versions: ?v=<today> is the latest (data/), not a folder */}
         {version && (versions.data ? versions.data.versions[0]?.date === version : !versions.error) ? <Status /> : page}
       </main>
+      {EDITION === "full" && (
+        <a className="sec-demo" href="./security-tests.html">AI 安全測試（示範・模擬資料）</a>
+      )}
       <footer className="foot">每天一版：日期就是版本，每一版都是當天結束時仍然有效的全部資料（不是當天的變動），保留最近 7 天。研究由每日排程的 agent 更新；社群與未驗證資訊以紅字標示，使用前請核對來源。</footer>
     </SourcesCtx.Provider>
   );

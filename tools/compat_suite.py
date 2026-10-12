@@ -230,6 +230,8 @@ def main():
     ap.add_argument("--cases", default="all", help="Comma-separated case ids, or 'all' / 'required'")
     ap.add_argument("--timeout", type=float, default=300.0)
     ap.add_argument("--litellm-version")
+    ap.add_argument("--purpose", choices=["pre-release", "regression", "adhoc"], help="why the test was run: pre-release = evidence for a release gate (shown first on the model page)")
+    ap.add_argument("--model-id", help="catalog model id(s) the routes stand for, comma separated (else matched from the route names)")
     ap.add_argument("--out")
     ap.add_argument("--fail-on-required", action="store_true", help="Exit 2 if any required case fails")
     ap.add_argument("--list", action="store_true", help="List cases and exit")
@@ -303,6 +305,10 @@ def main():
     }
     if args.litellm_version:
         run["litellmVersion"] = args.litellm_version
+    if args.purpose:
+        run["purpose"] = args.purpose
+    if args.model_id:
+        run["modelIds"] = [m.strip() for m in args.model_id.split(",") if m.strip()]
     if args.out:
         os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
         with open(args.out, "w", encoding="utf-8") as f:

@@ -89,3 +89,5 @@ details.radar-retired{margin-top:12px}details.radar-retired>summary{color:var(--
 .versionbar select{min-width:0;max-width:100%}
 .versionbar.past{background:var(--warn-bg);border-color:#d9bf7c;color:var(--warn)}
 .linklike{font:inherit;background:none;border:none;padding:0;color:var(--brand);text-decoration:underline;cursor:pointer;min-height:24px}
+.sec-demo{position:fixed;right:16px;bottom:16px;z-index:10;background:#0b3c7a;color:#fff;font:500 13px 'Noto Sans TC',system-ui,sans-serif;padding:8px 14px;border-radius:999px;text-decoration:none;box-shadow:0 1px 4px rgba(20,30,50,.25)}
+.sec-demo:hover{color:#fff;background:var(--brand-d)}
