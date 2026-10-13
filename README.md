@@ -129,7 +129,7 @@ python3 tools/sec_suite.py fetch --approve all   # 核准後才下載到 .cache/
 python3 tools/sec_suite.py ui                    # http://127.0.0.1:8765
 ```
 
-資料集與含 prompt／回應的結果只放在 `.cache/`；`runs/` 會被發布，只能放 `run --publish-summary` 產生的彙總。
+資料集與含 prompt／回應的完整結果只放在 `.cache/`；`runs/` 會被發布，只能放 `sec_suite.py publish` 產生的彙總與遮蔽過的逐筆案例（見下面的「上線前測試結果」）。
 
 平台清單（「我們平台上有哪些模型、何時退役」）：
 
@@ -184,12 +184,32 @@ llmops-research-agent 的 `docs/portal-editions-and-tests.md`。
 ## 上線前測試結果（模型頁的「內部測試」，兩個版本都有）
 
 模型頁的「內部測試」分頁依發布關卡分層顯示這個模型的實測：G3 API 相容性（`runs/compat`）、G4 效能（`runs/perf`）、G5 品質評測（尚無工具）、
-G6 AI 安全測試（`runs/security`，`sec_suite.py run --publish-summary` 的彙總）。`--purpose pre-release` 的測試置頂，每層顯示最近一次的結論；
+G6 AI 安全測試（`runs/security`）。`--purpose pre-release` 的測試置頂，每層顯示最近一次的結論；
 其他紀錄在下面。三個工具都有 `--purpose` 與 `--model-id`（`sec_suite.py` 是 `--model-ids <label>=<id>`），不給時以路由名稱比對模型。
 
+### G6 AI 安全測試的發布
+
+`sec_suite.py run` 的完整結果（`.cache/secsuite/results/<runId>.json`，含題目與回應全文）不會進 `runs/`。跑完後：
+
+```bash
+python3 tools/sec_suite.py publish <runId> --purpose pre-release \
+    --model-ids "<UI 上的 label 或路由>=<catalog id>,..."     # runId 可用 latest
+```
+
+產生兩個檔案：
+
+| 檔案 | 內容 | 哪個版本顯示 |
+| --- | --- | --- |
+| `runs/security/<runId>.json` | 彙總：每個項目（SEC-01 … SEC-16）的結論、計數、測什麼／怎麼判／及格標準、tokens | 兩個版本 |
+| `runs/security/<runId>.cases.json` | 逐筆案例（公開版遮蔽）：結果、judge 理由的分類、延遲、tokens；只有內容風險 none／low 的資料集保留題目與回應 | 只有完整版（乾淨版 build 時刪掉這個檔） |
+
+遮蔽規則：資料集在 `tools/secsuite/manifest.json` 的 `risk` 是 medium 以上、或 `publish: false`、或不在 manifest 裡的案例，
+system／prompt／回應／judge 說明／tool 呼叫全部清空並標 `redacted: true`。schema、`tools/validate_data.py` 與 pipeline 都會擋下
+未遮蔽的高風險案例和沒有 `public: true` 的檔案；`--summary-only` 只產生彙總。分頁只顯示這個模型那一欄（同一批的其他模型不並排）。
+
 有 data plane（`PORTAL_DATA_BASE_URL`）時，網站讀的是 pipeline 的 release：測試結果要用 llmops-research-agent 的
-`portalctl push --portal <這個 repo> --only runs` 發布，只 commit 到 `runs/` 不會出現在網站上。`runs/security/` 只能放彙總，含 prompt
-與回應全文的檔案（有 `cases`）會被 schema 與 pipeline 擋下。
+`portalctl push --portal <這個 repo> --only runs` 發布，只 commit 到 `runs/` 不會出現在網站上。沒有 data plane 時，commit 到 main 的
+`runs/` 就是網站的內容。
 
 ## 資料更新流程（建議）
 

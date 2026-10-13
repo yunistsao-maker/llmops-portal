@@ -3566,6 +3566,158 @@
       ],
       "type": "object"
     },
+    "SecurityCase": {
+      "additionalProperties": false,
+      "description": "One case of a security run as published: the text fields are empty for every case of a sensitive dataset.",
+      "properties": {
+        "caseId": {
+          "type": "string"
+        },
+        "category": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "dataset": {
+          "type": "string"
+        },
+        "detail": {
+          "type": "string"
+        },
+        "inputTokens": {
+          "type": "number"
+        },
+        "item": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "lang": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "latencyMs": {
+          "type": "number"
+        },
+        "model": {
+          "description": "model id the API reported",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "outcome": {
+          "enum": [
+            "pass",
+            "fail",
+            "review",
+            "error",
+            "info"
+          ],
+          "type": "string"
+        },
+        "outputTokens": {
+          "type": "number"
+        },
+        "pair": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prompt": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "content": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "role",
+              "content"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "redacted": {
+          "type": "boolean"
+        },
+        "refusalCategory": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "response": {
+          "type": "string"
+        },
+        "risk": {
+          "description": "risk of the dataset (tools/secsuite/manifest.json); anything but none / low is never shown as text",
+          "enum": [
+            "none",
+            "low",
+            "medium",
+            "medium-high",
+            "high",
+            "highest",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "stopReason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "system": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "target": {
+          "description": "target label (the column of the summary), \"gateway\" for SEC-16",
+          "type": "string"
+        },
+        "tools": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "trial": {
+          "type": "number"
+        },
+        "value": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "item",
+        "dataset",
+        "caseId",
+        "target",
+        "outcome",
+        "prompt",
+        "response",
+        "risk",
+        "redacted"
+      ],
+      "type": "object"
+    },
     "SecurityItemResult": {
       "additionalProperties": {},
       "description": "One target's result for one security test item (tools/secsuite: aggregate counts only, never prompt or response text).",
@@ -3636,6 +3788,37 @@
       ],
       "type": "object"
     },
+    "SecurityRunCases": {
+      "additionalProperties": false,
+      "description": "runs/security/<runId>.cases.json: `sec_suite.py publish` - only the full portal shows it; the clean build leaves it out.",
+      "properties": {
+        "cases": {
+          "items": {
+            "$ref": "#/definitions/SecurityCase"
+          },
+          "type": "array"
+        },
+        "public": {
+          "const": true,
+          "description": "always true: the cases were redacted for a page many people can open",
+          "type": "boolean"
+        },
+        "runId": {
+          "type": "string"
+        },
+        "schema": {
+          "const": "security-cases/v1",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema",
+        "runId",
+        "public",
+        "cases"
+      ],
+      "type": "object"
+    },
     "SecurityRunSummary": {
       "additionalProperties": false,
       "description": "runs/security/<runId>.json: what `sec_suite.py run --publish-summary` writes (G6 AI 安全測試).",
@@ -3664,11 +3847,36 @@
               "id": {
                 "type": "string"
               },
+              "methodology": {
+                "description": "what the item tests, how a case is scored, and the pass rule (from the catalog, for the page)",
+                "type": "string"
+              },
               "results": {
                 "additionalProperties": {
                   "$ref": "#/definitions/SecurityItemResult"
                 },
                 "type": "object"
+              },
+              "rule": {
+                "additionalProperties": false,
+                "properties": {
+                  "threshold": {
+                    "type": "number"
+                  },
+                  "type": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type"
+                ],
+                "type": "object"
+              },
+              "ruleText": {
+                "type": "string"
+              },
+              "scoring": {
+                "type": "string"
               },
               "tier": {
                 "enum": [

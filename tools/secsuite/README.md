@@ -51,7 +51,7 @@ python3 tools/sec_suite.py report --out site/security-tests.html --public
 
 `fetch` 沒帶 `--approve` 時只會列出清單、不下載；UI 的「資料集」頁同樣要先勾選資料集並確認已閱讀風險。每個資料集的來源、大小、授權與內容風險寫在 `manifest.json`。
 
-- 檔案放在 repo 根目錄的 `.cache/secsuite/`（已列入 `.gitignore`）。**不要把資料集或含 prompt／回應的結果放進 `runs/`**：portal 的 build 會把 `runs/` 原樣發布。要給 portal 的只有不含文字的彙總：`run --publish-summary` 會寫到 `runs/security/`。
+- 檔案放在 repo 根目錄的 `.cache/secsuite/`（已列入 `.gitignore`）。**不要把資料集或含 prompt／回應的結果放進 `runs/`**：portal 的 build 會把 `runs/` 原樣發布。要給 portal 的用 `sec_suite.py publish <runId> --purpose pre-release --model-ids <label>=<id>`：寫出彙總 `runs/security/<runId>.json` 與遮蔽過的逐筆案例 `<runId>.cases.json`（只有 risk none／low 的資料集保留題目與回應；只在完整版 portal 顯示）。`--summary-only` 只寫彙總。
 - 下載的檔案只會被當成 CSV／JSON／文字解析，不會被執行；每個檔案的 SHA-256 記在 `.cache/secsuite/state.json`。
 - 標示「高／最高」的資料集含有害請求的原文（只有請求、沒有答案）。UI 預設隱藏這些樣本的內容。
 - **執行比存放更需要注意**：把這些 prompt 送進雲端帳號或 gateway 可能觸發供應商的濫用偵測，部分拒答類別會計費。請用測試帳號，並事先知會資安團隊。

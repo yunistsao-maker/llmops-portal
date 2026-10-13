@@ -1,10 +1,10 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import type {
   CatalogFile, CompatRun, DeepDive, DigestFile, LifecycleFile, LiteLLMFile, OpenModelsFile, PerfRun,
-  PlatformInventory, RadarFile, RequirementsFile, SecurityRunSummary, Source, SourceRef, SourcesFile,
+  PlatformInventory, RadarFile, RequirementsFile, SecurityRunCases, SecurityRunSummary, Source, SourceRef, SourcesFile,
 } from "../../schema/types";
 
-export interface Manifest { generatedAt: string; digests: string[]; models: string[]; compatRuns: string[]; perfRuns: string[]; securityRuns?: string[]; hasInventory: boolean }
+export interface Manifest { generatedAt: string; digests: string[]; models: string[]; compatRuns: string[]; perfRuns: string[]; securityRuns?: string[]; securityCases?: string[]; hasInventory: boolean }
 
 /**
  * Which portal this build is (VITE_EDITION, set by `npm run build:clean`): "full" for the platform team, "clean" for
@@ -72,6 +72,12 @@ export const loaders = {
   perfRuns: async () => { const m = await loaders.manifest(); return Promise.all(m.perfRuns.map((f) => cached<PerfRun>(`runs/perf/${f}`))); },
   /** runs/security: aggregate results of tools/sec_suite.py (no prompt or response text). */
   securityRuns: async () => { const m = await loaders.manifest(); return Promise.all((m.securityRuns ?? []).map((f) => cached<SecurityRunSummary>(`runs/security/${f}`))); },
+  /** The redacted cases of one security run - null when this build has none (always so in the clean edition). */
+  securityCases: async (runId: string) => {
+    const m = await loaders.manifest();
+    const f = `${runId}.cases.json`;
+    return EDITION === "full" && (m.securityCases ?? []).includes(f) ? cached<SecurityRunCases>(`runs/security/${f}`) : null;
+  },
 };
 
 export function useData<T>(load: () => Promise<T>, deps: unknown[] = []) {

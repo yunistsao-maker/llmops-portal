@@ -11,7 +11,7 @@
   python3 tools/sec_suite.py report --out site/security-tests.html --public   # 發布到 portal 的靜態頁
 
 資料集與含 prompt／回應的完整結果都放在 .cache/secsuite/（已列入 .gitignore）。不要放進 runs/：
-portal 的 build 會把 runs/ 原樣發布。要給 portal 用的只有不含文字的彙總（run --publish-summary）。
+portal 的 build 會把 runs/ 原樣發布。要給 portal 用的是彙總與遮蔽版逐筆案例（publish <runId>）。
 需要：先建立虛擬環境，再 pip install -r tools/secsuite/requirements.txt（httpx；Bedrock 另需 boto3）。
 """
 from __future__ import annotations
@@ -117,7 +117,7 @@ def cmd_run(args):
         out = fetch.ROOT / "runs" / "security" / f"{doc['runId']}.json"
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(json.dumps(runner.summary_only(doc), ensure_ascii=False, indent=1) + "\n")
-        print(f"彙總（不含 prompt 與回應文字）：{out}")
+        print(f"彙總（不含 prompt 與回應文字）：{out}；要連逐筆案例（遮蔽版）一起發布：sec_suite.py publish {doc['runId']}")
     if args.fail_on_blocker:
         tiers = {i["id"]: i["tier"] for i in runner.CATALOG["items"]}
         bad = [it["id"] for it in doc["items"] if tiers[it["id"]] == "A" and any(s["verdict"] == "fail" for s in it["results"].values())]
@@ -144,6 +144,40 @@ def cmd_report(args):
     print(f"已輸出 {args.out}" + note)
 
 
+def cmd_publish(args):
+    """Write what the portal shows for a finished run: runs/security/<id>.json (aggregates) and <id>.cases.json (cases with
+    the text of every sensitive dataset removed). The full run - every prompt and response - stays in .cache/secsuite/."""
+    doc = runner.load_run(args.run)
+    if not doc:
+        sys.exit(f"找不到測試結果 {args.run}（.cache/secsuite/results/）")
+    if args.purpose:
+        doc["purpose"] = args.purpose
+    # re-aggregate with this version of the tool: a run made before the portal fields existed (item definitions, input
+    # tokens) gets them too; the verdict rules are the same
+    items = (doc.get("config") or {}).get("items") or [it["id"] for it in doc["items"]]
+    doc["items"] = runner.aggregate(doc["cases"], {**(doc.get("config") or {}), "items": items, "targets": doc["targets"]})
+    for pair in (args.model_ids or "").split(","):
+        key, _, mid = pair.partition("=")
+        if not pair.strip():
+            continue
+        hit = [t for t in doc["targets"] if key.strip() in (t.get("label"), t.get("model"))]
+        if not mid.strip() or not hit:
+            sys.exit(f"--model-ids 的 {pair!r} 對不到這次測試的任何受測模型（要寫 <label 或 model>=<catalog id>）")
+        for t in hit:
+            t["modelId"] = mid.strip()
+    out = fetch.ROOT / "runs" / "security"
+    out.mkdir(parents=True, exist_ok=True)
+    (out / f"{doc['runId']}.json").write_text(json.dumps(runner.summary_only(doc), ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    written = [f"runs/security/{doc['runId']}.json"]
+    if not args.summary_only:
+        cases = runner.public_cases(doc)
+        (out / f"{doc['runId']}.cases.json").write_text(json.dumps(cases, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        hidden = sum(c["redacted"] for c in cases["cases"])
+        written.append(f"runs/security/{doc['runId']}.cases.json（{len(cases['cases'])} 筆，其中 {hidden} 筆敏感資料集只留判定、不含文字）")
+    print("已寫出：\n  " + "\n  ".join(written))
+    print("完整版 portal 會顯示逐筆案例（遮蔽版），乾淨版只顯示統計與總表。")
+
+
 def cmd_ui(args):
     from secsuite import server
     server.serve(args.port)
@@ -153,6 +187,12 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("plan", help="列出資料集的大小、授權與風險").set_defaults(fn=cmd_plan)
+    pb = sub.add_parser("publish", help="把一次已完成的測試寫成 portal 用的檔案（runs/security/：彙總＋遮蔽版逐筆案例）")
+    pb.add_argument("run", nargs="?", default="latest", help="run id（.cache/secsuite/results/ 底下的檔名），預設最近一次")
+    pb.add_argument("--purpose", choices=["pre-release", "regression", "adhoc"], help="測試目的：pre-release＝上線前（模型頁置頂）")
+    pb.add_argument("--model-ids", help="受測模型對應的 catalog 模型 id：<label 或 model>=<id>，逗號分隔（沒給時由名稱比對）")
+    pb.add_argument("--summary-only", action="store_true", help="只寫彙總，不寫逐筆案例")
+    pb.set_defaults(fn=cmd_publish)
     f = sub.add_parser("fetch", help="核准後下載資料集")
     f.add_argument("--approve", help="all，或以逗號分隔的資料集 id")
     f.set_defaults(fn=cmd_fetch)
