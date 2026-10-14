@@ -4166,47 +4166,11 @@
   ],
   "watchlist": [
     {
-      "name": "Gemini 4 Argon",
-      "vendor": "google",
-      "status": "limited-preview",
-      "expected": "未公布（官方：as soon as possible，先開放付費 API 客戶與 Google AI Ultra）",
-      "note": "Google 2026-09-30 發表的新旗艦。目前只有「一部分」Fairwind Program 夥伴可用：對象是政府與國家資安機關、關鍵基礎設施營運者（醫療、電信、能源、金融）與核心技術平台，需填表申請並通過背景審查；只能給內部資安、事件應變或滲透測試團隊做防禦用途，要有 phishing-resistant MFA 與使用紀錄，不得分享、轉發或轉售存取——所以即使取得資格也不能掛在共用 gateway 上。Google 稱會「盡快」開放給開發者與企業，先從付費 API 客戶與 Google AI Ultra 開始，沒有日期。Gemini API 與 Agent Platform 文件（皆 2026-10-01 更新，10-02 兩次複查）都沒有 model ID、價格列或 release note；AWS / Azure 不提供。公告價：introductory $2 / $10（期滿後 $4 / $20，期限未公布），cached input 為 input 價的 95% off；output 上限 1M tokens（原為 64K）；context window 與 model ID 未公布（Artificial Analysis 列 1M）。Artificial Analysis Intelligence Index v4.3.2 為 53 分（High，#8）；Vals Index 68.9%（第 1）；其餘 benchmark 為 Google 自報。Fairwind 頁面稱以 Gemini Enterprise 的 managed model 存取時支援 zero data retention。 2026-10-06 查：沒有變化。Gemini API 的 models / changelog / pricing / deprecations 頁（皆 10-06 更新）與 Agent Platform 的模型版本頁、定價頁、release notes 都沒有 Argon；Argon 發表文與 Fairwind 頁未改（Google 10-02 的九月回顧文寫要先依早期測試者的回饋調整 guardrails 才會擴大開放）。Google 10-06 上線的是影像模型 Nano Banana 2.1。Artificial Analysis 仍列 53 分（#8 / 225）、每任務成本 $1.99、評測輸出 110M tokens，速度與 TTFT 未提供。",
-      "sources": [
-        {
-          "id": "google-gemini4-argon-blog"
-        },
-        {
-          "id": "deepmind-fairwind-program"
-        },
-        {
-          "id": "google-fairwind-program"
-        },
-        {
-          "id": "deepmind-gemini-cyber"
-        },
-        {
-          "id": "google-gemini-api-models"
-        },
-        {
-          "id": "google-agentplatform-release-notes"
-        },
-        {
-          "id": "aa-gemini4-argon"
-        },
-        {
-          "id": "vals-gemini4-argon"
-        },
-        {
-          "id": "google-ai-updates-sep2026"
-        }
-      ]
-    },
-    {
       "name": "Gemini 3.5 Pro",
       "vendor": "google",
       "status": "limited-preview",
       "expected": "未公布",
-      "note": "已宣布但沒有 GA 日期與公開價格。 2026-10-06 查：Gemini API 的 models 頁仍沒有 3.5 Pro，Agent Platform 的模型版本頁與定價頁也沒有；DeepMind 的 Pro 頁仍寫「3.5 Pro coming soon」。Google 已先發表 Gemini 4 Argon。",
+      "note": "已宣布但沒有 GA 日期與公開價格。 2026-10-06 查：Gemini API 的 models 頁仍沒有 3.5 Pro，Agent Platform 的模型版本頁與定價頁也沒有；DeepMind 的 Pro 頁仍寫「3.5 Pro coming soon」。Google 已先發表 Gemini 4 Argon。 2026-10-15 查：DeepMind 的 Pro 頁仍寫「3.5 Pro coming soon」；Gemini API models 頁（2026-10-13 更新）與 Agent Platform 模型版本頁都沒有 3.5 Pro。Google 已於 2026-10-13 讓 Gemini 4 Argon GA（見目錄）。",
       "sources": [
         {
           "id": "capitalandcompute-sept"
@@ -4222,6 +4186,9 @@
         },
         {
           "id": "deepmind-gemini-pro"
+        },
+        {
+          "id": "google-agentplatform-model-versions"
         }
       ]
     },
@@ -4260,7 +4227,7 @@
       "vendor": "openai",
       "status": "rumoured",
       "expected": "未公布",
-      "note": "2026-10-06 查：OpenAI 官方仍未發布（models、changelog、pricing 與 deprecations 頁都沒有；changelog 最新是 10-05 的 HIPAA BAA 流程；cyber 模型仍是 gpt-5.6-cyber，另有 gpt-daybreak-red-latest / gpt-daybreak-blue-latest 別名）。PYMNTS 2026-09-25 引述 Fortune：OpenAI 準備推出 GPT-6 Cyber 與資安 gateway 產品，無日期、價格與平台資訊。openai.com 的 news 頁本期讀不到（403）。",
+      "note": "2026-10-06 查：OpenAI 官方仍未發布（models、changelog、pricing 與 deprecations 頁都沒有；changelog 最新是 10-05 的 HIPAA BAA 流程；cyber 模型仍是 gpt-5.6-cyber，另有 gpt-daybreak-red-latest / gpt-daybreak-blue-latest 別名）。PYMNTS 2026-09-25 引述 Fortune：OpenAI 準備推出 GPT-6 Cyber 與資安 gateway 產品，無日期、價格與平台資訊。openai.com 的 news 頁本期讀不到（403）。 2026-10-15 查：OpenAI models 頁的資安模型仍是 gpt-5.6-cyber（Daybreak Red 另行核准存取），沒有 GPT-6 Cyber；changelog 也沒有。",
       "sources": [
         {
           "id": "fortune-gpt6-cyber"
@@ -4287,7 +4254,7 @@
       "vendor": "mistral",
       "status": "limited-preview",
       "expected": "權重：官方稱 2026 年 10 月底前釋出；三雲上架未公布",
-      "note": "Mistral 2026-10-06 發表的 public preview（官方暱稱 le Chonk）：1 兆參數、49B active 的原生多模態 open-weight 模型。目前只有 Mistral Studio 的 preview API，權重「by the end of the month」釋出；發表頁的模型卡列價為 input $1.36、output $4.18（每百萬 token，Mistral 自家 API）。發表文沒有提到 Bedrock、Foundry 或 Agent Platform。官方自述強項是資安（稱在 Artificial Analysis Cyber Index 進全球前五、其中重現並修補真實漏洞的測試得 82%）、agentic coding 與視覺 grounding，並稱訓練與 preview 都在自家歐洲資料中心——以上都是廠商自報。Artificial Analysis 10-06 的評測紀錄為 Mistral Large 4 Preview：Intelligence Index 38（GPT-6 Luna 為 38、Gemini 3.8 Flash 為 41）。追蹤重點：權重釋出後是否由 Bedrock / Foundry / Agent Platform 代管，以及授權條款。2026-10-06 首次收錄。 2026-10-11：Hugging Face 仍沒有權重；OpenRouter 已上架 preview API（mistralai/mistral-large-4-0）。",
+      "note": "Mistral 2026-10-06 發表的 public preview（官方暱稱 le Chonk）：1 兆參數、49B active 的原生多模態 open-weight 模型。目前只有 Mistral Studio 的 preview API，權重「by the end of the month」釋出；發表頁的模型卡列價為 input $1.36、output $4.18（每百萬 token，Mistral 自家 API）。發表文沒有提到 Bedrock、Foundry 或 Agent Platform。官方自述強項是資安（稱在 Artificial Analysis Cyber Index 進全球前五、其中重現並修補真實漏洞的測試得 82%）、agentic coding 與視覺 grounding，並稱訓練與 preview 都在自家歐洲資料中心——以上都是廠商自報。Artificial Analysis 10-06 的評測紀錄為 Mistral Large 4 Preview：Intelligence Index 38（GPT-6 Luna 為 38、Gemini 3.8 Flash 為 41）。追蹤重點：權重釋出後是否由 Bedrock / Foundry / Agent Platform 代管，以及授權條款。2026-10-06 首次收錄。 2026-10-11：Hugging Face 仍沒有權重；OpenRouter 已上架 preview API（mistralai/mistral-large-4-0）。 2026-10-15 查：發表頁仍寫權重 end of the month 釋出；Hugging Face 的 mistralai 組織頁沒有 Mistral Large 4（最新的 Large 仍是 Mistral-Large-3）。",
       "sources": [
         {
           "id": "mistral-large-4-announce"
@@ -4303,6 +4270,9 @@
         },
         {
           "id": "openrouter-models-api"
+        },
+        {
+          "id": "hf-mistralai-org"
         }
       ]
     },
@@ -4311,7 +4281,7 @@
       "vendor": "other",
       "status": "limited-preview",
       "expected": "權重：官方稱 2026 年 10 月內釋出（Apache 2.0）；三雲代管未公布",
-      "note": "501B（23B active）text-only MoE、1M context，2026-10-05 發表，目前只有 early access API。2026-10-11 複查：Hugging Face 仍查不到權重，Bedrock、Foundry、Agent Platform 都沒有。官方 benchmark 為廠商自述、未經獨立驗證；市場訊號見「開源模型」頁。",
+      "note": "501B（23B active）text-only MoE、1M context，2026-10-05 發表，目前只有 early access API。2026-10-11 複查：Hugging Face 仍查不到權重，Bedrock、Foundry、Agent Platform 都沒有。官方 benchmark 為廠商自述、未經獨立驗證；市場訊號見「開源模型」頁。 2026-10-15 查：Hugging Face 的 reflection 組織仍是 models 0（None public yet）。",
       "sources": [
         {
           "id": "reflection-beam-announce"
@@ -4321,6 +4291,42 @@
         },
         {
           "id": "aws-bedrock-model-cards"
+        },
+        {
+          "id": "huggingface-reflection-org"
+        }
+      ]
+    },
+    {
+      "name": "Meta Muse Wonder / Muse Wonder Full",
+      "vendor": "meta",
+      "status": "announced",
+      "expected": "三雲上架未公布",
+      "note": "Meta 2026-10-12 發表：Muse Wonder 即日起透過 Meta Model API 與 Muse Code 提供給開發者，Muse Wonder Full 只給 Muse Code 訂閱者；官方稱為自家最強模型，主打個人與專業 agentic 任務（Active Memory、Active Focus），依 Meta Superintelligence Scaling Framework 發布，完整安全評估報告「即將」公布。公告沒有價格，也沒有提到 Bedrock、Foundry 或 Agent Platform；2026-10-15 查 Bedrock 模型總覽、Foundry 直售模型頁與夥伴模型頁、Agent Platform 定價頁都沒有 Muse Wonder。Artificial Analysis（2026-10-15）：Muse Wonder（max）Intelligence Index v4.3.2 52 分（#9 / 216）、131.0 tok/s、TTFT 39.24 秒、每任務 $4.52；Muse Wonder Full（max）在 leaderboard 為 56 分（與 Claude Sonnet 5.5 max 同分）。LiteLLM main 分支 cost map 已有 meta/muse-wonder-1.0，但 Meta Model API 不在本平台的三雲路由內。2026-10-15 首次收錄。",
+      "sources": [
+        {
+          "id": "meta-muse-wonder-announce"
+        },
+        {
+          "id": "aa-muse-wonder"
+        },
+        {
+          "id": "aa-leaderboard-models"
+        },
+        {
+          "id": "aws-bedrock-model-cards"
+        },
+        {
+          "id": "ms-foundry-models-sold-by-azure"
+        },
+        {
+          "id": "ms-foundry-models-from-partners"
+        },
+        {
+          "id": "google-agentplatform-pricing"
+        },
+        {
+          "id": "litellm-cost-map-main"
         }
       ]
     }

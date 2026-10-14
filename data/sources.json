@@ -1,6 +1,6 @@
 {
   "schema": "sources/v1",
-  "generatedAt": "2026-10-11T13:30:00Z",
+  "generatedAt": "2026-10-14T17:43:00Z",
   "sources": [
     {
       "id": "anthropic-opus55-announce",
@@ -40,7 +40,7 @@
       "url": "https://platform.claude.com/docs/en/about-claude/pricing",
       "publisher": "Anthropic",
       "type": "vendor-doc",
-      "accessed": "2026-10-11"
+      "accessed": "2026-10-15"
     },
     {
       "id": "anthropic-release-notes",
@@ -48,7 +48,7 @@
       "url": "https://platform.claude.com/docs/en/release-notes/overview",
       "publisher": "Anthropic",
       "type": "vendor-doc",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-15"
     },
     {
       "id": "anthropic-claude-on-gcp",
@@ -192,7 +192,7 @@
       "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/model-retirement-schedule",
       "publisher": "Microsoft",
       "type": "csp-doc",
-      "accessed": "2026-10-11"
+      "accessed": "2026-10-15"
     },
     {
       "id": "ms-foundry-models-sold-by-azure",
@@ -208,7 +208,7 @@
       "url": "https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/claude-models",
       "publisher": "Microsoft",
       "type": "csp-doc",
-      "accessed": "2026-10-11"
+      "accessed": "2026-10-15"
     },
     {
       "id": "ms-foundry-claude-hosting",
@@ -1248,7 +1248,7 @@
       "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-sonnet-5-5.html",
       "publisher": "AWS",
       "type": "csp-doc",
-      "accessed": "2026-10-10"
+      "accessed": "2026-10-15"
     },
     {
       "id": "aws-sonnet55-whatsnew",
@@ -1824,7 +1824,7 @@
       "url": "https://aws.amazon.com/bedrock/pricing/",
       "publisher": "AWS",
       "type": "csp-doc",
-      "accessed": "2026-10-11"
+      "accessed": "2026-10-15"
     },
     {
       "id": "aws-bedrock-model-cards",
@@ -1856,7 +1856,7 @@
       "url": "https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/models-from-partners",
       "publisher": "Microsoft",
       "type": "csp-doc",
-      "accessed": "2026-10-11"
+      "accessed": "2026-10-15"
     },
     {
       "id": "ms-techcommunity-foundry-blog-index",
@@ -2208,7 +2208,7 @@
       "publisher": "AWS",
       "type": "csp-doc",
       "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-haiku-5-5.html",
-      "accessed": "2026-10-11"
+      "accessed": "2026-10-15"
     },
     {
       "id": "pypi-litellm-1-104-2",
@@ -2713,6 +2713,406 @@
       "type": "news",
       "url": "https://natlawreview.com/article/eu-digital-omnibus-ai-enters-force",
       "accessed": "2026-10-11"
+    },
+    {
+      "id": "anthropic-haiku55-overview",
+      "title": "Claude Haiku 5.5 model overview",
+      "url": "https://platform.claude.com/docs/en/models/haiku-5-5/overview",
+      "publisher": "Anthropic",
+      "type": "vendor-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "anthropic-haiku55-whatsnew",
+      "title": "What's new in Claude Haiku 5.5",
+      "url": "https://platform.claude.com/docs/en/models/haiku-5-5/whats-new-haiku-5-5",
+      "publisher": "Anthropic",
+      "type": "vendor-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "anthropic-haiku55-migration",
+      "title": "Claude Haiku 5.5 migration guide",
+      "url": "https://platform.claude.com/docs/en/models/haiku-5-5/migration-guide",
+      "publisher": "Anthropic",
+      "type": "vendor-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "anthropic-effort",
+      "title": "Effort (Claude Platform docs): levels and defaults per model",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/effort",
+      "publisher": "Anthropic",
+      "type": "vendor-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "anthropic-haiku55-systemcard",
+      "title": "System Card: Claude Haiku 5.5 (2026-10-07)",
+      "url": "https://www-cdn.anthropic.com/e1080d6bf5ae2018ea3c2f414064be03232f5be5/Claude%20Haiku%205.5%20System%20Card.pdf",
+      "publisher": "Anthropic",
+      "type": "vendor-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "aws-haiku55-blog",
+      "title": "Introducing Claude Haiku 5.5 on AWS (2026-10-07)",
+      "url": "https://aws.amazon.com/blogs/machine-learning/introducing-claude-haiku-5-5-on-aws/",
+      "publisher": "AWS",
+      "type": "csp-blog",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "ms-foundry-catalog-claude-haiku55",
+      "title": "Foundry model catalog: claude-haiku-5-5",
+      "url": "https://ai.azure.com/catalog/models/claude-haiku-5-5",
+      "publisher": "Microsoft Foundry",
+      "type": "csp-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "aa-haiku55",
+      "title": "Claude Haiku 5.5 (max) - Artificial Analysis",
+      "url": "https://artificialanalysis.ai/models/claude-haiku-5-5",
+      "publisher": "Artificial Analysis",
+      "type": "benchmark",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "google-gemini4-argon-model",
+      "title": "Gemini 4 Argon - Gemini API model page",
+      "url": "https://ai.google.dev/gemini-api/docs/models/gemini-4-argon",
+      "publisher": "Google AI for Developers",
+      "type": "vendor-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "google-gemini4-argon-ga-blog",
+      "title": "Gemini 4 Argon: Built to solve your hardest problems (2026-10-13)",
+      "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-argon/",
+      "publisher": "Google",
+      "type": "vendor-blog",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "google-gemini4-argon-dev-blog",
+      "title": "Gemini 4 Argon is now available for developers (2026-10-13)",
+      "url": "https://blog.google/innovation-and-ai/technology/developers-tools/build-with-gemini-4-argon/",
+      "publisher": "Google",
+      "type": "vendor-blog",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "deepmind-gemini4-argon-modelcard",
+      "title": "Gemini 4 Argon Model Card (published 2026-10-13)",
+      "url": "https://deepmind.google/models/model-cards/gemini-4-argon/",
+      "publisher": "Google DeepMind",
+      "type": "vendor-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "google-agentplatform-gemini4-argon",
+      "title": "Gemini 4 Argon - Gemini Enterprise Agent Platform model page",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/4-argon",
+      "publisher": "Google Cloud",
+      "type": "csp-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "google-agentplatform-gemini4-argon-guide",
+      "title": "Developer's guide to Gemini 4 Argon (Agent Platform)",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/guides/gemini-4-argon",
+      "publisher": "Google Cloud",
+      "type": "csp-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "google-agentplatform-data-residency",
+      "title": "Agent Platform data residency (ML processing by model and location)",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/resources/data-residency",
+      "publisher": "Google Cloud",
+      "type": "csp-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "google-agentplatform-zdr",
+      "title": "Gemini Enterprise Agent Platform and zero data retention",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/resources/zero-data-retention",
+      "publisher": "Google Cloud",
+      "type": "csp-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "google-agentplatform-abuse-monitoring",
+      "title": "Agent Platform abuse monitoring (Google Frontier Models, Advanced AI)",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/abuse-monitoring",
+      "publisher": "Google Cloud",
+      "type": "csp-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "google-gemini-api-usage-policies",
+      "title": "Gemini API abuse monitoring (usage policies)",
+      "url": "https://ai.google.dev/gemini-api/docs/usage-policies",
+      "publisher": "Google AI for Developers",
+      "type": "vendor-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "google-gemini-api-terms",
+      "title": "Gemini API Additional Terms of Service",
+      "url": "https://ai.google.dev/gemini-api/terms",
+      "publisher": "Google AI for Developers",
+      "type": "vendor-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "litellm-gemini4-argon",
+      "title": "Gemini 4 Argon API Pricing and Day 0 Support on LiteLLM (2026-10-13)",
+      "url": "https://docs.litellm.ai/blog/gemini-4-argon",
+      "publisher": "LiteLLM",
+      "type": "vendor-blog",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "litellm-grok47",
+      "title": "Day 0 Support: Grok 4.7 (2026-09-21)",
+      "url": "https://docs.litellm.ai/blog/grok_4_7",
+      "publisher": "LiteLLM",
+      "type": "vendor-blog",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "litellm-v1-101-0",
+      "title": "LiteLLM v1.101.0 release notes",
+      "url": "https://docs.litellm.ai/release_notes/v1.101.0/v1-101-0",
+      "publisher": "LiteLLM",
+      "type": "vendor-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "litellm-v1-105-0",
+      "title": "LiteLLM v1.105.0 release notes (2026-10-11)",
+      "url": "https://docs.litellm.ai/release_notes/v1.105.0/v1-105-0",
+      "publisher": "LiteLLM",
+      "type": "vendor-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "litellm-v1-105-1",
+      "title": "LiteLLM v1.105.1 release notes",
+      "url": "https://docs.litellm.ai/release_notes/v1.105.1/v1-105-1",
+      "publisher": "LiteLLM",
+      "type": "vendor-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "litellm-v1-106-0-rc1",
+      "title": "LiteLLM v1.106.0-rc.1 release notes",
+      "url": "https://docs.litellm.ai/release_notes/v1.106.0rc1/v1-106-0-rc-1",
+      "publisher": "LiteLLM",
+      "type": "vendor-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "litellm-v1-106-0-rc2",
+      "title": "LiteLLM v1.106.0-rc.2 release notes",
+      "url": "https://docs.litellm.ai/release_notes/v1.106.0rc2/v1-106-0-rc-2",
+      "publisher": "LiteLLM",
+      "type": "vendor-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "litellm-bedrock-docs",
+      "title": "LiteLLM docs: AWS Bedrock provider",
+      "url": "https://docs.litellm.ai/docs/providers/bedrock",
+      "publisher": "LiteLLM",
+      "type": "vendor-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "litellm-vertex-partner",
+      "title": "LiteLLM docs: Vertex AI partner models (incl. xAI Grok)",
+      "url": "https://docs.litellm.ai/docs/providers/vertex_partner",
+      "publisher": "LiteLLM",
+      "type": "vendor-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "anthropic-fable51-overview",
+      "title": "Claude Fable 5.1 model overview",
+      "url": "https://platform.claude.com/docs/en/models/fable-5-1/overview",
+      "publisher": "Anthropic",
+      "type": "vendor-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "anthropic-fable51-whatsnew",
+      "title": "What's new in Claude Fable 5.1",
+      "url": "https://platform.claude.com/docs/en/models/fable-5-1/whats-new-fable-5-1",
+      "publisher": "Anthropic",
+      "type": "vendor-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "anthropic-fable51-announce",
+      "title": "Claude Fable 5.1 and Mythos 5.1 (announcement)",
+      "url": "https://www.anthropic.com/claude-fable-and-mythos-5-1",
+      "publisher": "Anthropic",
+      "type": "vendor-blog",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "anthropic-fable51-systemcard",
+      "title": "System Card: Claude Fable 5.1 & Claude Mythos 5.1 (2026-09-01)",
+      "url": "https://www.anthropic.com/claude-fable-5-1-mythos-5-1-system-card",
+      "publisher": "Anthropic",
+      "type": "vendor-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "aws-bedrock-fable51-card",
+      "title": "Amazon Bedrock model card: Claude Fable 5.1",
+      "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-fable-5-1.html",
+      "publisher": "AWS",
+      "type": "csp-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "aws-bedrock-abuse-detection",
+      "title": "Amazon Bedrock abuse detection (model-specific retention)",
+      "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/abuse-detection.html",
+      "publisher": "AWS",
+      "type": "csp-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "aws-bedrock-pricing-data",
+      "title": "Amazon Bedrock pricing page data feed (meteredUnitMaps, bedrockfoundationmodels, published 2026-10-12)",
+      "url": "https://b0.p.awsstatic.com/pricing/2.0/meteredUnitMaps/bedrockfoundationmodels/USD/current/bedrockfoundationmodels.json",
+      "publisher": "AWS",
+      "type": "csp-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "google-agentplatform-fable51",
+      "title": "Claude Fable 5.1 on Google Cloud (Agent Platform model page)",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/partner-models/claude/fable-5-1",
+      "publisher": "Google Cloud",
+      "type": "csp-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "aa-fable51",
+      "title": "Claude Fable 5.1 (max with fallback) - Artificial Analysis",
+      "url": "https://artificialanalysis.ai/models/claude-fable-5-1",
+      "publisher": "Artificial Analysis",
+      "type": "benchmark",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "aws-bedrock-grok47-card",
+      "title": "Amazon Bedrock model card: Grok 4.7",
+      "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-xai-grok-4-7.html",
+      "publisher": "AWS",
+      "type": "csp-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "ms-techcommunity-grok47-foundry",
+      "title": "Introducing Grok 4.7 on Microsoft Foundry (2026-10-06)",
+      "url": "https://techcommunity.microsoft.com/t5/microsoft-foundry-blog/introducing-grok-4-7-on-microsoft-foundry/ba-p/4562168",
+      "publisher": "Microsoft Tech Community",
+      "type": "csp-blog",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "ms-foundry-grok-howto",
+      "title": "Deploy and use Grok models in Microsoft Foundry",
+      "url": "https://learn.microsoft.com/en-us/azure/foundry/foundry-models/how-to/use-foundry-models-grok",
+      "publisher": "Microsoft Learn",
+      "type": "csp-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "google-agentplatform-grok47",
+      "title": "Grok 4.7 (Agent Platform partner model page, Preview)",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/partner-models/grok/grok-4-7",
+      "publisher": "Google Cloud",
+      "type": "csp-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "xai-grok47-model",
+      "title": "Grok 4.7 model page (SpaceXSI / xAI docs)",
+      "url": "https://docs.x.ai/developers/models/grok-4.7",
+      "publisher": "SpaceXAI (xAI)",
+      "type": "vendor-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "xai-models",
+      "title": "Grok Models & Pricing (SpaceXSI / xAI docs)",
+      "url": "https://docs.x.ai/developers/models",
+      "publisher": "SpaceXAI (xAI)",
+      "type": "vendor-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "xai-release-notes",
+      "title": "xAI API release notes",
+      "url": "https://docs.x.ai/developers/release-notes",
+      "publisher": "SpaceXAI (xAI)",
+      "type": "vendor-doc",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "xai-grok47-announce",
+      "title": "Introducing Grok 4.7 (2026-09-21)",
+      "url": "https://x.ai/news/grok-4-7",
+      "publisher": "SpaceXAI (xAI)",
+      "type": "vendor-blog",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "aa-grok47",
+      "title": "Grok 4.7 (xhigh) - Artificial Analysis",
+      "url": "https://artificialanalysis.ai/models/grok-4-7",
+      "publisher": "Artificial Analysis",
+      "type": "benchmark",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "meta-muse-wonder-announce",
+      "title": "Introducing Muse Wonder and Muse Wonder Full: Frontier Models for Agents (2026-10-12)",
+      "url": "https://about.fb.com/news/2026/10/introducing-muse-wonder-models/",
+      "publisher": "Meta",
+      "type": "vendor-blog",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "aa-muse-wonder",
+      "title": "Muse Wonder (max) - Artificial Analysis",
+      "url": "https://artificialanalysis.ai/models/muse-wonder",
+      "publisher": "Artificial Analysis",
+      "type": "benchmark",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "hf-mistralai-org",
+      "title": "Mistral AI organization on Hugging Face",
+      "url": "https://huggingface.co/mistralai",
+      "publisher": "Hugging Face",
+      "type": "community",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "xai-reasoning",
+      "title": "Reasoning (SpaceXSI / xAI docs): reasoning_effort per model",
+      "url": "https://docs.x.ai/developers/model-capabilities/text/reasoning",
+      "publisher": "SpaceXAI (xAI)",
+      "type": "vendor-doc",
+      "accessed": "2026-10-15"
     }
   ]
 }

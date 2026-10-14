@@ -1,28 +1,11 @@
 import { go } from "../App";
-import { linkTo, loaders, money, useData } from "../data";
+import { aaScore, linkTo, loaders, money, newestAAVersion, useData } from "../data";
 import { Empty, PageHead, Status } from "../ui";
-import type { BenchmarkResult, Model } from "../../../schema/types";
-
-const isAA = (b: BenchmarkResult) => b.name.startsWith("Artificial");
-/** "v4.3.2" -> [4, 3, 2]; null for a version that is not a dotted number (e.g. a note about an older index). */
-const versionKey = (v?: string) => { const m = /^v?(\d+(?:\.\d+)*)$/.exec((v ?? "").trim()); return m ? m[1].split(".").map(Number) : null; };
-const newer = (a: number[], b: number[]) => { for (let i = 0; i < Math.max(a.length, b.length); i++) if ((a[i] ?? 0) !== (b[i] ?? 0)) return (a[i] ?? 0) > (b[i] ?? 0); return false; };
-
-/** The newest Artificial Analysis index version any of these models has a score for (scores compare only within one version). */
-function newestAAVersion(models: Model[]): string | undefined {
-  let best: { v: string; k: number[] } | undefined;
-  for (const b of models.flatMap((m) => m.benchmarks.filter(isAA))) {
-    const k = versionKey(b.version);
-    if (k && b.version && (!best || newer(k, best.k))) best = { v: b.version, k };
-  }
-  return best?.v;
-}
+import type { Model } from "../../../schema/types";
 
 function aaCell(m: Model, version?: string) {
-  const mine = m.benchmarks.filter(isAA);
-  const b = mine.filter((x) => x.version === version).sort((x, y) => y.date.localeCompare(x.date))[0];
+  const { score: b, other } = aaScore(m, version);
   if (b) return b.rank ? `${b.score}（${b.rank}）` : `${b.score}`;
-  const other = mine.filter((x) => versionKey(x.version)).sort((x, y) => y.date.localeCompare(x.date))[0];
   return <>—{other && <div className="note">只有 {other.version} 的分數（{other.score}），不同版本不比較</div>}</>;
 }
 

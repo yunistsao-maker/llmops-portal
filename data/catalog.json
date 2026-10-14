@@ -1,9 +1,1415 @@
 {
   "schema": "catalog/v1",
-  "generatedAt": "2026-10-11T13:30:00Z",
+  "generatedAt": "2026-10-14T17:43:00Z",
   "locale": "zh-TW",
-  "asOf": "2026-10-11",
+  "asOf": "2026-10-15",
   "models": [
+    {
+      "id": "claude-fable-5-1",
+      "name": "Claude Fable 5.1",
+      "vendor": "anthropic",
+      "family": "Claude Fable",
+      "tier": "frontier",
+      "releaseDate": "2026-09-01",
+      "platformStatus": "evaluating",
+      "predecessorId": "claude-fable-5",
+      "modalities": {
+        "input": [
+          "text",
+          "image",
+          "pdf"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "knowledgeCutoff": "2026-06",
+      "reasoning": {
+        "supported": true,
+        "alwaysOn": true,
+        "effortLevels": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ],
+        "defaultEffort": "high",
+        "parameter": "output_config.effort（Messages API）；經 LiteLLM 以 reasoning_effort 傳入",
+        "notes": [
+          "thinking: {type: enabled, budget_tokens} 與 {type: disabled} 都回 400；只能省略或送 adaptive。",
+          "Foundry 的 effort 表 Fable 5.1 不支援 max（頁面註記 xhigh 與 max 結果相同）；Bedrock 模型卡列 low～max 五級。",
+          "Per-message effort（beta，mid-conversation-output-config-2026-07-01）在 Claude API、Google Cloud、Bedrock 可用；Bedrock InvokeModel 要放在 request body 的 anthropic_beta。"
+        ]
+      },
+      "vendorModelId": "claude-fable-5-1",
+      "systemCardUrl": "https://www.anthropic.com/claude-fable-5-1-mythos-5-1-system-card",
+      "modelCardUrl": "https://platform.claude.com/docs/en/models/fable-5-1/overview",
+      "summary": "Anthropic 2026-09-01 發布的 Claude Fable 5 後繼模型，與 Claude Mythos 5.1 是同一個模型、但套用較嚴的 dual-use safeguards。$10 / $50（cache read 降到 $0.25），1M context、128K 輸出，thinking 永遠開啟、預設 effort high。Claude API、Bedrock、Agent Platform 為 GA，Foundry 只有 Hosted on Anthropic 的 Preview。AA v4.3.2 53 分（max，#5 / 216），每任務 $7.63，是本目錄最貴的選項；官方建議多數工作先用 Opus 5.5。合規重點：Bedrock 必須 opt-in AWS review（aws_review）且全部流量保留最多 30 天；Agent Platform 要同意 Advanced AI Safety Addendum、prompt / response 保存最多 30 天並與 Anthropic 分享；拒答率明顯高於先前的 Claude 模型。",
+      "strengths": [
+        "AA Intelligence Index v4.3.2 53 分（max with fallback，#5 / 216）；Anthropic 自報 Terminal-Bench 4.0 55.8%（Mythos 5.1 60.9%）、Terminal-Bench-Science 0.1 52.6%、GDPval-AA v2 1853、CursorBench 3.2.0 73.4%。",
+        "官方改進重點：多小時的 agentic coding、多步驟研究，以及文件、試算表、簡報產出；1M context 全段同價。",
+        "Cache read 只要 $0.25（基本 input 的 0.025 倍）：官方估典型工作負載比 Fable 5 便宜約 25%，高度 agentic 工作最多約 45%。",
+        "四個通路可用（Claude API、Bedrock、Agent Platform GA；Foundry Preview），model ID 一致（Bedrock 為 anthropic.claude-fable-5-1）。",
+        "各平台輸出都帶 Anthropic 統計式文字浮水印，可配合內容來源標示需求。"
+      ],
+      "weaknesses": [
+        "Bedrock 合規前提：必須以 Data Retention API 把模式設為 aws_review（opt-in AWS review）；全部流量保留最多 30 天做自動離線濫用偵測，被分類器標記的可能由 AWS 人工審查（EFS 資格客戶 2026-12-31 前可 ZDR）。",
+        "Agent Platform 合規前提：Fable 屬 Advanced AI，須同意 Advanced AI Safety Addendum；所有 prompt 與 response 由 Google 保存最多 30 天，且必須為每個 location 開啟與 Anthropic 的 prompt-response 分享，ZDR 可能無法達成。",
+        "拒答率較高：cyber 與 life sciences 的 dual-use 分類器會擋請求（Bedrock 模型卡：materially higher than previous Claude models），以 HTTP 200 + stop_reason: \"refusal\" 回傳，必須當主要回應路徑處理。",
+        "成本與延遲：$10 / $50 為本目錄最高；AA（max）每任務 $7.63、首 token 約 293.55 秒、71.6 tok/s；Anthropic 也建議多數工作先用 Opus 5.5。",
+        "沒有台灣或亞太境內處理：Bedrock 只有 us. Geo 與 global.（沒有 jp. / au. / eu.），Agent Platform 只有 global 與 US / EU multi-region，Foundry 只在 eastus2 / swedencentral 且可能在 Azure 之外處理。",
+        "Claude API 預設 30 天保留、屬 Covered Model，需 Anthropic 明示授權才有 ZDR；forced tool_choice（any / tool）回 400；thinking block 只有 Fable 5.1 / Mythos 5.1 讀得到，fallback 到其他模型會遺失推理。",
+        "Bedrock 只有 Standard 服務層（沒有 Priority / Flex / Reserved），pricing 頁也沒有 batch 價。"
+      ],
+      "bestFor": [
+        "Opus 5.5 在較高 effort 仍不足時的最困難推理與長時程代理任務（官方建議用法）",
+        "多小時無人值守的程式開發、大型重構 / 遷移與 code review",
+        "多步驟研究、財務 / 法律分析，以及文件、試算表、簡報產出",
+        "大量重讀快取前綴的長 agent session（cache read $0.25）"
+      ],
+      "avoidFor": [
+        "資安研究、滲透測試、生物等 dual-use 工作（分類器會擋；完整能力只在 Mythos 5.1 的驗證存取計畫）",
+        "需要 ZDR，或不能接受 30 天保留與 AWS / Google / Anthropic 濫用審查的資料",
+        "延遲敏感或高量的一般工作（改用 Opus 5.5、Sonnet 5.5 或 Haiku 5.5）",
+        "依賴 forced tool_choice、thinking disabled、非預設 temperature 或 prefill 的既有程式"
+      ],
+      "safety": {
+        "classifications": [
+          "Anthropic RSP / Frontier Compliance Framework（system card，2026-09-01）：化學與生物判定具 CB-1 能力、未達 CB-2，Fable 5.1 沿用 Fable 5 的生物 safeguards；自動化 AI R&D 風險為 low；對齊的災難性風險由 very low 調為 low。",
+          "Fable 5.1 與 Mythos 5.1 權重相同、safeguards 不同：Fable 5.1 一般可用，Mythos 5.1 只開放給經驗證的組織。"
+        ],
+        "behaviours": [
+          "cyber 與 life sciences dual-use 分類器：被擋時回 HTTP 200 + stop_reason: \"refusal\" + stop_details（標示類別）。",
+          "拒答計費各平台不同：Claude API 自 2026-09-24 起，低誤判類別在輸出前的拒答會計費；Bedrock 模型卡寫 prompt 階段拒答不計費，Foundry 頁寫被拒的 input tokens 不計費；串流中途拒答計已輸出部分。",
+          "fallbacks: \"default\"（beta）可在伺服器端改用建議模型重試；Fable 5.1 允許的 fallback 目標為 Claude Opus 4.8 與 Claude Opus 5。",
+          "允許在原始碼中找漏洞（所有存取層級），但不協助開發 exploit；官方稱 cyber safeguards 的誤判比先前少 60%。",
+          "輸出文字帶統計式浮水印；經 Files API 取回的影像 / 影音帶 C2PA Content Credentials。"
+        ],
+        "programmes": [
+          "Claude Mythos 5.1：同模型、較寬鬆的 safeguards，只開放給通過 Anthropic 驗證計畫（例如 Cyber Verification Program）的組織；Bedrock pricing 頁註明 Mythos 5.1 為 gated、需經 Anthropic 帳戶團隊申請。",
+          "Enterprise Frontier Safeguards（EFS）：資料存放在客戶控制的雲端基礎設施，分階段提供；Bedrock 上的 EFS 資格客戶 2026-12-31 前可 ZDR。",
+          "生物：與美國政府合作的存取計畫，開放 Mythos 5.1 的進階生物能力（官方稱即將開放科學家申請）。"
+        ],
+        "sources": [
+          {
+            "id": "anthropic-fable51-systemcard"
+          },
+          {
+            "id": "anthropic-fable51-whatsnew"
+          },
+          {
+            "id": "anthropic-fable51-announce"
+          },
+          {
+            "id": "aws-bedrock-fable51-card"
+          },
+          {
+            "id": "aws-bedrock-abuse-detection"
+          },
+          {
+            "id": "aws-bedrock-pricing"
+          },
+          {
+            "id": "ms-foundry-claude-models"
+          }
+        ]
+      },
+      "offerings": [
+        {
+          "id": "claude-fable-5-1@bedrock",
+          "cloud": "aws",
+          "service": "bedrock",
+          "status": "ga",
+          "availableSince": "2026-09-01",
+          "providerModelId": "anthropic.claude-fable-5-1",
+          "inferenceTargets": [
+            {
+              "scope": "global",
+              "id": "global.anthropic.claude-fable-5-1",
+              "geography": "全球動態路由（無駐留保證）"
+            },
+            {
+              "scope": "geo",
+              "id": "us.anthropic.claude-fable-5-1",
+              "geography": "US（來源區 us-east-1/2、us-west-1/2、ca-central-1、ca-west-1；目的區在美國，加拿大來源區另含本區）"
+            }
+          ],
+          "endpoints": [
+            {
+              "endpoint": "bedrock-runtime",
+              "apis": [
+                "anthropic-messages",
+                "bedrock-converse",
+                "bedrock-invoke"
+              ],
+              "notes": [
+                "Responses 與 Chat Completions 不支援。",
+                "沒有 In-Region：必須用 us.* 或 global.* profile。"
+              ]
+            },
+            {
+              "endpoint": "bedrock-mantle",
+              "apis": [
+                "anthropic-messages"
+              ],
+              "notes": [
+                "只在 us-gov-west-1（GovCloud West）提供 In-Region；/anthropic/v1/messages。"
+              ]
+            }
+          ],
+          "apacAvailability": [
+            {
+              "region": "ap-east-2",
+              "label": "Taipei",
+              "scopes": [
+                "global"
+              ],
+              "note": "台北區只能用 Global CRIS"
+            },
+            {
+              "region": "ap-northeast-1",
+              "label": "Tokyo",
+              "scopes": [
+                "global"
+              ],
+              "note": "沒有 jp. Geo"
+            },
+            {
+              "region": "ap-northeast-2",
+              "label": "Seoul",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-northeast-3",
+              "label": "Osaka",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-south-1",
+              "label": "Mumbai",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-south-2",
+              "label": "Hyderabad",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-southeast-1",
+              "label": "Singapore",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-southeast-2",
+              "label": "Sydney",
+              "scopes": [
+                "global"
+              ],
+              "note": "沒有 au. Geo"
+            },
+            {
+              "region": "ap-southeast-3",
+              "label": "Jakarta",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-southeast-4",
+              "label": "Melbourne",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-southeast-5",
+              "label": "Malaysia",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-southeast-6",
+              "label": "New Zealand",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-southeast-7",
+              "label": "Thailand",
+              "scopes": [
+                "global"
+              ]
+            }
+          ],
+          "regionNotes": [
+            "只有 us. Geo 與 global.：沒有 jp. / au. / eu.（與 Opus 5.5、Haiku 5.5 不同）。LiteLLM cost map 有 eu.anthropic.claude-fable-5-1 的列，但模型卡沒有 EU Geo，不要設定。",
+            "GovCloud（us-gov-east-1、us-gov-west-1）只有 Geo。"
+          ],
+          "dataProcessing": {
+            "processor": "AWS Bedrock（Anthropic 模型，透過 AWS Marketplace 計費；product ID prod-lt3y75wunrtv4）",
+            "residencyOptions": [
+              "US geo",
+              "Global（無駐留保證）"
+            ],
+            "taiwanResidency": "no",
+            "zdr": "on-request",
+            "retentionNotes": [
+              "使用前必須 opt-in AWS review：用 Data Retention API 把 data retention mode 設為 aws_review。",
+              "abuse detection 頁：Claude Fable 5 與 Fable 5.1 的全部流量保留最多 30 天做自動離線濫用偵測；被分類器標記的流量可能由 AWS 人工審查；保存資料由 AWS 處理、不分享給模型供應商。",
+              "跨區推論時，保存的輸入 / 輸出存放在實際處理請求的目的區域（global.* 可能是任何區域）。",
+              "符合 Enterprise Frontier Safeguards 資格的客戶在 2026-12-31 前可享 ZDR，之後恢復 30 天保留；EFS 計畫預計支援 customer-managed encryption keys 與自帶 bucket。"
+            ],
+            "sources": [
+              {
+                "id": "aws-bedrock-fable51-card"
+              },
+              {
+                "id": "aws-bedrock-abuse-detection"
+              }
+            ]
+          },
+          "features": [
+            {
+              "feature": "streaming",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "aws-bedrock-fable51-card"
+                }
+              ]
+            },
+            {
+              "feature": "tool-calling",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "anthropic-fable51-whatsnew"
+                }
+              ]
+            },
+            {
+              "feature": "forced-tool-choice",
+              "status": "not-supported",
+              "note": "模型層級限制：tool_choice any / tool 回 400。",
+              "sources": [
+                {
+                  "id": "anthropic-fable51-whatsnew"
+                }
+              ]
+            },
+            {
+              "feature": "vision",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "aws-bedrock-fable51-card"
+                }
+              ]
+            },
+            {
+              "feature": "pdf-input",
+              "status": "unknown",
+              "note": "模型卡輸入模態只列 Text / Image。",
+              "sources": [
+                {
+                  "id": "aws-bedrock-fable51-card"
+                }
+              ]
+            },
+            {
+              "feature": "prompt-caching",
+              "status": "supported",
+              "note": "最少 512 tokens、最多 4 個 checkpoint、TTL 5 分鐘或 1 小時；runtime 與 mantle 都支援。",
+              "sources": [
+                {
+                  "id": "aws-bedrock-fable51-card"
+                }
+              ]
+            },
+            {
+              "feature": "batch",
+              "status": "not-supported",
+              "note": "Bedrock pricing 頁的 batch 欄為 N/A。",
+              "sources": [
+                {
+                  "id": "aws-bedrock-pricing"
+                },
+                {
+                  "id": "aws-bedrock-pricing-data"
+                }
+              ]
+            },
+            {
+              "feature": "reasoning-control",
+              "status": "supported",
+              "note": "adaptive thinking 永遠開啟；effort low / medium / high（預設）/ xhigh / max。",
+              "sources": [
+                {
+                  "id": "aws-bedrock-fable51-card"
+                }
+              ]
+            },
+            {
+              "feature": "temperature",
+              "status": "not-supported",
+              "note": "temperature 只能 1.0 或不送、top_p 只能 0.99 或不送、兩者不能同時指定、不支援 top_k。",
+              "sources": [
+                {
+                  "id": "aws-bedrock-fable51-card"
+                }
+              ]
+            },
+            {
+              "feature": "count-tokens",
+              "status": "partial",
+              "note": "只有 bedrock-mantle 支援。",
+              "sources": [
+                {
+                  "id": "aws-bedrock-fable51-card"
+                }
+              ]
+            },
+            {
+              "feature": "guardrails",
+              "status": "partial",
+              "note": "bedrock-runtime 支援、bedrock-mantle 不支援。",
+              "sources": [
+                {
+                  "id": "aws-bedrock-fable51-card"
+                }
+              ]
+            },
+            {
+              "feature": "priority-tier",
+              "status": "not-supported",
+              "sources": [
+                {
+                  "id": "aws-bedrock-fable51-card"
+                }
+              ]
+            },
+            {
+              "feature": "flex-tier",
+              "status": "not-supported",
+              "sources": [
+                {
+                  "id": "aws-bedrock-fable51-card"
+                }
+              ]
+            },
+            {
+              "feature": "provisioned-throughput",
+              "status": "not-supported",
+              "note": "Reserved 服務層不支援。",
+              "sources": [
+                {
+                  "id": "aws-bedrock-fable51-card"
+                }
+              ]
+            },
+            {
+              "feature": "zero-data-retention",
+              "status": "partial",
+              "note": "只有 Enterprise Frontier Safeguards 資格客戶，至 2026-12-31。",
+              "sources": [
+                {
+                  "id": "aws-bedrock-abuse-detection"
+                }
+              ]
+            }
+          ],
+          "pricing": [
+            {
+              "scope": "global",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 10.0,
+              "output": 50.0,
+              "cacheRead": 0.25,
+              "cacheWrite": 12.5,
+              "cacheWrite1h": 20.0,
+              "notes": [
+                "Bedrock pricing 頁（動態價格資料，2026-10-12 發布，2026-10-15 讀取 US East (N. Virginia)）：Global Cross-region Inference；batch 欄為 N/A。"
+              ],
+              "sources": [
+                {
+                  "id": "aws-bedrock-pricing"
+                },
+                {
+                  "id": "aws-bedrock-pricing-data"
+                }
+              ],
+              "verification": "official"
+            },
+            {
+              "scope": "geo",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 11.0,
+              "output": 55.0,
+              "cacheRead": 0.275,
+              "cacheWrite": 13.75,
+              "cacheWrite1h": 22.0,
+              "notes": [
+                "Geo and In-region Cross-region Inference 表：比 Global 高 10%（Fable 5.1 只有 us. Geo）。"
+              ],
+              "sources": [
+                {
+                  "id": "aws-bedrock-pricing"
+                },
+                {
+                  "id": "aws-bedrock-pricing-data"
+                }
+              ],
+              "verification": "official"
+            }
+          ],
+          "quotas": [
+            {
+              "scope": "account default",
+              "note": "依帳號與區域預設配額；上線前在 Service Quotas 申請 us. / global. profile 的配額。",
+              "sources": [
+                {
+                  "id": "aws-bedrock-fable51-card"
+                }
+              ],
+              "verification": "official"
+            }
+          ],
+          "lifecycle": {
+            "eolNoSoonerThan": "2027-09-01",
+            "legacyPeriod": "至少 6 個月",
+            "notes": [
+              "模型卡：Model lifecycle Active，適用「2026-09-07 以前上市模型」的生命週期政策；Model EOL date N/A。"
+            ]
+          },
+          "litellmModel": "bedrock/global.anthropic.claude-fable-5-1",
+          "onboardingNotes": [
+            "先用 Data Retention API 設定 aws_review，再在 Bedrock console 啟用模型存取（Marketplace product prod-lt3y75wunrtv4）。",
+            "台北區（ap-east-2）呼叫 global.anthropic.claude-fable-5-1；需要美國境內處理才用 us.*。",
+            "把 stop_reason: \"refusal\" 當成主要回應路徑處理，並設好 fallback。"
+          ],
+          "sources": [
+            {
+              "id": "aws-bedrock-fable51-card"
+            },
+            {
+              "id": "aws-bedrock-abuse-detection"
+            },
+            {
+              "id": "aws-bedrock-pricing"
+            },
+            {
+              "id": "aws-bedrock-pricing-data"
+            }
+          ],
+          "verification": "official"
+        },
+        {
+          "id": "claude-fable-5-1@agent-platform",
+          "cloud": "gcp",
+          "service": "agent-platform",
+          "status": "ga",
+          "availableSince": "2026-09-01",
+          "providerModelId": "claude-fable-5-1",
+          "inferenceTargets": [
+            {
+              "scope": "global",
+              "id": "global",
+              "geography": "global endpoint（模型頁 ML processing 欄另列 Asia Pacific asia-southeast1）"
+            },
+            {
+              "scope": "multi-region",
+              "id": "us",
+              "geography": "United States multi-region"
+            },
+            {
+              "scope": "multi-region",
+              "id": "eu",
+              "geography": "Europe multi-region"
+            }
+          ],
+          "endpoints": [
+            {
+              "endpoint": "Agent Platform（Claude on Google Cloud）",
+              "apis": [
+                "anthropic-messages",
+                "batch"
+              ],
+              "notes": [
+                "模型頁列 Batch predictions、Prompt caching、Function calling、Count tokens、Web search、Computer use 為支援。",
+                "Per-message effort（beta）在 Google Cloud 可用（mid-conversation-output-config-2026-07-01）。"
+              ]
+            }
+          ],
+          "apacAvailability": [
+            {
+              "region": "global",
+              "label": "Global endpoint",
+              "scopes": [
+                "global"
+              ],
+              "note": "沒有亞太區域端點；模型頁 ML processing 欄列 asia-southeast1"
+            }
+          ],
+          "dataProcessing": {
+            "processor": "Google Cloud（Anthropic 提供模型；依 Anthropic Commercial Terms 與 Service Specific Terms Section F）",
+            "residencyOptions": [
+              "Global",
+              "US multi-region",
+              "EU multi-region"
+            ],
+            "taiwanResidency": "no",
+            "zdr": "not-available",
+            "retentionNotes": [
+              "Claude Fable（所有版本）屬 Advanced AI：每個專案要先在 Model Garden 同意 Advanced AI Safety Addendum（需要 aiplatform.consents.update 權限，含於 aiplatform.admin）。",
+              "所有 prompt 與 response 記錄並保存最多 30 天，只用於濫用監控、不用於訓練；存放在客戶選的 region / multi-region，不以 CMEK 加密；部分 Advanced AI 功能可能無法 opt-out，ZDR 可能無法達成。",
+              "依 Anthropic Service Specific Terms Section F，必須為每個 model location 開啟與 Anthropic 的 prompt-response 分享。",
+              "Google 的自動調查工具會分析記錄；授權員工可能檢視被標記的 prompt、聯絡客戶，嚴重或反覆濫用可能停權。"
+            ],
+            "sources": [
+              {
+                "id": "google-agentplatform-fable51"
+              },
+              {
+                "id": "google-agentplatform-abuse-monitoring"
+              }
+            ]
+          },
+          "features": [
+            {
+              "feature": "tool-calling",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "google-agentplatform-fable51"
+                }
+              ]
+            },
+            {
+              "feature": "forced-tool-choice",
+              "status": "not-supported",
+              "note": "模型層級限制。",
+              "sources": [
+                {
+                  "id": "anthropic-fable51-whatsnew"
+                }
+              ]
+            },
+            {
+              "feature": "vision",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "google-agentplatform-fable51"
+                }
+              ]
+            },
+            {
+              "feature": "pdf-input",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "google-agentplatform-fable51"
+                }
+              ]
+            },
+            {
+              "feature": "prompt-caching",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "google-agentplatform-fable51"
+                }
+              ]
+            },
+            {
+              "feature": "batch",
+              "status": "supported",
+              "note": "Batch predictions；Batch 價為一半。",
+              "sources": [
+                {
+                  "id": "google-agentplatform-fable51"
+                },
+                {
+                  "id": "google-agentplatform-pricing"
+                }
+              ]
+            },
+            {
+              "feature": "count-tokens",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "google-agentplatform-fable51"
+                }
+              ]
+            },
+            {
+              "feature": "computer-use",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "google-agentplatform-fable51"
+                }
+              ]
+            },
+            {
+              "feature": "server-side-tools",
+              "status": "supported",
+              "note": "Web search。",
+              "sources": [
+                {
+                  "id": "google-agentplatform-fable51"
+                }
+              ]
+            },
+            {
+              "feature": "provisioned-throughput",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "google-agentplatform-fable51"
+                }
+              ]
+            },
+            {
+              "feature": "zero-data-retention",
+              "status": "not-supported",
+              "note": "Advanced AI：prompt / response 保存最多 30 天，ZDR 可能無法達成。",
+              "sources": [
+                {
+                  "id": "google-agentplatform-abuse-monitoring"
+                }
+              ]
+            }
+          ],
+          "pricing": [
+            {
+              "scope": "global",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 10.0,
+              "output": 50.0,
+              "cacheRead": 0.25,
+              "cacheWrite": 12.5,
+              "cacheWrite1h": 20.0,
+              "batchDiscountPct": 50,
+              "notes": [
+                "Agent Platform 定價頁 Global 表：Batch input $5、output $25；≤200K 與 >200K 輸入同價。"
+              ],
+              "sources": [
+                {
+                  "id": "google-agentplatform-pricing"
+                }
+              ],
+              "verification": "official"
+            },
+            {
+              "scope": "multi-region（US / EU）",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 11.0,
+              "output": 55.0,
+              "cacheRead": 0.275,
+              "cacheWrite": 13.75,
+              "cacheWrite1h": 22.0,
+              "batchDiscountPct": 50,
+              "notes": [
+                "US / EU Multi-Region 表：比 global 高 10%；Batch $5.50 / $27.50、Batch cache hit $0.275。"
+              ],
+              "sources": [
+                {
+                  "id": "google-agentplatform-pricing"
+                }
+              ],
+              "verification": "official"
+            }
+          ],
+          "quotas": [
+            {
+              "scope": "global endpoint / multi-region",
+              "note": "Claude 配額頁（2026-10-13 更新）與模型頁的 Fable 5.1 配額欄位都是空白；上線前向 Google 申請。",
+              "sources": [
+                {
+                  "id": "google-agentplatform-claude-quotas"
+                },
+                {
+                  "id": "google-agentplatform-fable51"
+                }
+              ],
+              "verification": "official"
+            }
+          ],
+          "lifecycle": {
+            "eolNoSoonerThan": "2027-03-01",
+            "notes": [
+              "模型頁：Retirement date No sooner than March 1, 2027——比 Anthropic 與 Bedrock 的「不早於 2027-09-01」早半年，GCP 路由以此日期規劃。"
+            ]
+          },
+          "litellmModel": "vertex_ai/claude-fable-5-1",
+          "onboardingNotes": [
+            "啟用順序：Model Garden 同意 Advanced AI Safety Addendum（每專案一次）→ 線上條款客戶在模型卡按 enable、回答公司與用途問題並接受 Anthropic 與 Marketplace 條款（Private Offer 客戶改為接受 Private Offer）→ 用 enableModel API 啟用 model location → 為每個 location 開啟與 Anthropic 的 request-response sharing。",
+            "LiteLLM 設 vertex_location: global（或 us / eu）。"
+          ],
+          "sources": [
+            {
+              "id": "google-agentplatform-fable51"
+            },
+            {
+              "id": "google-agentplatform-abuse-monitoring"
+            },
+            {
+              "id": "google-agentplatform-pricing"
+            },
+            {
+              "id": "google-agentplatform-claude-quotas"
+            }
+          ],
+          "verification": "official"
+        },
+        {
+          "id": "claude-fable-5-1@foundry",
+          "cloud": "azure",
+          "service": "foundry",
+          "status": "preview",
+          "providerModelId": "claude-fable-5-1",
+          "inferenceTargets": [
+            {
+              "scope": "global",
+              "id": "Global Standard",
+              "geography": "Hosted on Anthropic infrastructure（version 1）：eastus2、swedencentral；資料可能在 Azure 之外處理"
+            }
+          ],
+          "endpoints": [
+            {
+              "endpoint": "https://{resource}.services.ai.azure.com/anthropic/v1/*",
+              "apis": [
+                "anthropic-messages"
+              ],
+              "notes": [
+                "Fable 5.1 只有 Hosted on Anthropic infrastructure（Preview），沒有 Hosted on Azure 與 US Data Zone。"
+              ]
+            }
+          ],
+          "apacAvailability": [],
+          "regionNotes": [
+            "沒有亞太區域；Global Standard 只在 eastus2 與 swedencentral。"
+          ],
+          "dataProcessing": {
+            "processor": "Anthropic（賣方與營運方，為獨立資料處理者）",
+            "residencyOptions": [
+              "Global Standard（Hosted on Anthropic）"
+            ],
+            "taiwanResidency": "no",
+            "zdr": "on-request",
+            "retentionNotes": [
+              "資料保留依 Anthropic DPA 與 Commercial Terms。",
+              "Hosted on Anthropic infrastructure：prompts 與 outputs 在 Anthropic 的基礎設施處理，可能在 Azure 之外、所選 Azure 區域之外。",
+              "Anthropic：Fable 5.1 預設 30 天資料保留，屬 Covered Model，除非 Anthropic 明示授權否則不適用 ZDR。"
+            ],
+            "sources": [
+              {
+                "id": "ms-foundry-claude-hosting"
+              },
+              {
+                "id": "anthropic-fable51-whatsnew"
+              }
+            ]
+          },
+          "features": [
+            {
+              "feature": "tool-calling",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "ms-foundry-models-from-partners"
+                }
+              ]
+            },
+            {
+              "feature": "forced-tool-choice",
+              "status": "not-supported",
+              "note": "模型層級限制。",
+              "sources": [
+                {
+                  "id": "anthropic-fable51-whatsnew"
+                }
+              ]
+            },
+            {
+              "feature": "vision",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "ms-foundry-models-from-partners"
+                }
+              ]
+            },
+            {
+              "feature": "reasoning-control",
+              "status": "partial",
+              "note": "Foundry 的 effort 表：low / medium / high / xhigh，不支援 max（頁面註記 xhigh 與 max 結果相同）；thinking 只接受 adaptive。",
+              "sources": [
+                {
+                  "id": "ms-foundry-claude-models"
+                }
+              ]
+            },
+            {
+              "feature": "temperature",
+              "status": "not-supported",
+              "note": "top_p 至少 0.99（否則 400）；top_k、temperature、thinking enabled / disabled 與 output_format 不支援。",
+              "sources": [
+                {
+                  "id": "ms-foundry-models-from-partners"
+                }
+              ]
+            }
+          ],
+          "pricing": [
+            {
+              "scope": "global",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 10.0,
+              "output": 50.0,
+              "cacheRead": 0.25,
+              "cacheWrite": 12.5,
+              "cacheWrite1h": 20.0,
+              "notes": [
+                "Anthropic 定價頁：Claude in Microsoft Foundry 以 Anthropic 標準 per-model 費率計價，換算成 Claude Consumption Units（$0.01 / CCU）透過 Azure Marketplace 計費；US Data Zone 的 1.1 倍只適用 Hosted on Azure，Fable 5.1 沒有這個選項。"
+              ],
+              "sources": [
+                {
+                  "id": "anthropic-pricing"
+                },
+                {
+                  "id": "anthropic-fable51-overview"
+                }
+              ],
+              "verification": "official"
+            }
+          ],
+          "quotas": [],
+          "lifecycle": {
+            "retirementDate": "2027-12-05",
+            "notes": [
+              "Foundry 退役表：claude-fable-5-1 version 1，Lifecycle Preview，Retirement date 2027-12-05。"
+            ]
+          },
+          "litellmModel": "azure_ai/claude-fable-5-1",
+          "onboardingNotes": [
+            "只能部署 Hosted on Anthropic infrastructure 的 Global Standard（Preview），區域選 eastus2 或 swedencentral。",
+            "Preview 狀態，不建議承載正式工作負載。"
+          ],
+          "sources": [
+            {
+              "id": "ms-foundry-claude-models"
+            },
+            {
+              "id": "ms-foundry-models-from-partners"
+            },
+            {
+              "id": "ms-foundry-claude-hosting"
+            },
+            {
+              "id": "ms-foundry-retirement-schedule"
+            },
+            {
+              "id": "anthropic-claude-in-foundry"
+            },
+            {
+              "id": "anthropic-pricing"
+            }
+          ],
+          "verification": "official"
+        },
+        {
+          "id": "claude-fable-5-1@anthropic-api",
+          "cloud": "vendor-direct",
+          "service": "anthropic-api",
+          "status": "ga",
+          "availableSince": "2026-09-01",
+          "providerModelId": "claude-fable-5-1",
+          "inferenceTargets": [
+            {
+              "scope": "vendor-default",
+              "id": "claude-fable-5-1",
+              "geography": "global（預設）"
+            },
+            {
+              "scope": "geo",
+              "id": "inference_geo: us",
+              "geography": "美國（1.1 倍價）"
+            }
+          ],
+          "endpoints": [
+            {
+              "endpoint": "Claude API（Messages API）",
+              "apis": [
+                "anthropic-messages",
+                "batch"
+              ],
+              "notes": [
+                "Batch API：input $5、output $25（五折）。"
+              ]
+            }
+          ],
+          "apacAvailability": [],
+          "regionNotes": [
+            "Claude API 預設 global；inference_geo: \"us\" 可限定美國處理，沒有亞太選項。"
+          ],
+          "dataProcessing": {
+            "processor": "Anthropic",
+            "residencyOptions": [
+              "Global（預設）",
+              "US（inference_geo: us）"
+            ],
+            "taiwanResidency": "no",
+            "zdr": "on-request",
+            "retentionNotes": [
+              "Fable 5.1 與 Mythos 5.1 為 Covered Models：30 天資料保留，除非 Anthropic 明示授權否則不適用 ZDR。",
+              "官方公告：Enterprise Frontier Safeguards（資料存放在客戶控制的雲端基礎設施）將分階段提供；在那之前，符合資格的客戶可用 ZDR。"
+            ],
+            "sources": [
+              {
+                "id": "anthropic-fable51-whatsnew"
+              },
+              {
+                "id": "anthropic-fable51-announce"
+              }
+            ]
+          },
+          "features": [
+            {
+              "feature": "tool-calling",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "anthropic-fable51-whatsnew"
+                }
+              ]
+            },
+            {
+              "feature": "forced-tool-choice",
+              "status": "not-supported",
+              "note": "tool_choice any / tool 回 400；改用 auto + strict tool use 或 structured outputs。",
+              "sources": [
+                {
+                  "id": "anthropic-fable51-whatsnew"
+                }
+              ]
+            },
+            {
+              "feature": "structured-outputs",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "anthropic-fable51-whatsnew"
+                }
+              ]
+            },
+            {
+              "feature": "vision",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "anthropic-fable51-overview"
+                }
+              ]
+            },
+            {
+              "feature": "prompt-caching",
+              "status": "supported",
+              "note": "最少 512 tokens；cache read 為基本 input 的 0.025 倍（$0.25）。",
+              "sources": [
+                {
+                  "id": "anthropic-fable51-whatsnew"
+                }
+              ]
+            },
+            {
+              "feature": "batch",
+              "status": "supported",
+              "note": "五折。",
+              "sources": [
+                {
+                  "id": "anthropic-fable51-overview"
+                }
+              ]
+            },
+            {
+              "feature": "reasoning-control",
+              "status": "supported",
+              "note": "effort low / medium / high（預設）/ xhigh / max；per-message effort 為 beta。",
+              "sources": [
+                {
+                  "id": "anthropic-effort"
+                },
+                {
+                  "id": "anthropic-fable51-whatsnew"
+                }
+              ]
+            },
+            {
+              "feature": "temperature",
+              "status": "not-supported",
+              "note": "非預設的 temperature / top_p / top_k 回 400；prefill 回 400。",
+              "sources": [
+                {
+                  "id": "anthropic-fable51-whatsnew"
+                }
+              ]
+            },
+            {
+              "feature": "zero-data-retention",
+              "status": "partial",
+              "note": "需 Anthropic 明示授權。",
+              "sources": [
+                {
+                  "id": "anthropic-fable51-whatsnew"
+                }
+              ]
+            }
+          ],
+          "pricing": [
+            {
+              "scope": "global",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 10.0,
+              "output": 50.0,
+              "cacheRead": 0.25,
+              "cacheWrite": 12.5,
+              "cacheWrite1h": 20.0,
+              "batchDiscountPct": 50,
+              "notes": [
+                "inference_geo: \"us\" 對所有 token 類別套用 1.1 倍（含 cache 讀寫）。",
+                "官方估計典型工作負載比 Fable 5 便宜約 25%，高度 agentic 工作最多約 45%（cache read 降價的效果）。"
+              ],
+              "sources": [
+                {
+                  "id": "anthropic-fable51-overview"
+                },
+                {
+                  "id": "anthropic-pricing"
+                }
+              ],
+              "verification": "official"
+            }
+          ],
+          "quotas": [],
+          "lifecycle": {
+            "eolNoSoonerThan": "2027-09-01",
+            "notes": [
+              "Model deprecations 頁：claude-fable-5-1 Active，Retirement Not sooner than September 1, 2027。"
+            ]
+          },
+          "litellmModel": "anthropic/claude-fable-5-1",
+          "onboardingNotes": [
+            "2026-08-31 之後建立的帳號會強制檢查 thinking block 之前的內容：自建 messages 陣列的程式先依 migration guide 確認歷史是 append-only。"
+          ],
+          "sources": [
+            {
+              "id": "anthropic-fable51-overview"
+            },
+            {
+              "id": "anthropic-fable51-whatsnew"
+            },
+            {
+              "id": "anthropic-pricing"
+            },
+            {
+              "id": "anthropic-deprecations"
+            },
+            {
+              "id": "anthropic-fable51-announce"
+            }
+          ],
+          "verification": "official"
+        }
+      ],
+      "benchmarks": [
+        {
+          "name": "Artificial Analysis Intelligence Index",
+          "version": "v4.3.2",
+          "variant": "max effort, default fallback",
+          "score": 53,
+          "unit": "index",
+          "rank": "#5 / 216",
+          "measuredBy": "independent",
+          "date": "2026-10-15",
+          "notes": "AA 模型頁 2026-10-15 讀取；名次與分母取自頁面的 Model summary。",
+          "sources": [
+            {
+              "id": "aa-fable51"
+            }
+          ]
+        },
+        {
+          "name": "Artificial Analysis Intelligence Index",
+          "version": "v4.3.2",
+          "variant": "high effort, with fallback",
+          "score": 51,
+          "unit": "index",
+          "measuredBy": "independent",
+          "date": "2026-10-15",
+          "notes": "AA leaderboard 頁（xhigh with fallback 為 53，medium 49、low 47）。",
+          "sources": [
+            {
+              "id": "aa-leaderboard-models"
+            }
+          ]
+        },
+        {
+          "name": "Terminal-Bench 4.0",
+          "score": 55.8,
+          "unit": "percent",
+          "measuredBy": "vendor",
+          "date": "2026-09-01",
+          "notes": "Mythos 5.1 為 60.9%；差距來自先前 cyber safeguards 介入的題目。safeguards 介入時 cyber 題由 Opus 4.8、生物題由 Opus 5 完成。",
+          "sources": [
+            {
+              "id": "anthropic-fable51-announce"
+            }
+          ]
+        },
+        {
+          "name": "Terminal-Bench-Science 0.1",
+          "score": 52.6,
+          "unit": "percent",
+          "measuredBy": "vendor",
+          "date": "2026-09-01",
+          "sources": [
+            {
+              "id": "anthropic-fable51-announce"
+            }
+          ]
+        },
+        {
+          "name": "GDPval-AA v2",
+          "score": 1853,
+          "unit": "elo",
+          "measuredBy": "vendor",
+          "date": "2026-09-01",
+          "sources": [
+            {
+              "id": "anthropic-fable51-announce"
+            }
+          ]
+        },
+        {
+          "name": "OSWorld 2.0",
+          "variant": "partial credit",
+          "score": 77.9,
+          "unit": "percent",
+          "measuredBy": "vendor",
+          "date": "2026-09-01",
+          "notes": "strict 計分為 41.7%。",
+          "sources": [
+            {
+              "id": "anthropic-fable51-announce"
+            }
+          ]
+        },
+        {
+          "name": "Humanity's Last Exam",
+          "variant": "no tools",
+          "score": 60.9,
+          "unit": "percent",
+          "measuredBy": "vendor",
+          "date": "2026-09-01",
+          "notes": "with tools 為 65.0%。",
+          "sources": [
+            {
+              "id": "anthropic-fable51-announce"
+            }
+          ]
+        },
+        {
+          "name": "CursorBench 3.2.0",
+          "score": 73.4,
+          "unit": "percent",
+          "measuredBy": "vendor",
+          "date": "2026-09-01",
+          "sources": [
+            {
+              "id": "anthropic-fable51-announce"
+            }
+          ]
+        },
+        {
+          "name": "AutomationBench",
+          "score": 31.4,
+          "unit": "percent",
+          "measuredBy": "vendor",
+          "date": "2026-09-01",
+          "sources": [
+            {
+              "id": "anthropic-fable51-announce"
+            }
+          ]
+        }
+      ],
+      "performanceReference": [
+        {
+          "provider": "Anthropic API（Artificial Analysis）",
+          "variant": "max effort, default fallback",
+          "outputTokensPerSec": 71.6,
+          "ttftSec": 293.55,
+          "costPerIndexTaskUsd": 7.63,
+          "indexOutputTokensMillions": 190,
+          "date": "2026-10-15",
+          "notes": "AA 模型頁 2026-10-15 讀取（v4.3.2）；TTFT 依 AA 定義，推理模型含 thinking 時間。",
+          "sources": [
+            {
+              "id": "aa-fable51"
+            }
+          ]
+        },
+        {
+          "provider": "Anthropic API（Artificial Analysis leaderboard）",
+          "variant": "high effort, with fallback",
+          "outputTokensPerSec": 55,
+          "ttftSec": 20.37,
+          "costPerIndexTaskUsd": 3.91,
+          "date": "2026-10-15",
+          "notes": "取自 leaderboard 的 Median Tokens/s 與 Latency First Chunk 欄；與模型頁的量測值可能不同。",
+          "sources": [
+            {
+              "id": "aa-leaderboard-models"
+            }
+          ]
+        }
+      ],
+      "litellm": {
+        "providerStrings": [
+          {
+            "service": "anthropic-api",
+            "model": "anthropic/claude-fable-5-1"
+          },
+          {
+            "service": "bedrock",
+            "model": "bedrock/global.anthropic.claude-fable-5-1",
+            "note": "美國境內：bedrock/us.anthropic.claude-fable-5-1；沒有 jp. / au. / eu."
+          },
+          {
+            "service": "agent-platform",
+            "model": "vertex_ai/claude-fable-5-1",
+            "note": "vertex_location: global | us | eu"
+          },
+          {
+            "service": "foundry",
+            "model": "azure_ai/claude-fable-5-1",
+            "note": "Preview（Hosted on Anthropic）；api_base 指向 https://{resource}.services.ai.azure.com/anthropic"
+          }
+        ],
+        "minVersionRouting": "v1.76.0（Reload Price Data）",
+        "minVersionBundledCostMap": "v1.101.0",
+        "minVersionParams": "v1.101.0（reasoning_effort、forced tool_choice 回 400 或在 drop_params 下降為 auto：PR #39148；Vertex AI 與 Bedrock 的 response_format 改用不強制 tool_choice 的 JSON tool fallback：PR #39184）",
+        "recommendedVersion": "v1.104.2（本平台目前建議版本；內建 cost map 自 v1.101.0 起已含 Fable 5.1）",
+        "caveats": [
+          "forced tool_choice（any / tool）在 Fable 5.1 回 400；drop_params 開啟時 LiteLLM 降為 auto——請求會成功，但模型可以不呼叫工具。",
+          "Bedrock 只能用 us. 或 global. profile；cost map 雖有 eu.anthropic.claude-fable-5-1（$11 / $55），Bedrock 模型卡沒有 EU Geo。",
+          "Bedrock 模型卡：使用此模型前必須完成 aws_review opt-in——gateway 上線前先在每個 AWS 帳號設定。",
+          "拒答以 HTTP 200 + stop_reason: refusal 回傳，gateway 的錯誤率監控看不到，要另外統計拒答比例。",
+          "thinking block 綁定模型：fallback 到 Fable 5.1 / Mythos 5.1 以外的模型會遺失先前推理，fallback 優先設在同模型的其他 CSP。",
+          "main 分支 cost map 的 Bedrock 價（global $10 / $50、cache read $0.25；us. $11 / $55、cache read $0.275）與 AWS pricing 頁一致（2026-10-15）。"
+        ],
+        "configSnippet": "- model_name: claude-fable-5-1\n  litellm_params:\n    model: bedrock/global.anthropic.claude-fable-5-1\n    aws_region_name: ap-east-2\n  model_info:\n    catalog_id: claude-fable-5-1\n    data_residency: global\n",
+        "status": "researched",
+        "sources": [
+          {
+            "id": "litellm-v1-101-0"
+          },
+          {
+            "id": "litellm-cost-map-main"
+          },
+          {
+            "id": "aws-bedrock-fable51-card"
+          },
+          {
+            "id": "aws-bedrock-pricing-data"
+          }
+        ]
+      },
+      "tags": [
+        "frontier",
+        "reasoning",
+        "coding",
+        "agentic",
+        "1m-context",
+        "high-refusal",
+        "compliance-review"
+      ],
+      "sources": [
+        {
+          "id": "anthropic-fable51-overview"
+        },
+        {
+          "id": "anthropic-fable51-whatsnew"
+        },
+        {
+          "id": "anthropic-fable51-announce"
+        },
+        {
+          "id": "anthropic-fable51-systemcard"
+        },
+        {
+          "id": "anthropic-models-overview"
+        },
+        {
+          "id": "anthropic-pricing"
+        },
+        {
+          "id": "anthropic-deprecations"
+        },
+        {
+          "id": "anthropic-release-notes"
+        },
+        {
+          "id": "aws-bedrock-fable51-card"
+        },
+        {
+          "id": "aws-bedrock-abuse-detection"
+        },
+        {
+          "id": "aws-bedrock-pricing"
+        },
+        {
+          "id": "google-agentplatform-fable51"
+        },
+        {
+          "id": "google-agentplatform-abuse-monitoring"
+        },
+        {
+          "id": "ms-foundry-claude-models"
+        },
+        {
+          "id": "ms-foundry-models-from-partners"
+        },
+        {
+          "id": "aa-fable51"
+        }
+      ],
+      "lastVerified": "2026-10-15"
+    },
     {
       "id": "claude-opus-5-5",
       "name": "Claude Opus 5.5",
@@ -1218,7 +2624,7 @@
       },
       "vendorModelId": "claude-sonnet-5-5",
       "modelCardUrl": "https://platform.claude.com/docs/en/models/sonnet-5-5/overview",
-      "summary": "Anthropic 2026-09-28 發布的 Claude 5.5 家族第二款模型，官方稱比 Sonnet 5 快 30%、多數工作成本低至多 30%，單價與 Sonnet 5 相同（$2 / $10，cache read $0.20）。Claude API、Bedrock、Google Cloud、Foundry 同日可用。AA Intelligence Index v4.3.2 56 分，僅次於 Opus 5.5。導入重點：thinking 無法完全關閉（disabled 改為 between_tools）、forced tool_choice 回 400、temperature / top_p / top_k 送非預設值回 400、預設 effort 為 high；Bedrock 只有 us / eu / global profile（沒有 jp），台北區只能走 Global CRIS。",
+      "summary": "Anthropic 2026-09-28 發布的 Claude 5.5 家族第二款模型，官方稱比 Sonnet 5 快 30%、多數工作成本低至多 30%，input / output 單價與 Sonnet 5 相同（$2 / $10），cache read 自 2026-10-07 起降為 $0.10。Claude API、Bedrock、Google Cloud、Foundry 同日可用。AA Intelligence Index v4.3.2 56 分，僅次於 Opus 5.5。導入重點：thinking 無法完全關閉（disabled 改為 between_tools）、forced tool_choice 回 400、temperature / top_p / top_k 送非預設值回 400、預設 effort 為 high；Bedrock 有 us / eu / au / global profile（沒有 jp），台北區只能走 Global CRIS。",
       "strengths": [
         "AA Intelligence Index v4.3.2 56 分（max effort），在 225 個同級模型中排名第 2，僅次於 Opus 5.5；價格是 Opus 5.5 的一半。",
         "官方稱比 Sonnet 5 快 30%、多數工作成本低至多 30%；AA 測得 127 tok/s（2026-10-06 讀取，上週約 140）。",
@@ -1230,7 +2636,7 @@
         "很冗長：AA 評測產生 420M output tokens（中位數 81M），每任務成本 $7.67，高於 Opus 5.5 的 $5.98——務必以每任務成本比較。",
         "AA max effort 首 token 約 442 秒；互動場景要用 low / medium。",
         "thinking 不能完全關閉、forced tool_choice 回 400、temperature 非預設值回 400：舊 Sonnet 程式需改寫。",
-        "Bedrock：沒有 jp / au profile，APAC 只有 Global CRIS；不支援 structured outputs、Batch 與 Priority / Flex；模型卡與 pricing 頁未列價格。",
+        "Bedrock：沒有 jp profile（au. 只在雪梨 / 墨爾本之間路由），台北、東京等其餘 APAC 區域只有 Global CRIS；不支援 structured outputs、Batch 與 Priority / Flex。",
         "沒有台灣境內處理選項。"
       ],
       "bestFor": [
@@ -1557,20 +2963,21 @@
               "unit": "per_1m_tokens",
               "input": 2.0,
               "output": 10.0,
+              "cacheRead": 0.1,
+              "cacheWrite": 2.5,
+              "cacheWrite1h": 4.0,
               "notes": [
-                "不是 AWS 公布的價格：取自 LiteLLM v1.105.0rc1 release notes 的內建 cost map（global.anthropic.claude-sonnet-5-5），與 Anthropic 一方價相同。Bedrock 模型卡與 pricing 頁到 2026-10-06 都沒有可讀的 Sonnet 5.5 價格——以 Bedrock console 與帳單為準。",
-                "Cache 價格未列；Anthropic 一方價為 cache read $0.20。",
-                "AWS Bedrock pricing 頁註記：自 October 7 起 Sonnet 5.5 的 cache read 價格比先前降低 50%（頁面沒有列出金額，實際價格以 Bedrock console 與帳單為準）。"
+                "Bedrock pricing 頁（動態價格資料，2026-10-12 發布，2026-10-15 讀取）Global Cross-region Inference：$2 / $10、5 分鐘 cache 寫入 $2.50、1 小時 $4、cache read $0.10；batch 欄為 N/A。"
               ],
               "sources": [
                 {
-                  "id": "litellm-v1-105-0-rc1"
+                  "id": "aws-bedrock-pricing"
                 },
                 {
-                  "id": "anthropic-pricing"
+                  "id": "aws-bedrock-pricing-data"
                 }
               ],
-              "verification": "community"
+              "verification": "official"
             },
             {
               "scope": "geo",
@@ -1578,19 +2985,24 @@
               "unit": "per_1m_tokens",
               "input": 2.2,
               "output": 11.0,
+              "cacheRead": 0.11,
+              "cacheWrite": 2.75,
+              "cacheWrite1h": 4.4,
               "notes": [
-                "不是 AWS 公布的價格：LiteLLM cost map 的 us. / eu. 列（geo 比 global 高 10%，與 Opus 5.5 的實測慣例一致）。",
-                "同一份 cost map 另有 jp. / au. / apac. 的列，但 Bedrock 模型卡只有 us. / eu. 與 global.——cost map 有列不代表 profile 存在。"
+                "Bedrock pricing 頁 Geo and In-region Cross-region Inference 表：比 Global 高 10%（us. / eu. / au.）。"
               ],
               "sources": [
                 {
-                  "id": "litellm-v1-105-0-rc1"
+                  "id": "aws-bedrock-pricing"
+                },
+                {
+                  "id": "aws-bedrock-pricing-data"
                 },
                 {
                   "id": "aws-bedrock-sonnet55-card"
                 }
               ],
-              "verification": "community"
+              "verification": "official"
             }
           ],
           "quotas": [],
@@ -2014,7 +3426,7 @@
           {
             "service": "bedrock",
             "model": "bedrock/converse/global.anthropic.claude-sonnet-5-5",
-            "note": "另有 us. / eu.；沒有 jp."
+            "note": "另有 us. / eu. / au.；沒有 jp."
           },
           {
             "service": "agent-platform",
@@ -2037,7 +3449,7 @@
           "thinking block 綁定帳號：跨 CSP fallback（不同帳號）時先前的 thinking 會被靜默丟棄。",
           "經 gateway 使用 Claude Code auto mode 需要 v1.103.2：之前的版本會丟掉 /v1/messages 的 safeguards 欄位（Claude Code 顯示 Auto mode server: Disabled，改用 client 端分類器）；1.103.2 起原樣轉送到 Anthropic、Bedrock Invoke、Vertex AI 與 Azure AI Foundry。",
           "經 Agent Platform（Vertex AI）路由時 LiteLLM 會丟掉 per-turn-control beta：Claude Code 的 per-message output_config 回 400（messages.N.output_config: Extra inputs are not permitted）後由 Claude Code 去掉 beta 重試，per-message effort 不生效（issue #43557 開啟中，v1.103.0～v1.104.0-rc.1 與 main；2026-10-05 單次讀取）。",
-          "LiteLLM v1.105.0rc1 的 cost map 列有 jp. / au. / apac.anthropic.claude-sonnet-5-5（$2.2 / $11），但 Bedrock 模型卡（2026-10-06）只有 us. / eu. 與 global. profile——不要因為 cost map 有列就設定不存在的 profile。"
+          "LiteLLM cost map 列有 jp. / au. / apac.anthropic.claude-sonnet-5-5（$2.2 / $11），但 Bedrock 模型卡（2026-10-15）只有 us. / eu. / au. 與 global. profile——jp. 與 apac. 不存在，不要因為 cost map 有列就設定。"
         ],
         "configSnippet": "- model_name: claude-sonnet-5-5\n  litellm_params:\n    model: bedrock/converse/global.anthropic.claude-sonnet-5-5\n    aws_region_name: ap-east-2\n  model_info:\n    catalog_id: claude-sonnet-5-5\n    data_residency: global\n",
         "status": "researched",
@@ -2287,6 +3699,13 @@
               ]
             },
             {
+              "region": "ap-south-2",
+              "label": "Hyderabad",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
               "region": "ap-southeast-3",
               "label": "Jakarta",
               "scopes": [
@@ -2304,6 +3723,13 @@
             {
               "region": "ap-southeast-5",
               "label": "Malaysia",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-southeast-6",
+              "label": "New Zealand",
               "scopes": [
                 "global"
               ]
@@ -2555,7 +3981,8 @@
           ],
           "apacAvailability": [],
           "regionNotes": [
-            "沒有任何亞太區域。部署名稱預設 claude-haiku-5-5。"
+            "沒有任何亞太區域。部署名稱預設 claude-haiku-5-5。",
+            "2026-10-15 重讀 models-from-partners 的 Region availability by deployment type：Global Standard 表 claude-haiku-5-5 只有 version 1（Hosted on Anthropic infrastructure），✅ 在 centralus、eastus、eastus2、northcentralus、southcentralus、westcentralus、westus、westus3 與歐洲表的 swedencentral；Data Zone Standard 表只有 version 2（Hosted on Azure），✅ 在同樣 8 個美國區域；亞太與中東非洲表沒有 Claude。swedencentral 是部署區域，不代表處理地點：Global Standard 可在任何區域處理，Hosted on Anthropic 可能在 Azure 之外處理。"
           ],
           "dataProcessing": {
             "processor": "Global Standard 由 Anthropic 代管；Data Zone Standard 由 Azure 代管（資料留在美國）",
@@ -2838,16 +4265,35 @@
           "score": 43,
           "unit": "index",
           "measuredBy": "independent",
-          "date": "2026-10-11",
-          "notes": "同頁另有 xhigh 41（$0.12/task）、high 38（$0.08/task）。數字取自排行榜頁的擷取結果。",
+          "date": "2026-10-15",
+          "notes": "2026-10-15 讀取模型頁：分數仍為 43，名次與分母取自頁面的 Model summary（同級模型數會隨新模型加入而變）。2026-10-11 排行榜同頁另有 xhigh 41（$0.12/task）、high 38（$0.08/task）。",
           "sources": [
+            {
+              "id": "aa-haiku55"
+            },
             {
               "id": "aa-leaderboard-models"
             }
-          ]
+          ],
+          "rank": "#2 / 176"
         }
       ],
       "performanceReference": [
+        {
+          "provider": "Anthropic API（Artificial Analysis）",
+          "variant": "max effort",
+          "outputTokensPerSec": 237.3,
+          "ttftSec": 336.77,
+          "costPerIndexTaskUsd": 0.21,
+          "indexOutputTokensMillions": 440,
+          "date": "2026-10-15",
+          "notes": "Artificial Analysis 2026-10-15 讀取（v4.3.2）；TTFT 取模型頁 FAQ 的 time to first token，推理模型含 thinking 時間。速度是滾動量測，每次讀取都會變動（同日稍早讀到 302.98 秒）。",
+          "sources": [
+            {
+              "id": "aa-haiku55"
+            }
+          ]
+        },
         {
           "provider": "Anthropic API（Artificial Analysis）",
           "variant": "max effort",
@@ -6180,6 +7626,1032 @@
       "knowledgeCutoff": "2026-05-18"
     },
     {
+      "id": "gemini-4-argon",
+      "name": "Gemini 4 Argon",
+      "vendor": "google",
+      "family": "Gemini 4",
+      "tier": "frontier",
+      "releaseDate": "2026-10-13",
+      "platformStatus": "evaluating",
+      "modalities": {
+        "input": [
+          "text",
+          "image",
+          "video",
+          "audio",
+          "pdf"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "contextWindow": 1048576,
+      "maxOutputTokens": 1048576,
+      "knowledgeCutoff": "2026-03（模型卡：Gemini 4 的 knowledge cutoff）",
+      "reasoning": {
+        "supported": true,
+        "alwaysOn": true,
+        "effortLevels": [
+          "low",
+          "medium",
+          "high"
+        ],
+        "defaultEffort": "medium",
+        "parameter": "thinking_level（取代 thinking_budget）；LiteLLM 以 reasoning_effort 映射",
+        "notes": [
+          "thinking_budget 與 thinking_level=\"MINIMAL\" 都回 HTTP 400，沒有關閉 thinking 的選項（alwaysOn 為依此推論）。",
+          "max_output_tokens 是 thinking + 回答的總上限：官方建議既有程式至少設 32,768，困難推理與程式設 131,072 或 262,144 並開 long decode。",
+          "maxOutputTokens 取模型頁的 1,048,576（需 long decode，扣除輸入）；單次同步請求上限為 65,536（Agent Platform 非串流直接 HTTP 為 32,768）。"
+        ]
+      },
+      "vendorModelId": "gemini-4-argon",
+      "modelCardUrl": "https://deepmind.google/models/model-cards/gemini-4-argon/",
+      "summary": "Google 2026-09-30 發表（先開放 Fairwind 資安夥伴）、2026-10-13 GA 的 Gemini 4 家族首款模型，定位為旗艦推理模型：輸入與輸出共用 1,048,576 tokens 上限，long decode 單次回應可輸出到約 1M tokens，thinking 分 low / medium（預設）/ high。Gemini API（只限付費層）與 Agent Platform（global、us、eu）同日 GA；AWS 與 Azure 不提供，也沒有亞太區域。促銷價 $2 / $10（cache $0.10）至 2026-11-30，2026-12-01 起 $4 / $20。AA Intelligence Index v4.3.2 53 分（high，#8 / 216），每任務 $1.99。導入重點：thinking_budget 與 MINIMAL 回 400、sampling 參數被忽略、只有 implicit caching、單次同步輸出上限 65,536。",
+      "strengths": [
+        "AA Intelligence Index v4.3.2 53 分（high，#8 / 216），每任務成本 $1.99、評測輸出 110M tokens——同樣 53 分的 Claude Fable 5.1（max）每任務 $7.63（2026-10-15 讀取）。",
+        "輸入 + 輸出共用 1,048,576 tokens，long decode 讓單次回應突破 64K、最多到 1M tokens（扣除輸入）：適合長證明、深度推導、大型程式產生。",
+        "Google 自報（模型卡）：DeepSWE v1.1 77.9%、AutomationBench 51.3%、Vals Finance Agent v2 65.4%、Harvey Legal Agent Benchmark 19.6%、LVBench 91.7%、GraphWalks 256K–1M 84.2%，同表皆高於 GPT-6 Astra、Claude Fable 5.1、Claude Opus 5.5。",
+        "多模態輸入：文字、影像、影片、音訊、PDF；agentic video understanding GA。",
+        "促銷期 $2 / $10、cache $0.10；Batch / Flex 半價。Agent Platform 支援 Provisioned Throughput、Priority PayGo，以及 Data residency、CMEK、VPC-SC、AXT 安全控制。"
+      ],
+      "weaknesses": [
+        "2026-12-01 起價格翻倍（$4 / $20、cache $0.20；Agent Platform 非 global 端點 $4.40 / $22）——預算要同時列兩組價格。",
+        "沒有亞太或台灣處理選項：Agent Platform 只有 global 與 us / eu multi-region（ML processing 只在 US / EU），Gemini API 沒有區域選擇；AWS 與 Azure 不提供。",
+        "單次同步請求最多 65,536 output tokens（Agent Platform 非串流直接 HTTP 為 32,768）；要更長必須 long decode——Agent Platform 只在 v1beta1 GenerateContent，Interactions API、OpenAI 相容層與舊版 SDK 都拿不到長輸出。",
+        "API 規則較嚴：thinking_budget / MINIMAL 回 400；temperature / top_p / top_k 被忽略；frequency_penalty / presence_penalty / candidate_count 回 400；不支援 explicit caching 與 prefill，歷史不能以 model turn 結尾。",
+        "AA 尚未公布輸出速度與首 token 延遲；官方提醒困難 prompt 可能要數分鐘、HTTP timeout 至少設 15 分鐘。",
+        "模型卡：生物（CBRN）與資安的 Uplift Level 1 CCL 都「無法排除已達到」，一般版套用額外 safeguards；不受 cyber guardrail 限制的版本只給通過 Fairwind 審核的防禦方（Cyber Permissive，allowlist）。"
+      ],
+      "bestFor": [
+        "超長推理與輸出：形式證明、數學 / 科學推導、需要超過 64K 輸出的程式產生（搭配 long decode）",
+        "大型 codebase 遷移、重構與長時程代理任務",
+        "金融、法律等專業知識工作，以及文件、圖表、長影片的多模態理解",
+        "需要 Google Search / Maps grounding 的研究型應用"
+      ],
+      "avoidFor": [
+        "資料必須留在台灣或亞太區域的工作負載",
+        "低延遲互動（官方提醒困難 prompt 需數分鐘；AA 尚無延遲數據）",
+        "仍依賴 temperature、thinking_budget、explicit caching 或 prefill 的既有程式（需先改寫）",
+        "大量簡單分類 / 擷取（改用 Gemini 3.8 Flash 或 GPT-6 Luna）"
+      ],
+      "safety": {
+        "classifications": [
+          "Google DeepMind Frontier Safety Framework（2026-04 版）：CBRN 生物 Uplift Level 1 CCL 與 Cybersecurity Uplift Level 1 CCL 都「無法排除已達到」，Google 以 safety case 與部署 safeguards 評估殘餘風險低於 CCL；化學 / 放射 / 核 TCL、Harmful Manipulation 與 ML R&D CCL 未達到。"
+        ],
+        "behaviours": [
+          "依 Frontier Safety Framework 設計為拒絕 cyber 與 CBRN 有害請求、同時保留合法 dual-use 研究；Google 稱外部生物 red team 只能解鎖不到 1% 的生物子任務（自報）。",
+          "部署 misalignment monitor：讀取 agent 的推理與動作，即時攔阻未經授權的繞道作法。",
+          "Gray Swan Indirect Prompt Injection benchmark：15 次 adaptive attack 的攻擊成功率 0.7%（Google 自報）。"
+        ],
+        "programmes": [
+          "Gemini 4 Argon Cyber Permissive（gemini-4-argon-cyber-permissive）：GA 但需 allowlist，經 Google 團隊或 Fairwind Program 申請；預設 thinking HIGH、不支援 computer use、只有 global 與 us；屬 Google Frontier Models（Service Specific Terms 第 31、34 節），prompt 與 response 記錄最多 30 天；Gemini 3.8 Flash Cyber 的資格不沿用。",
+          "Fairwind Program：Google 2026-10-13 起擴大到數百個新增夥伴，提供沒有 cyber guardrails 的 Argon。"
+        ],
+        "sources": [
+          {
+            "id": "deepmind-gemini4-argon-modelcard"
+          },
+          {
+            "id": "google-gemini4-argon-ga-blog"
+          },
+          {
+            "id": "google-gemini4-argon-blog"
+          },
+          {
+            "id": "google-agentplatform-gemini4-argon"
+          },
+          {
+            "id": "google-agentplatform-abuse-monitoring"
+          }
+        ]
+      },
+      "offerings": [
+        {
+          "id": "gemini-4-argon@agent-platform",
+          "cloud": "gcp",
+          "service": "agent-platform",
+          "status": "ga",
+          "availableSince": "2026-10-13",
+          "providerModelId": "gemini-4-argon",
+          "inferenceTargets": [
+            {
+              "scope": "global",
+              "id": "global",
+              "geography": "全球（無駐留保證；可在任何 Google Cloud 區域處理）"
+            },
+            {
+              "scope": "multi-region",
+              "id": "us",
+              "geography": "US multi-region（ML processing 在美國）"
+            },
+            {
+              "scope": "multi-region",
+              "id": "eu",
+              "geography": "EU multi-region（ML processing 在 EU 成員國，不含英國、瑞士）"
+            }
+          ],
+          "endpoints": [
+            {
+              "endpoint": "aiplatform.googleapis.com（generateContent / streamGenerateContent）",
+              "apis": [
+                "gemini-generate-content",
+                "batch"
+              ],
+              "notes": [
+                "單次請求最多 65,536 output tokens（非串流的直接 HTTP 請求為 32,768）；output 含 thinking、function call 與回答。",
+                "Long decode（continuation_token）只在 v1beta1 的 GenerateContent 可用（known issue，v1 不支援）；Gen AI SDK 預設走 v1beta1 並自動續接，自建 REST 迴圈要用 v1beta1 路徑。每個 segment 的時間上限 20 分鐘。",
+                "Interactions API 為 preview，且不支援 long decode。"
+              ]
+            },
+            {
+              "endpoint": "OpenAI 相容 Chat Completions API",
+              "apis": [
+                "openai-chat-completions"
+              ],
+              "notes": [
+                "模型頁列為支援；但開發者指南說明 OpenAI 相容層與舊版 SDK 無法用 continuation token 取回長輸出。"
+              ]
+            }
+          ],
+          "apacAvailability": [
+            {
+              "region": "global",
+              "label": "Global endpoint",
+              "scopes": [
+                "global"
+              ],
+              "note": "沒有亞太區域：資料駐留頁 Argon 只勾 US / EU multi-region（Japan、Singapore、South Korea、Australia、India 欄都沒有）。"
+            }
+          ],
+          "regionNotes": [
+            "模型頁（2026-10-13 更新）：Model availability 為 global、us、eu；ML processing 為 us、eu multi-region；Standard PayGo、Priority PayGo 與 Provisioned Throughput 都是 global、us、eu。",
+            "Gemini 4 Argon Cyber Permissive 只有 global 與 us。"
+          ],
+          "dataProcessing": {
+            "processor": "Google Cloud",
+            "residencyOptions": [
+              "Global（無駐留保證）",
+              "US multi-region",
+              "EU multi-region"
+            ],
+            "taiwanResidency": "no",
+            "zdr": "on-request",
+            "retentionNotes": [
+              "ZDR 頁：要達到零資料保留，依 GCP 線上條款的客戶須申請 abuse monitoring prompt logging 例外（Cloud Master Agreement 客戶預設豁免）、不開 request-response logging、Interactions API 明確設 store=false（預設 true）。",
+              "Grounding with Google Search 的 logs 會保留 3 天且無法關閉（要 ZDR 改用 Web Grounding for Enterprise）；Grounding with Google Maps 保留 30 天。",
+              "Implicit caching 預設開啟（in-memory 與 durable，都在寫入後 24 小時內刪除；durable caching 不支援 CMEK）；用 global endpoint 時快取資料可能在任何區域，可在專案層級關閉 durable caching 或全部 caching。",
+              "一般版 Argon 不在 Google Frontier Models 的範圍（abuse monitoring 頁 Models in scope 只列 Gemini 4 Argon (Cyber Permissive)）；Cyber Permissive 的 prompt 與 response 會記錄最多 30 天。",
+              "開發者指南：long decode 的各種續接方式都標示 No server storage（ZDR-compliant）。"
+            ],
+            "sources": [
+              {
+                "id": "google-agentplatform-data-residency"
+              },
+              {
+                "id": "google-agentplatform-zdr"
+              },
+              {
+                "id": "google-agentplatform-abuse-monitoring"
+              },
+              {
+                "id": "google-agentplatform-gemini4-argon-guide"
+              }
+            ]
+          },
+          "features": [
+            {
+              "feature": "streaming",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "google-agentplatform-gemini4-argon-guide"
+                }
+              ]
+            },
+            {
+              "feature": "tool-calling",
+              "status": "supported",
+              "note": "每個 FunctionResponse 必須對應前一個 FunctionCall 的 id、name 與順序；工具呼叫前避免非結構化文字。",
+              "sources": [
+                {
+                  "id": "google-agentplatform-gemini4-argon-guide"
+                }
+              ]
+            },
+            {
+              "feature": "structured-outputs",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "google-agentplatform-gemini4-argon"
+                }
+              ]
+            },
+            {
+              "feature": "vision",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "google-agentplatform-gemini4-argon"
+                }
+              ]
+            },
+            {
+              "feature": "pdf-input",
+              "status": "supported",
+              "note": "每個 prompt 最多 3,000 個檔案、每檔最多 3,000 頁。",
+              "sources": [
+                {
+                  "id": "google-agentplatform-gemini4-argon"
+                }
+              ]
+            },
+            {
+              "feature": "audio-input",
+              "status": "supported",
+              "note": "每個 prompt 約 8.4 小時或 1M tokens。",
+              "sources": [
+                {
+                  "id": "google-agentplatform-gemini4-argon"
+                }
+              ]
+            },
+            {
+              "feature": "video-input",
+              "status": "supported",
+              "note": "agentic video understanding GA，預設關閉（media_processing=\"agentic\" 開啟）。",
+              "sources": [
+                {
+                  "id": "google-agentplatform-gemini4-argon"
+                },
+                {
+                  "id": "google-agentplatform-gemini4-argon-guide"
+                }
+              ]
+            },
+            {
+              "feature": "prompt-caching",
+              "status": "partial",
+              "note": "只有 implicit caching（共享前綴至少 6,144 tokens，durable caching 預設開啟）；explicit context caching 不支援。cached input 為 input 價的 5%。",
+              "sources": [
+                {
+                  "id": "google-agentplatform-gemini4-argon"
+                },
+                {
+                  "id": "google-agentplatform-pricing"
+                }
+              ]
+            },
+            {
+              "feature": "batch",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "google-agentplatform-gemini4-argon"
+                }
+              ]
+            },
+            {
+              "feature": "reasoning-control",
+              "status": "supported",
+              "note": "thinking_level：LOW、MEDIUM（預設）、HIGH；thinking_budget 與 MINIMAL 回 HTTP 400。",
+              "sources": [
+                {
+                  "id": "google-agentplatform-gemini4-argon"
+                }
+              ]
+            },
+            {
+              "feature": "temperature",
+              "status": "not-supported",
+              "note": "temperature / top_p / top_k 的自訂值會被忽略；frequency_penalty、presence_penalty、candidate_count 回 HTTP 400。",
+              "sources": [
+                {
+                  "id": "google-agentplatform-gemini4-argon-guide"
+                }
+              ]
+            },
+            {
+              "feature": "count-tokens",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "google-agentplatform-gemini4-argon"
+                }
+              ]
+            },
+            {
+              "feature": "computer-use",
+              "status": "partial",
+              "note": "Preview。",
+              "sources": [
+                {
+                  "id": "google-agentplatform-gemini4-argon"
+                }
+              ]
+            },
+            {
+              "feature": "server-side-tools",
+              "status": "supported",
+              "note": "Grounding（Google Search、Google Maps、Agent Search、Parallel Web Search、Exa Web Search、Web Grounding for Enterprise）、code execution、URL context。",
+              "sources": [
+                {
+                  "id": "google-agentplatform-gemini4-argon"
+                }
+              ]
+            },
+            {
+              "feature": "fine-tuning",
+              "status": "not-supported",
+              "sources": [
+                {
+                  "id": "google-agentplatform-gemini4-argon"
+                }
+              ]
+            },
+            {
+              "feature": "provisioned-throughput",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "google-agentplatform-gemini4-argon"
+                }
+              ]
+            },
+            {
+              "feature": "priority-tier",
+              "status": "supported",
+              "note": "Priority PayGo。",
+              "sources": [
+                {
+                  "id": "google-agentplatform-gemini4-argon"
+                },
+                {
+                  "id": "google-agentplatform-pricing"
+                }
+              ]
+            },
+            {
+              "feature": "flex-tier",
+              "status": "unknown",
+              "note": "定價頁有 Batch / Flex 分頁（與 Batch 同價），但模型頁的 consumption options 沒有列 Flex。",
+              "sources": [
+                {
+                  "id": "google-agentplatform-pricing"
+                },
+                {
+                  "id": "google-agentplatform-gemini4-argon"
+                }
+              ]
+            },
+            {
+              "feature": "zero-data-retention",
+              "status": "partial",
+              "note": "需依 ZDR 頁逐項設定（abuse monitoring 例外、store=false、不用 Google Search grounding 等）。",
+              "sources": [
+                {
+                  "id": "google-agentplatform-zdr"
+                }
+              ]
+            }
+          ],
+          "pricing": [
+            {
+              "scope": "standard (global)",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 2.0,
+              "output": 10.0,
+              "cacheRead": 0.1,
+              "batchDiscountPct": 50,
+              "validFrom": "2026-10-13",
+              "validUntil": "2026-11-30",
+              "thereafter": {
+                "input": 4.0,
+                "output": 20.0,
+                "cacheRead": 0.2
+              },
+              "notes": [
+                "Output 價格含 response 與 reasoning tokens。",
+                "定價頁註記：促銷價以「淨支出 50% credits back」的方式提供；不適用 Gemini 4 Argon Cyber Permissive（Cyber Permissive 一律 $4 / $20、cached $0.20）。",
+                "Priority：$3.60 / $18（cached $0.18），2026-12-01 起 $7.20 / $36（cached $0.36）。",
+                "Batch / Flex：$1 / $5（cached $0.05），2026-12-01 起 $2 / $10（cached $0.10）。",
+                "Grounding with Google Search 與 Google Maps：每月 5,000 次免費（Gemini 3 與 Gemini 4 合計），之後每 1,000 次 $14。"
+              ],
+              "sources": [
+                {
+                  "id": "google-agentplatform-pricing"
+                }
+              ],
+              "verification": "official"
+            },
+            {
+              "scope": "non-global（us / eu multi-region）",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 2.2,
+              "output": 11.0,
+              "cacheRead": 0.11,
+              "validFrom": "2026-10-13",
+              "validUntil": "2026-11-30",
+              "thereafter": {
+                "input": 4.4,
+                "output": 22.0,
+                "cacheRead": 0.22
+              },
+              "notes": [
+                "非 global 端點比 global 高 10%。",
+                "Priority：$3.96 / $19.80（cached $0.198），2026-12-01 起 $7.92 / $39.60（cached $0.396）。",
+                "Batch / Flex：$1.10 / $5.50（cached $0.055），2026-12-01 起 $2.20 / $11（cached $0.11）。"
+              ],
+              "sources": [
+                {
+                  "id": "google-agentplatform-pricing"
+                }
+              ],
+              "verification": "official"
+            }
+          ],
+          "quotas": [
+            {
+              "scope": "consumption options",
+              "note": "模型頁：Fixed quota 不支援；可用 Standard PayGo、Priority PayGo、Provisioned Throughput 與 Batch。官方配額頁本次沒有查到 Argon 的 QPM / TPM 數字。",
+              "sources": [
+                {
+                  "id": "google-agentplatform-gemini4-argon"
+                }
+              ],
+              "verification": "official"
+            }
+          ],
+          "lifecycle": {
+            "notes": [
+              "模型版本頁（2026-10-13 更新）：gemini-4-argon 列在「發布後至少提供 12 個月」的表格，Release date 2026-10-13，Retirement date 為 No retirement date announced。",
+              "gemini-4-argon-cyber-permissive 同日發布，同樣沒有公布退役日。"
+            ]
+          },
+          "litellmModel": "vertex_ai/gemini-4-argon",
+          "onboardingNotes": [
+            "在 Agent Studio / Model Garden 選 gemini-4-argon；Region 選 Global、us 或 eu。",
+            "Gen AI SDK 升到 google-genai >= 2.30.1（Python）或 @google/genai >= 2.29.1（JS）；舊版 SDK 與 OpenAI 相容層拿不到 long decode 的長輸出。",
+            "上線前移除：temperature / top_p / top_k（被忽略）、frequency_penalty / presence_penalty / candidate_count（400）、thinking_budget 與 MINIMAL（400）、explicit cachedContents；對話歷史不能以 model turn 結尾，也不支援 prefill。",
+            "需要 ZDR 的專案：Interactions API 設 store=false、不開 request-response logging、改用 Web Grounding for Enterprise。",
+            "2026-12-01 前更新 LiteLLM cost map 與預算（促銷價結束，價格翻倍）。"
+          ],
+          "sources": [
+            {
+              "id": "google-agentplatform-gemini4-argon"
+            },
+            {
+              "id": "google-agentplatform-gemini4-argon-guide"
+            },
+            {
+              "id": "google-agentplatform-pricing"
+            },
+            {
+              "id": "google-agentplatform-model-versions"
+            },
+            {
+              "id": "google-agentplatform-release-notes"
+            },
+            {
+              "id": "google-agentplatform-data-residency"
+            },
+            {
+              "id": "google-agentplatform-zdr"
+            },
+            {
+              "id": "google-agentplatform-abuse-monitoring"
+            }
+          ],
+          "verification": "official"
+        },
+        {
+          "id": "gemini-4-argon@gemini-api",
+          "cloud": "vendor-direct",
+          "service": "gemini-api",
+          "status": "ga",
+          "availableSince": "2026-10-13",
+          "providerModelId": "gemini-4-argon",
+          "inferenceTargets": [
+            {
+              "scope": "vendor-default",
+              "id": "gemini-4-argon",
+              "geography": "沒有區域選項；條款載明 Paid Services 的 logs 可能暫存或快取於 Google 或其代理商設有設施的任何國家"
+            }
+          ],
+          "endpoints": [
+            {
+              "endpoint": "generativelanguage.googleapis.com/v1beta（interactions、generateContent）",
+              "apis": [
+                "gemini-generate-content",
+                "batch"
+              ],
+              "notes": [
+                "官方範例以 Interactions API 為主；超過 64K 的輸出用 background: true 搭配 max_output_tokens > 65,536（background 沒設 max_output_tokens 時於 64K 停止）。",
+                "Client 端續接（不在伺服器保存 interaction）目前只在 GenerateContent API；Interactions API 的 client-side continuation 為 coming soon。",
+                "困難 prompt 可能要數分鐘：官方建議用 background execution，或把 HTTP client timeout 設到至少 15 分鐘。"
+              ]
+            }
+          ],
+          "apacAvailability": [],
+          "regionNotes": [
+            "Gemini API 沒有區域端點；Available regions 頁列有 Taiwan，代表可從台灣使用，不代表資料在台灣處理。"
+          ],
+          "dataProcessing": {
+            "processor": "Google（Gemini API Paid Services，依 Data Processing Addendum 擔任 processor）",
+            "residencyOptions": [
+              "無（未提供區域選擇）"
+            ],
+            "taiwanResidency": "no",
+            "zdr": "unknown",
+            "retentionNotes": [
+              "Paid Services：prompts 與 responses 不用於改進產品；為偵測 Prohibited Use Policy 違規會記錄一段有限期間，可能暫存或快取於 Google 或其代理商設有設施的任何國家。",
+              "Abuse monitoring 頁：prompts、contextual information 與 output 保留 55 天；被標記的內容可能由授權的 Google 員工審查。",
+              "Argon 不提供 Free tier，也不包含在 Google AI Pro 方案內。",
+              "Background execution 會在伺服器保存 interaction；不想被保存時，官方建議改用 GenerateContent 的 client-side continuation。"
+            ],
+            "sources": [
+              {
+                "id": "google-gemini-api-terms"
+              },
+              {
+                "id": "google-gemini-api-usage-policies"
+              },
+              {
+                "id": "google-gemini38-latest"
+              }
+            ]
+          },
+          "features": [
+            {
+              "feature": "streaming",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "google-gemini38-latest"
+                }
+              ]
+            },
+            {
+              "feature": "tool-calling",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "google-gemini4-argon-model"
+                }
+              ]
+            },
+            {
+              "feature": "structured-outputs",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "google-gemini4-argon-model"
+                }
+              ]
+            },
+            {
+              "feature": "vision",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "google-gemini4-argon-model"
+                }
+              ]
+            },
+            {
+              "feature": "pdf-input",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "google-gemini4-argon-model"
+                }
+              ]
+            },
+            {
+              "feature": "audio-input",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "google-gemini4-argon-model"
+                }
+              ]
+            },
+            {
+              "feature": "video-input",
+              "status": "supported",
+              "note": "Agentic video understanding 支援（預設 static）。",
+              "sources": [
+                {
+                  "id": "google-gemini4-argon-model"
+                }
+              ]
+            },
+            {
+              "feature": "prompt-caching",
+              "status": "partial",
+              "note": "只有 implicit caching：prompt 至少 4,096 tokens 時預設啟用，cache hit 折扣 95%（$0.10，即 input 價的 5%）；explicit caching 不支援。",
+              "sources": [
+                {
+                  "id": "google-gemini38-latest"
+                },
+                {
+                  "id": "google-gemini4-argon-model"
+                }
+              ]
+            },
+            {
+              "feature": "batch",
+              "status": "supported",
+              "note": "Batch 為標準價的一半。",
+              "sources": [
+                {
+                  "id": "google-gemini4-argon-model"
+                },
+                {
+                  "id": "google-gemini-api-pricing"
+                }
+              ]
+            },
+            {
+              "feature": "flex-tier",
+              "status": "supported",
+              "note": "與 Batch 同價。",
+              "sources": [
+                {
+                  "id": "google-gemini4-argon-model"
+                },
+                {
+                  "id": "google-gemini-api-pricing"
+                }
+              ]
+            },
+            {
+              "feature": "priority-tier",
+              "status": "supported",
+              "note": "標準價的 1.8 倍。",
+              "sources": [
+                {
+                  "id": "google-gemini4-argon-model"
+                },
+                {
+                  "id": "google-gemini-api-pricing"
+                }
+              ]
+            },
+            {
+              "feature": "reasoning-control",
+              "status": "supported",
+              "note": "thinking_level：low、medium（預設）、high。",
+              "sources": [
+                {
+                  "id": "google-gemini38-latest"
+                }
+              ]
+            },
+            {
+              "feature": "temperature",
+              "status": "not-supported",
+              "note": "temperature / top_p / top_k 送了會被忽略。",
+              "sources": [
+                {
+                  "id": "google-gemini38-latest"
+                }
+              ]
+            },
+            {
+              "feature": "computer-use",
+              "status": "partial",
+              "note": "Preview。",
+              "sources": [
+                {
+                  "id": "google-gemini4-argon-model"
+                }
+              ]
+            },
+            {
+              "feature": "server-side-tools",
+              "status": "supported",
+              "note": "Search grounding、Google Maps grounding、code execution、URL context、file search。",
+              "sources": [
+                {
+                  "id": "google-gemini4-argon-model"
+                }
+              ]
+            }
+          ],
+          "pricing": [
+            {
+              "scope": "standard",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 2.0,
+              "output": 10.0,
+              "cacheRead": 0.1,
+              "batchDiscountPct": 50,
+              "validFrom": "2026-10-13",
+              "validUntil": "2026-11-30",
+              "thereafter": {
+                "input": 4.0,
+                "output": 20.0,
+                "cacheRead": 0.2
+              },
+              "notes": [
+                "Output 含 thinking tokens；Free tier：Not available。",
+                "Batch 與 Flex：$1 / $5（cache $0.05），2026-12-01 起 $2 / $10（cache $0.10）。",
+                "Priority：$3.60 / $18（cache $0.18），2026-12-01 起 $7.20 / $36（cache $0.36）。",
+                "Grounding with Google Search / Google Maps：每月 5,000 次免費（Gemini 3 以後的模型合計），之後每 1,000 次 $14。"
+              ],
+              "sources": [
+                {
+                  "id": "google-gemini-api-pricing"
+                },
+                {
+                  "id": "google-gemini38-latest"
+                }
+              ],
+              "verification": "official"
+            }
+          ],
+          "quotas": [],
+          "lifecycle": {
+            "notes": [
+              "Gemini API models 頁列為 Stable（gemini-4-argon）；release notes 2026-10-13 GA。沒有公布退役日。"
+            ]
+          },
+          "litellmModel": "gemini/gemini-4-argon",
+          "onboardingNotes": [
+            "需要付費 API key（Free tier 與 Google AI Pro 不可用）。",
+            "已設定 max_output_tokens 的既有程式：官方建議至少 32,768；需要更長輸出時用 background execution。",
+            "移除 explicit caching（cachedContents / caches.create）與 temperature / top_p / top_k；多輪與 function calling 用 previous_interaction_id 把狀態留在伺服器。"
+          ],
+          "sources": [
+            {
+              "id": "google-gemini4-argon-model"
+            },
+            {
+              "id": "google-gemini38-latest"
+            },
+            {
+              "id": "google-gemini-api-pricing"
+            },
+            {
+              "id": "google-gemini-api-changelog"
+            },
+            {
+              "id": "google-gemini-api-models"
+            },
+            {
+              "id": "google-gemini-api-usage-policies"
+            },
+            {
+              "id": "google-gemini-api-terms"
+            },
+            {
+              "id": "google-gemini4-argon-dev-blog"
+            }
+          ],
+          "verification": "official"
+        }
+      ],
+      "benchmarks": [
+        {
+          "name": "Artificial Analysis Intelligence Index",
+          "version": "v4.3.2",
+          "variant": "high",
+          "score": 53,
+          "unit": "index",
+          "rank": "#8 / 216",
+          "measuredBy": "independent",
+          "date": "2026-10-15",
+          "notes": "AA 模型頁 2026-10-15 讀取；名次與分母取自頁面的 Model summary。",
+          "sources": [
+            {
+              "id": "aa-gemini4-argon"
+            }
+          ]
+        },
+        {
+          "name": "DeepSWE v1.1",
+          "score": 77.9,
+          "unit": "percent",
+          "measuredBy": "vendor",
+          "date": "2026-10-13",
+          "sources": [
+            {
+              "id": "deepmind-gemini4-argon-modelcard"
+            }
+          ]
+        },
+        {
+          "name": "Vals Index",
+          "score": 68.9,
+          "unit": "percent",
+          "measuredBy": "vendor",
+          "date": "2026-10-13",
+          "notes": "模型卡同表：GPT-6 Astra 63.1%、Claude Fable 5.1 65.8%、Claude Opus 5.5 67.0%。",
+          "sources": [
+            {
+              "id": "deepmind-gemini4-argon-modelcard"
+            }
+          ]
+        },
+        {
+          "name": "AutomationBench",
+          "score": 51.3,
+          "unit": "percent",
+          "measuredBy": "vendor",
+          "date": "2026-10-13",
+          "sources": [
+            {
+              "id": "deepmind-gemini4-argon-modelcard"
+            }
+          ]
+        },
+        {
+          "name": "Vals Finance Agent v2",
+          "score": 65.4,
+          "unit": "percent",
+          "measuredBy": "vendor",
+          "date": "2026-10-13",
+          "sources": [
+            {
+              "id": "deepmind-gemini4-argon-modelcard"
+            }
+          ]
+        },
+        {
+          "name": "Terminal-Bench 4.0",
+          "score": 57.4,
+          "unit": "percent",
+          "measuredBy": "vendor",
+          "date": "2026-10-13",
+          "notes": "模型卡同表 Claude Opus 5.5 為 66.4%。",
+          "sources": [
+            {
+              "id": "deepmind-gemini4-argon-modelcard"
+            }
+          ]
+        },
+        {
+          "name": "GraphWalks",
+          "variant": "256k to 1M, BFS (F1)",
+          "score": 84.2,
+          "unit": "percent",
+          "measuredBy": "vendor",
+          "date": "2026-10-13",
+          "sources": [
+            {
+              "id": "deepmind-gemini4-argon-modelcard"
+            }
+          ]
+        },
+        {
+          "name": "LVBench",
+          "score": 91.7,
+          "unit": "percent",
+          "measuredBy": "vendor",
+          "date": "2026-10-13",
+          "sources": [
+            {
+              "id": "deepmind-gemini4-argon-modelcard"
+            }
+          ]
+        },
+        {
+          "name": "CWE-bench v1",
+          "score": 68.0,
+          "unit": "percent",
+          "measuredBy": "vendor",
+          "date": "2026-10-13",
+          "sources": [
+            {
+              "id": "deepmind-gemini4-argon-modelcard"
+            }
+          ]
+        }
+      ],
+      "performanceReference": [
+        {
+          "provider": "Google（Artificial Analysis）",
+          "variant": "high",
+          "costPerIndexTaskUsd": 1.99,
+          "indexOutputTokensMillions": 110,
+          "date": "2026-10-15",
+          "notes": "AA 模型頁 2026-10-15 讀取（v4.3.2）：Speed 為 N/A，leaderboard 的 tokens/s 與延遲欄也是空白。",
+          "sources": [
+            {
+              "id": "aa-gemini4-argon"
+            },
+            {
+              "id": "aa-leaderboard-models"
+            }
+          ]
+        }
+      ],
+      "litellm": {
+        "providerStrings": [
+          {
+            "service": "gemini-api",
+            "model": "gemini/gemini-4-argon"
+          },
+          {
+            "service": "agent-platform",
+            "model": "vertex_ai/gemini-4-argon",
+            "note": "vertex_location: global（或 us / eu）"
+          }
+        ],
+        "minVersionRouting": "v1.76.0（Reload Price Data 或 POST /reload/model_cost_map）",
+        "recommendedVersion": "v1.104.2（本平台目前建議版本，見 LiteLLM 頁；內建 cost map 尚無 Argon，需 Reload Price Data）",
+        "caveats": [
+          "內建 cost map：v1.105.0、v1.105.1、v1.106.0-rc.1 / rc.2 的 release notes 都沒有 gemini-4-argon；main 分支的 cost map 已有 gemini/ 與 vertex_ai/gemini-4-argon（input $2、output $10、cache read $0.10；gemini/ 的 max_output_tokens 為 65,536、vertex_ai/ 為 1,048,576），要靠 remote cost map reload。",
+          "LiteLLM 會把 reasoning_effort 轉成 thinking_level；不要送 minimal / none，也不要送 thinking_budget（Argon 回 400）。",
+          "LiteLLM 部落格寫每個請求最多 65,536 output tokens；long decode 的 continuation_token / background execution 經 gateway 是否可用沒有文件說明——需要超過 64K 輸出的工作先直連 Gen AI SDK 驗證。",
+          "frequency_penalty / presence_penalty / candidate_count 會回 400、temperature / top_p / top_k 會被忽略：在 deployment 開 drop_params 或由 gateway 移除。",
+          "cost map 的 $2 / $10 是促銷價：2026-12-01 前要更新或 reload，否則成本低估一半；vertex_ai/ 只有一組價格，us / eu 端點貴 10% 的部分不會反映。"
+        ],
+        "configSnippet": "- model_name: gemini-4-argon\n  litellm_params:\n    model: vertex_ai/gemini-4-argon\n    vertex_project: os.environ/VERTEX_PROJECT\n    vertex_location: global\n  model_info:\n    catalog_id: gemini-4-argon\n    data_residency: global\n",
+        "status": "researched",
+        "sources": [
+          {
+            "id": "litellm-gemini4-argon"
+          },
+          {
+            "id": "litellm-cost-map-main"
+          },
+          {
+            "id": "litellm-v1-105-0"
+          },
+          {
+            "id": "litellm-v1-105-1"
+          },
+          {
+            "id": "litellm-v1-106-0-rc1"
+          },
+          {
+            "id": "litellm-v1-106-0-rc2"
+          }
+        ]
+      },
+      "tags": [
+        "frontier",
+        "reasoning",
+        "long-output",
+        "multimodal",
+        "1m-context",
+        "promo-pricing"
+      ],
+      "sources": [
+        {
+          "id": "google-gemini4-argon-model"
+        },
+        {
+          "id": "google-gemini38-latest"
+        },
+        {
+          "id": "google-gemini-api-changelog"
+        },
+        {
+          "id": "google-gemini-api-models"
+        },
+        {
+          "id": "google-gemini-api-pricing"
+        },
+        {
+          "id": "google-agentplatform-gemini4-argon"
+        },
+        {
+          "id": "google-agentplatform-gemini4-argon-guide"
+        },
+        {
+          "id": "google-agentplatform-release-notes"
+        },
+        {
+          "id": "google-agentplatform-model-versions"
+        },
+        {
+          "id": "google-agentplatform-pricing"
+        },
+        {
+          "id": "deepmind-gemini4-argon-modelcard"
+        },
+        {
+          "id": "google-gemini4-argon-blog"
+        },
+        {
+          "id": "google-gemini4-argon-ga-blog"
+        },
+        {
+          "id": "aa-gemini4-argon"
+        },
+        {
+          "id": "litellm-gemini4-argon"
+        }
+      ],
+      "lastVerified": "2026-10-15"
+    },
+    {
       "id": "gemini-3-8-flash",
       "name": "Gemini 3.8 Flash",
       "vendor": "google",
@@ -6717,51 +9189,1102 @@
         }
       ],
       "lastVerified": "2026-10-10"
+    },
+    {
+      "id": "grok-4-7",
+      "name": "Grok 4.7",
+      "vendor": "xai",
+      "family": "Grok",
+      "tier": "frontier",
+      "releaseDate": "2026-09-21",
+      "platformStatus": "evaluating",
+      "predecessorId": "grok-4-6",
+      "modalities": {
+        "input": [
+          "text",
+          "image"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "contextWindow": 500000,
+      "maxOutputTokens": 500000,
+      "knowledgeCutoff": "2026-05",
+      "reasoning": {
+        "supported": true,
+        "effortLevels": [
+          "low",
+          "medium",
+          "high",
+          "xhigh"
+        ],
+        "defaultEffort": "high",
+        "parameter": "reasoning_effort（Chat Completions）/ reasoning.effort（Responses）",
+        "notes": [
+          "Reasoning 無法關閉：xAI reasoning 文件寫「If not specified, reasoning_effort defaults to \"high\". Reasoning cannot be disabled.」，Bedrock 模型卡寫「Reasoning is always active by default」（2026-10-15 讀取）。",
+          "Foundry 文件：Responses API 的 reasoning.effort 只列 low / medium / high；xhigh 只見於 Chat Completions 的 reasoning_effort。",
+          "xAI API 的 Responses 一律回傳 reasoning.encrypted_content。",
+          "maxOutputTokens 取 Foundry 能力表的 500,000（輸入 + 輸出合計 500,000）；xAI release notes 寫 no text output limit，Bedrock 模型卡沒有列。"
+        ],
+        "alwaysOn": true
+      },
+      "vendorModelId": "grok-4.7",
+      "modelCardUrl": "https://docs.x.ai/developers/models/grok-4.7",
+      "summary": "SpaceXAI（前稱 xAI）2026-09-21 發表的旗艦模型，官方稱比 Grok 4.6 更會檢查自己的工作、處理長 context；500K context、文字 + 影像輸入，reasoning effort low / medium / high（預設）/ xhigh。Bedrock（2026-09-28）與 Foundry（2026-10-06）GA，Agent Platform 為 Preview（2026-09-30）。三雲標準價都是 $2 / $6（cache $0.50），xAI、Foundry、Agent Platform 在輸入超過 200K 時全部翻倍。AA v4.3.2 46 分（xhigh，#30 / 216），每任務 $3.74，輸出非常冗長（240M tokens）。台北區在 Bedrock 只能走 Global CRIS，三雲都沒有台灣境內處理。",
+      "strengths": [
+        "價格低：$2 / $6、cache $0.50（≤200K 輸入），input 為 Fable 5.1 的五分之一、output 約八分之一；Bedrock 另有 Priority（1.75 倍）與 Flex（0.5 倍）。",
+        "SpaceXAI 自報：DeepSWE v1.1 71.0%（high）、CursorBench 4.0 46.3%（xHigh）、EEBench 64.0%、Harvey Legal Agent Benchmark 19.6%、Terminal-Bench 4.0 37.6%（Grok 4.6 為 20.3%）。",
+        "三雲都有：Bedrock 與 Foundry GA；Bedrock 台北區可用 Global CRIS，Foundry Global Standard 含 japaneast、japanwest、koreacentral、australiaeast、southindia。",
+        "Bedrock 同時支援 Responses、Chat Completions、Converse、Invoke，以及 structured outputs、implicit prompt caching、Guardrails。",
+        "SpaceXAI 稱 safeguard stack 全新，HackerBench v0.3 只讓 3.3% 的高風險 dual-use prompt 通過，同時少擋正當資安工作（廠商自報）。"
+      ],
+      "weaknesses": [
+        "輸入超過 200K tokens 時所有 token 兩倍價（$4 / $12、cache $1；Foundry US DataZone $4.40 / $13.20）；Bedrock 模型卡沒有列長文價，是否加價未確認。",
+        "AA v4.3.2 46 分（#30 / 216），明顯低於 Opus 5.5、Fable 5.1 與 Gemini 4 Argon；xhigh 評測輸出 240M tokens（冗長度 #111 / 114），每任務 $3.74，首 token 約 98 秒。",
+        "Bedrock 沒有 In-Region、Geo 只有 us.；不支援 server-side tool use、count tokens 與 Reserved。",
+        "Agent Platform 只是 Preview：只支援 Fixed quota（QPM 13、input TPM 188,000、output TPM 16,000），不支援 Standard pay-as-you-go、Provisioned Throughput 與 Batch。",
+        "Foundry 能力表的語言只列 en，中文品質需內部驗證。"
+      ],
+      "bestFor": [
+        "成本敏感、但需要 frontier 級程式能力的代理任務",
+        "需要三雲同時可用、以 OpenAI 相容 API（Chat Completions / Responses）整合的應用",
+        "工程類（官方主打電機工程、CAD）與文件 / 簡報產出等知識工作"
+      ],
+      "avoidFor": [
+        "需要最高推理品質的工作（AA 分數落後 Opus 5.5、Fable 5.1、Gemini 4 Argon）",
+        "輸入常超過 200K tokens 的長文件工作（全部 token 兩倍價）",
+        "以繁體中文為主的場景（未經內部驗證前）",
+        "需要台灣境內處理或日本 Geo 的資料"
+      ],
+      "safety": {
+        "classifications": [
+          "SpaceXAI 自述：全新 safeguard stack；LatchBio biosafety benchmark 62.4%、HackerBench v0.3 只讓 3.3% 的高風險 dual-use prompt 通過（廠商自報，沒有獨立驗證）。"
+        ],
+        "behaviours": [
+          "xAI API：Responses API 一律回傳 reasoning.encrypted_content；grok-4.20 以後的模型會靜默忽略 logprobs / top_logprobs。",
+          "xAI API 2026-09-25 起接受 safety_identifier 欄位，可把違規歸因到終端使用者，而不是 API key。"
+        ],
+        "programmes": [
+          "SpaceXAI 開始邀請部分資安夥伴使用 Grok 4.7 的 red-team 能力做防禦研究（invite-only）。"
+        ],
+        "sources": [
+          {
+            "id": "xai-grok47-announce"
+          },
+          {
+            "id": "xai-models"
+          },
+          {
+            "id": "xai-release-notes"
+          }
+        ]
+      },
+      "offerings": [
+        {
+          "id": "grok-4-7@bedrock",
+          "cloud": "aws",
+          "service": "bedrock",
+          "status": "ga",
+          "availableSince": "2026-09-28",
+          "providerModelId": "xai.grok-4.7",
+          "inferenceTargets": [
+            {
+              "scope": "global",
+              "id": "global.xai.grok-4.7",
+              "geography": "全球動態路由（無駐留保證）"
+            },
+            {
+              "scope": "geo",
+              "id": "us.xai.grok-4.7",
+              "geography": "US（來源區 us-east-1/2、us-west-1/2、ca-central-1、ca-west-1）"
+            }
+          ],
+          "endpoints": [
+            {
+              "endpoint": "bedrock-runtime（/openai/v1）",
+              "apis": [
+                "openai-responses",
+                "openai-chat-completions",
+                "bedrock-converse",
+                "bedrock-invoke"
+              ],
+              "notes": [
+                "bedrock-mantle 不支援；In-Region 不支援，model 必須填 us.xai.grok-4.7 或 global.xai.grok-4.7。",
+                "Application inference profiles 只支援 Invoke 與 Converse（Responses / Chat Completions 不支援）；Projects 只支援 default project。"
+              ]
+            }
+          ],
+          "apacAvailability": [
+            {
+              "region": "ap-east-2",
+              "label": "Taipei",
+              "scopes": [
+                "global"
+              ],
+              "note": "台北區只能用 Global CRIS"
+            },
+            {
+              "region": "ap-northeast-1",
+              "label": "Tokyo",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-northeast-2",
+              "label": "Seoul",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-northeast-3",
+              "label": "Osaka",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-south-1",
+              "label": "Mumbai",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-south-2",
+              "label": "Hyderabad",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-southeast-1",
+              "label": "Singapore",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-southeast-2",
+              "label": "Sydney",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-southeast-3",
+              "label": "Jakarta",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-southeast-4",
+              "label": "Melbourne",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-southeast-5",
+              "label": "Malaysia",
+              "scopes": [
+                "global"
+              ]
+            },
+            {
+              "region": "ap-southeast-7",
+              "label": "Thailand",
+              "scopes": [
+                "global"
+              ]
+            }
+          ],
+          "regionNotes": [
+            "只有 Geo（US）與 Global CRIS；APAC 12 個區域（含台北，不含紐西蘭 ap-southeast-6）都只有 Global。"
+          ],
+          "dataProcessing": {
+            "processor": "AWS Bedrock（SpaceXAI 模型）",
+            "residencyOptions": [
+              "US geo",
+              "Global（無駐留保證）"
+            ],
+            "taiwanResidency": "no",
+            "zdr": "unknown",
+            "retentionNotes": [
+              "Bedrock 採 zero operator access（ZOA）資料安全模型；abuse detection 頁的模型專屬保留規定只列 OpenAI 與 Claude Fable，沒有 Grok——是否另有保留規定請向 AWS 確認。",
+              "Invocation logs 由客戶自行開關（模型卡列為支援功能）。"
+            ],
+            "sources": [
+              {
+                "id": "aws-bedrock-abuse-detection"
+              },
+              {
+                "id": "aws-bedrock-grok47-card"
+              }
+            ]
+          },
+          "features": [
+            {
+              "feature": "streaming",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "aws-bedrock-grok47-card"
+                }
+              ]
+            },
+            {
+              "feature": "vision",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "aws-bedrock-grok47-card"
+                }
+              ]
+            },
+            {
+              "feature": "structured-outputs",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "aws-bedrock-grok47-card"
+                }
+              ]
+            },
+            {
+              "feature": "prompt-caching",
+              "status": "supported",
+              "note": "Implicit prompt caching。",
+              "sources": [
+                {
+                  "id": "aws-bedrock-grok47-card"
+                }
+              ]
+            },
+            {
+              "feature": "reasoning-control",
+              "status": "supported",
+              "note": "low / medium / high / xhigh。",
+              "sources": [
+                {
+                  "id": "aws-bedrock-grok47-card"
+                }
+              ]
+            },
+            {
+              "feature": "guardrails",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "aws-bedrock-grok47-card"
+                }
+              ]
+            },
+            {
+              "feature": "server-side-tools",
+              "status": "not-supported",
+              "sources": [
+                {
+                  "id": "aws-bedrock-grok47-card"
+                }
+              ]
+            },
+            {
+              "feature": "count-tokens",
+              "status": "not-supported",
+              "sources": [
+                {
+                  "id": "aws-bedrock-grok47-card"
+                }
+              ]
+            },
+            {
+              "feature": "priority-tier",
+              "status": "supported",
+              "note": "Standard 的 1.75 倍。",
+              "sources": [
+                {
+                  "id": "aws-bedrock-grok47-card"
+                }
+              ]
+            },
+            {
+              "feature": "flex-tier",
+              "status": "supported",
+              "note": "Standard 的 0.5 倍。",
+              "sources": [
+                {
+                  "id": "aws-bedrock-grok47-card"
+                }
+              ]
+            },
+            {
+              "feature": "provisioned-throughput",
+              "status": "not-supported",
+              "note": "Reserved 不支援。",
+              "sources": [
+                {
+                  "id": "aws-bedrock-grok47-card"
+                }
+              ]
+            }
+          ],
+          "pricing": [
+            {
+              "scope": "global",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 2.0,
+              "output": 6.0,
+              "cacheRead": 0.5,
+              "notes": [
+                "模型卡 Pricing 表（Standard tier）；Priority 為 1.75 倍、Flex 為 0.5 倍。",
+                "模型卡沒有列 >200K 長文價。"
+              ],
+              "sources": [
+                {
+                  "id": "aws-bedrock-grok47-card"
+                }
+              ],
+              "verification": "official"
+            },
+            {
+              "scope": "geo",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 2.2,
+              "output": 6.6,
+              "cacheRead": 0.55,
+              "notes": [
+                "Geo CRIS（us.）。"
+              ],
+              "sources": [
+                {
+                  "id": "aws-bedrock-grok47-card"
+                }
+              ],
+              "verification": "official"
+            }
+          ],
+          "quotas": [
+            {
+              "scope": "account default",
+              "note": "依帳號與區域預設配額；上線前在 Service Quotas 申請 us. / global. profile 的配額。",
+              "sources": [
+                {
+                  "id": "aws-bedrock-grok47-card"
+                }
+              ],
+              "verification": "official"
+            }
+          ],
+          "lifecycle": {
+            "eolNoSoonerThan": "2027-09-28",
+            "legacyPeriod": "至少 6 個月",
+            "notes": [
+              "模型卡：Model lifecycle Active；Model EOL date N/A。"
+            ]
+          },
+          "litellmModel": "bedrock/global.xai.grok-4.7",
+          "onboardingNotes": [
+            "OpenAI SDK 的 base URL 設 https://bedrock-runtime.<region>.amazonaws.com/openai/v1，model 填 us.xai.grok-4.7 或 global.xai.grok-4.7。",
+            "台北區（ap-east-2）用 global.xai.grok-4.7。"
+          ],
+          "sources": [
+            {
+              "id": "aws-bedrock-grok47-card"
+            },
+            {
+              "id": "aws-grok47-whatsnew"
+            },
+            {
+              "id": "aws-bedrock-abuse-detection"
+            }
+          ],
+          "verification": "official"
+        },
+        {
+          "id": "grok-4-7@foundry",
+          "cloud": "azure",
+          "service": "foundry",
+          "status": "ga",
+          "availableSince": "2026-10-06",
+          "providerModelId": "grok-4.7",
+          "inferenceTargets": [
+            {
+              "scope": "global",
+              "id": "Global Standard",
+              "geography": "任意區域處理"
+            },
+            {
+              "scope": "data-zone",
+              "id": "Data Zone Standard (US)",
+              "geography": "美國"
+            }
+          ],
+          "endpoints": [
+            {
+              "endpoint": "https://<resource-name>.services.ai.azure.com/openai/v1",
+              "apis": [
+                "openai-chat-completions",
+                "openai-responses"
+              ],
+              "notes": [
+                "model 填部署名稱；以 Microsoft Entra ID 或 API key 驗證。",
+                "reasoning_effort（Chat Completions）low / medium / high / xhigh，預設 high；Responses 的 reasoning.effort 文件只列 low / medium / high。",
+                "max_completion_tokens / max_output_tokens 的上限都包含 reasoning tokens。"
+              ]
+            }
+          ],
+          "apacAvailability": [
+            {
+              "region": "japaneast",
+              "label": "Japan East",
+              "scopes": [
+                "global"
+              ],
+              "note": "Global Standard"
+            },
+            {
+              "region": "japanwest",
+              "label": "Japan West",
+              "scopes": [
+                "global"
+              ],
+              "note": "Global Standard"
+            },
+            {
+              "region": "koreacentral",
+              "label": "Korea Central",
+              "scopes": [
+                "global"
+              ],
+              "note": "Global Standard"
+            },
+            {
+              "region": "australiaeast",
+              "label": "Australia East",
+              "scopes": [
+                "global"
+              ],
+              "note": "Global Standard"
+            },
+            {
+              "region": "southindia",
+              "label": "South India",
+              "scopes": [
+                "global"
+              ],
+              "note": "Global Standard"
+            }
+          ],
+          "regionNotes": [
+            "Global Standard：美洲 12 區、歐洲 12 區、亞太 5 區、中東與非洲 2 區；Data Zone Standard 只有美國 9 區。"
+          ],
+          "dataProcessing": {
+            "processor": "Microsoft（Foundry Models sold by Azure）",
+            "residencyOptions": [
+              "Global Standard",
+              "US Data Zone"
+            ],
+            "taiwanResidency": "no",
+            "zdr": "unknown",
+            "retentionNotes": [
+              "Data Zone 部署只在指定資料區（US）內處理 prompts 與 responses；Global Standard 可在任何區域處理。",
+              "本次沒有查到 Grok 專屬的資料保留或 abuse monitoring 說明，請依 Azure 直售模型的條款確認。"
+            ],
+            "sources": [
+              {
+                "id": "ms-foundry-region-availability"
+              },
+              {
+                "id": "ms-foundry-models-sold-by-azure"
+              }
+            ]
+          },
+          "features": [
+            {
+              "feature": "streaming",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "ms-foundry-grok-howto"
+                },
+                {
+                  "id": "ms-techcommunity-grok47-foundry"
+                }
+              ]
+            },
+            {
+              "feature": "tool-calling",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "ms-foundry-models-sold-by-azure"
+                },
+                {
+                  "id": "ms-foundry-grok-howto"
+                }
+              ]
+            },
+            {
+              "feature": "structured-outputs",
+              "status": "supported",
+              "note": "Response formats：text、JSON。",
+              "sources": [
+                {
+                  "id": "ms-foundry-models-sold-by-azure"
+                }
+              ]
+            },
+            {
+              "feature": "vision",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "ms-foundry-models-sold-by-azure"
+                }
+              ]
+            },
+            {
+              "feature": "reasoning-control",
+              "status": "supported",
+              "note": "Chat Completions low～xhigh；Responses low～high。",
+              "sources": [
+                {
+                  "id": "ms-foundry-grok-howto"
+                }
+              ]
+            }
+          ],
+          "pricing": [
+            {
+              "scope": "global",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 2.0,
+              "output": 6.0,
+              "cacheRead": 0.5,
+              "longContext": {
+                "thresholdInputTokens": 200000,
+                "input": 4.0,
+                "output": 12.0,
+                "cacheRead": 1.0
+              },
+              "notes": [
+                "Microsoft Tech Community 公告（2026-10-06）價格表：Global Standard。"
+              ],
+              "sources": [
+                {
+                  "id": "ms-techcommunity-grok47-foundry"
+                }
+              ],
+              "verification": "official"
+            },
+            {
+              "scope": "data-zone-us",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 2.2,
+              "output": 6.6,
+              "cacheRead": 0.55,
+              "longContext": {
+                "thresholdInputTokens": 200000,
+                "input": 4.4,
+                "output": 13.2,
+                "cacheRead": 1.1
+              },
+              "notes": [
+                "US DataZone 比 Global 高 10%。"
+              ],
+              "sources": [
+                {
+                  "id": "ms-techcommunity-grok47-foundry"
+                }
+              ],
+              "verification": "official"
+            }
+          ],
+          "quotas": [],
+          "lifecycle": {
+            "notes": [
+              "Foundry：GA 的 SpaceXAI Grok 模型自 Grok 4.7 起至少提供 6 個月；退役表（2026-10-15 讀取）尚未列 grok-4.7。"
+            ]
+          },
+          "litellmModel": "azure_ai/grok-4.7",
+          "onboardingNotes": [
+            "部署：az cognitiveservices account deployment create --model-name grok-4.7 --model-format xAI --model-version 1，SKU 依部署類型。",
+            "部署需要 Foundry 資源上的 Cognitive Services Contributor 角色。"
+          ],
+          "sources": [
+            {
+              "id": "ms-foundry-models-sold-by-azure"
+            },
+            {
+              "id": "ms-foundry-grok-howto"
+            },
+            {
+              "id": "ms-foundry-region-availability"
+            },
+            {
+              "id": "ms-techcommunity-grok47-foundry"
+            },
+            {
+              "id": "ms-foundry-retirement-schedule"
+            }
+          ],
+          "verification": "official"
+        },
+        {
+          "id": "grok-4-7@agent-platform",
+          "cloud": "gcp",
+          "service": "agent-platform",
+          "status": "preview",
+          "availableSince": "2026-09-30",
+          "providerModelId": "grok-4.7",
+          "inferenceTargets": [
+            {
+              "scope": "global",
+              "id": "global",
+              "geography": "global endpoint"
+            },
+            {
+              "scope": "multi-region",
+              "id": "us",
+              "geography": "United States multi-region（ML processing 在美國）"
+            }
+          ],
+          "endpoints": [
+            {
+              "endpoint": "Agent Platform Model Garden（OpenAI 相容 chat completions）",
+              "apis": [
+                "openai-chat-completions"
+              ],
+              "notes": [
+                "LiteLLM 文件：Model Garden 的 xAI 模型走 OpenAI 相容 chat-completions 路徑，前綴 vertex_ai/xai/。"
+              ]
+            }
+          ],
+          "apacAvailability": [
+            {
+              "region": "global",
+              "label": "Global endpoint",
+              "scopes": [
+                "global"
+              ],
+              "note": "沒有亞太區域；ML processing 只列 United States multi-region"
+            }
+          ],
+          "regionNotes": [
+            "Preview，適用 Pre-GA Offerings Terms（as is、支援有限）。"
+          ],
+          "dataProcessing": {
+            "processor": "Google Cloud（xAI 提供模型）",
+            "residencyOptions": [
+              "Global",
+              "US multi-region"
+            ],
+            "taiwanResidency": "no",
+            "zdr": "unknown",
+            "retentionNotes": [
+              "本次沒有查到 Grok 在 Agent Platform 的專屬資料保留說明。"
+            ],
+            "sources": [
+              {
+                "id": "google-agentplatform-grok47"
+              }
+            ]
+          },
+          "features": [
+            {
+              "feature": "vision",
+              "status": "supported",
+              "sources": [
+                {
+                  "id": "google-agentplatform-grok47"
+                }
+              ]
+            },
+            {
+              "feature": "tool-calling",
+              "status": "partial",
+              "note": "Preview。",
+              "sources": [
+                {
+                  "id": "google-agentplatform-grok47"
+                }
+              ]
+            },
+            {
+              "feature": "structured-outputs",
+              "status": "partial",
+              "note": "Preview。",
+              "sources": [
+                {
+                  "id": "google-agentplatform-grok47"
+                }
+              ]
+            },
+            {
+              "feature": "reasoning-control",
+              "status": "partial",
+              "note": "Preview。",
+              "sources": [
+                {
+                  "id": "google-agentplatform-grok47"
+                }
+              ]
+            },
+            {
+              "feature": "batch",
+              "status": "not-supported",
+              "sources": [
+                {
+                  "id": "google-agentplatform-grok47"
+                }
+              ]
+            },
+            {
+              "feature": "provisioned-throughput",
+              "status": "not-supported",
+              "sources": [
+                {
+                  "id": "google-agentplatform-grok47"
+                }
+              ]
+            }
+          ],
+          "pricing": [
+            {
+              "scope": "standard",
+              "currency": "USD",
+              "unit": "per_1m_tokens",
+              "input": 2.0,
+              "output": 6.0,
+              "cacheRead": 0.5,
+              "longContext": {
+                "thresholdInputTokens": 200000,
+                "input": 4.0,
+                "output": 12.0,
+                "cacheRead": 1.0
+              },
+              "notes": [
+                "定價頁 xAI Grok 表（≤200K / >200K 輸入兩欄）。",
+                "模型頁的 Usage types 只支援 Fixed quota，Standard pay-as-you-go 與 Provisioned Throughput 不支援。"
+              ],
+              "sources": [
+                {
+                  "id": "google-agentplatform-pricing"
+                }
+              ],
+              "verification": "official"
+            }
+          ],
+          "quotas": [
+            {
+              "scope": "multi-region（us）",
+              "rpm": 13,
+              "inputTpm": 188000,
+              "outputTpm": 16000,
+              "note": "QPM 13；context length 524,288。",
+              "sources": [
+                {
+                  "id": "google-agentplatform-grok47"
+                }
+              ],
+              "verification": "official"
+            },
+            {
+              "scope": "global endpoint",
+              "rpm": 13,
+              "inputTpm": 188000,
+              "outputTpm": 16000,
+              "note": "QPM 13；context length 524,288。",
+              "sources": [
+                {
+                  "id": "google-agentplatform-grok47"
+                }
+              ],
+              "verification": "official"
+            }
+          ],
+          "lifecycle": {
+            "notes": [
+              "模型頁：Launch stage Preview，Release date 2026-09-30。"
+            ]
+          },
+          "litellmModel": "vertex_ai/xai/grok-4.7",
+          "onboardingNotes": [
+            "Preview 且配額很小（QPM 13），只建議 PoC；正式環境用 Bedrock 或 Foundry。"
+          ],
+          "sources": [
+            {
+              "id": "google-agentplatform-grok47"
+            },
+            {
+              "id": "google-agentplatform-pricing"
+            },
+            {
+              "id": "litellm-vertex-partner"
+            }
+          ],
+          "verification": "official"
+        }
+      ],
+      "benchmarks": [
+        {
+          "name": "Artificial Analysis Intelligence Index",
+          "version": "v4.3.2",
+          "variant": "xhigh",
+          "score": 46,
+          "unit": "index",
+          "rank": "#30 / 216",
+          "measuredBy": "independent",
+          "date": "2026-10-15",
+          "notes": "AA 模型頁 2026-10-15 讀取；名次與分母取自頁面的 Model summary。",
+          "sources": [
+            {
+              "id": "aa-grok47"
+            }
+          ]
+        },
+        {
+          "name": "Artificial Analysis Intelligence Index",
+          "version": "v4.3.2",
+          "variant": "high",
+          "score": 46,
+          "unit": "index",
+          "measuredBy": "independent",
+          "date": "2026-10-15",
+          "notes": "AA leaderboard 頁（low 為 42）。",
+          "sources": [
+            {
+              "id": "aa-leaderboard-models"
+            }
+          ]
+        },
+        {
+          "name": "CursorBench 4.0",
+          "variant": "xHigh",
+          "score": 46.3,
+          "unit": "percent",
+          "measuredBy": "vendor",
+          "date": "2026-09-21",
+          "sources": [
+            {
+              "id": "xai-grok47-announce"
+            }
+          ]
+        },
+        {
+          "name": "DeepSWE v1.1",
+          "variant": "high effort",
+          "score": 71.0,
+          "unit": "percent",
+          "measuredBy": "vendor",
+          "date": "2026-09-21",
+          "sources": [
+            {
+              "id": "xai-grok47-announce"
+            },
+            {
+              "id": "ms-techcommunity-grok47-foundry"
+            }
+          ]
+        },
+        {
+          "name": "EEBench",
+          "score": 64.0,
+          "unit": "percent",
+          "measuredBy": "vendor",
+          "date": "2026-09-21",
+          "sources": [
+            {
+              "id": "xai-grok47-announce"
+            }
+          ]
+        },
+        {
+          "name": "Terminal-Bench 4.0",
+          "score": 37.6,
+          "unit": "percent",
+          "measuredBy": "vendor",
+          "date": "2026-09-21",
+          "notes": "Grok 4.6 為 20.3%。",
+          "sources": [
+            {
+              "id": "xai-grok47-announce"
+            }
+          ]
+        },
+        {
+          "name": "Harvey Legal Agent Benchmark",
+          "score": 19.6,
+          "unit": "percent",
+          "measuredBy": "vendor",
+          "date": "2026-09-21",
+          "sources": [
+            {
+              "id": "xai-grok47-announce"
+            },
+            {
+              "id": "ms-techcommunity-grok47-foundry"
+            }
+          ]
+        },
+        {
+          "name": "HealthBench Professional",
+          "score": 56.7,
+          "unit": "percent",
+          "measuredBy": "vendor",
+          "date": "2026-09-21",
+          "sources": [
+            {
+              "id": "xai-grok47-announce"
+            }
+          ]
+        }
+      ],
+      "performanceReference": [
+        {
+          "provider": "SpaceXAI API（Artificial Analysis）",
+          "variant": "xhigh",
+          "outputTokensPerSec": 75.4,
+          "ttftSec": 98.27,
+          "costPerIndexTaskUsd": 3.74,
+          "indexOutputTokensMillions": 240,
+          "date": "2026-10-15",
+          "notes": "AA 模型頁 2026-10-15 讀取（v4.3.2）；TTFT 依 AA 定義，推理模型含 thinking 時間。",
+          "sources": [
+            {
+              "id": "aa-grok47"
+            }
+          ]
+        },
+        {
+          "provider": "SpaceXAI API（Artificial Analysis leaderboard）",
+          "variant": "high",
+          "outputTokensPerSec": 77,
+          "ttftSec": 55.62,
+          "costPerIndexTaskUsd": 2.73,
+          "date": "2026-10-15",
+          "notes": "取自 leaderboard 的 Median Tokens/s 與 Latency First Chunk 欄；同頁 xhigh 列為 86 tok/s、100.97 秒，與模型頁不同。",
+          "sources": [
+            {
+              "id": "aa-leaderboard-models"
+            }
+          ]
+        }
+      ],
+      "litellm": {
+        "providerStrings": [
+          {
+            "service": "bedrock",
+            "model": "bedrock/global.xai.grok-4.7",
+            "note": "美國境內：bedrock/us.xai.grok-4.7；寫法比照 LiteLLM Bedrock 文件的 Grok 4.6（Converse），原生 Chat Completions 用 bedrock/chat_completions/ 前綴"
+          },
+          {
+            "service": "foundry",
+            "model": "azure_ai/grok-4.7",
+            "note": "內建 cost map 自 v1.106.0-rc.1 起（PR #44937）"
+          },
+          {
+            "service": "agent-platform",
+            "model": "vertex_ai/xai/grok-4.7",
+            "note": "Preview"
+          }
+        ],
+        "minVersionRouting": "v1.76.0（Reload Price Data）",
+        "minVersionBundledCostMap": "v1.105.0（Bedrock global. / us.、Vertex AI、xai/；azure_ai/grok-4.7 要 v1.106.0-rc.1）",
+        "recommendedVersion": "v1.104.2（本平台目前建議版本；1.104 線的內建 cost map 沒有 Grok 4.7，需 Reload Price Data）",
+        "caveats": [
+          "v1.105.0 的內建 cost map 另有裸的 xai.grok-4.7 列；v1.106.0-rc.1 已移除（AWS 不能直接呼叫裸 ID，PR #45460、#45479）——一律用 us. / global. profile。",
+          "xAI 直連（xai/grok-4.7，LiteLLM 支援 /chat/completions 與 /responses）不在本目錄的 Service 列舉內，所以沒有列為 offering。",
+          "main 分支 cost map 的 xai/、azure_ai/、vertex_ai/xai/ 列有 >200K 長文價，Bedrock 的 global. / us. 列沒有（與模型卡一致）。",
+          "Bedrock 的 application inference profile 只支援 Invoke / Converse：走 Responses 或 Chat Completions 就不能用 application profile 做成本分攤。"
+        ],
+        "configSnippet": "- model_name: grok-4-7\n  litellm_params:\n    model: bedrock/global.xai.grok-4.7\n    aws_region_name: ap-east-2\n  model_info:\n    catalog_id: grok-4-7\n    data_residency: global\n",
+        "status": "researched",
+        "sources": [
+          {
+            "id": "litellm-grok47"
+          },
+          {
+            "id": "litellm-v1-105-0"
+          },
+          {
+            "id": "litellm-v1-106-0-rc1"
+          },
+          {
+            "id": "litellm-cost-map-main"
+          },
+          {
+            "id": "litellm-bedrock-docs"
+          },
+          {
+            "id": "litellm-vertex-partner"
+          }
+        ]
+      },
+      "tags": [
+        "frontier",
+        "coding",
+        "agentic",
+        "three-cloud",
+        "low-cost",
+        "long-context-surcharge"
+      ],
+      "sources": [
+        {
+          "id": "xai-grok47-announce"
+        },
+        {
+          "id": "xai-release-notes"
+        },
+        {
+          "id": "xai-grok47-model"
+        },
+        {
+          "id": "xai-models"
+        },
+        {
+          "id": "aws-bedrock-grok47-card"
+        },
+        {
+          "id": "aws-grok47-whatsnew"
+        },
+        {
+          "id": "ms-foundry-models-sold-by-azure"
+        },
+        {
+          "id": "ms-techcommunity-grok47-foundry"
+        },
+        {
+          "id": "ms-foundry-grok-howto"
+        },
+        {
+          "id": "google-agentplatform-grok47"
+        },
+        {
+          "id": "aa-grok47"
+        },
+        {
+          "id": "xai-reasoning"
+        }
+      ],
+      "lastVerified": "2026-10-15"
     }
   ],
   "watchlist": [
-    {
-      "name": "Gemini 4 Argon",
-      "vendor": "google",
-      "status": "limited-preview",
-      "expected": "未公布（官方：as soon as possible，先開放付費 API 客戶與 Google AI Ultra）",
-      "note": "Google 2026-09-30 發表的新旗艦。目前只有「一部分」Fairwind Program 夥伴可用：對象是政府與國家資安機關、關鍵基礎設施營運者（醫療、電信、能源、金融）與核心技術平台，需填表申請並通過背景審查；只能給內部資安、事件應變或滲透測試團隊做防禦用途，要有 phishing-resistant MFA 與使用紀錄，不得分享、轉發或轉售存取——所以即使取得資格也不能掛在共用 gateway 上。Google 稱會「盡快」開放給開發者與企業，先從付費 API 客戶與 Google AI Ultra 開始，沒有日期。Gemini API 與 Agent Platform 文件（皆 2026-10-01 更新，10-02 兩次複查）都沒有 model ID、價格列或 release note；AWS / Azure 不提供。公告價：introductory $2 / $10（期滿後 $4 / $20，期限未公布），cached input 為 input 價的 95% off；output 上限 1M tokens（原為 64K）；context window 與 model ID 未公布（Artificial Analysis 列 1M）。Artificial Analysis Intelligence Index v4.3.2 為 53 分（High，#8）；Vals Index 68.9%（第 1）；其餘 benchmark 為 Google 自報。Fairwind 頁面稱以 Gemini Enterprise 的 managed model 存取時支援 zero data retention。 2026-10-06 查：沒有變化。Gemini API 的 models / changelog / pricing / deprecations 頁（皆 10-06 更新）與 Agent Platform 的模型版本頁、定價頁、release notes 都沒有 Argon；Argon 發表文與 Fairwind 頁未改（Google 10-02 的九月回顧文寫要先依早期測試者的回饋調整 guardrails 才會擴大開放）。Google 10-06 上線的是影像模型 Nano Banana 2.1。Artificial Analysis 仍列 53 分（#8 / 225）、每任務成本 $1.99、評測輸出 110M tokens，速度與 TTFT 未提供。",
-      "sources": [
-        {
-          "id": "google-gemini4-argon-blog"
-        },
-        {
-          "id": "deepmind-fairwind-program"
-        },
-        {
-          "id": "google-fairwind-program"
-        },
-        {
-          "id": "deepmind-gemini-cyber"
-        },
-        {
-          "id": "google-gemini-api-models"
-        },
-        {
-          "id": "google-agentplatform-release-notes"
-        },
-        {
-          "id": "aa-gemini4-argon"
-        },
-        {
-          "id": "vals-gemini4-argon"
-        },
-        {
-          "id": "google-ai-updates-sep2026"
-        }
-      ]
-    },
     {
       "name": "Gemini 3.5 Pro",
       "vendor": "google",
       "status": "limited-preview",
       "expected": "未公布",
-      "note": "已宣布但沒有 GA 日期與公開價格。 2026-10-06 查：Gemini API 的 models 頁仍沒有 3.5 Pro，Agent Platform 的模型版本頁與定價頁也沒有；DeepMind 的 Pro 頁仍寫「3.5 Pro coming soon」。Google 已先發表 Gemini 4 Argon。",
+      "note": "已宣布但沒有 GA 日期與公開價格。 2026-10-06 查：Gemini API 的 models 頁仍沒有 3.5 Pro，Agent Platform 的模型版本頁與定價頁也沒有；DeepMind 的 Pro 頁仍寫「3.5 Pro coming soon」。Google 已先發表 Gemini 4 Argon。 2026-10-15 查：DeepMind 的 Pro 頁仍寫「3.5 Pro coming soon」；Gemini API models 頁（2026-10-13 更新）與 Agent Platform 模型版本頁都沒有 3.5 Pro。Google 已於 2026-10-13 讓 Gemini 4 Argon GA（見目錄）。",
       "sources": [
         {
           "id": "capitalandcompute-sept"
@@ -6777,6 +10300,9 @@
         },
         {
           "id": "deepmind-gemini-pro"
+        },
+        {
+          "id": "google-agentplatform-model-versions"
         }
       ]
     },
@@ -6815,7 +10341,7 @@
       "vendor": "openai",
       "status": "rumoured",
       "expected": "未公布",
-      "note": "2026-10-06 查：OpenAI 官方仍未發布（models、changelog、pricing 與 deprecations 頁都沒有；changelog 最新是 10-05 的 HIPAA BAA 流程；cyber 模型仍是 gpt-5.6-cyber，另有 gpt-daybreak-red-latest / gpt-daybreak-blue-latest 別名）。PYMNTS 2026-09-25 引述 Fortune：OpenAI 準備推出 GPT-6 Cyber 與資安 gateway 產品，無日期、價格與平台資訊。openai.com 的 news 頁本期讀不到（403）。",
+      "note": "2026-10-06 查：OpenAI 官方仍未發布（models、changelog、pricing 與 deprecations 頁都沒有；changelog 最新是 10-05 的 HIPAA BAA 流程；cyber 模型仍是 gpt-5.6-cyber，另有 gpt-daybreak-red-latest / gpt-daybreak-blue-latest 別名）。PYMNTS 2026-09-25 引述 Fortune：OpenAI 準備推出 GPT-6 Cyber 與資安 gateway 產品，無日期、價格與平台資訊。openai.com 的 news 頁本期讀不到（403）。 2026-10-15 查：OpenAI models 頁的資安模型仍是 gpt-5.6-cyber（Daybreak Red 另行核准存取），沒有 GPT-6 Cyber；changelog 也沒有。",
       "sources": [
         {
           "id": "fortune-gpt6-cyber"
@@ -6842,7 +10368,7 @@
       "vendor": "mistral",
       "status": "limited-preview",
       "expected": "權重：官方稱 2026 年 10 月底前釋出；三雲上架未公布",
-      "note": "Mistral 2026-10-06 發表的 public preview（官方暱稱 le Chonk）：1 兆參數、49B active 的原生多模態 open-weight 模型。目前只有 Mistral Studio 的 preview API，權重「by the end of the month」釋出；發表頁的模型卡列價為 input $1.36、output $4.18（每百萬 token，Mistral 自家 API）。發表文沒有提到 Bedrock、Foundry 或 Agent Platform。官方自述強項是資安（稱在 Artificial Analysis Cyber Index 進全球前五、其中重現並修補真實漏洞的測試得 82%）、agentic coding 與視覺 grounding，並稱訓練與 preview 都在自家歐洲資料中心——以上都是廠商自報。Artificial Analysis 10-06 的評測紀錄為 Mistral Large 4 Preview：Intelligence Index 38（GPT-6 Luna 為 38、Gemini 3.8 Flash 為 41）。追蹤重點：權重釋出後是否由 Bedrock / Foundry / Agent Platform 代管，以及授權條款。2026-10-06 首次收錄。 2026-10-11：Hugging Face 仍沒有權重；OpenRouter 已上架 preview API（mistralai/mistral-large-4-0）。",
+      "note": "Mistral 2026-10-06 發表的 public preview（官方暱稱 le Chonk）：1 兆參數、49B active 的原生多模態 open-weight 模型。目前只有 Mistral Studio 的 preview API，權重「by the end of the month」釋出；發表頁的模型卡列價為 input $1.36、output $4.18（每百萬 token，Mistral 自家 API）。發表文沒有提到 Bedrock、Foundry 或 Agent Platform。官方自述強項是資安（稱在 Artificial Analysis Cyber Index 進全球前五、其中重現並修補真實漏洞的測試得 82%）、agentic coding 與視覺 grounding，並稱訓練與 preview 都在自家歐洲資料中心——以上都是廠商自報。Artificial Analysis 10-06 的評測紀錄為 Mistral Large 4 Preview：Intelligence Index 38（GPT-6 Luna 為 38、Gemini 3.8 Flash 為 41）。追蹤重點：權重釋出後是否由 Bedrock / Foundry / Agent Platform 代管，以及授權條款。2026-10-06 首次收錄。 2026-10-11：Hugging Face 仍沒有權重；OpenRouter 已上架 preview API（mistralai/mistral-large-4-0）。 2026-10-15 查：發表頁仍寫權重 end of the month 釋出；Hugging Face 的 mistralai 組織頁沒有 Mistral Large 4（最新的 Large 仍是 Mistral-Large-3）。",
       "sources": [
         {
           "id": "mistral-large-4-announce"
@@ -6858,6 +10384,9 @@
         },
         {
           "id": "openrouter-models-api"
+        },
+        {
+          "id": "hf-mistralai-org"
         }
       ]
     },
@@ -6866,7 +10395,7 @@
       "vendor": "other",
       "status": "limited-preview",
       "expected": "權重：官方稱 2026 年 10 月內釋出（Apache 2.0）；三雲代管未公布",
-      "note": "501B（23B active）text-only MoE、1M context，2026-10-05 發表，目前只有 early access API。2026-10-11 複查：Hugging Face 仍查不到權重，Bedrock、Foundry、Agent Platform 都沒有。官方 benchmark 為廠商自述、未經獨立驗證；市場訊號見「開源模型」頁。",
+      "note": "501B（23B active）text-only MoE、1M context，2026-10-05 發表，目前只有 early access API。2026-10-11 複查：Hugging Face 仍查不到權重，Bedrock、Foundry、Agent Platform 都沒有。官方 benchmark 為廠商自述、未經獨立驗證；市場訊號見「開源模型」頁。 2026-10-15 查：Hugging Face 的 reflection 組織仍是 models 0（None public yet）。",
       "sources": [
         {
           "id": "reflection-beam-announce"
@@ -6876,6 +10405,42 @@
         },
         {
           "id": "aws-bedrock-model-cards"
+        },
+        {
+          "id": "huggingface-reflection-org"
+        }
+      ]
+    },
+    {
+      "name": "Meta Muse Wonder / Muse Wonder Full",
+      "vendor": "meta",
+      "status": "announced",
+      "expected": "三雲上架未公布",
+      "note": "Meta 2026-10-12 發表：Muse Wonder 即日起透過 Meta Model API 與 Muse Code 提供給開發者，Muse Wonder Full 只給 Muse Code 訂閱者；官方稱為自家最強模型，主打個人與專業 agentic 任務（Active Memory、Active Focus），依 Meta Superintelligence Scaling Framework 發布，完整安全評估報告「即將」公布。公告沒有價格，也沒有提到 Bedrock、Foundry 或 Agent Platform；2026-10-15 查 Bedrock 模型總覽、Foundry 直售模型頁與夥伴模型頁、Agent Platform 定價頁都沒有 Muse Wonder。Artificial Analysis（2026-10-15）：Muse Wonder（max）Intelligence Index v4.3.2 52 分（#9 / 216）、131.0 tok/s、TTFT 39.24 秒、每任務 $4.52；Muse Wonder Full（max）在 leaderboard 為 56 分（與 Claude Sonnet 5.5 max 同分）。LiteLLM main 分支 cost map 已有 meta/muse-wonder-1.0，但 Meta Model API 不在本平台的三雲路由內。2026-10-15 首次收錄。",
+      "sources": [
+        {
+          "id": "meta-muse-wonder-announce"
+        },
+        {
+          "id": "aa-muse-wonder"
+        },
+        {
+          "id": "aa-leaderboard-models"
+        },
+        {
+          "id": "aws-bedrock-model-cards"
+        },
+        {
+          "id": "ms-foundry-models-sold-by-azure"
+        },
+        {
+          "id": "ms-foundry-models-from-partners"
+        },
+        {
+          "id": "google-agentplatform-pricing"
+        },
+        {
+          "id": "litellm-cost-map-main"
         }
       ]
     }

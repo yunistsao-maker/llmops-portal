@@ -4,9 +4,10 @@
 // build uses the data committed to this repo.
 //
 // Daily versions: the pointer's `versions` (or, for an older pointer, its history) says which release
-// was live at the end of each day (Asia/Taipei). For each of the 6 days before today the release of
-// that day goes to versions/<date>/ (its data/ only); today is the live release above. The list of
-// the 7 days is written to .portal-versions.json for tools/build_versions.py and build_site.mjs.
+// was live at the end of each day (Asia/Taipei). For each of the DAYS - 1 (29) days before today the
+// release of that day goes to versions/<date>/ (its data/ only); today is the live release above. A
+// release that was live on several days is fetched once. The list of the DAYS (30) days is written to
+// .portal-versions.json for tools/build_versions.py and build_site.mjs.
 import { createHash } from "node:crypto";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
@@ -48,7 +49,7 @@ for (const [path, { sha256 }] of Object.entries(release.files)) {
 if (!files.has("data/catalog.json")) throw new Error("release has no data/catalog.json");
 
 // ---- daily versions (read before anything is replaced: a failure here leaves the checkout as it was)
-const DAYS = 7;
+const DAYS = 30; // dated versions: today + 29 days (the research pipeline's pointer keeps 30)
 const RELEASE_ID = /^[0-9]{8}T[0-9]{6}Z-[0-9a-f]{8}$/;
 const DAY = /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/;
 const taipeiDay = (iso) => new Date(Date.parse(iso) + 8 * 3600_000).toISOString().slice(0, 10); // UTC+8, no DST

@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import type {
-  CatalogFile, CompatRun, DeepDive, DigestFile, LifecycleFile, LiteLLMFile, OpenModelsFile, PerfRun,
+  BenchmarkResult, CatalogFile, CompatRun, DeepDive, DigestFile, LifecycleFile, LiteLLMFile, Model, OpenModelsFile, PerfRun,
   PlatformInventory, RadarFile, RequirementsFile, SecurityRunCases, SecurityRunSummary, Source, SourceRef, SourcesFile,
 } from "../../schema/types";
 
@@ -23,6 +23,8 @@ export interface VersionsFile { schema: string; today: string; versions: Version
 const VERSION = /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/;
 /** Pages that show the team's own records (測試結果, 發布流程): never versioned, whatever the address says. */
 export const UNVERSIONED = new Set(["tests", "release"]);
+/** How many dated versions a build keeps (today + 29 days): tools/fetch_release.mjs DAYS. */
+export const VERSION_DAYS = 30;
 /** The daily version named in the address (#/models?v=2026-10-10), kept while moving between pages. */
 export function addressVersion(): string | null {
   const v = new URLSearchParams(window.location.hash.split("?")[1] ?? "").get("v");
@@ -103,6 +105,30 @@ export const daysFrom = (iso: string, today = viewDate()) =>
   Math.round((new Date(iso + "T00:00:00").getTime() - new Date(today.toDateString()).getTime()) / 86400000);
 export const money = (n?: number) => (n === undefined ? "—" : `$${Number.isInteger(n) ? n : n < 0.1 ? n.toFixed(3).replace(/0$/, "") : n.toFixed(2)}`);
 export const fmt = (n: number | null | undefined, d = 0) => (n === null || n === undefined ? "—" : n.toLocaleString("en-US", { maximumFractionDigits: d }));
+
+/** Artificial Analysis Intelligence Index scores compare only within one index version (catalog, compare). */
+export const isAA = (b: BenchmarkResult) => b.name.startsWith("Artificial");
+/** "v4.3.2" -> [4, 3, 2]; null for a version that is not a dotted number (e.g. a note about an older index). */
+export const versionKey = (v?: string) => { const m = /^v?(\d+(?:\.\d+)*)$/.exec((v ?? "").trim()); return m ? m[1].split(".").map(Number) : null; };
+const newer = (a: number[], b: number[]) => { for (let i = 0; i < Math.max(a.length, b.length); i++) if ((a[i] ?? 0) !== (b[i] ?? 0)) return (a[i] ?? 0) > (b[i] ?? 0); return false; };
+
+/** The newest Artificial Analysis index version any of these models has a score for. */
+export function newestAAVersion(models: Model[]): string | undefined {
+  let best: { v: string; k: number[] } | undefined;
+  for (const b of models.flatMap((m) => m.benchmarks.filter(isAA))) {
+    const k = versionKey(b.version);
+    if (k && b.version && (!best || newer(k, best.k))) best = { v: b.version, k };
+  }
+  return best?.v;
+}
+
+/** This model's AA score for `version` (the newest reading when there are several), and its newest score in another version. */
+export function aaScore(m: Model, version?: string): { score?: BenchmarkResult; other?: BenchmarkResult } {
+  const mine = m.benchmarks.filter(isAA);
+  const score = mine.filter((x) => x.version === version).sort((x, y) => y.date.localeCompare(x.date))[0];
+  const other = score ? undefined : mine.filter((x) => versionKey(x.version)).sort((x, y) => y.date.localeCompare(x.date))[0];
+  return { score, other };
+}
 
 /** Browser-local store (per viewer). Used for gate checklists; wrapped so private windows still work. */
 export function useLocal<T>(key: string, initial: T): [T, (v: T) => void] {

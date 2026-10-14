@@ -1,0 +1,784 @@
+{
+  "schema": "deep-dive/v1",
+  "modelId": "claude-haiku-5-5",
+  "title": "Claude Haiku 5.5 技術深度解析",
+  "locale": "zh-TW",
+  "asOf": "2026-10-15",
+  "tldr": "Haiku 5.5（2026-10-07 在 Claude API、Bedrock、Agent Platform、Foundry 同日 GA）是 Claude 5.5 家族最快、最便宜的模型：prompt ≤100K tokens 時 $0.10 / $0.50（>100K 變 $0.50 / $2.50），1M context、128K output，是第一個有 effort 的 Haiku（預設 medium）。AA Intelligence Index v4.3.2：max 43、medium 34（每任務 $0.05）。從 Haiku 4.5 升級是破壞性的：budget_tokens、temperature / top_p / top_k 非預設值、assistant prefill 都回 400；adaptive thinking 預設開啟、回應可能以 thinking block 開頭；新 tokenizer 同文字約多 30% tokens。Bedrock 不支援 structured outputs、Batch 與 Priority / Flex；台北區只能走 Global CRIS，需日本境內處理可用 jp. profile（+10%）。Haiku 4.5 的退役下限：Anthropic API 2026-10-15、Bedrock 2026-10-16，Foundry 表列 2026-11-15——現在就該排遷移。",
+  "whatsNew": [
+    {
+      "title": "價格大降，改依 prompt 長度分級",
+      "detail": "prompt ≤100K tokens：input $0.10、output $0.50、5 分鐘 cache write $0.125、1 小時 $0.20、cache read $0.01；>100K：$0.50 / $2.50 / $0.625 / $1 / $0.05。門檻以單一請求的全部 input tokens 計（含 cache read 與 cache write）。Batch 五折（≤100K 為 $0.05 / $0.25）。官方稱 ≤100K 比 Haiku 4.5 便宜 90%、>100K 便宜 50%（已計入新 tokenizer），平均約少 75%；Haiku 5.5 不適用其他 4.6 以後模型的 1M 平價。",
+      "sources": [
+        {
+          "id": "anthropic-haiku55-announce"
+        },
+        {
+          "id": "anthropic-pricing",
+          "note": "Claude Haiku 5.5 prompt-length pricing"
+        },
+        {
+          "id": "anthropic-haiku55-overview"
+        }
+      ]
+    },
+    {
+      "title": "第一個有 effort 的 Haiku：adaptive thinking + 五級 effort",
+      "detail": "adaptive thinking 預設開啟；effort 支援 low / medium / high / xhigh / max，預設 medium（與 Opus 5.5 相同，其他模型預設 high）。可以送 thinking disabled，但只限 effort ≤ high，xhigh / max 搭配 disabled 回 400。Claude API 與 Google Cloud 另支援 per-message effort（beta header mid-conversation-output-config-2026-07-01）。",
+      "sources": [
+        {
+          "id": "anthropic-effort",
+          "note": "Claude Haiku 5.5"
+        },
+        {
+          "id": "anthropic-haiku55-whatsnew"
+        },
+        {
+          "id": "aws-bedrock-haiku55-card"
+        }
+      ]
+    },
+    {
+      "title": "1M context、128K output、caching 門檻降到 512",
+      "detail": "Haiku 4.5 是 200K / 64K。Batch API 搭配 output-300k-2026-03-24 beta header 可輸出 300K；knowledge cutoff 與 training data cutoff 皆為 2026-06；prompt caching 最低 512 tokens（Haiku 4.5 為 4,096）。",
+      "sources": [
+        {
+          "id": "anthropic-haiku55-overview"
+        },
+        {
+          "id": "anthropic-haiku55-whatsnew"
+        }
+      ]
+    },
+    {
+      "title": "新工具版本與 SDK 支援",
+      "detail": "Claude API 與 Google Cloud 使用 computer_toolset_20260801（不需 beta header）與 browser_toolset_20260801（browser use 僅這兩個通路）；Bedrock 使用 computer_20251124 + computer-use-2025-11-24。Python / TypeScript SDK 同日加入 browser / computer use 的 beta 類別。Bedrock bedrock-runtime 另支援 compaction（compact-2026-09-04）。",
+      "sources": [
+        {
+          "id": "anthropic-haiku55-migration",
+          "note": "Computer use"
+        },
+        {
+          "id": "anthropic-release-notes"
+        },
+        {
+          "id": "aws-bedrock-haiku55-card"
+        }
+      ]
+    },
+    {
+      "title": "Anthropic 公布的基準（vs Haiku 4.5）",
+      "detail": "OSWorld 2.1（offline subset）72.4% vs 15.7%；GDPval-AA v2.1 1620 vs 735；Humanity's Last Exam（with tools）57.4% vs 18.7%；Terminal-Bench 4.0 39.2% vs 0.0%（Sonnet 5.5 為 70.6%）。官方建議複雜 agentic coding 仍用 Sonnet 5.5 / Opus 5.5，Haiku 5.5 適合當 sub-agent。",
+      "sources": [
+        {
+          "id": "anthropic-haiku55-announce"
+        }
+      ]
+    },
+    {
+      "title": "安全分類器可直接拒答",
+      "detail": "安全分類器拒答時回 stop_reason: refusal，沒有 server-side fallback。系統卡：Gray Swan 間接 prompt injection（k=15）攻擊成功率由 Haiku 4.5 的 83.2% 降到 7.1%。",
+      "sources": [
+        {
+          "id": "anthropic-haiku55-whatsnew"
+        },
+        {
+          "id": "anthropic-haiku55-systemcard"
+        }
+      ]
+    }
+  ],
+  "vsPredecessor": {
+    "predecessorId": "claude-haiku-4-5",
+    "changes": [
+      {
+        "area": "單價（Claude API，每 1M tokens）",
+        "before": "$1 / $5；cache read $0.10",
+        "after": "≤100K：$0.10 / $0.50、cache read $0.01；>100K：$0.50 / $2.50、cache read $0.05",
+        "impact": "短 prompt 便宜約 90%；但新 tokenizer 多約 30% tokens，且 >100K 價格是五倍，需以實際流量重算。"
+      },
+      {
+        "area": "Context / output",
+        "before": "200K / 64K",
+        "after": "1M / 128K（Batch + beta header 可到 300K）",
+        "impact": "長文件可以放得下，但超過 100K 就進入高價級距。"
+      },
+      {
+        "area": "Tokenizer 與圖片",
+        "before": "舊 tokenizer；圖片 standard tier（長邊 1,568 px 或 1,568 visual tokens 以上縮圖）",
+        "after": "Claude 4.7 以後的新 tokenizer（同文字約 +30%）；圖片 high-resolution tier（2,576 px 或 4,784 visual tokens）",
+        "impact": "usage、count tokens、max_tokens 餘裕與成本估算都要重算；2000×1500 的圖約 2.5 倍 visual tokens。"
+      },
+      {
+        "area": "Thinking",
+        "before": "thinking.type = enabled + budget_tokens",
+        "after": "adaptive（預設開啟）+ effort（預設 medium）；budget_tokens 回 400；disabled 只限 effort ≤ high",
+        "impact": "回應可能以 thinking block 開頭；thinking tokens 計入 max_tokens；前幾輪的 thinking block 都留在 context（計為 input）。"
+      },
+      {
+        "area": "取樣參數",
+        "before": "temperature / top_p / top_k 可設",
+        "after": "temperature 只能 1、top_p 只能 0.99；top_k 任何值、或同時送 temperature 與 top_p 都回 400",
+        "impact": "評測框架與舊 prompt 常送 temperature=0，會直接失敗。"
+      },
+      {
+        "area": "Assistant prefill",
+        "before": "支援",
+        "after": "最後一則是 assistant 時回 400（即使 thinking 關閉）",
+        "impact": "用 prefill 控格式或續寫的流程要改寫。"
+      },
+      {
+        "area": "Forced tool_choice（any / 指定 tool）",
+        "before": "支援",
+        "after": "仍可用，但回應直接是 tool call、沒有 thinking block",
+        "impact": "與 Sonnet 5.5 不同（Sonnet 5.5 回 400）；需要先思考再呼叫工具時改用 auto。"
+      },
+      {
+        "area": "Prompt caching 最低長度",
+        "before": "4,096 tokens",
+        "after": "512 tokens",
+        "impact": "短 system prompt 也能 cache。"
+      },
+      {
+        "area": "Computer use 工具",
+        "before": "computer_20250124 + computer-use-2025-01-24",
+        "after": "Claude API / Google Cloud：computer_toolset_20260801；Bedrock：computer_20251124 + computer-use-2025-11-24",
+        "impact": "舊版工具定義在三個通路都會被拒。"
+      },
+      {
+        "area": "Bedrock structured outputs",
+        "before": "bedrock-runtime 支援",
+        "after": "不支援（output_config.format 與 strict tools 皆不可用）",
+        "impact": "Bedrock 上的 JSON 擷取流程要改成 prompt 描述格式或不加 strict 的 tool，並在程式驗證。"
+      },
+      {
+        "area": "Bedrock inference profile",
+        "before": "global. / us. / eu. / au. / jp. / in. + anthropic.claude-haiku-4-5-20251001-v1:0",
+        "after": "global. / us. / eu. / au. / jp. + anthropic.claude-haiku-5-5（沒有 in.、沒有日期與版本後綴）",
+        "impact": "gateway 的 model 字串要整個換掉；台北區兩代都只有 Global。"
+      },
+      {
+        "area": "Priority Tier（Claude API）",
+        "before": "可承諾",
+        "after": "不支援",
+        "impact": "有 Haiku 4.5 Priority Tier 承諾的組織要另行規劃容量。"
+      },
+      {
+        "area": "inference_geo（Claude API）",
+        "before": "不支援（送了回 400）",
+        "after": "支援 us（1.1 倍，含 >100K 價）",
+        "impact": "Claude API 直連可選美國境內處理。"
+      },
+      {
+        "area": "Knowledge cutoff",
+        "before": "2025-02（Bedrock 模型卡）",
+        "after": "2026-06",
+        "impact": "較新的 API、法規與產品資訊。"
+      }
+    ]
+  },
+  "breakingChanges": [
+    {
+      "title": "手動 extended thinking（budget_tokens）回 400",
+      "detail": "thinking: {type: enabled, budget_tokens: N} 回 400。Microsoft 的兩份 Foundry 文件對 enabled 是否支援說法不一。",
+      "migration": "改送 thinking: {type: adaptive}（或省略）並以 output_config.effort 控制深度；要最低延遲可送 disabled，但 effort 必須 ≤ high。",
+      "severity": "high",
+      "sources": [
+        {
+          "id": "anthropic-haiku55-migration",
+          "note": "Thinking"
+        },
+        {
+          "id": "anthropic-effort"
+        },
+        {
+          "id": "ms-foundry-models-from-partners"
+        },
+        {
+          "id": "ms-foundry-claude-models"
+        }
+      ]
+    },
+    {
+      "title": "取樣參數非預設值回 400",
+      "detail": "temperature 必須是 1、top_p 必須是 0.99（含 top_p=1 也回 400）；任何 top_k、或同時送 temperature 與 top_p 都回 400。",
+      "migration": "client 端不送；gateway 對 Haiku 5.5 路由設 additional_drop_params 並以 compat suite 驗證。",
+      "severity": "high",
+      "sources": [
+        {
+          "id": "anthropic-haiku55-migration",
+          "note": "Remove sampling parameters"
+        },
+        {
+          "id": "ms-foundry-models-from-partners"
+        }
+      ]
+    },
+    {
+      "title": "Assistant prefill 回 400",
+      "detail": "messages 以 assistant turn 結尾時回 400，即使 thinking 關閉。",
+      "migration": "格式控制改用 structured outputs 或帶 enum 的 tool（Bedrock 沒有 structured outputs）；續寫改放在 user turn。",
+      "severity": "high",
+      "sources": [
+        {
+          "id": "anthropic-haiku55-migration",
+          "note": "Assistant prefill"
+        },
+        {
+          "id": "anthropic-release-notes"
+        }
+      ]
+    },
+    {
+      "title": "回應可能以 thinking block 開頭",
+      "detail": "adaptive thinking 預設開啟，即使請求沒提 thinking，content[0] 也可能是 thinking；thinking tokens 計入 max_tokens，太小可能在輸出文字前就以 max_tokens 停止。",
+      "migration": "依 type 選 text block；提高 max_tokens 或降低 effort；要看推理摘要送 thinking.display: summarized。",
+      "severity": "high",
+      "sources": [
+        {
+          "id": "anthropic-haiku55-whatsnew"
+        },
+        {
+          "id": "anthropic-haiku55-migration",
+          "note": "Thinking"
+        },
+        {
+          "id": "aws-haiku55-blog"
+        }
+      ]
+    },
+    {
+      "title": "Bedrock 不支援 structured outputs",
+      "detail": "bedrock-runtime 與 bedrock-mantle 都不支援（Haiku 4.5 的 bedrock-runtime 支援）。",
+      "migration": "Bedrock 路由改用 prompt 描述格式或不加 strict 的 tool，並在程式驗證；必要時改走 @vertex / @azure。",
+      "severity": "high",
+      "sources": [
+        {
+          "id": "aws-bedrock-haiku55-card"
+        },
+        {
+          "id": "anthropic-haiku55-whatsnew"
+        },
+        {
+          "id": "aws-bedrock-haiku45-card"
+        }
+      ]
+    },
+    {
+      "title": "computer_20250124 被拒",
+      "detail": "Claude API 與 Google Cloud 回 400，Bedrock 不接受；fine-grained-tool-streaming-2025-05-14 與 toolset 併用也回 400。Foundry 不提供 computer_toolset_20260801 / browser_toolset_20260801。",
+      "migration": "Claude API / Google Cloud 改 computer_toolset_20260801；Bedrock 改 computer_20251124 + computer-use-2025-11-24；依 tool_use 的 name 與 toolset_name 分派。",
+      "severity": "medium",
+      "sources": [
+        {
+          "id": "anthropic-haiku55-migration",
+          "note": "Computer use"
+        },
+        {
+          "id": "anthropic-claude-in-foundry"
+        }
+      ]
+    },
+    {
+      "title": "修改先前回合後送回 thinking block 回 400",
+      "detail": "改了 system、tools 或先前 messages 再送回 thinking block 會回 400（Haiku 4.5 不檢查）；2026-08-31 00:00 UTC 前建立的帳號只在設定 thinking.block_binding.prefix_mismatch_behavior 時才會發生。",
+      "migration": "送回 thinking block 的對話保持 append-only；要移除舊 block 用 thinking block clearing。",
+      "severity": "medium",
+      "sources": [
+        {
+          "id": "anthropic-haiku55-migration",
+          "note": "Keep earlier turns unchanged"
+        },
+        {
+          "id": "anthropic-release-notes"
+        }
+      ]
+    },
+    {
+      "title": "Thinking block 綁定帳號、跨模型讀取受限",
+      "detail": "thinking block 只在產生它的帳號或已連結帳號有效，其他帳號的會被靜默丟棄；Haiku 5.5 讀不到 Opus 5 / 5.5、Sonnet 5.5、Fable、Mythos 的 thinking block（也是靜默丟棄）。",
+      "migration": "fallback 優先設同模型的其他路由；跨模型 / 跨帳號 fallback 後監控品質。",
+      "severity": "medium",
+      "sources": [
+        {
+          "id": "anthropic-haiku55-migration",
+          "note": "Cross-model reads"
+        },
+        {
+          "id": "anthropic-haiku55-whatsnew"
+        }
+      ]
+    },
+    {
+      "title": "同文字 token 數增加",
+      "detail": "新 tokenizer 同文字約 +30% tokens；圖片改 high-resolution tier。usage、count tokens、max_tokens 與成本估算都會變。",
+      "migration": "以 model=claude-haiku-5-5 重新計數，並把 >100K 分級納入成本模型。",
+      "severity": "medium",
+      "sources": [
+        {
+          "id": "anthropic-haiku55-migration",
+          "note": "Tokenizer"
+        },
+        {
+          "id": "anthropic-pricing"
+        }
+      ]
+    },
+    {
+      "title": "Claude API 不支援 Priority Tier",
+      "detail": "Haiku 4.5 的 Priority Tier 承諾不能沿用到 Haiku 5.5。",
+      "migration": "另行規劃容量（例如保留 Haiku 4.5 到退役前、或分流到其他通路）。",
+      "severity": "low",
+      "sources": [
+        {
+          "id": "anthropic-haiku55-migration"
+        }
+      ]
+    }
+  ],
+  "availabilityMatrix": [
+    {
+      "cloud": "aws",
+      "service": "bedrock",
+      "status": "ga",
+      "notes": "2026-10-07 上線；bedrock-runtime（Messages / Converse / Invoke）與 bedrock-mantle（Messages）。沒有 In-Region（mantle 只在 us-gov-west-1）。Geo profile：us. / eu. / au. / jp.（沒有 apac.、in.）；APAC 13 個區域都可用 global.，其中台北（ap-east-2）、首爾、新加坡等只有 Global，jp. 來源區為東京 / 大阪、au. 為雪梨 / 墨爾本。價格（pricing 頁載入的 AWS 價格資料）：Global $0.10 / $0.50（>100K $0.50 / $2.50），台北同價；Geo 加 10%；Batch 標 N/A。Service tier 表只有 Standard；不支援 structured outputs；count tokens 只有 mantle；guardrails 只有 runtime。EOL 不早於 2027-10-07，Legacy 期 6 個月。"
+    },
+    {
+      "cloud": "gcp",
+      "service": "agent-platform",
+      "status": "ga",
+      "notes": "Model Garden 2026-10-07 上線（release note）；global endpoint 與 US / EU multi-region（+10%）；global 的 ML processing 地點含 asia-southeast1。預設配額：global QPM 3,000、input TPM 30M、output TPM 3M；multi-region QPM 1,500、15M、1.5M。支援 batch（$0.05 / $0.25）、prompt caching、computer use、web search、function calling、count tokens 與 Provisioned Throughput；Memory tool 標示非 GA。退役不早於 2027-10-07。"
+    },
+    {
+      "cloud": "azure",
+      "service": "foundry",
+      "status": "ga",
+      "notes": "Hosted on Azure 與 Hosted on Anthropic 皆 GA；Global Standard（version 1，Hosted on Anthropic infrastructure）：8 個美國區域（centralus、eastus、eastus2、northcentralus、southcentralus、westcentralus、westus、westus3）與 swedencentral；Data Zone Standard US（version 2，Hosted on Azure）：同樣 8 個美國區域；沒有亞太區域（models-from-partners 頁，2026-10-15 讀取）。swedencentral 是部署區域、不是處理地點保證：Global Standard 可在任何區域處理，Hosted on Anthropic 可能在 Azure 之外處理。以 CCU 計費（$0.01 / CCU，按 Claude API 標準價）；Anthropic 定價頁載明 US Data Zone 套用 1.1 倍。Foundry 不支援 Message Batches API 與 computer / browser toolset。Microsoft 退役表（2026-09-23 更新）尚未列入 Haiku 5.5。"
+    },
+    {
+      "cloud": "vendor-direct",
+      "service": "anthropic-api",
+      "status": "ga",
+      "notes": "Claude API：claude-haiku-5-5（沒有日期後綴、也沒有另外的 alias）；Claude Platform on AWS 同 ID（AWS 部落格：北美可用）。inference_geo: us 為 1.1 倍；不支援 Priority Tier 與 fast mode。退役不早於 2027-10-07。"
+    }
+  ],
+  "apiCompatibility": [
+    {
+      "route": "claude-haiku-5-5@bedrock（bedrock-runtime）",
+      "surface": "Converse",
+      "status": "supported",
+      "note": "Bedrock 模型卡（2026-10-15 讀取）"
+    },
+    {
+      "route": "claude-haiku-5-5@bedrock（bedrock-runtime）",
+      "surface": "Anthropic Messages / Invoke",
+      "status": "supported",
+      "note": "Anthropic SDK base_url 為 https://bedrock-runtime.{region}.amazonaws.com/anthropic"
+    },
+    {
+      "route": "claude-haiku-5-5@bedrock（bedrock-mantle）",
+      "surface": "Anthropic Messages",
+      "status": "supported",
+      "note": "In-Region 只有 us-gov-west-1；支援 count tokens、不支援 guardrails"
+    },
+    {
+      "route": "claude-haiku-5-5@bedrock",
+      "surface": "Chat Completions / Responses",
+      "status": "not-supported"
+    },
+    {
+      "route": "claude-haiku-5-5@bedrock",
+      "surface": "Structured outputs",
+      "status": "not-supported"
+    },
+    {
+      "route": "claude-haiku-5-5@bedrock",
+      "surface": "Batch / Priority / Flex",
+      "status": "not-supported",
+      "note": "Service tier 表只有 Standard（模型卡文字仍描述 Priority / Flex，兩者不一致）"
+    },
+    {
+      "route": "claude-haiku-5-5@agent-platform",
+      "surface": "Anthropic Messages",
+      "status": "supported",
+      "note": "global / us / eu"
+    },
+    {
+      "route": "claude-haiku-5-5@agent-platform",
+      "surface": "Batch predictions",
+      "status": "supported",
+      "note": "$0.05 / $0.25（global）"
+    },
+    {
+      "route": "claude-haiku-5-5@foundry",
+      "surface": "Anthropic Messages（/anthropic/v1/messages）與 count_tokens",
+      "status": "supported"
+    },
+    {
+      "route": "claude-haiku-5-5@foundry",
+      "surface": "Message Batches API",
+      "status": "not-supported",
+      "note": "Foundry 整體不支援"
+    },
+    {
+      "route": "claude-haiku-5-5@foundry",
+      "surface": "Structured outputs",
+      "status": "partial",
+      "note": "Microsoft：output_config.format 與 strict tools 可用；models-from-partners 頁：output_format 只在 thinking adaptive 時支援"
+    },
+    {
+      "route": "claude-haiku-5-5（Claude API）",
+      "surface": "Messages / Message Batches",
+      "status": "supported"
+    },
+    {
+      "route": "LiteLLM gateway",
+      "surface": "/v1/chat/completions、/v1/messages",
+      "status": "supported",
+      "note": "Day-0：v1.76.0 以上 reload cost map 即可"
+    },
+    {
+      "route": "LiteLLM gateway → Bedrock",
+      "surface": "response_format",
+      "status": "unknown",
+      "note": "cost map 標 supports_response_schema: true，但 Bedrock 模型卡不支援 structured outputs，需以 compat suite 確認"
+    }
+  ],
+  "strengths": [
+    "單價：prompt ≤100K 時 $0.10 / $0.50，是 Sonnet 5.5（$2 / $10）的二十分之一；cache read $0.01；Batch 五折。",
+    "Artificial Analysis Intelligence Index v4.3.2：max 43（同級 175 個模型中第 2）；medium 34、每任務 $0.05，low 29、$0.02。Sonnet 5.5（max with fallback）為 56、$5.46。",
+    "速度：AA leaderboard 中位數 170～237 tok/s；medium 首 chunk 12.85 秒、low 9.21 秒。官方稱在標準速度下是目前最快的模型。",
+    "Anthropic 公布：OSWorld 2.1 72.4%（Haiku 4.5 為 15.7%）、GDPval-AA v2.1 1620（735）、HLE with tools 57.4%（18.7%）。",
+    "安全：系統卡顯示 prompt injection 與惡意 computer use 拒絕率大幅改善（惡意 computer use 任務拒絕 82.59% vs 58.93%），benign over-refusal 0.17%（Haiku 4.5 為 0.44%）。",
+    "四個通路同日 GA、model ID 一致；Bedrock 有 jp. Geo profile（Sonnet 5.5 只有 us. / eu. / au.）；退役皆不早於 2027-10-07。",
+    "1M context、128K output；prompt caching 最低 512 tokens；forced tool_choice 仍可用（分類 / 擷取常用）。"
+  ],
+  "weaknesses": [
+    "prompt >100K 單價變五倍（$0.50 / $2.50），且不適用 1M 平價；Geo、multi-region、inference_geo: us 與 Foundry US Data Zone 的 1.1 倍也套用在高價級距。",
+    "很冗長：AA max effort 評測產生 440M output tokens（中位數 95M，verbosity 60 名中第 60）；max effort 首 chunk 約 318 秒（leaderboard），不適合互動。",
+    "新 tokenizer 同文字約 +30% tokens、圖片 visual tokens 增加：實際節省小於單價差。",
+    "從 Haiku 4.5 升級是破壞性的：budget_tokens、取樣參數、prefill、computer use 版本、Bedrock structured outputs。",
+    "Bedrock：不支援 structured outputs、Batch、Priority / Flex，沒有 In-Region；台北只能走 Global CRIS。Claude API 不支援 Priority Tier。",
+    "系統卡：自動化行為稽核中 over-refuse 比其他受測模型多；未告知使用者就使用外洩答案的比率 17%（Haiku 4.5 為 2%）；幻覺程度約與 Haiku 4.5 相當、高於其他近期模型。",
+    "複雜 agentic coding 明顯落後：Terminal-Bench 4.0 39.2%（Sonnet 5.5 為 70.6%）。"
+  ],
+  "bestFor": [
+    "分類、路由、擷取、摘要、compaction 等高流量、延遲敏感的工作（prompt ≤100K）",
+    "agent 的 sub-agent（搭配 Opus 5.5 / Sonnet 5.5 當主 agent）與 browser / computer use 子任務",
+    "即時客服等互動場景（effort low / medium）",
+    "Claude Haiku 4.5 的直接替代（Anthropic API 退役不早於 2026-10-15、Bedrock 不早於 2026-10-16、Foundry 表列 2026-11-15）"
+  ],
+  "avoidFor": [
+    "以 >100K prompt 為主的長文件工作（單價五倍，先評估切塊或改用 Sonnet 5.5）",
+    "Bedrock 上依賴 structured outputs、Batch 或 Priority / Flex 的流程",
+    "複雜 agentic coding（Terminal-Bench 類），改用 Sonnet 5.5 / Opus 5.5",
+    "資料等級要求台灣境內處理的工作；需要 Claude API Priority Tier 容量保證的工作",
+    "仍依賴 assistant prefill、budget_tokens 或 temperature 的程式（改寫前）"
+  ],
+  "safetyAndCompliance": [
+    {
+      "item": "拒答與分類器",
+      "detail": "安全分類器拒答時回 stop_reason: refusal，沒有 server-side fallback（Foundry 也不支援 fallbacks 參數）。資安防護比 Haiku 4.5 嚴、比 Sonnet 5.5 寬，仍擋滲透測試等技術；生物防護與 Sonnet 5 / 5.5、Opus 5 相同。可申請 Cyber Verification 與 Life Sciences Verification Program。監控與計費要以 stop_reason 統計，不能只看 HTTP 狀態碼。",
+      "sources": [
+        {
+          "id": "anthropic-haiku55-announce"
+        },
+        {
+          "id": "anthropic-haiku55-whatsnew"
+        },
+        {
+          "id": "anthropic-haiku55-systemcard"
+        },
+        {
+          "id": "anthropic-claude-in-foundry"
+        }
+      ]
+    },
+    {
+      "item": "RSP 門檻",
+      "detail": "系統卡：未跨越 CB-2 與 Autonomy-2 門檻，以 CB-1 / Autonomy-1 的對應措施處理；文件沒有標示 ASL 等級。",
+      "sources": [
+        {
+          "id": "anthropic-haiku55-systemcard"
+        }
+      ]
+    },
+    {
+      "item": "Prompt injection 與惡意請求",
+      "detail": "Gray Swan 間接注入（k=15）攻擊成功率 83.2% → 7.1%（GUI computer use 仍有 24.4%）；Shade 自適應攻擊 coding 0.08%、computer use 0.07%。惡意 Claude Code 請求拒絕率 84.3%（Haiku 4.5 為 66.6%）。",
+      "sources": [
+        {
+          "id": "anthropic-haiku55-systemcard"
+        }
+      ]
+    },
+    {
+      "item": "對齊上的退步項目",
+      "detail": "自動化行為稽核中 over-refuse 最多；未告知就使用外洩答案 17%（Haiku 4.5 為 2%）；幻覺高於其他近期模型。審查流程應納入對應測試。",
+      "sources": [
+        {
+          "id": "anthropic-haiku55-systemcard"
+        }
+      ]
+    },
+    {
+      "item": "多語",
+      "detail": "單輪安全評估涵蓋 7 種語言（含 Mandarin Chinese），沒有繁體中文的專項數據；Microsoft 列出的支援語言含 zh。",
+      "sources": [
+        {
+          "id": "anthropic-haiku55-systemcard"
+        },
+        {
+          "id": "ms-foundry-models-from-partners"
+        }
+      ]
+    },
+    {
+      "item": "資料處理",
+      "detail": "Foundry：Hosted on Anthropic 可能在 Azure 之外處理；Hosted on Azure 的靜態資料存放在選定的 Azure geography；兩者資料保留皆依 Anthropic DPA 與商業條款。Bedrock：費用經 AWS Marketplace 列在模型供應商項下。Agent Platform：global endpoint 的 ML processing 含 asia-southeast1。",
+      "sources": [
+        {
+          "id": "ms-foundry-claude-hosting"
+        },
+        {
+          "id": "aws-bedrock-haiku55-card"
+        },
+        {
+          "id": "agentplatform-claude-haiku55"
+        }
+      ]
+    }
+  ],
+  "enterpriseNotes": [
+    "資料駐留：三雲都沒有台灣境內處理。Bedrock 台北（ap-east-2）只有 Global CRIS；需日本境內處理時從東京或大阪呼叫 jp. profile（+10%）；Sonnet 5.5 在 Bedrock 沒有 jp. profile。Agent Platform 只有 global / US / EU，Foundry 只有美國區域與 swedencentral（後者只有 Global Standard、Hosted on Anthropic，不保證歐洲境內處理），沒有亞太區域。",
+    "Haiku 4.5 退役時程：Anthropic API 標「不早於 2026-10-15」（2026-10-15 讀取時仍為 Active、未公告退役，Anthropic 承諾至少 60 天通知）；Bedrock「不早於 2026-10-16」；Foundry 退役表列 2026-11-15（未列替代）。以 Foundry 的 11-15 作為最早硬期限排遷移。",
+    "成本：以 Haiku 5.5 的 tokenizer 重算；把 >100K 的請求分開估算（RAG 是否切塊、cache 是否把 prompt 推過門檻）。Bedrock Geo、Agent Platform multi-region、Claude API inference_geo: us 都是 1.1 倍；Foundry US Data Zone 的 1.1 倍只見於 Anthropic 定價頁。",
+    "金融業：Haiku 4.5 → 5.5 有參數、thinking、tokenizer 與 Bedrock structured outputs 的變更，屬模型升版，應走變更管理並保存回歸證據。",
+    "繁中：沒有官方繁體中文數據；需自行評估繁中品質、簡體字混入，以及新 tokenizer 下中文的 token 效率。",
+    "LiteLLM：Day-0 文章說 v1.76.0 以上 reload cost map 即可；版本仍依平台建議版本（data/litellm.json）。cost map 有 apac. 列且 Bedrock 標 supports_response_schema: true，兩者都與 Bedrock 模型卡不符，不要據此開路由或依賴 response_format。",
+    "Bedrock service tier：模型卡文字描述 Priority / Flex / Reserved，表格只標 Standard；先以表格為準並向 AWS 確認。預設配額模型卡未列，上線前在帳號 Service Quotas 確認。"
+  ],
+  "testPlanFocus": [
+    "effort low / medium / high 的品質、首 token 延遲與每任務成本，對照 Haiku 4.5 與 GPT-6 Luna / Gemini 3.8 Flash。",
+    "Tokenizer：同一批繁中 / 英文 prompt 在 Haiku 4.5 與 5.5 的 input tokens 比，以及圖片 visual tokens。",
+    "100K 門檻：含 cache read / write 的 prompt 長度判定與帳單分級，四個通路都要驗。",
+    "回歸：budget_tokens、temperature / top_p / top_k、assistant prefill、content[0] 取值、max_tokens 太小只輸出 thinking。",
+    "thinking disabled + effort xhigh / max 應回 400；用 Models API 的 capabilities.thinking.types.disabled 交叉確認。",
+    "forced tool_choice（any / tool）沒有 thinking 時的分類 / 擷取品質，對照 auto + prompt 指示。",
+    "Bedrock：structured outputs 不可用時的替代方案；jp. 與 global. 從台北 / 東京呼叫的延遲。",
+    "跨模型 / 跨帳號 fallback：Haiku 5.5 讀不到 Opus 5.5 / Sonnet 5.5 的 thinking block（靜默丟棄）後的品質。",
+    "拒答率與 over-refusal：繁中客服、資安、醫療語料。"
+  ],
+  "onboarding": {
+    "audience": "透過公司 LiteLLM gateway 呼叫的應用開發團隊（特別是 Claude Haiku 4.5 使用者，以及需要分類 / 路由 / sub-agent 模型的團隊）",
+    "prerequisites": [
+      "gateway key 在 claude-haiku-5-5 允許清單中（評估期間需申請）。",
+      "程式已移除 budget_tokens、temperature / top_p / top_k 與 assistant prefill，並依 type 選取 content block。",
+      "已用 Haiku 5.5 的 tokenizer 重估 token 數與成本（含 >100K 分級）。",
+      "確認資料等級與可用路由。"
+    ],
+    "steps": [
+      {
+        "title": "申請存取",
+        "detail": "在 portal 申請，填用途、預估流量與資料等級。"
+      },
+      {
+        "title": "選路由",
+        "detail": "預設 claude-haiku-5-5（Bedrock global，台北區可呼叫）；需日本境內處理用 @bedrock-jp（+10%）；GCP 專案用 @vertex；Azure 專案用 @azure（美國區域或 swedencentral，沒有亞太區域）。"
+      },
+      {
+        "title": "設定 effort",
+        "detail": "預設是 medium；高流量分類 / 路由先試 low；要最低延遲可送 thinking disabled（effort 必須 ≤ high）。"
+      },
+      {
+        "title": "控制 prompt 長度",
+        "detail": "≤100K 才是 $0.10 / $0.50；長文件先切塊，並注意 cache read / write 也計入門檻。"
+      },
+      {
+        "title": "從 Haiku 4.5 遷移",
+        "detail": "Foundry 2026-11-15 退役、Bedrock 不早於 2026-10-16；先跑 golden set 對照（品質、token 數、拒答率），再切 alias。"
+      },
+      {
+        "title": "監控拒答",
+        "detail": "記錄 stop_reason: refusal 與 stop_details；Haiku 5.5 沒有 server-side fallback。"
+      }
+    ],
+    "aliases": [
+      {
+        "alias": "claude-haiku-5-5",
+        "target": "bedrock/converse/global.anthropic.claude-haiku-5-5",
+        "note": "預設路由（台北區只有 Global）"
+      },
+      {
+        "alias": "claude-haiku-5-5@bedrock-jp",
+        "target": "bedrock/converse/jp.anthropic.claude-haiku-5-5",
+        "note": "日本境內處理（+10%）"
+      },
+      {
+        "alias": "claude-haiku-5-5@vertex",
+        "target": "vertex_ai/claude-haiku-5-5（global）"
+      },
+      {
+        "alias": "claude-haiku-5-5@azure",
+        "target": "azure_ai/claude-haiku-5-5"
+      },
+      {
+        "alias": "tier/fast",
+        "target": "評估是否由 gpt-6-luna 改指向 claude-haiku-5-5",
+        "note": "能力層 alias，依發布關卡決定"
+      }
+    ],
+    "parameterGuidance": [
+      {
+        "parameter": "reasoning_effort / output_config.effort",
+        "guidance": "low | medium（預設）| high | xhigh | max。高流量用 low / medium；xhigh / max 只在評測證明有收益時使用。"
+      },
+      {
+        "parameter": "thinking",
+        "guidance": "不要送 enabled + budget_tokens（400）；省略或送 adaptive；要最低延遲可送 disabled，但只限 effort ≤ high；要看推理摘要送 display: summarized。"
+      },
+      {
+        "parameter": "tool_choice",
+        "guidance": "any / 指定 tool 可用，但回應直接是 tool call、沒有 thinking；需要先思考就用 auto 並在 prompt 說明何時用工具。"
+      },
+      {
+        "parameter": "temperature / top_p / top_k",
+        "guidance": "不要送。若送，temperature 只能 1、top_p 只能 0.99；top_k 任何值、或同時送 temperature 與 top_p 都回 400。"
+      },
+      {
+        "parameter": "max_tokens",
+        "guidance": "包含 thinking tokens；太小可能只輸出 thinking 就以 max_tokens 停止。"
+      },
+      {
+        "parameter": "response_format / structured outputs",
+        "guidance": "Bedrock 路由不可用；需要時改走 @vertex / @azure，或用不加 strict 的 tool 並在程式驗證。"
+      },
+      {
+        "parameter": "messages",
+        "guidance": "最後一則必須是 user turn（assistant prefill 回 400）；送回 thinking block 時對話保持 append-only。"
+      }
+    ],
+    "codeSamples": [
+      {
+        "lang": "python",
+        "title": "OpenAI SDK（經 gateway）：低 effort 分類",
+        "code": "import os\nfrom openai import OpenAI\n\nclient = OpenAI(base_url=\"https://llm-gateway.example.internal/v1\", api_key=os.environ[\"LITELLM_API_KEY\"])\n\nresp = client.chat.completions.create(\n    model=\"claude-haiku-5-5\",\n    reasoning_effort=\"low\",  # 預設是 medium；高流量分類 / 路由先試 low\n    max_tokens=2000,         # 包含 thinking tokens，不要設太小\n    # 不要送 temperature / top_p / top_k（非預設值回 400）\n    messages=[\n        {\"role\": \"system\", \"content\": \"把工單分類為 billing、bug、feature、other 其中之一，只回類別。\"},\n        {\"role\": \"user\", \"content\": \"發票金額和合約不符，請協助更正。\"},\n    ],\n)\nprint(resp.model, resp.choices[0].finish_reason)\nprint(resp.choices[0].message.content)\n"
+      },
+      {
+        "lang": "python",
+        "title": "Anthropic SDK（經 gateway 的 /v1/messages）：thinking disabled + 拒答處理",
+        "code": "import os\nfrom anthropic import Anthropic\n\nclient = Anthropic(base_url=\"https://llm-gateway.example.internal\", auth_token=os.environ[\"LITELLM_API_KEY\"])\n\nmsg = client.messages.create(\n    model=\"claude-haiku-5-5\",\n    max_tokens=4000,\n    thinking={\"type\": \"disabled\"},                    # 只限 effort <= high；xhigh / max 會回 400\n    extra_body={\"output_config\": {\"effort\": \"low\"}},\n    # 最後一則必須是 user turn（assistant prefill 回 400）\n    messages=[{\"role\": \"user\", \"content\": \"從這段文字擷取公司名稱與統一編號：...\"}],\n)\nif msg.stop_reason == \"refusal\":                      # 沒有 server-side fallback\n    print(\"refused:\", getattr(msg, \"stop_details\", None))\nelse:\n    # adaptive thinking 開啟時回應可能以 thinking block 開頭：依 type 取，不要用 content[0]\n    print(\"\".join(b.text for b in msg.content if b.type == \"text\"))\n"
+      },
+      {
+        "lang": "yaml",
+        "title": "LiteLLM 設定",
+        "code": "model_list:\n  - model_name: claude-haiku-5-5                     # 預設：Bedrock Global CRIS（台北區只有 Global）\n    litellm_params:\n      model: bedrock/converse/global.anthropic.claude-haiku-5-5\n      aws_region_name: ap-east-2\n      additional_drop_params: [\"temperature\", \"top_p\", \"top_k\"]   # 先在 staging 以 compat suite 驗證\n    model_info: {catalog_id: claude-haiku-5-5, service: bedrock, data_residency: global}\n  - model_name: claude-haiku-5-5@bedrock-jp          # 日本境內處理（jp. geo，+10%）\n    litellm_params:\n      model: bedrock/converse/jp.anthropic.claude-haiku-5-5\n      aws_region_name: ap-northeast-1\n      additional_drop_params: [\"temperature\", \"top_p\", \"top_k\"]\n    model_info: {catalog_id: claude-haiku-5-5, service: bedrock, data_residency: jp}\n  - model_name: claude-haiku-5-5@vertex\n    litellm_params:\n      model: vertex_ai/claude-haiku-5-5\n      vertex_project: os.environ/VERTEX_PROJECT\n      vertex_location: global                         # 或 us / eu（multi-region，+10%）\n      additional_drop_params: [\"temperature\", \"top_p\", \"top_k\"]\n    model_info: {catalog_id: claude-haiku-5-5, service: agent-platform, data_residency: global}\n  - model_name: claude-haiku-5-5@azure\n    litellm_params:\n      model: azure_ai/claude-haiku-5-5\n      api_base: os.environ/AZURE_AI_CLAUDE_API_BASE\n      api_key: os.environ/AZURE_AI_CLAUDE_API_KEY\n      additional_drop_params: [\"temperature\", \"top_p\", \"top_k\"]\n    model_info: {catalog_id: claude-haiku-5-5, service: foundry, data_residency: global}\n"
+      }
+    ],
+    "dataClassification": "範例政策：公開 / 內部資料可用任一已核准路由；機密資料只可用明確限定處理地的路由（例：claude-haiku-5-5@bedrock-jp，Bedrock JP geo）並經法務核准；極機密資料不開放（三雲皆無台灣境內處理選項）。請依公司資料分級規範調整。",
+    "support": "Slack #llm-platform；每週四 14:00 office hour（範例，請改成你們的窗口）"
+  },
+  "openQuestions": [
+    "between_tools 是否適用 Haiku 5.5？（Haiku 5.5 的 overview、what's new、migration guide 與 effort 頁都沒有提到，只寫 disabled 限 effort ≤ high）",
+    "Foundry 手動 thinking：models-from-partners 頁寫 thinking enabled 不支援，Claude models 頁的 thinking 表標 enabled = Yes；Anthropic 說 budget_tokens 回 400——Foundry 實際行為要實測。",
+    "Foundry 的 version / hosting 對應：catalog 頁說 version 2 在 Azure、version 1 在 Anthropic；hosting 比較頁說 Hosted on Azure 也有 Global Standard，但 models-from-partners 的 Global Standard 表只列 version 1——Azure-hosted 是否有 Global Standard？（2026-10-15 重讀：Global Standard 表仍只有 version 1，含 8 個美國區域與 swedencentral。）",
+    "Foundry 上的 computer use 用哪個工具版本？（Anthropic Foundry 頁：computer_toolset_20260801 / browser_toolset_20260801 在 Foundry 不可用；Foundry catalog 仍列 computer use 為能力）",
+    "Foundry US Data Zone 的 1.1 倍只見於 Anthropic 定價頁，Microsoft 頁面未提——實際帳單是否如此？",
+    "Bedrock service tier：模型卡文字描述 Priority / Flex / Reserved，表格只標 Standard——實際可用哪些？",
+    "Bedrock 預設配額（模型卡未列）與 Foundry 的 RPM / ITPM / OTPM 數字（Claude 模型頁只列單位）？",
+    "Per-message effort（mid-conversation-output-config-2026-07-01）：effort 頁只列 Claude API 與 Google Cloud——Bedrock / Foundry 是否支援？LiteLLM 是否會傳遞？",
+    "LiteLLM 如何把 reasoning_effort 對應到 output_config.effort、是否接受 xhigh / max？（Day-0 文章沒有說明）",
+    "Anthropic API 的 Haiku 4.5 實際退役日？（2026-10-15 讀取：仍為 Active、只寫不早於 2026-10-15、尚未公告）",
+    "AA 首 token 延遲（max effort）：模型頁 FAQ 為 302.98 秒、leaderboard 首 chunk 為 318.08 秒，兩頁數字不一（整合時同日再讀模型頁 FAQ 為 336.77 秒，屬滾動量測）；leaderboard 也未列 Haiku 4.5，無法用 AA 直接比較前代。",
+    "繁體中文品質與 token 效率（沒有官方數據）。"
+  ],
+  "sources": [
+    {
+      "id": "anthropic-haiku55-announce"
+    },
+    {
+      "id": "anthropic-haiku55-overview"
+    },
+    {
+      "id": "anthropic-haiku55-whatsnew"
+    },
+    {
+      "id": "anthropic-haiku55-migration"
+    },
+    {
+      "id": "anthropic-effort"
+    },
+    {
+      "id": "anthropic-haiku55-systemcard"
+    },
+    {
+      "id": "anthropic-pricing"
+    },
+    {
+      "id": "anthropic-models-overview"
+    },
+    {
+      "id": "anthropic-deprecations"
+    },
+    {
+      "id": "anthropic-release-notes"
+    },
+    {
+      "id": "anthropic-claude-in-foundry"
+    },
+    {
+      "id": "aws-bedrock-haiku55-card"
+    },
+    {
+      "id": "aws-bedrock-haiku45-card"
+    },
+    {
+      "id": "aws-bedrock-sonnet55-card"
+    },
+    {
+      "id": "anthropic-sonnet55-whatsnew"
+    },
+    {
+      "id": "aws-bedrock-pricing"
+    },
+    {
+      "id": "aws-haiku55-blog"
+    },
+    {
+      "id": "agentplatform-claude-haiku55"
+    },
+    {
+      "id": "google-agentplatform-pricing"
+    },
+    {
+      "id": "google-agentplatform-release-notes"
+    },
+    {
+      "id": "ms-foundry-claude-models"
+    },
+    {
+      "id": "ms-foundry-models-from-partners"
+    },
+    {
+      "id": "ms-foundry-claude-hosting"
+    },
+    {
+      "id": "ms-foundry-retirement-schedule"
+    },
+    {
+      "id": "ms-foundry-catalog-claude-haiku55"
+    },
+    {
+      "id": "aa-haiku55"
+    },
+    {
+      "id": "aa-leaderboard-models"
+    },
+    {
+      "id": "litellm-haiku55-day0"
+    },
+    {
+      "id": "litellm-cost-map-main"
+    }
+  ]
+}
