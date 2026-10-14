@@ -689,6 +689,16 @@ export interface RequirementsFile {
 // Weekly digest (produced by the scheduled research task)
 // ---------------------------------------------------------------------------
 
+/**
+ * Subject key of a digest entry: the same subject reported on different days carries the same topic and is merged
+ * into ONE Release Radar card (latest wording + dated history). Format "<area>:<subject>[:<aspect>]", lowercase, e.g.
+ * "pricing:claude-sonnet-5-5", "litellm:recommended-version", "cve:cve-2026-89032",
+ * "lifecycle:gemini-api:gemini-3-1-flash-image".
+ * @pattern ^[a-z0-9][a-z0-9-]*(?::[a-z0-9][a-z0-9._-]*){1,3}$
+ * @maxLength 100
+ */
+export type RadarTopic = string;
+
 export interface DigestItem {
   title: string;
   date?: ISODate;
@@ -697,6 +707,33 @@ export interface DigestItem {
   detail: string;
   impact: "high" | "medium" | "low";
   sources: SourceRef[];
+  /**
+   * Same subject across days, merged into one Radar card (within the same section). Format
+   * "<area>:<subject>[:<aspect>]", lowercase, e.g. "pricing:claude-sonnet-5-5", "litellm:recommended-version",
+   * "cve:cve-2026-89032", "lifecycle:gemini-api:gemini-3-1-flash-image".
+   */
+  topic?: RadarTopic;
+  /** true = coverage note ("checked, no change"): the Radar shows it under a separate collapsed block, not as news. */
+  check?: boolean;
+  /**
+   * Exact titles of EARLIER digest entries of the same section that this entry updates; the Radar folds them into this entry.
+   * @maxItems 10
+   */
+  merges?: string[];
+}
+
+export interface DigestActionItem {
+  priority: Priority;
+  action: string;
+  due?: ISODate;
+  relatedModelIds?: string[];
+  /** Same task across days, merged into one Radar action item (same format as DigestItem.topic). */
+  topic?: RadarTopic;
+  /**
+   * Exact `action` texts of EARLIER digest action items that this item updates; the Radar folds them into this item.
+   * @maxItems 10
+   */
+  merges?: string[];
 }
 
 export interface DigestFile {
@@ -713,7 +750,7 @@ export interface DigestFile {
   litellm: DigestItem[];
   security: DigestItem[];
   regulatory: DigestItem[];
-  actionItems: { priority: Priority; action: string; due?: ISODate; relatedModelIds?: string[] }[];
+  actionItems: DigestActionItem[];
   watchlist: WatchItem[];
   /** Facts the research job could not verify from a primary source. */
   unverified: string[];
@@ -740,16 +777,54 @@ export interface RadarProvenance {
   isNew: boolean;
 }
 
+/** An earlier statement folded into a merged Radar news card (newest first; the card's current wording is not repeated). */
+export interface RadarUpdate {
+  /** Digest id (date) of the statement. */
+  date: ISODate;
+  title: string;
+  detail?: string;
+}
+
+/** An earlier wording of a merged Radar action item (newest first; the item's current wording is not repeated). */
+export interface RadarActionUpdate {
+  /** Digest id (date) of the statement. */
+  date: ISODate;
+  action: string;
+  priority: Priority;
+  due?: ISODate;
+}
+
 export interface RadarActionItem extends RadarProvenance {
   priority: Priority;
   action: string;
   due?: ISODate;
   relatedModelIds?: string[];
+  /** The subject key the item was merged by (DigestActionItem.topic or radar/curation.json `topics`). */
+  topic?: RadarTopic;
+  /** Earlier statements folded into this item, newest first, excluding the current one. */
+  updates?: RadarActionUpdate[];
   /** "due" = has a due date not yet passed; "open" = no due date, still within the carry window. */
   state: "due" | "open";
 }
 
-export interface RadarItem extends DigestItem, RadarProvenance {}
+export interface RadarItem extends Omit<DigestItem, "check" | "merges">, RadarProvenance {
+  /** Earlier statements folded into this card, newest first, excluding the current one. */
+  updates?: RadarUpdate[];
+}
+
+export type RadarSection = "newModels" | "lifecycleChanges" | "pricingChanges" | "litellm" | "security" | "regulatory";
+
+/** A coverage note ("checked, no change"): DigestItem.check, or an entry listed in radar/curation.json `checks`. */
+export interface RadarCheck {
+  /** The entry's own id (hash of its section and normalised title), for radar/curation.json. */
+  id: string;
+  /** Digest id (date) of the note. */
+  date: ISODate;
+  section: RadarSection;
+  title: string;
+  detail: string;
+  sources: SourceRef[];
+}
 
 export interface RadarFile {
   schema: "radar/v1";
@@ -771,6 +846,11 @@ export interface RadarFile {
   litellm: RadarItem[];
   security: RadarItem[];
   regulatory: RadarItem[];
+  /**
+   * Coverage notes ("checked, no change") of the last 3 digests, newest first; per section only the notes of the newest
+   * digest that has any. Never part of the news sections. Shown collapsed.
+   */
+  checks?: RadarCheck[];
   watchlist: WatchItem[];
   unverified: string[];
 }
@@ -780,10 +860,20 @@ export interface RadarCuration {
   schema: "radar-curation/v1";
   /** Several texts that say the same thing: the entries listed in `ids` become one entry with the id `keep` (newest wording wins). */
   merge: { keep: string; ids: string[]; reason: string }[];
-  /** Action items done or no longer relevant before their due date. */
+  /**
+   * Action items done or no longer relevant before their due date. Applies to the item that contains `id` while no other
+   * entry merged into it restated the subject after `id`'s last statement.
+   */
   close: { id: string; on: ISODate; reason: string }[];
   /** New wording for an action item (e.g. a merged tracker without the models that launched). Ignored once a newer digest restates the item. */
   rewrite?: { id: string; on: ISODate; action: string; priority?: Priority; due?: ISODate | null; reason: string }[];
+  /**
+   * Topics for entries written before digests carried `topic`: every entry id listed (news "it-…" or action "ai-…";
+   * an entry's own id or a card id) gets the topic, so entries of the same subject become one card.
+   */
+  topics?: { topic: RadarTopic; ids: string[]; reason: string }[];
+  /** Legacy news entries that are coverage notes ("checked, no change"), as if they carried `check: true`. */
+  checks?: { ids: string[]; reason: string }[];
 }
 
 // ---------------------------------------------------------------------------

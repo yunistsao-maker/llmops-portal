@@ -679,34 +679,49 @@
       ],
       "type": "object"
     },
+    "DigestActionItem": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "type": "string"
+        },
+        "due": {
+          "$ref": "#/definitions/ISODate"
+        },
+        "merges": {
+          "description": "Exact `action` texts of EARLIER digest action items that this item updates; the Radar folds them into this item.",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 10,
+          "type": "array"
+        },
+        "priority": {
+          "$ref": "#/definitions/Priority"
+        },
+        "relatedModelIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "topic": {
+          "$ref": "#/definitions/RadarTopic",
+          "description": "Same task across days, merged into one Radar action item (same format as DigestItem.topic)."
+        }
+      },
+      "required": [
+        "priority",
+        "action"
+      ],
+      "type": "object"
+    },
     "DigestFile": {
       "additionalProperties": false,
       "properties": {
         "actionItems": {
           "items": {
-            "additionalProperties": false,
-            "properties": {
-              "action": {
-                "type": "string"
-              },
-              "due": {
-                "$ref": "#/definitions/ISODate"
-              },
-              "priority": {
-                "$ref": "#/definitions/Priority"
-              },
-              "relatedModelIds": {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              }
-            },
-            "required": [
-              "priority",
-              "action"
-            ],
-            "type": "object"
+            "$ref": "#/definitions/DigestActionItem"
           },
           "type": "array"
         },
@@ -805,6 +820,10 @@
     "DigestItem": {
       "additionalProperties": false,
       "properties": {
+        "check": {
+          "description": "true = coverage note (\"checked, no change\"): the Radar shows it under a separate collapsed block, not as news.",
+          "type": "boolean"
+        },
         "clouds": {
           "items": {
             "$ref": "#/definitions/Cloud"
@@ -825,6 +844,14 @@
           ],
           "type": "string"
         },
+        "merges": {
+          "description": "Exact titles of EARLIER digest entries of the same section that this entry updates; the Radar folds them into this entry.",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 10,
+          "type": "array"
+        },
         "sources": {
           "items": {
             "$ref": "#/definitions/SourceRef"
@@ -833,6 +860,10 @@
         },
         "title": {
           "type": "string"
+        },
+        "topic": {
+          "$ref": "#/definitions/RadarTopic",
+          "description": "Same subject across days, merged into one Radar card (within the same section). Format \"<area>:<subject>[:<aspect>]\", lowercase, e.g. \"pricing:claude-sonnet-5-5\", \"litellm:recommended-version\", \"cve:cve-2026-89032\", \"lifecycle:gemini-api:gemini-3-1-flash-image\"."
         },
         "vendor": {
           "$ref": "#/definitions/Vendor"
@@ -2724,6 +2755,17 @@
             "open"
           ],
           "type": "string"
+        },
+        "topic": {
+          "$ref": "#/definitions/RadarTopic",
+          "description": "The subject key the item was merged by (DigestActionItem.topic or radar/curation.json `topics`)."
+        },
+        "updates": {
+          "description": "Earlier statements folded into this item, newest first, excluding the current one.",
+          "items": {
+            "$ref": "#/definitions/RadarActionUpdate"
+          },
+          "type": "array"
         }
       },
       "required": [
@@ -2738,12 +2780,98 @@
       ],
       "type": "object"
     },
+    "RadarActionUpdate": {
+      "additionalProperties": false,
+      "description": "An earlier wording of a merged Radar action item (newest first; the item's current wording is not repeated).",
+      "properties": {
+        "action": {
+          "type": "string"
+        },
+        "date": {
+          "$ref": "#/definitions/ISODate",
+          "description": "Digest id (date) of the statement."
+        },
+        "due": {
+          "$ref": "#/definitions/ISODate"
+        },
+        "priority": {
+          "$ref": "#/definitions/Priority"
+        }
+      },
+      "required": [
+        "date",
+        "action",
+        "priority"
+      ],
+      "type": "object"
+    },
+    "RadarCheck": {
+      "additionalProperties": false,
+      "description": "A coverage note (\"checked, no change\"): DigestItem.check, or an entry listed in radar/curation.json `checks`.",
+      "properties": {
+        "date": {
+          "$ref": "#/definitions/ISODate",
+          "description": "Digest id (date) of the note."
+        },
+        "detail": {
+          "type": "string"
+        },
+        "id": {
+          "description": "The entry's own id (hash of its section and normalised title), for radar/curation.json.",
+          "type": "string"
+        },
+        "section": {
+          "$ref": "#/definitions/RadarSection"
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/definitions/SourceRef"
+          },
+          "type": "array"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "date",
+        "section",
+        "title",
+        "detail",
+        "sources"
+      ],
+      "type": "object"
+    },
     "RadarCuration": {
       "additionalProperties": false,
       "description": "Human / agent decisions the roll-up applies (radar/curation.json — outside data/, which a release replaces).",
       "properties": {
+        "checks": {
+          "description": "Legacy news entries that are coverage notes (\"checked, no change\"), as if they carried `check: true`.",
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "ids": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "ids",
+              "reason"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
         "close": {
-          "description": "Action items done or no longer relevant before their due date.",
+          "description": "Action items done or no longer relevant before their due date. Applies to the item that contains `id` while no other entry merged into it restated the subject after `id`'s last statement.",
           "items": {
             "additionalProperties": false,
             "properties": {
@@ -2837,6 +2965,33 @@
         "schema": {
           "const": "radar-curation/v1",
           "type": "string"
+        },
+        "topics": {
+          "description": "Topics for entries written before digests carried `topic`: every entry id listed (news \"it-…\" or action \"ai-…\"; an entry's own id or a card id) gets the topic, so entries of the same subject become one card.",
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "ids": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "topic": {
+                "$ref": "#/definitions/RadarTopic"
+              }
+            },
+            "required": [
+              "topic",
+              "ids",
+              "reason"
+            ],
+            "type": "object"
+          },
+          "type": "array"
         }
       },
       "required": [
@@ -2858,6 +3013,13 @@
         "asOf": {
           "$ref": "#/definitions/ISODate",
           "description": "The version of this view = the newest digest id."
+        },
+        "checks": {
+          "description": "Coverage notes (\"checked, no change\") of the last 3 digests, newest first; per section only the notes of the newest digest that has any. Never part of the news sections. Shown collapsed.",
+          "items": {
+            "$ref": "#/definitions/RadarCheck"
+          },
+          "type": "array"
         },
         "coverage": {
           "additionalProperties": false,
@@ -2986,6 +3148,17 @@
                   "open"
                 ],
                 "type": "string"
+              },
+              "topic": {
+                "$ref": "#/definitions/RadarTopic",
+                "description": "The subject key the item was merged by (DigestActionItem.topic or radar/curation.json `topics`)."
+              },
+              "updates": {
+                "description": "Earlier statements folded into this item, newest first, excluding the current one.",
+                "items": {
+                  "$ref": "#/definitions/RadarActionUpdate"
+                },
+                "type": "array"
               }
             },
             "required": [
@@ -3110,6 +3283,17 @@
         "title": {
           "type": "string"
         },
+        "topic": {
+          "$ref": "#/definitions/RadarTopic",
+          "description": "Same subject across days, merged into one Radar card (within the same section). Format \"<area>:<subject>[:<aspect>]\", lowercase, e.g. \"pricing:claude-sonnet-5-5\", \"litellm:recommended-version\", \"cve:cve-2026-89032\", \"lifecycle:gemini-api:gemini-3-1-flash-image\"."
+        },
+        "updates": {
+          "description": "Earlier statements folded into this card, newest first, excluding the current one.",
+          "items": {
+            "$ref": "#/definitions/RadarUpdate"
+          },
+          "type": "array"
+        },
         "vendor": {
           "$ref": "#/definitions/Vendor"
         }
@@ -3161,6 +3345,44 @@
         "lastSeen",
         "seenIn",
         "isNew"
+      ],
+      "type": "object"
+    },
+    "RadarSection": {
+      "enum": [
+        "newModels",
+        "lifecycleChanges",
+        "pricingChanges",
+        "litellm",
+        "security",
+        "regulatory"
+      ],
+      "type": "string"
+    },
+    "RadarTopic": {
+      "description": "Subject key of a digest entry: the same subject reported on different days carries the same topic and is merged into ONE Release Radar card (latest wording + dated history). Format \"<area>:<subject>[:<aspect>]\", lowercase, e.g. \"pricing:claude-sonnet-5-5\", \"litellm:recommended-version\", \"cve:cve-2026-89032\", \"lifecycle:gemini-api:gemini-3-1-flash-image\".",
+      "maxLength": 100,
+      "pattern": "^[a-z0-9][a-z0-9-]*(?::[a-z0-9][a-z0-9._-]*){1,3}$",
+      "type": "string"
+    },
+    "RadarUpdate": {
+      "additionalProperties": false,
+      "description": "An earlier statement folded into a merged Radar news card (newest first; the card's current wording is not repeated).",
+      "properties": {
+        "date": {
+          "$ref": "#/definitions/ISODate",
+          "description": "Digest id (date) of the statement."
+        },
+        "detail": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "date",
+        "title"
       ],
       "type": "object"
     },

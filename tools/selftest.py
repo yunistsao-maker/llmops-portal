@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""End-to-end self-test: mock gateway -> compat suite -> perf probe -> inventory sync -> schema validation.
+"""End-to-end self-test: Release Radar merge rules -> mock gateway -> compat suite -> perf probe -> inventory sync ->
+schema validation.
 
   python3 tools/selftest.py        # no credentials, no model spend; ~20 s
 
@@ -7,13 +8,17 @@ Use it in CI whenever the tools or the schema change.
 """
 from __future__ import annotations
 
+import contextlib
+import io
 import json
 import os
+import shutil
 import socket
 import subprocess
 import sys
 import tempfile
 import time
+from pathlib import Path
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, ".."))
@@ -31,11 +36,76 @@ def run(cmd, **kw):
     return subprocess.run(cmd, cwd=ROOT, text=True, capture_output=True, **kw)
 
 
+def radar_selftest(failures: list[str]) -> None:
+    """tools/build_radar.py on three synthetic digests: topic / merges / check, curation topics / checks / close."""
+    sys.path.insert(0, HERE)
+    import build_radar as br
+
+    src = [{"id": json.load(open(os.path.join(ROOT, "data/sources.json")))["sources"][0]["id"]}]
+    item = lambda title, **kw: {"title": title, "detail": f"{title} 的說明", "impact": "low", "sources": src, **kw}
+    act = lambda text, **kw: {"priority": "P1", "action": text, **kw}
+    days = {
+        "2026-10-01": {"pricingChanges": [item("X 價格 $1", topic="pricing:x"), item("Y 價格"), item("本期沒有牌價變動", check=True),
+                                          item("W 的舊價格")],
+                       "actionItems": [act("升級 gateway 到 v1", due="2026-10-10", topic="gw:upgrade"), act("盤點 Z 的使用", priority="P2")]},
+        "2026-10-02": {"pricingChanges": [item("X 降價到 $0.5", topic="pricing:x"), item("Y 價格更正", merges=["Y 價格"]),
+                                          item("本期沒有既有模型的牌價變動")],
+                       "actionItems": [act("gateway 改升 v2：先在 staging 驗證，再通知使用者重新登入", due="2026-10-12", topic="gw:upgrade")]},
+        "2026-10-03": {"pricingChanges": [item("W 價格公告"), item("V 價格", merges=["從來沒有出現過的標題"])], "actionItems": []},
+    }
+    tmp = tempfile.mkdtemp(prefix="llmops-radar-selftest-")
+    os.makedirs(os.path.join(tmp, "data/digests"))
+    os.makedirs(os.path.join(tmp, "radar"))
+    os.makedirs(os.path.join(tmp, "schema"))
+    for did, body in days.items():
+        doc = {"schema": "digest/v1", "id": did, "locale": "zh-TW", "periodStart": did, "periodEnd": did,
+               "generatedAt": f"{did}T00:00:00Z", "headline": f"{did} 摘要", "newModels": [], "lifecycleChanges": [],
+               "pricingChanges": [], "litellm": [], "security": [], "regulatory": [], "watchlist": [], "unverified": [], **body}
+        json.dump(doc, open(os.path.join(tmp, f"data/digests/{did}.json"), "w"), ensure_ascii=False)
+    pid = lambda title: br.hid("it-", "pricingChanges", br.norm(title))
+    aid = lambda text: br.hid("ai-", "", br.norm(text))
+    curation = {"schema": "radar-curation/v1", "merge": [],
+                "close": [{"id": aid("升級 gateway 到 v1"), "on": "2026-10-02", "reason": "被 v2 取代"},
+                          {"id": aid("盤點 Z 的使用"), "on": "2026-10-03", "reason": "已完成"}],
+                "topics": [{"topic": "pricing:w", "ids": [pid("W 的舊價格"), pid("W 價格公告")], "reason": "同一個模型的價格"}],
+                "checks": [{"ids": [pid("本期沒有既有模型的牌價變動")], "reason": "複查紀錄"}]}
+    json.dump(curation, open(os.path.join(tmp, "radar/curation.json"), "w"), ensure_ascii=False)
+    err = io.StringIO()
+    with contextlib.redirect_stderr(err):
+        radar = br.build(Path(tmp))
+    json.dump(radar, open(os.path.join(tmp, "data/radar.json"), "w"), ensure_ascii=False)
+    cards = {c["title"]: c for c in radar["pricingChanges"]}
+    want = {"X 降價到 $0.5": ("pricing:x", ["X 價格 $1"], pid("X 價格 $1")), "Y 價格更正": (None, ["Y 價格"], pid("Y 價格")),
+            "W 價格公告": ("pricing:w", ["W 的舊價格"], pid("W 的舊價格")), "V 價格": (None, [], pid("V 價格"))}
+    if set(cards) != set(want):
+        failures.append(f"radar: pricing cards {sorted(cards)} (want {sorted(want)})")
+    for title, (topic, older, cid) in want.items():
+        c = cards.get(title, {})
+        if c and (c.get("topic") != topic or [u["title"] for u in c.get("updates", [])] != older or c["id"] != cid):
+            failures.append(f"radar: card {title!r}: topic {c.get('topic')}, updates {c.get('updates')}, id {c['id']} (want {topic}, {older}, {cid})")
+    if [(c["date"], c["title"]) for c in radar["checks"]] != [("2026-10-02", "本期沒有既有模型的牌價變動")]:
+        failures.append(f"radar: checks {radar['checks']} (want only the newest digest's coverage note)")
+    up = [a for a in radar["actionItems"] if a.get("topic") == "gw:upgrade"]
+    if len(up) != 1 or up[0]["action"] != "gateway 改升 v2：先在 staging 驗證，再通知使用者重新登入" or [u["action"] for u in up[0].get("updates", [])] != ["升級 gateway 到 v1"]:
+        failures.append(f"radar: gw:upgrade should be one open item (a close on its older statement does not close it): {up}")
+    if [(a["action"], a["reason"]) for a in radar["retired"]] != [("盤點 Z 的使用", "closed")]:
+        failures.append(f"radar: retired {radar['retired']}")
+    if "merges names no earlier entry" not in err.getvalue():
+        failures.append("radar: an unresolved `merges` title should be reported on stderr")
+    shutil.copy(os.path.join(ROOT, "schema/llmops.schema.json"), os.path.join(tmp, "schema/llmops.schema.json"))
+    shutil.copy(os.path.join(ROOT, "data/sources.json"), os.path.join(tmp, "data/sources.json"))
+    r = run([PY, "tools/validate_data.py", "--root", tmp])
+    if r.returncode != 0:
+        failures.append("radar: synthetic digests / curation / radar.json failed schema validation:\n" + r.stdout[-1500:])
+    print("radar merge rules:", "ok" if not failures else "FAILED")
+
+
 def main():
+    failures = []
+    radar_selftest(failures)
     port = free_port()
     gw = f"http://127.0.0.1:{port}"
     srv = subprocess.Popen([PY, os.path.join(HERE, "mock_gateway.py"), "--port", str(port)], stdout=subprocess.PIPE, text=True)
-    failures = []
     try:
         for _ in range(50):
             try:
@@ -104,7 +174,6 @@ def main():
         # validate the generated run files with the real schema
         os.makedirs(os.path.join(tmp, "schema"), exist_ok=True)
         os.makedirs(os.path.join(tmp, "data"), exist_ok=True)
-        import shutil
         shutil.copy(os.path.join(ROOT, "schema/llmops.schema.json"), os.path.join(tmp, "schema/llmops.schema.json"))
         shutil.copy(os.path.join(ROOT, "data/sources.json"), os.path.join(tmp, "data/sources.json"))
         r = run([PY, "tools/validate_data.py", "--root", tmp])

@@ -31,14 +31,14 @@ tools/
   validate_data.py         Python：schema + 跨檔檢查（來源 id、重複 id、日期）
   validate.mjs             Node/ajv：schema 檢查（給前端 CI）
   mock_gateway.py          不花 token 的模擬 gateway
-  selftest.py              端到端自測（mock → compat → perf → inventory → schema）
+  selftest.py              端到端自測（Radar 合併規則 → mock → compat → perf → inventory → schema）
   build_site.mjs           組出 dist/：site/ + data/ + runs/ + config/，並產生 data/manifest.json（含 radarAsOf 與 release，供部署後檢查）
   build_radar.py           產生 data/radar.json；--check 檢查是否最新（npm run validate 會跑）
   build_versions.py        Amplify build：替最近 6 天的每日版本各建一份 Radar（versions/<日期>/，由 fetch_release.mjs 抓下）
   fetch_release.mjs        Amplify build 時抓 pipeline 上線中的 release（release 還沒有的 open-models.json 沿用 repo 的版本）
   sec_suite.py + secsuite/ AI 安全測試（G6）：核准後下載公開資料集、抽樣、執行、本機 UI（見 tools/secsuite/README.md）
 runs/compat, runs/perf    測試結果（UI「測試結果」頁讀取，由 manifest 列出）
-radar/curation.json       合併 Release Radar 時套用的人工決定：合併同義項目、關閉已完成的行動項目、改寫過時的說法
+radar/curation.json       合併 Release Radar 時套用的人工決定：合併同義項目、替舊紀錄補 topic、標出複查紀錄、關閉已完成的行動項目、改寫過時的說法
 site/                     由 web/ build 出來的 portal UI（Amplify 直接使用，不在雲端 build JS）
 web/                      portal UI 原始碼（React + Vite）；改畫面後 `cd web && npm run build`，再把 dist 的 index.html、assets/、security-tests.html 複製到 site/
 amplify.yml               Amplify：validate_data.py → build_site.mjs → 發布 dist/
@@ -62,7 +62,7 @@ npm run selftest                  # 不需憑證，約 20 秒
 
 | 頁面 | 讀取 | 重點 |
 |---|---|---|
-| 首頁 / Release Radar | `radar.json`（合併版本；沒有時退回最新一份 digest）、`lifecycle.json` | 頁面上方的「資料版本」選單（每個研究頁面都有）切換最近 7 天；未到期的行動項目全部列出（當天新增的有標示）、最近 14 天移出的項目、各類新聞合併去重。原始紀錄在 `#/digest/<日期>`（稽核用） |
+| 首頁 / Release Radar | `radar.json`（合併版本；沒有時退回最新一份 digest）、`lifecycle.json` | 頁面上方的「資料版本」選單（每個研究頁面都有）切換最近 7 天；未到期的行動項目全部列出（當天新增、當天更新的有標示）、最近 14 天移出的項目；同一件事不論哪天報導都只有一張卡（最新說法＋「更新紀錄」），「已複查、沒有變動」另外收合列出。原始紀錄在 `#/digest/<日期>`（稽核用） |
 | 開源模型 | `open-models.json` | 熱度判定依據、三雲託管、授權與導入注意事項 |
 | 模型目錄 | `catalog.json` → `models[]` | 依 vendor、tier、雲、platformStatus、`taiwanResidency`、價格篩選 |
 | 模型頁 · 概覽 | `catalog.json` + `models/<id>.json` | tldr、strengths / weaknesses、bestFor / avoidFor |
@@ -145,9 +145,31 @@ Azure 部署名稱是自訂的，請在 LiteLLM 設定的 `model_info` 加 `base
 每一次研究產生一份 digest（`data/digests/<日期>.json`），寫入後不再修改——它是「那一天查到什麼」的稽核紀錄。
 Release Radar 頁讀的是 `data/radar.json`：`tools/build_radar.py` 把所有 digest 合併成一份目前狀態，日期就是版本（Amplify 每次 build 都重新產生；舊版本留在 pipeline 的 release 與 git 歷史）。
 
-- 行動項目：文字相同或幾乎相同的視為同一項；有到期日的在到期前都顯示，沒有到期日的在最後一次被提到後 30 天內顯示。
-- `radar/curation.json` 放人（或整理用的 agent）做的決定：`merge`（同一件事的不同說法）、`close`（已完成或被取代，附理由）、`rewrite`（改寫過時的說法；之後的 digest 又提到時以 digest 為準）。
-- 新聞類（新模型、價格、LiteLLM、資安、法規）依標題合併，30 天後移出；生命週期變動在它自己的日期之前一直顯示。
+**同一件事只有一張卡。** 不同天的紀錄（新聞只在同一節內；行動項目全部一起）符合下面任一條就合併：
+
+1. `radar/curation.json` 的 `merge`：同一件事的不同說法，指定合併成 `keep` 那個 id。
+2. 相同的 `topic`：每日紀錄的項目（`DigestItem.topic`、行動項目的 `topic`）自己標；沒有標的舊紀錄由 curation 的 `topics` 補上。
+   格式 `<領域>:<主題>[:<面向>]`，全小寫，例如 `pricing:claude-sonnet-5-5`、`litellm:recommended-version`、`cve:cve-2026-89032`、
+   `lifecycle:gemini-api:gemini-3-1-flash-image`、`regulation:eu-ai-act`。研究任務寫新的一期時，先看 `radar.json` 各卡片的 `topic`，同一件事沿用同一個 topic。
+3. `merges`：新項目列出它更新的「較早」項目的完整標題（行動項目是完整的 `action` 文字，最多 10 個）；比對時忽略標點與「【…補充】」標記。找不到的標題會在 build 時印警告。
+4. 文字相同或幾乎相同（正規化後相似度 ≥ 0.92）。
+
+合併後的卡片：標題、說明、影響、日期、廠商、雲（行動項目是內容、優先順序、到期日、相關模型）取最新的一則；來源全部保留（最新的在前）；
+`firstSeen` / `lastSeen` / `seenIn` 涵蓋整張卡；較早的說法依日期放在 `updates`（頁面上的「更新紀錄（N）」，最新的在前；連續幾天一字不差的說法只算一次，記第一天）。
+卡片的 id 是卡片裡最早那一則的 id，新的說法加入時 id 不變。
+
+- **複查紀錄不是新聞**：「查過、沒有變動」的項目（每日紀錄標 `check: true`，或舊紀錄列在 curation 的 `checks`）不會變成新聞卡，也不參與合併；
+  `radar.json` 的 `checks` 只放最近 3 份每日紀錄裡、每一節最新一次的複查，頁面上收合在「已複查、沒有變動（N）」。原始紀錄仍在 `#/digest/<日期>`。
+- 行動項目：有到期日的在到期前都顯示，沒有到期日的在最後一次被提到後 30 天內顯示。
+- 新聞類（新模型、價格、LiteLLM、資安、法規）最後一次出現後 30 天移出；生命週期變動在它自己的日期之前一直顯示。
+- `radar/curation.json` 放人（或整理用的 agent）做的決定：
+  - `merge`：同一件事的不同說法（見上面第 1 條）。
+  - `topics`：`{ topic, ids, reason }`，替還沒有 `topic` 的舊紀錄指定主題；`ids` 可以是新聞的 `it-…` 或行動項目的 `ai-…`，填卡片 id 或單則紀錄自己的 id 都可以。
+  - `checks`：`{ ids, reason }`，舊紀錄裡屬於「複查、沒有變動」的新聞項目。
+  - `close`（已完成或被取代，附理由）與 `rewrite`（改寫過時的說法）：填卡片 id 或併進卡片的任一則的 id；只要卡片裡沒有其他項目在那一則之後又提到這件事就有效
+    （有新的說法併進來，就以新的說法為準）；`rewrite` 之後的 digest 又提到時也以 digest 為準。
+  - 寫錯的 id（`topics` / `checks` 對不到任何紀錄）會在 build 時印警告；警告不影響產出的檔案。
+- 每份 digest 寫入後不再修改；舊 digest 沒有 `topic` / `check` / `merges` 也照樣有效（三個欄位都是選填）。
 
 ```bash
 python3 tools/build_radar.py            # 產生 data/radar.json
