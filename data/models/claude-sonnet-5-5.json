@@ -8,7 +8,7 @@
   "whatsNew": [
     {
       "title": "更快、更便宜的 Sonnet",
-      "detail": "官方：比 Sonnet 5 快 30%、多數工作成本低至多 30%；tokenizer 與單價和 Sonnet 5 相同（$2 / $10、cache 寫入 5 分鐘 $2.50 / 1 小時 $4、cache read $0.20、Batch 五折）。",
+      "detail": "官方：比 Sonnet 5 快 30%、多數工作成本低至多 30%；tokenizer 與 input / output 單價和 Sonnet 5 相同（$2 / $10、cache 寫入 5 分鐘 $2.50 / 1 小時 $4、Batch 五折）。Cache read 自 2026-10-07 起由 $0.20 降為 $0.10（基本 input 的 0.05 倍，與 Opus 5.5 相同）。",
       "sources": [
         {
           "id": "anthropic-sonnet55-news"
@@ -18,6 +18,12 @@
         },
         {
           "id": "anthropic-sonnet55-whatsnew"
+        },
+        {
+          "id": "anthropic-release-notes"
+        },
+        {
+          "id": "anthropic-pricing"
         }
       ]
     },
@@ -175,7 +181,7 @@
       "cloud": "aws",
       "service": "bedrock",
       "status": "ga",
-      "notes": "us. / eu. / global. profile；沒有 jp. / au.；APAC 13 個區域（含台北）都只有 Global CRIS；runtime 支援 Messages / Converse / Invoke 與 prompt caching；不支援 structured outputs、Batch；價格未列於模型卡（LiteLLM cost map 列 global $2 / $10、us. / eu. $2.2 / $11，不是 AWS 公布的數字）。"
+      "notes": "us. / eu. / au. / global. profile（au.* 只在雪梨與墨爾本之間路由）；沒有 jp.；APAC 13 個區域中只有雪梨、墨爾本另有 au. Geo，台北、東京等其餘區域只有 Global CRIS；runtime 支援 Messages / Converse / Invoke 與 prompt caching；不支援 structured outputs、Batch、Priority / Flex。Bedrock pricing 頁（動態價格資料，2026-10-15）：Global $2 / $10、cache read $0.10、5 分鐘 / 1 小時寫入 $2.50 / $4；Geo / In-Region $2.20 / $11、cache read $0.11、寫入 $2.75 / $4.40。"
     },
     {
       "cloud": "gcp",
@@ -242,7 +248,7 @@
     "很冗長：AA 評測產生 420M output tokens（中位數 81M），每任務成本 $7.67，高於 Opus 5.5 的 $5.98——務必以每任務成本比較。",
     "AA max effort 首 token 約 442 秒；互動場景要用 low / medium。",
     "thinking 不能完全關閉、forced tool_choice 回 400、temperature 非預設值回 400：舊 Sonnet 程式需改寫。",
-    "Bedrock：沒有 jp / au profile，APAC 只有 Global CRIS；不支援 structured outputs、Batch 與 Priority / Flex；模型卡與 pricing 頁未列價格。",
+    "Bedrock：沒有 jp profile（au. 只在雪梨 / 墨爾本之間路由），台北、東京等其餘 APAC 區域只有 Global CRIS；不支援 structured outputs、Batch 與 Priority / Flex。",
     "沒有台灣境內處理選項。"
   ],
   "bestFor": [
@@ -394,8 +400,8 @@
     "support": "Slack #llm-platform；每週四 14:00 office hour（範例，請改成你們的窗口）"
   },
   "openQuestions": [
-    "Bedrock 價格與 geo 加價？（模型卡 2026-10-06 仍未列；pricing 頁的靜態內容沒有 Claude 5.x 的列。LiteLLM v1.105.0rc1 的 cost map 列 global $2 / $10、us. / eu. $2.2 / $11）",
-    "Bedrock 是否會加 jp. / au. profile？（2026-10-06：模型卡仍只有 us. / eu.；LiteLLM cost map 有 jp. / au. / apac. 的列，但那不是 AWS 的資料）",
+    "（已解，2026-10-15）Bedrock 價格：pricing 頁的動態價格資料列 Global $2 / $10、cache read $0.10；Geo / In-Region 加價 10%（$2.20 / $11、cache read $0.11）。",
+    "Bedrock 是否會加 jp. profile？（2026-10-15：模型卡已有 us. / eu. / au. 與 global.，au.* 只在雪梨與墨爾本之間路由；仍沒有 jp.）",
     "Foundry US Data Zone 的 1.1 倍只見於 Anthropic 定價頁，Microsoft 頁面未提——實際帳單是否如此？",
     "xhigh effort：Bedrock 模型卡列出；Anthropic API、Agent Platform 與 Foundry 是否接受？",
     "Agent Platform 的區域與配額？（定價頁只有 Global 與 US / EU multi-region）",

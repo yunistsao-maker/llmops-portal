@@ -42,7 +42,7 @@ const manifest = {
 writeFileSync(`${dist}/data/manifest.json`, JSON.stringify(manifest, null, 2) + "\n");
 
 // Daily versions (tools/fetch_release.mjs + tools/build_versions.py): data/versions/<date>/ mirrors data/ for each of
-// the 6 days before today; data/versions.json lists the 7 days for the version menu on every page. Today is data/.
+// the 29 days before today; data/versions.json lists the 30 days for the version menu on every page. Today is data/.
 const taipeiToday = new Date(Date.now() + 8 * 3600_000).toISOString().slice(0, 10);
 const listed = existsSync(`${root}.portal-versions.json`) ? JSON.parse(readFileSync(`${root}.portal-versions.json`, "utf8")) : null;
 const days = listed?.days?.length ? listed.days : [{ date: taipeiToday, releaseId: manifest.release, publishedAt: null }];

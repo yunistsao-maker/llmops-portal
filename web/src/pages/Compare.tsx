@@ -1,16 +1,22 @@
 import { go } from "../App";
-import { linkTo, loaders, money, useData } from "../data";
+import { aaScore, linkTo, loaders, money, newestAAVersion, useData } from "../data";
 import { Empty, PageHead, Status } from "../ui";
 import type { Model } from "../../../schema/types";
 
-const rows: [string, (m: Model) => React.ReactNode][] = [
+function aaCell(m: Model, version?: string) {
+  const { score: b, other } = aaScore(m, version);
+  if (b) return b.rank ? `${b.score}（${b.rank}）` : `${b.score}`;
+  return <>—{other && <div className="note">只有 {other.version} 的分數（{other.score}），不同版本不比較</div>}</>;
+}
+
+const rows = (aa?: string): [string, (m: Model) => React.ReactNode][] => [
   ["廠商 / 層級", (m) => `${m.vendor} · ${m.tier}`],
   ["發布", (m) => m.releaseDate],
   ["雲端", (m) => [...new Set(m.offerings.map((o) => `${o.cloud.toUpperCase()}（${o.status}）`))].join("、")],
   ["Context / 最大輸出", (m) => `${(m.contextWindow / 1000).toFixed(0)}K / ${(m.maxOutputTokens / 1000).toFixed(0)}K`],
   ["推理", (m) => `${m.reasoning.alwaysOn ? "永遠開啟" : "可關閉"} · effort：${(m.reasoning.effortLevels ?? []).join(" / ")}`],
   ["Global 價格 in / out", (m) => { const p = m.offerings.flatMap((o) => o.pricing).find((x) => x.input !== undefined); return `${money(p?.input)} / ${money(p?.output)}`; }],
-  ["AA v4.3.2", (m) => { const b = m.benchmarks.find((x) => x.name.startsWith("Artificial") && x.version === "v4.3.2"); return b ? `${b.score}（${b.rank ?? ""}）` : "—"; }],
+  [aa ? `AA ${aa}` : "AA 智慧指數", (m) => aaCell(m, aa)],
   ["AA 每任務成本", (m) => { const p = m.performanceReference.find((x) => x.costPerIndexTaskUsd !== undefined); return p ? `$${p.costPerIndexTaskUsd}` : "—"; }],
   ["輸出速度 / 首 token", (m) => { const p = m.performanceReference.find((x) => x.outputTokensPerSec); return p ? `${p.outputTokensPerSec} tok/s · ${p.ttftSec ?? "—"} 秒（${p.variant}）` : "—"; }],
   ["台灣境內處理", (m) => (m.offerings.some((o) => o.dataProcessing.taiwanResidency === "yes") ? "有" : "無")],
@@ -23,6 +29,7 @@ export default function Compare({ ids }: { ids: string[] }) {
   const { data, error } = useData(loaders.catalog);
   if (!data) return <Status error={error} />;
   const models = ids.map((id) => data.models.find((m) => m.id === id)).filter(Boolean) as Model[];
+  const aa = newestAAVersion(models);
   return (
     <>
       <PageHead eyebrow="最多 3 個模型並排" title="模型比較" />
@@ -37,9 +44,9 @@ export default function Compare({ ids }: { ids: string[] }) {
         <section className="card">
           <table>
             <thead><tr><th style={{ width: 180 }}></th>{models.map((m) => <th key={m.id}><a href={linkTo(`models/${m.id}`)} style={{ fontWeight: 700, fontSize: 16 }}>{m.name}</a></th>)}</tr></thead>
-            <tbody>{rows.map(([label, f]) => <tr key={label}><td className="note">{label}</td>{models.map((m) => <td key={m.id}>{f(m)}</td>)}</tr>)}</tbody>
+            <tbody>{rows(aa).map(([label, f]) => <tr key={label}><td className="note">{label}</td>{models.map((m) => <td key={m.id}>{f(m)}</td>)}</tr>)}</tbody>
           </table>
-          <p className="note">智慧指數只在相同版本（v4.3.2）比較；延遲依 effort 差異極大，請看各模型的效能頁。</p>
+          <p className="note">智慧指數只在相同版本{aa ? `（${aa}，所選模型中最新的版本）` : ""}比較；延遲依 effort 差異極大，請看各模型的效能頁。</p>
         </section>)}
     </>
   );

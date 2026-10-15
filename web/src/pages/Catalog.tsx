@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { go } from "../App";
-import { linkTo, loaders, money, useData } from "../data";
+import { aaScore, linkTo, loaders, money, newestAAVersion, useData } from "../data";
 import { Filters, PageHead, Status } from "../ui";
 
 const CLOUDS = [["all", "全部雲端"], ["aws", "AWS Bedrock"], ["azure", "Azure Foundry"], ["gcp", "GCP Agent Platform"]] as const;
@@ -17,6 +17,8 @@ export default function Catalog() {
     (cloud === "all" || m.offerings.some((o) => o.cloud === cloud)) && (tier === "all" || m.tier === tier) &&
     (!q || (m.name + m.vendor + m.tags.join(" ")).toLowerCase().includes(q.toLowerCase())));
   const toggle = (id: string) => setPick(pick.includes(id) ? pick.filter((x) => x !== id) : [...pick, id].slice(-3));
+  /** Scores compare only within one AA index version: show the newest version any catalog model has. */
+  const aaVersion = newestAAVersion(data.models);
   return (
     <>
       <PageHead eyebrow={`共 ${data.models.length} 個模型 · 資料更新 ${data.asOf}`} title="模型目錄"
@@ -28,11 +30,11 @@ export default function Catalog() {
       <Filters label="依層級篩選" options={TIERS} value={tier} onChange={setTier} />
       <section className="card">
         <table>
-          <thead><tr><th>比較</th><th>模型</th><th>層級</th><th>發布</th><th>雲端</th><th>Context</th><th>Global in / out</th><th>AA v4.3.2</th><th>台灣境內</th><th>平台狀態</th></tr></thead>
+          <thead><tr><th>比較</th><th>模型</th><th>層級</th><th>發布</th><th>雲端</th><th>Context</th><th>Global in / out</th><th>{aaVersion ? `AA ${aaVersion}` : "AA 智慧指數"}</th><th>台灣境內</th><th>平台狀態</th></tr></thead>
           <tbody>
             {models.map((m) => {
               const p = m.offerings.flatMap((o) => o.pricing).find((x) => x.input !== undefined);
-              const aa = m.benchmarks.find((b) => b.name.startsWith("Artificial Analysis") && b.version === "v4.3.2");
+              const { score: aa, other } = aaScore(m, aaVersion);
               const tw = m.offerings.some((o) => o.dataProcessing.taiwanResidency === "yes");
               return (
                 <tr key={m.id}>
@@ -42,7 +44,7 @@ export default function Catalog() {
                   <td>{[...new Set(m.offerings.map((o) => o.cloud.toUpperCase()))].join("、")}</td>
                   <td className="mono">{(m.contextWindow / 1000).toFixed(0)}K</td>
                   <td className="mono">{money(p?.input)} / {money(p?.output)}</td>
-                  <td className="mono">{aa ? aa.score : "—"}</td>
+                  <td className="mono">{aa ? aa.score : <>—{other && <div className="note">只有 {other.version}（{other.score}）</div>}</>}</td>
                   <td>{tw ? "有" : <span className="pill warn">無</span>}</td>
                   <td><span className="pill">{m.platformStatus}</span></td>
                 </tr>);

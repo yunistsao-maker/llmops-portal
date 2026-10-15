@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { addressVersion, EDITION, hasPage, loaders, selectedVersion, SourcesCtx, UNVERSIONED, useData, type VersionsFile } from "./data";
+import { addressVersion, EDITION, hasPage, loaders, selectedVersion, SourcesCtx, UNVERSIONED, useData, VERSION_DAYS, type VersionsFile } from "./data";
 import Radar from "./pages/Radar";
 import Catalog from "./pages/Catalog";
 import Compare from "./pages/Compare";
@@ -74,7 +74,7 @@ export default function App() {
       {EDITION === "full" && (
         <a className="sec-demo" href="./security-tests.html">AI 安全測試（示範・模擬資料）</a>
       )}
-      <footer className="foot">每天一版：日期就是版本，每一版都是當天結束時仍然有效的全部資料（不是當天的變動），保留最近 7 天。研究由每日排程的 agent 更新；社群與未驗證資訊以紅字標示，使用前請核對來源。</footer>
+      <footer className="foot">每天一版：日期就是版本，每一版都是當天結束時仍然有效的全部資料（不是當天的變動），保留最近 {VERSION_DAYS} 天。研究由每日排程的 agent 更新；社群與未驗證資訊以紅字標示，使用前請核對來源。</footer>
     </SourcesCtx.Provider>
   );
 }
@@ -100,7 +100,7 @@ function VersionBar({ index, version, onPick }: { index?: VersionsFile; version:
       </label>
       {version ? (
         <span>
-          {known ? <>正在看 <b>{version}</b> 的版本：那天結束時上線的資料，含當時仍然有效的所有項目。</> : <>沒有 {version} 這一版（只保留最近 7 天）。</>}{" "}
+          {known ? <>正在看 <b>{version}</b> 的版本：那天結束時上線的資料，含當時仍然有效的所有項目。</> : <>沒有 {version} 這一版（只保留最近 {VERSION_DAYS} 天）。</>}{" "}
           <button className="linklike" onClick={() => onPick(null)}>回到最新版本</button>
         </span>
       ) : (

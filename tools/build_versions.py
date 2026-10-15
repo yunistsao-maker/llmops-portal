@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Build the merged Release Radar of every daily version (versions/<date>/data/radar.json).
 
-tools/fetch_release.mjs puts the release that was live at the end of each of the 6 days before today under
-versions/<date>/ and lists the 7 days (today = the live release in data/) in .portal-versions.json. Each past day
+tools/fetch_release.mjs puts the release that was live at the end of each of the 29 days before today under
+versions/<date>/ and lists the 30 days (today = the live release in data/) in .portal-versions.json. Each past day
 gets the Radar as it was on that day: the digests of that release up to that date, merged with the same rules
 (tools/build_radar.py) and the repo's radar/curation.json - curation entries carry their own dates, so a closure
 made later does not reach back into an earlier day.

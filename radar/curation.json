@@ -231,5 +231,647 @@
       "reason": "v1.102.4 已在 1.102 線修正 Chat→Responses bridge 的重複記帳（litellm.json）。",
       "action": "LiteLLM #44500（Chat→Responses bridge 重複記帳，v1.102.0 起）：1.102 線已在 v1.102.4 修正，1.103 / 1.104 線的 notes 尚未見修正。修正版上線前，FinOps 以 litellm_call_id 去重並對照 CSP 帳單檢查 10 月以來的 spend 與團隊預算。"
     }
+  ],
+  "topics": [
+    {
+      "topic": "model:gemini-3-8-flash",
+      "ids": [
+        "it-5172466b5b"
+      ],
+      "reason": "Gemini 3.8 Flash 上市（09-24 首次收錄）；之後的同一主題併入這張卡。"
+    },
+    {
+      "topic": "model:gpt-6-astra",
+      "ids": [
+        "it-365ddbb0de"
+      ],
+      "reason": "GPT-6 Astra 上市（09-24 首次收錄）。"
+    },
+    {
+      "topic": "model:claude-opus-5-5",
+      "ids": [
+        "it-8e18176d52"
+      ],
+      "reason": "Claude Opus 5.5 上市（09-24 首次收錄）。"
+    },
+    {
+      "topic": "model:gpt-6-sol-luna",
+      "ids": [
+        "it-f570b4b7e3"
+      ],
+      "reason": "GPT-6 Sol / Luna 上市（09-24 首次收錄）。"
+    },
+    {
+      "topic": "model:claude-sonnet-5-5",
+      "ids": [
+        "it-cf0156f967"
+      ],
+      "reason": "Claude Sonnet 5.5 三雲 GA（10-01 首次收錄）。"
+    },
+    {
+      "topic": "model:gpt-6-1-sol",
+      "ids": [
+        "it-4770b9e948"
+      ],
+      "reason": "GPT-6.1 Sol 上市（10-01 首次收錄）。"
+    },
+    {
+      "topic": "model:gpt-6-1-sol-ultrafast",
+      "ids": [
+        "it-00ec2a3b5e"
+      ],
+      "reason": "GPT-6.1 Sol Ultrafast 上線（10-11 補登）。"
+    },
+    {
+      "topic": "model:claude-haiku-5-5",
+      "ids": [
+        "it-ed221434fd"
+      ],
+      "reason": "Claude Haiku 5.5 發布（10-10 只確認 Bedrock、10-11 補齊三雲，已由 merge 合併）。"
+    },
+    {
+      "topic": "model:gemini-4-argon",
+      "ids": [
+        "it-ac5d1af47a"
+      ],
+      "reason": "Gemini 4 Argon 發表、僅限 Fairwind Program（10-02 補登）。"
+    },
+    {
+      "topic": "model:glm-5-3",
+      "ids": [
+        "it-c2ab565572"
+      ],
+      "reason": "Bedrock 上架 Z.ai GLM 5.3（10-06）。"
+    },
+    {
+      "topic": "model:mistral-large-4",
+      "ids": [
+        "it-5db0bedd03"
+      ],
+      "reason": "Mistral Large 4 public preview（10-06）；權重與三雲上架後續會再報。"
+    },
+    {
+      "topic": "model:nano-banana-2-1",
+      "ids": [
+        "it-20bf313f1e"
+      ],
+      "reason": "Nano Banana 2.1 GA（10-06）。"
+    },
+    {
+      "topic": "model:existing-model-updates",
+      "ids": [
+        "it-d02028a0a5",
+        "it-5ae2d5b4ff"
+      ],
+      "reason": "同一類紀錄：既有模型的補充與更正（10-02「既有模型的補充與更正」、10-05「既有模型的補充與文字更正」），合成一張卡，較早的一期留在更新紀錄。"
+    },
+    {
+      "topic": "benchmark:artificial-analysis",
+      "ids": [
+        "it-c1c8a72930",
+        "it-ce0e3e6eb8"
+      ],
+      "reason": "同一件事的兩次複查：Artificial Analysis 指數版本仍為 v4.3.2、catalog 模型的分數與名次（10-05、10-06）。"
+    },
+    {
+      "topic": "open-models:weekly",
+      "ids": [
+        "it-77eb4f86db"
+      ],
+      "reason": "開放權重模型的每週熱度與三雲託管（10-11）；之後每週的更新併入這張卡。"
+    },
+    {
+      "topic": "lifecycle:agent-platform:gemini-2-5",
+      "ids": [
+        "it-7c74644992"
+      ],
+      "reason": "Agent Platform gemini-2.5-pro / flash / flash-lite 的 10-20 退役（已由 merge 合併 09-24 至 10-06 的四則）。"
+    },
+    {
+      "topic": "lifecycle:gemini-api:flash-image",
+      "ids": [
+        "it-ea109268b4",
+        "it-0f70e7cca6",
+        "it-3d4296728f"
+      ],
+      "reason": "同一串事件：Gemini API 影像模型的關閉日——gemini-2.5-flash-image 的 10-02（09-28、10-01、10-02）、gemini-3.1-flash-image 的 10-29（10-06），10-11 兩者一起更正（3.1 的關閉日撤回、2.5 改為 2027-03-15）。10-06 與 10-11 的紀錄都同時寫兩個模型（替代鏈 2.5 → 3.1 → nano-banana-2.1），拆不開。"
+    },
+    {
+      "topic": "lifecycle:foundry:claude-4-5",
+      "ids": [
+        "it-61d17f86ac"
+      ],
+      "reason": "Foundry Claude Sonnet / Haiku / Opus 4.5 退役日（已由 merge 合併 09-28 至 10-02 的三則）。"
+    },
+    {
+      "topic": "lifecycle:anthropic:claude-sonnet-4-5",
+      "ids": [
+        "it-ea0a716272"
+      ],
+      "reason": "Anthropic 宣布 Claude Sonnet 4.5 於 2026-11-30 退役（10-01）。"
+    },
+    {
+      "topic": "lifecycle:bedrock:claude-4-5",
+      "ids": [
+        "it-3452d6ad47",
+        "it-7f9ced030e"
+      ],
+      "reason": "同一件事：Bedrock 上 Claude 4.5 家族的生命週期——10-05 仍為 Active，10-10 Sonnet 4.5 進入 Legacy（EOL 2027-04-08）。"
+    },
+    {
+      "topic": "lifecycle:foundry:gpt-4-1-gpt-4o",
+      "ids": [
+        "it-f41dd07386",
+        "it-a29b595095"
+      ],
+      "reason": "同一張表的同一組模型：Azure gpt-4.1 / gpt-4o 的退役日（09-24），10-10 更新 gpt-4.1-nano 由 10-14 延到 2027-04-14。"
+    },
+    {
+      "topic": "lifecycle:foundry:o-series",
+      "ids": [
+        "it-64e5084fa6"
+      ],
+      "reason": "Azure o 系列 2026-11-19 退役（09-24）。"
+    },
+    {
+      "topic": "lifecycle:bedrock:policy",
+      "ids": [
+        "it-b997e2948d"
+      ],
+      "reason": "Bedrock 2026-09-07 起的新生命週期政策（09-24）。"
+    },
+    {
+      "topic": "lifecycle:anthropic:claude-opus-5",
+      "ids": [
+        "it-e2131b1b45"
+      ],
+      "reason": "Claude Opus 5 轉為 legacy（09-24）。"
+    },
+    {
+      "topic": "lifecycle:gemini-api:gemini-2-5",
+      "ids": [
+        "it-ee9a683f5b"
+      ],
+      "reason": "Gemini API 限縮 2.5 模型存取（09-28）；Agent Platform 的 2.5 退役是另一張卡。"
+    },
+    {
+      "topic": "lifecycle:bedrock:gpt-6-sol-luna",
+      "ids": [
+        "it-9d15150279"
+      ],
+      "reason": "Bedrock GPT-6 Sol / Luna 的 EOL 不早於 2027-09-22（09-28）。"
+    },
+    {
+      "topic": "lifecycle:openai-api:gpt-5-4-cyber-transcribe",
+      "ids": [
+        "it-f75331bd18"
+      ],
+      "reason": "OpenAI API：gpt-5.4-cyber 10-01 關閉、轉錄模型 2027-02-26（10-01）。"
+    },
+    {
+      "topic": "lifecycle:openai-api:gpt-5-1-tts",
+      "ids": [
+        "it-31cb5432cb"
+      ],
+      "reason": "OpenAI API：gpt-5.1 家族 2027-04-01、TTS 2027-01-06 關閉（10-02）。"
+    },
+    {
+      "topic": "lifecycle:agent-platform:gemini-3-6-3-7-flash",
+      "ids": [
+        "it-990f7b8259"
+      ],
+      "reason": "Agent Platform gemini-3.6-flash 11-19、gemini-3.7-flash 2027-01-28 退役（10-06）。"
+    },
+    {
+      "topic": "lifecycle:gemini-api:gemini-3-7-3-5-flash",
+      "ids": [
+        "it-fe2d655644"
+      ],
+      "reason": "Gemini API gemini-3.7-flash / 3.5-flash 棄用並自動導向新版（10-11 補登）。"
+    },
+    {
+      "topic": "lifecycle:gemini-api:deep-research-pro-preview",
+      "ids": [
+        "it-bd6be60e23"
+      ],
+      "reason": "Gemini API deep-research-pro-preview-12-2025 10-23 關閉（10-11）。"
+    },
+    {
+      "topic": "pricing:claude-opus-5-5",
+      "ids": [
+        "it-55d81cd363",
+        "it-fcf8757933"
+      ],
+      "reason": "同一個模型的價格：Claude Opus 5.5 降價（09-24），09-28 取得 Agent Platform 與 Foundry 的官方價格。"
+    },
+    {
+      "topic": "pricing:gpt-6-sol-luna",
+      "ids": [
+        "it-dd2acebf48",
+        "it-5715f654ca"
+      ],
+      "reason": "同一組模型的價格：GPT-6 Sol / Luna（09-24），09-28 Bedrock 價格改為官方。"
+    },
+    {
+      "topic": "pricing:gpt-6-astra",
+      "ids": [
+        "it-8dbdbf82c0",
+        "it-e4316eebdc"
+      ],
+      "reason": "同一個模型的價格：GPT-6 Astra（09-24 $10 / $50），10-02 Bedrock 公布 Ultrafast 為 Standard 的 6 倍。"
+    },
+    {
+      "topic": "pricing:gemini-3-8-flash",
+      "ids": [
+        "it-4f10d43d06",
+        "it-3851f61365",
+        "it-0fceebfdfc",
+        "it-33079166e1"
+      ],
+      "reason": "同一個模型的價格：Gemini 3.8 Flash 促銷價 12-31 到期（09-24）、非 global +10%（09-28）、促銷以 credits back 提供（10-02）、Provisioned Throughput 另有 50% credits（10-05）。"
+    },
+    {
+      "topic": "pricing:gpt-6-1-sol",
+      "ids": [
+        "it-8b2d287b9f",
+        "it-88e05e3890"
+      ],
+      "reason": "同一個模型的價格：GPT-6.1 Sol 同價、cached input 減半（10-01），10-11 Ultrafast 為 Standard 的 6 倍。"
+    },
+    {
+      "topic": "pricing:claude-sonnet-5-5",
+      "ids": [
+        "it-de86f96c4e",
+        "it-68f2216484",
+        "it-b2c1ade0f6",
+        "it-bc9bfc5d47"
+      ],
+      "reason": "同一個模型的價格：Claude Sonnet 5.5 與 Sonnet 5 同價（10-01）、Agent Platform 官方確認（10-02）、Bedrock 暫填 cost map 數字（10-06）、cache read 減半（10-10）。"
+    },
+    {
+      "topic": "pricing:gemini-4-argon",
+      "ids": [
+        "it-c4df0d33fd"
+      ],
+      "reason": "Gemini 4 Argon 公告價（10-02，尚不可購買）。"
+    },
+    {
+      "topic": "pricing:claude-haiku-5-5",
+      "ids": [
+        "it-150bcfa6e9"
+      ],
+      "reason": "Claude Haiku 5.5 價格（10-11）。"
+    },
+    {
+      "topic": "pricing:claude-opus-4-1",
+      "ids": [
+        "it-b3804cbcd8"
+      ],
+      "reason": "Bedrock Claude Opus 4.1 extended access 價格未公布（10-11）。"
+    },
+    {
+      "topic": "pricing:foundry:claude-us-data-zone",
+      "ids": [
+        "it-2eef4168e5"
+      ],
+      "reason": "Claude on Foundry 的 US Data Zone 1.1 倍（10-02）。"
+    },
+    {
+      "topic": "pricing:openai-api:service-tiers",
+      "ids": [
+        "it-cc695a870a"
+      ],
+      "reason": "OpenAI 一方 API 的服務層價格（10-05）。"
+    },
+    {
+      "topic": "litellm:recommended-version",
+      "ids": [
+        "it-6c3fcb5f00",
+        "it-a3938d17ae",
+        "it-eb6f50f9c0",
+        "it-2428c70c05",
+        "it-313c87dc6e",
+        "it-18692bc5be",
+        "it-96fa112e6a",
+        "it-1f5c1eba31",
+        "it-2b66c0a995"
+      ],
+      "reason": "同一件事：LiteLLM 的建議版本與支援窗口——v1.102.1（09-24）、窗口 v1.100–v1.103（09-28）、v1.103.2（10-01、10-02）、v1.104.0（10-05、10-06）、窗口 v1.101–v1.104（10-05）、10-10 的 patch（v1.104.2 等）、10-11 窗口換線並改推薦 v1.104.2。每一則的結論都是「現在該用哪一版」，最新一則取代前面的。"
+    },
+    {
+      "topic": "litellm:release:1.105",
+      "ids": [
+        "it-37cd2bbfab",
+        "it-9e12b527c8"
+      ],
+      "reason": "同一個版本：LiteLLM 1.105.0——10-06 rc1 notes 預告三項 breaking change，10-11 stable 上 PyPI（notes 未公開，先不要升）。"
+    },
+    {
+      "topic": "litellm:open-issues",
+      "ids": [
+        "it-620d619d56",
+        "it-939ebe716e",
+        "it-ae39abd816",
+        "it-cf581a7bc2",
+        "it-9b1047e69e"
+      ],
+      "reason": "同一串追蹤：LiteLLM 開啟中的 issue（#42725 Bedrock GPT-6 temperature、#42689 未知金鑰寫入 spend rows、#44500 重複記帳等）——09-24 起逐則記錄，10-02 起合寫成一則狀態，每期以最新的狀態為準。"
+    },
+    {
+      "topic": "cve:cve-2026-84377",
+      "ids": [
+        "it-de5850f23e",
+        "it-41a762ec25"
+      ],
+      "reason": "同一個 CVE：CVE-2026-84377（10-02 收錄），10-05 更正發布日。"
+    },
+    {
+      "topic": "cve:cve-2026-89032",
+      "ids": [
+        "it-b2d29cf688",
+        "it-8d1cb4793b"
+      ],
+      "reason": "同一個 CVE：CVE-2026-89032（10-05 收錄），10-06 補充相依套件掃描器看不到這一筆。"
+    },
+    {
+      "topic": "cve:cve-2026-59823",
+      "ids": [
+        "it-c3473a0827"
+      ],
+      "reason": "CVE-2026-59823（09-28）。"
+    },
+    {
+      "topic": "cve:cve-2026-49468",
+      "ids": [
+        "it-b209c0c1fc"
+      ],
+      "reason": "CVE-2026-49468（GHSA-4xpc-pv4p-pm3w，09-28）。"
+    },
+    {
+      "topic": "safety:gpt-6-astra",
+      "ids": [
+        "it-cb27cad2ee"
+      ],
+      "reason": "GPT-6 Astra 的資安能力分級（09-24）。"
+    },
+    {
+      "topic": "safety:claude-opus-5-5",
+      "ids": [
+        "it-16dd30d2c3"
+      ],
+      "reason": "Claude Opus 5.5 的資安請求改路由（09-24）。"
+    },
+    {
+      "topic": "safety:claude-sonnet-5-5",
+      "ids": [
+        "it-abbe8a6dda"
+      ],
+      "reason": "Claude Sonnet 5.5 的拒答分類（10-01）。"
+    },
+    {
+      "topic": "safety:gemini-4-argon",
+      "ids": [
+        "it-c1c7097d76"
+      ],
+      "reason": "Gemini 4 Argon 的存取條件（10-02）。"
+    },
+    {
+      "topic": "regulation:eu-ai-act",
+      "ids": [
+        "it-921e7fe72d",
+        "it-5eb4477565",
+        "it-b78e10b7b9"
+      ],
+      "reason": "同一條法規的進度：EU AI Act 第 50 條與浮水印寬限到 12-02（09-24）、AI Office 對 GPAI 行使執法權（10-01）、標示實務守則與第 50 條指引（10-05 補登）。"
+    },
+    {
+      "topic": "regulation:us-frontier-ai",
+      "ids": [
+        "it-7317f8a512",
+        "it-ca46e9712b"
+      ],
+      "reason": "同一條政策線：美國對前沿模型的存取與出口管制——EO 14409 的發布前自願存取（10-02），10-05 複查 EO 14434 只改用語、沒有新的出口管制。"
+    },
+    {
+      "topic": "regulation:tw-moda-ai-agent-guideline",
+      "ids": [
+        "it-915ec0e352",
+        "it-93b11bf53f"
+      ],
+      "reason": "同一件事：數發部研擬的「AI代理」資安參考指引（10-01），10-05 更正指引名稱並補登金管會、資安署的相關政策。"
+    },
+    {
+      "topic": "regulation:tw-moda-ai-risk-framework",
+      "ids": [
+        "it-ee537bf4ce"
+      ],
+      "reason": "數發部 AI 風險分類框架（09-24）。"
+    },
+    {
+      "topic": "regulation:tw-fsc-ai-guideline",
+      "ids": [
+        "it-fba7e74205"
+      ],
+      "reason": "金管會金融業 AI 指引納入代理 AI（09-24）。"
+    },
+    {
+      "topic": "regulation:eu-ai-act:openai-text-watermark",
+      "ids": [
+        "it-f422bc230f"
+      ],
+      "reason": "OpenAI API 的選用文字浮水印（10-06，對應 EU AI Act 標示義務）。"
+    },
+    {
+      "topic": "lifecycle:bedrock:claude-opus-4-1",
+      "ids": [
+        "ai-06ad7cab0c",
+        "ai-2cb72cdc53",
+        "ai-642abe9800",
+        "ai-abfaf2ed09"
+      ],
+      "reason": "同一項任務的四次重述：Bedrock Claude Opus 4.1 10-08 進入 public extended access，確認遷移到 Opus 5.5 的時程（09-24、09-28、10-01 / 10-02、10-05 / 10-06）。"
+    },
+    {
+      "topic": "lifecycle:bedrock:claude-sonnet-4",
+      "ids": [
+        "ai-be3fc3e6bb",
+        "ai-5ee961b89b",
+        "ai-b6b64b2278"
+      ],
+      "reason": "同一項遷移：09-24 的兩項（Bedrock Claude Sonnet 4、Azure gpt-4.1-nano，都是 10-14）09-28 起合寫為一項；10-11 rewrite 只剩 Sonnet 4（nano 延至 2027-04-14）。"
+    },
+    {
+      "topic": "lifecycle:gemini-api:gemini-2-5-flash-image",
+      "ids": [
+        "ai-732bb02ceb",
+        "ai-2422305e08",
+        "ai-1fe9028979",
+        "ai-fd48c166c5"
+      ],
+      "reason": "同一項確認：Gemini API 的 gemini-2.5-flash-image 10-02 關閉、確認沒有路由直接使用（09-24 先確認日期，09-28、10-01、10-02 重述）。"
+    },
+    {
+      "topic": "gateway:remove-retired-routes",
+      "ids": [
+        "ai-4d150fb79c",
+        "ai-98f8c9fe16"
+      ],
+      "reason": "同一項任務：從 gateway 與 fallback 移除同一批已過退役日的模型（10-05 與 10-06 的清單相同，10-05 多一句確認）。"
+    },
+    {
+      "topic": "litellm:upgrade",
+      "ids": [
+        "ai-aa5d5b93e0",
+        "ai-74b513c3e3",
+        "ai-545030ed58",
+        "ai-78ec191919",
+        "ai-d592ffd1c8",
+        "ai-e2a83cf9ce",
+        "ai-f12a4e055f",
+        "ai-0bc93971d2"
+      ],
+      "reason": "同一項任務：LiteLLM production 版本——v1.102.1（09-24、09-28）、在 staging 驗證 1.103.0（09-28）與 v1.103.2（10-01、10-02）、v1.104.0（10-05、10-06）、v1.104.2（10-10、10-11）。每次都是「先在 staging 驗證再升 production」，目標版本隨建議版本前進；10-11 的 close 說明 v1.104.0 那兩則由 ai-0bc93971d2 接手。"
+    },
+    {
+      "topic": "cve:cve-2026-89032",
+      "ids": [
+        "ai-9e4809ddac",
+        "ai-01abdb78c6"
+      ],
+      "reason": "同一項任務：CVE-2026-89032——盤點 LiteLLM 版本、升到 v1.101.4 以上、處理 semantic cache（10-05），10-06 補充掃描器看不到。"
+    },
+    {
+      "topic": "litellm:patch-level",
+      "ids": [
+        "ai-5e6b992632",
+        "ai-f1745f10fa"
+      ],
+      "reason": "同一項任務：所有 LiteLLM 環境升到所在線的最新 patch（10-01），10-02 加上 CVE-2026-84377 的版本下限。"
+    },
+    {
+      "topic": "lifecycle:foundry:claude-4-5",
+      "ids": [
+        "ai-d3b94938bd",
+        "ai-be7155cc78",
+        "ai-cba7f5d23c"
+      ],
+      "reason": "同一項遷移：Foundry 的 Claude Haiku 4.5 / Opus 4.5（09-28、10-01 的單獨項目），10-02 起與 Sonnet 4.5 合寫（ai-d3b94938bd）。"
+    },
+    {
+      "topic": "lifecycle:foundry:gpt-4o-transcribe",
+      "ids": [
+        "ai-79660ab40e",
+        "ai-402125a4a5"
+      ],
+      "reason": "同一批退役：Azure gpt-4o-transcribe（2025-03-20）10-15 退役（09-24），10-05 起與 gpt-4o-mini-transcribe、gpt-4o-mini-tts、sora-2 合寫。"
+    },
+    {
+      "topic": "lifecycle:agent-platform:gemini-2-5",
+      "ids": [
+        "ai-dbb5d1d62e"
+      ],
+      "reason": "Agent Platform Gemini 2.5 10-20 停止服務的切換任務（已由 merge 合併）。"
+    },
+    {
+      "topic": "tracking:watchlist",
+      "ids": [
+        "ai-25ad8ccff8"
+      ],
+      "reason": "追蹤清單（尚未發布的模型、開放權重的權重釋出、待讀的 notes 與指引），已由 merge 合併。"
+    },
+    {
+      "topic": "gateway:service-tier-ultrafast",
+      "ids": [
+        "ai-2cba7af3aa"
+      ],
+      "reason": "gateway 是否允許 service_tier: \"ultrafast\" 的決策（已由 merge 合併）。"
+    },
+    {
+      "topic": "eval:claude-sonnet-5-5-gpt-6-1-sol",
+      "ids": [
+        "ai-070b253b30"
+      ],
+      "reason": "Claude Sonnet 5.5 與 GPT-6.1 Sol 的 G1–G6 評估（已由 merge 合併）。"
+    },
+    {
+      "topic": "eval:claude-haiku-5-5",
+      "ids": [
+        "ai-c9ed91e6e4"
+      ],
+      "reason": "Claude Haiku 5.5 的 G1–G6 評估（10-11）。"
+    },
+    {
+      "topic": "litellm:issue:44500",
+      "ids": [
+        "ai-2c41e818f4"
+      ],
+      "reason": "LiteLLM #44500 重複記帳的 workaround 與 FinOps 對帳（已由 merge 合併）。"
+    },
+    {
+      "topic": "finops:foundry-data-zone",
+      "ids": [
+        "ai-19c3862cd4"
+      ],
+      "reason": "Foundry Data Zone 部署的自訂價格與帳單核對（已由 merge 合併）。"
+    },
+    {
+      "topic": "regulation:eu-ai-act",
+      "ids": [
+        "ai-7c9897c136"
+      ],
+      "reason": "EU AI 生成內容標示寬限到 12-02，11-25 前確認做法（已由 merge 合併）。"
+    },
+    {
+      "topic": "pricing:gemini-3-8-flash",
+      "ids": [
+        "ai-df7eac24b8"
+      ],
+      "reason": "Gemini 3.8 Flash 以 2027 標準價編列預算。"
+    }
+  ],
+  "checks": [
+    {
+      "ids": [
+        "it-66b99efed0",
+        "it-4b0dbef056"
+      ],
+      "reason": "新模型一節的複查紀錄：「本期沒有新模型在三雲 GA 或 preview」（10-05）與「追蹤中的模型：都還沒發布」（10-02、10-05、10-06，已由 merge 合併）——查過、沒有新發布。"
+    },
+    {
+      "ids": [
+        "it-663934fcef",
+        "it-2ee9a640a3",
+        "it-ddd5de8224",
+        "it-4d6243e35d",
+        "it-986a4a3ea1",
+        "it-f52f8aac97"
+      ],
+      "reason": "生命週期一節的複查紀錄：「複查無變動」（09-28、10-01、10-02）、「兩週內到期的項目（複查無變動）」與「退役日複查：10-14 至 10-23 全部不變」（10-05、10-06、10-11）、Foundry 退役表仍未列入 GPT-6 / Claude 5.5（10-05）、「沒有新的棄用公告」（10-05、10-06）。各事件本身另有卡片與 lifecycle.json。"
+    },
+    {
+      "ids": [
+        "it-077bf50f2d",
+        "it-cc348493cd"
+      ],
+      "reason": "價格一節的複查紀錄：「本期沒有牌價變動」（10-05）、「本期沒有既有模型的牌價變動」（10-06）。"
+    },
+    {
+      "ids": [
+        "it-41ab285e0a",
+        "it-5cdda961d3",
+        "it-84cda75483"
+      ],
+      "reason": "資安一節的複查紀錄：LiteLLM 安全公告未能複查（10-01；10-02 補記的 CVE-2026-84377 另有卡片）、支援窗口內沒有新公告（10-06）、OSV 沒有新公告（10-11）。"
+    },
+    {
+      "ids": [
+        "it-99ac1efd7a",
+        "it-78251d65c4",
+        "it-6a8c721a28",
+        "it-6d271a0c55",
+        "it-3849381908"
+      ],
+      "reason": "法規一節的複查紀錄：各期「沒有新的法規或政策事實」（10-02、10-05、10-06、10-10、10-11）。"
+    }
   ]
 }

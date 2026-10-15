@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { DigestFile, DigestItem, RadarActionItem, RadarFile, RadarItem, WatchItem } from "../../../schema/types";
+import type { DigestFile, DigestItem, RadarActionItem, RadarActionUpdate, RadarCheck, RadarFile, RadarItem, RadarUpdate, WatchItem } from "../../../schema/types";
 import { go } from "../App";
 import { daysFrom, linkTo, loaders, money, useData } from "../data";
 import { Bullets, Filters, PageHead, Sources, Status } from "../ui";
@@ -9,6 +9,7 @@ type SectionKey = "newModels" | "lifecycleChanges" | "pricingChanges" | "litellm
 const SECTIONS: [SectionKey, string][] = [
   ["newModels", "新模型"], ["lifecycleChanges", "生命週期變動"], ["pricingChanges", "價格"], ["litellm", "LiteLLM"], ["security", "資安"], ["regulatory", "法規"],
 ];
+const SECTION_LABEL = Object.fromEntries(SECTIONS) as Record<SectionKey, string>;
 const IMPACT: Record<DigestItem["impact"], string> = { high: "高", medium: "中", low: "低" };
 const RETIRED: Record<string, string> = { expired: "已到期", closed: "已完成或取代", stale: "30 天未再提到" };
 const ACTION_FILTERS = [["all", "全部"], ["new", "當天新增"], ["P0", "P0"], ["P1", "P1"], ["P2", "P2"]] as const;
@@ -54,24 +55,26 @@ function MergedView({ r }: { r: RadarFile }) {
             <h2 style={{ margin: 0 }}>行動項目</h2>
             <Filters label="篩選行動項目" options={ACTION_FILTERS.map(([v, l]) => [v, v === "all" ? `${l}（${r.actionItems.length}）` : v === "new" ? `${l}（${newCount}）` : `${l}（${r.actionItems.filter((a) => a.priority === v).length}）`] as const)} value={filter} onChange={setFilter} />
           </div>
-          <p className="note">未到期的項目、以及仍在追蹤的項目都在這裡，不論是哪一天提出的；同一件事在不同天的說法已合併成一項。</p>
-          {items.length === 0 ? <p className="note">沒有符合條件的項目。</p> : items.map((a) => <ActionRow key={a.id} a={a} />)}
+          <p className="note">未到期的項目、以及仍在追蹤的項目都在這裡，不論是哪一天提出的；同一件事在不同天的說法已合併成一項，較早的說法在每一項的「更新紀錄」。</p>
+          {items.length === 0 ? <p className="note">沒有符合條件的項目。</p> : items.map((a) => <ActionRow key={a.id} a={a} asOf={r.asOf} />)}
           {r.retired.length > 0 && (
             <details className="radar-retired">
               <summary>最近 14 天移出的項目（{r.retired.length}）</summary>
               {r.retired.map((a) => (
-                <div className="list-item" key={a.id}>
-                  <span className="mono" style={{ width: 100, flexShrink: 0 }}>{a.retiredOn}</span>
+                <div className="list-item radar-action" key={a.id}>
+                  <span className="mono radar-date">{a.retiredOn}</span>
                   <span className="tag P2">{RETIRED[a.reason]}</span>
-                  <span style={{ fontSize: 14, lineHeight: 1.6, color: "var(--muted)" }}>{a.action}{a.note && <div className="note">{a.note}</div>}</span>
+                  <span style={{ fontSize: 14, lineHeight: 1.6, color: "var(--muted)" }}>{a.action}{a.note && <div className="note">{a.note}</div>}
+                    {a.updates && a.updates.length > 0 && <ActionHistory updates={a.updates} />}</span>
                 </div>))}
             </details>)}
         </section>
         <Side watchlist={r.watchlist} />
       </div>
       <div className="grid2">
-        {SECTIONS.map(([k, label]) => r[k].length > 0 && <SectionCard key={k} label={label} items={r[k]} />)}
+        {SECTIONS.map(([k, label]) => r[k].length > 0 && <SectionCard key={k} label={label} items={r[k]} asOf={r.asOf} />)}
       </div>
+      {r.checks && r.checks.length > 0 && <Checks checks={r.checks} />}
       {r.unverified.length > 0 && (
         <section className="card">
           <details><summary><strong>尚未驗證（最近 7 天，{r.unverified.length} 項）</strong></summary>
@@ -91,35 +94,90 @@ function MergedView({ r }: { r: RadarFile }) {
   );
 }
 
-function ActionRow({ a }: { a: RadarActionItem }) {
+function ActionRow({ a, asOf }: { a: RadarActionItem; asOf: string }) {
   return (
-    <div className="list-item">
-      <span className="mono" style={{ width: 100, flexShrink: 0 }}>{a.due ?? "持續"}
+    <div className="list-item radar-action">
+      <span className="mono radar-date">{a.due ?? "持續"}
         {a.due && <div className="note">{daysFrom(a.due) >= 0 ? `剩 ${daysFrom(a.due)} 天` : `已過 ${-daysFrom(a.due)} 天`}</div>}</span>
       <span className={`tag ${a.priority}`}>{a.priority}</span>
       <span style={{ fontSize: 15, lineHeight: 1.6 }}>
-        {a.isNew && <span className="tag tag-new" style={{ marginRight: 8 }}>當天新增</span>}{a.action}
+        {a.isNew && <span className="tag tag-new" style={{ marginRight: 8 }}>當天新增</span>}
+        {!a.isNew && a.lastSeen === asOf && (a.updates?.length ?? 0) > 0 && <span className="tag tag-upd" style={{ marginRight: 8 }}>當天更新</span>}{a.action}
         {a.relatedModelIds?.map((m) => <a key={m} href={linkTo(`models/${m}`)} className="note" style={{ marginLeft: 8 }}>{m}</a>)}
         <div className="note">{a.isNew ? `${md(a.firstSeen)} 提出` : `自 ${md(a.firstSeen)} 起 · 最後提到 ${md(a.lastSeen)}`}{a.seenIn.length > 1 && ` · 合併 ${a.seenIn.length} 份紀錄`}</div>
+        {a.updates && a.updates.length > 0 && <ActionHistory updates={a.updates} />}
       </span>
     </div>
   );
 }
 
-function SectionCard({ label, items }: { label: string; items: RadarItem[] }) {
+/** A card that already existed and got a new statement in this version (shown as 更新, not 新). */
+const updatedOn = (it: RadarItem, asOf: string) => !it.isNew && it.lastSeen === asOf && (it.updates?.length ?? 0) > 0;
+
+function SectionCard({ label, items, asOf }: { label: string; items: RadarItem[]; asOf: string }) {
   const [all, setAll] = useState(false);
   const fresh = items.filter((i) => i.isNew).length;
-  const shown = all ? items : items.slice(0, Math.max(SHOW, fresh));
+  const updated = items.filter((i) => updatedOn(i, asOf)).length;
+  const shown = all ? items : items.slice(0, Math.max(SHOW, fresh + updated));
   return (
     <section className="card">
-      <h2>{label} <span className="note">{items.length} 項{fresh > 0 && ` · 當天新增 ${fresh}`}</span></h2>
+      <h2>{label} <span className="note">{items.length} 項{fresh > 0 && ` · 當天新增 ${fresh}`}{updated > 0 && ` · 當天更新 ${updated}`}</span></h2>
       {shown.map((it) => (
         <details key={it.id}>
-          <summary><span className={`tag imp-${it.impact}`}>{IMPACT[it.impact]}</span> {it.isNew && <span className="tag tag-new">新</span>} {it.title} {it.date && <span className="note mono">{it.date}</span>}</summary>
+          <summary><span className={`tag imp-${it.impact}`}>{IMPACT[it.impact]}</span> {it.isNew && <span className="tag tag-new">新</span>}{updatedOn(it, asOf) && <span className="tag tag-upd">更新</span>} {it.title} {it.date && <span className="note mono">{it.date}</span>}
+            {it.updates && it.updates.length > 0 && <span className="note"> · 合併 {it.updates.length + 1} 則</span>}</summary>
           <p style={{ fontSize: 14, lineHeight: 1.7 }}>{it.detail}<Sources refs={it.sources} /></p>
           <p className="note">第一次出現 {it.firstSeen}{it.lastSeen !== it.firstSeen && `，最後更新 ${it.lastSeen}`}（{it.seenIn.length} 份紀錄）</p>
+          {it.updates && it.updates.length > 0 && <NewsHistory updates={it.updates} />}
         </details>))}
       {items.length > shown.length && <button className="btn" style={{ marginTop: 12 }} onClick={() => setAll(true)}>顯示其餘 {items.length - shown.length} 項</button>}
+    </section>
+  );
+}
+
+/** Earlier statements folded into a merged card, newest first (the card shows the current one). */
+function NewsHistory({ updates }: { updates: RadarUpdate[] }) {
+  return (
+    <details className="radar-history">
+      <summary>更新紀錄（{updates.length}）</summary>
+      <ol className="radar-history-list">
+        {updates.map((u, i) => (
+          <li key={`${u.date}-${i}`}><span className="mono">{u.date}</span>
+            <div><strong>{u.title}</strong>{u.detail && <div className="radar-history-detail">{u.detail}</div>}</div></li>))}
+      </ol>
+    </details>
+  );
+}
+
+function ActionHistory({ updates }: { updates: RadarActionUpdate[] }) {
+  return (
+    <details className="radar-history">
+      <summary>更新紀錄（{updates.length}）</summary>
+      <ol className="radar-history-list">
+        {updates.map((u, i) => (
+          <li key={`${u.date}-${i}`}><span className="mono">{u.date}</span>
+            <div><span className={`tag ${u.priority}`}>{u.priority}</span>{u.due && <span className="note mono"> 到期 {u.due}</span>}
+              <div className="radar-history-detail">{u.action}</div></div></li>))}
+      </ol>
+    </details>
+  );
+}
+
+/** Coverage notes ("checked, no change"): what the research runs looked at and found unchanged - not news. */
+function Checks({ checks }: { checks: RadarCheck[] }) {
+  return (
+    <section className="card">
+      <details className="radar-checks">
+        <summary><strong>已複查、沒有變動（{checks.length}）</strong></summary>
+        <p className="note">最近 3 份每日紀錄裡、每一節最新一次的複查：查過哪些來源、沒有找到變動。這些不是新聞，所以不列在上面的各節。</p>
+        {checks.map((c) => (
+          <div className="list-item radar-action" key={`${c.date}-${c.id}`}>
+            <span className="mono radar-date">{c.date}</span>
+            <span className="tag P2">{SECTION_LABEL[c.section]}</span>
+            <span style={{ fontSize: 14, lineHeight: 1.6 }}><strong>{c.title}</strong>
+              <div className="radar-history-detail">{c.detail}<Sources refs={c.sources} /></div></span>
+          </div>))}
+      </details>
     </section>
   );
 }
@@ -197,7 +255,7 @@ function DigestView({ digestId, audit }: { digestId?: string; audit?: boolean })
             <h2>{label}</h2>
             {d[k].map((it) => (
               <details key={it.title}>
-                <summary><span className={`tag imp-${it.impact}`}>{IMPACT[it.impact]}</span> {it.title} {it.date && <span className="note mono">{it.date}</span>}</summary>
+                <summary><span className={`tag imp-${it.impact}`}>{IMPACT[it.impact]}</span> {it.check && <span className="tag P2">複查</span>} {it.title} {it.date && <span className="note mono">{it.date}</span>}</summary>
                 <p style={{ fontSize: 14, lineHeight: 1.7 }}>{it.detail}<Sources refs={it.sources} /></p>
               </details>))}
           </section>))}
