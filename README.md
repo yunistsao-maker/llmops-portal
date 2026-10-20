@@ -26,6 +26,7 @@ data/
 config/litellm.example.yaml   新模型的 LiteLLM 設定範例（路由命名、fallback、能力層 alias）
 tools/
   compat_suite.py          API 相容性測試（17 個案例 × 每條路由）→ runs/compat/*.json
+  gateway_csp_check.py     Gateway → CSP 相容性：同一組案例經 gateway 與直連 CSP 各跑一次，歸因並計算相容性指標 → runs/compat/*.json（kind gateway-csp）
   perf_probe.py            TTFT / TTFAT / ITL / TTLT / tok/s / goodput → runs/perf/*.json
   sync_inventory.py        讀 LiteLLM /model/info，對照 EOL → data/internal/platform-inventory.json
   validate_data.py         Python：schema + 跨檔檢查（來源 id、重複 id、日期）
@@ -110,6 +111,36 @@ python3 tools/compat_suite.py --gateway https://llm-gateway.example.internal/v1 
   --litellm-version v1.102.1 --out runs/compat/$(date +%F)-opus55.json --fail-on-required
 python3 tools/compat_suite.py --list      # 看所有案例
 ```
+
+### Gateway → CSP 相容性與指標（測試結果 → 「Gateway → CSP 相容性」分頁）
+
+同一組案例（compat_suite 的 17 個，加上串流結尾、串流 tool call、成本標頭、fallback、3 個錯誤對應案例，共 24 個）**經 gateway 送一次、直連路由背後的 CSP 端點再送一次**，
+每個失敗都會被歸因：`gateway`（只有經 gateway 才失敗：LiteLLM 轉換、drop_params、proxy 設定，要修 gateway）、`provider`（直連也失敗：CSP 或模型的限制）、
+`unknown`（沒有直連基準）。路由檔的格式見 `tools/fixtures/gateway-routes.example.yaml`；金鑰只從環境變數讀，結果檔只記錄直連端點的協定與 host。
+
+```bash
+export LITELLM_API_KEY=sk-...  AWS_BEARER_TOKEN_BEDROCK=...  AZURE_API_KEY=...  GOOGLE_ACCESS_TOKEN=$(gcloud auth print-access-token)
+python3 tools/gateway_csp_check.py --gateway https://llm-gateway.example.internal/v1 \
+  --routes-file gateway-routes.yaml --direct --samples 5 --litellm-version v1.105.1 --purpose regression \
+  --out runs/compat/$(date +%F)-gateway-csp.json --fail-on-required
+python3 tools/gateway_csp_check.py --list      # 24 個案例與所屬的 API 功能
+```
+
+| 指標 | 計算 | 怎麼讀 |
+| --- | --- | --- |
+| 相容率 / 必要案例通過率 | 通過 ÷（通過 + 失敗 + 錯誤），略過不算 | 必要案例是 G3 門檻：100% |
+| Gateway 造成 | 經 gateway 失敗、直連通過的案例數 | > 0 就是 gateway 該修（升級、改 prefix、改 `model_info`） |
+| CSP / 模型限制 | 兩邊都失敗的案例數 | client 端避開、`drop_params`，或改走別的 CSP |
+| 靜默降級率 | HTTP 200 但違反約定的回應 ÷ 所有 HTTP 200 | 最危險：client 不會報錯 |
+| 錯誤對應率 | 無效請求得到 4xx 的比例 | 5xx 會被重試、200 代表錯誤被吞掉 |
+| 成本追蹤率 | 回應帶 `x-litellm-response-cost` > 0 的比例 | < 100%：cost map 缺模型或價格為 0 |
+| Fallback 率 | `x-litellm-attempted-fallbacks` > 0 的比例 | 測試時應為 0 |
+| 延遲開銷 | gateway − 直連的 p50 / p95（`--samples` 成對），串流另算 TTFT 開銷 | 直連要和 gateway 同區域、同部署 |
+| Prompt token 差異 | 兩邊回報的 prompt_tokens 差距（%） | 成本分攤的偏差 |
+
+同一頁也列出「依公開文件」的支援矩陣（`data/litellm.json` → `providerCompatibility`，LiteLLM 各 provider × 12 類 API 功能），在實測之前先有參考；
+實測與文件不一致時以實測為準。完整定義在 `requirements.json` → `metricDefinitions`（「方法與來源」頁）。`runs/compat/example-mock-gateway-csp.json` 是對
+`tools/mock_gateway.py` 跑的示範資料，頁面上標示為模擬。
 
 效能（固定 effort 與 profile；從實際網路出口量測；每天 3 個時段 × 3 天）：
 

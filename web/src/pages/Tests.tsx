@@ -1,21 +1,54 @@
 import { useState } from "react";
 import type { Percentiles, PerfRun } from "../../../schema/types";
+import { go } from "../App";
 import { fmt, loaders, useData } from "../data";
-import { Empty, PageHead, Status } from "../ui";
+import { Empty, PageHead, Status, Tabs } from "../ui";
+import GatewayCsp from "./GatewayCsp";
 
 const STATUS: Record<string, [string, string]> = { pass: ["通過", "pass"], fail: ["失敗", "fail"], error: ["錯誤", "error"], skip: ["略過", "skipped"] };
 
-export default function Tests() {
+/** The page's views; the address names one: #/tests, #/tests/gateway-csp, #/tests/perf. */
+const VIEWS = [["", "各路由 API 相容性"], ["gateway-csp", "Gateway → CSP 相容性"], ["perf", "效能"]] as const;
+
+export default function Tests({ view = "" }: { view?: string }) {
   const compat = useData(loaders.compatRuns);
   const perf = useData(loaders.perfRuns);
   const manifest = useData(loaders.manifest);
+  const litellm = useData(loaders.litellm);
   const [ci, setCi] = useState(0);
   if (!compat.data || !perf.data || !manifest.data) return <Status error={compat.error || perf.error || manifest.error} />;
-  const run = compat.data[ci];
+  const current = VIEWS.find(([id]) => id === view) ?? VIEWS[0];
+  const tabs = (
+    <Tabs tabs={VIEWS.map(([, label]) => label)} value={current[1]}
+          onChange={(label) => go(["tests", VIEWS.find(([, l]) => l === label)![0]].filter(Boolean).join("/"))} />
+  );
+  if (current[0] === "gateway-csp") {
+    return (
+      <>
+        <PageHead eyebrow="runs/compat（tools/gateway_csp_check.py）與 data/litellm.json" title="測試結果" />
+        {tabs}
+        <GatewayCsp runs={compat.data} files={manifest.data.compatRuns} litellm={litellm.data} />
+      </>);
+  }
+  const routeRuns = compat.data.map((r, i) => ({ r, f: manifest.data!.compatRuns[i] }));
+  const run = routeRuns[ci]?.r;
   const isMock = (name: string) => name.includes("mock");
+  if (current[0] === "perf") {
+    return (
+      <>
+        <PageHead eyebrow="runs/perf（tools/perf_probe.py）" title="測試結果" />
+        {tabs}
+        <section className="card">
+          <h2>效能</h2>
+          {perf.data.length === 0 ? <p className="note">還沒有效能測試紀錄。</p> : perf.data.map((r, i) => <PerfCard key={r.runId} r={r} mock={isMock(manifest.data!.perfRuns[i])} />)}
+          <p className="note">TTFT 為第一個任何內容（含 thinking）的時間；TTFAT 為第一個答案 token 的時間，推理模型以 TTFAT 判斷使用者體感。定義見「方法與來源」。</p>
+        </section>
+      </>);
+  }
   return (
     <>
       <PageHead eyebrow="runs/compat 與 runs/perf（由 tools/ 產生）" title="測試結果" />
+      {tabs}
       <Empty>
         內部實測是發布關卡 G3（API 相容性）與 G4（效能）的證據（G6 AI 安全測試的彙總見各模型頁的「內部測試」）。上線前的測試請加 --purpose pre-release，模型頁會置頂顯示。在你們的 gateway 上執行後把 JSON 放進 <span className="mono">runs/</span>，重新 build 就會出現在這裡：
         <pre className="code">{`python3 tools/compat_suite.py --gateway <GW>/v1 --routes claude-opus-5-5,claude-opus-5-5@vertex \\
@@ -24,6 +57,7 @@ python3 tools/perf_probe.py --gateway <GW>/v1 --route claude-opus-5-5 --profile 
   --effort medium --concurrency 4 --requests 40 --slo-ttfat-ms 8000 --slo-ttlt-ms 60000 \\
   --client-location "Taipei HQ" --out runs/perf/$(date +%F)-opus55-zh-tw.json`}</pre>
         目前顯示的 example-mock 是對模擬 gateway 跑的範例，用來示範版面，不代表任何模型的真實表現。
+        要分辨失敗是 gateway 還是 CSP 造成的，看「Gateway → CSP 相容性」分頁。
       </Empty>
 
       <section className="card">
@@ -32,7 +66,7 @@ python3 tools/perf_probe.py --gateway <GW>/v1 --route claude-opus-5-5 --profile 
           {compat.data.length > 0 && (
             <label className="note">執行紀錄{" "}
               <select value={ci} onChange={(e) => setCi(Number(e.target.value))}>
-                {compat.data.map((r, i) => <option key={r.runId} value={i}>{manifest.data!.compatRuns[i]}</option>)}
+                {routeRuns.map(({ r, f }, i) => <option key={r.runId} value={i}>{f}{r.kind === "gateway-csp" ? "（gateway → CSP）" : ""}</option>)}
               </select></label>)}
         </div>
         {!run ? <p className="note">還沒有相容性測試紀錄。</p> : (
@@ -66,11 +100,6 @@ python3 tools/perf_probe.py --gateway <GW>/v1 --route claude-opus-5-5 --profile 
           </>)}
       </section>
 
-      <section className="card">
-        <h2>效能</h2>
-        {perf.data.length === 0 ? <p className="note">還沒有效能測試紀錄。</p> : perf.data.map((r, i) => <PerfCard key={r.runId} r={r} mock={isMock(manifest.data!.perfRuns[i])} />)}
-        <p className="note">TTFT 為第一個任何內容（含 thinking）的時間；TTFAT 為第一個答案 token 的時間，推理模型以 TTFAT 判斷使用者體感。定義見「方法與來源」。</p>
-      </section>
     </>
   );
 }

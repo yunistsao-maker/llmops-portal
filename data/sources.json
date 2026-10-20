@@ -3433,6 +3433,318 @@
       "publisher": "Taipei Times (Bloomberg)",
       "type": "news",
       "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-berriai-litellm-docs-repo-aws-bedrock-litellm-docs",
+      "title": "AWS Bedrock (LiteLLM docs)",
+      "url": "https://github.com/BerriAI/litellm-docs/blob/02b6918fe872206ae984eccd15acf0f938f36c4b/docs/providers/bedrock.md",
+      "publisher": "LiteLLM docs",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-berriai-litellm-docs-repo-input-params-litellm-docs",
+      "title": "Input Params (LiteLLM docs)",
+      "url": "https://github.com/BerriAI/litellm-docs/blob/02b6918fe872206ae984eccd15acf0f938f36c4b/docs/completion/input.md",
+      "publisher": "LiteLLM docs",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-berriai-litellm-docs-repo-usage-litellm-docs",
+      "title": "Usage (LiteLLM docs)",
+      "url": "https://github.com/BerriAI/litellm-docs/blob/02b6918fe872206ae984eccd15acf0f938f36c4b/docs/completion/usage.md",
+      "publisher": "LiteLLM docs",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-berriai-litellm-docs-repo-drop-unsupported-params-li",
+      "title": "Drop Unsupported Params (LiteLLM docs)",
+      "url": "https://github.com/BerriAI/litellm-docs/blob/02b6918fe872206ae984eccd15acf0f938f36c4b/docs/completion/drop_params.md",
+      "publisher": "LiteLLM docs",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-berriai-litellm-docs-repo-thinking-reasoning-content",
+      "title": "'Thinking' / 'Reasoning Content' (LiteLLM docs)",
+      "url": "https://github.com/BerriAI/litellm-docs/blob/02b6918fe872206ae984eccd15acf0f938f36c4b/docs/reasoning_content.md",
+      "publisher": "LiteLLM docs",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-berriai-litellm-docs-repo-structured-outputs-json-mo",
+      "title": "Structured Outputs (JSON Mode) (LiteLLM docs)",
+      "url": "https://github.com/BerriAI/litellm-docs/blob/02b6918fe872206ae984eccd15acf0f938f36c4b/docs/completion/json_mode.md",
+      "publisher": "LiteLLM docs",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-berriai-litellm-docs-repo-prompt-caching-litellm-doc",
+      "title": "Prompt Caching (LiteLLM docs)",
+      "url": "https://github.com/BerriAI/litellm-docs/blob/02b6918fe872206ae984eccd15acf0f938f36c4b/docs/completion/prompt_caching.md",
+      "publisher": "LiteLLM docs",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-berriai-litellm-docs-repo-responses-litellm-docs",
+      "title": "/responses (LiteLLM docs)",
+      "url": "https://github.com/BerriAI/litellm-docs/blob/02b6918fe872206ae984eccd15acf0f938f36c4b/docs/response_api.md",
+      "publisher": "LiteLLM docs",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-berriai-litellm-docs-repo-native-v1-messages-and-v1-",
+      "title": "Native /v1/messages and /v1/responses Passthrough (LiteLLM docs)",
+      "url": "https://github.com/BerriAI/litellm-docs/blob/02b6918fe872206ae984eccd15acf0f938f36c4b/docs/anthropic_unified/native_passthrough.md",
+      "publisher": "LiteLLM docs",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-berriai-litellm-docs-repo-exception-mapping-litellm-",
+      "title": "Exception Mapping (LiteLLM docs)",
+      "url": "https://github.com/BerriAI/litellm-docs/blob/02b6918fe872206ae984eccd15acf0f938f36c4b/docs/exception_mapping.md",
+      "publisher": "LiteLLM docs",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-berriai-litellm-docs-repo-spend-tracking-litellm-doc",
+      "title": "Spend Tracking (LiteLLM docs)",
+      "url": "https://github.com/BerriAI/litellm-docs/blob/02b6918fe872206ae984eccd15acf0f938f36c4b/docs/proxy/cost_tracking.md",
+      "publisher": "LiteLLM docs",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-berriai-litellm-docs-repo-response-headers-litellm-d",
+      "title": "Response Headers (LiteLLM docs)",
+      "url": "https://github.com/BerriAI/litellm-docs/blob/02b6918fe872206ae984eccd15acf0f938f36c4b/docs/proxy/response_headers.md",
+      "publisher": "LiteLLM docs",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-berriai-litellm-docs-repo-azure-openai-litellm-docs",
+      "title": "Azure OpenAI (LiteLLM docs)",
+      "url": "https://github.com/BerriAI/litellm-docs/blob/02b6918fe872206ae984eccd15acf0f938f36c4b/docs/providers/azure/azure.md",
+      "publisher": "LiteLLM docs",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-berriai-litellm-docs-repo-function-calling-litellm-d",
+      "title": "Function Calling (LiteLLM docs)",
+      "url": "https://github.com/BerriAI/litellm-docs/blob/02b6918fe872206ae984eccd15acf0f938f36c4b/docs/completion/function_call.md",
+      "publisher": "LiteLLM docs",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-berriai-litellm-docs-repo-using-pdf-input-litellm-do",
+      "title": "Using PDF Input (LiteLLM docs)",
+      "url": "https://github.com/BerriAI/litellm-docs/blob/02b6918fe872206ae984eccd15acf0f938f36c4b/docs/completion/document_understanding.md",
+      "publisher": "LiteLLM docs",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-berriai-litellm-docs-repo-auto-inject-prompt-caching",
+      "title": "Auto-Inject Prompt Caching Checkpoints (LiteLLM docs)",
+      "url": "https://github.com/BerriAI/litellm-docs/blob/02b6918fe872206ae984eccd15acf0f938f36c4b/docs/tutorials/prompt_caching.md",
+      "publisher": "LiteLLM docs",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "microsoft-learn-prompt-caching-with-azure-openai-in-microsof",
+      "title": "Prompt caching with Azure OpenAI in Microsoft Foundry Models",
+      "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/prompt-caching",
+      "publisher": "Microsoft Learn",
+      "type": "csp-doc",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-berriai-litellm-docs-repo-azure-responses-api-litell",
+      "title": "Azure Responses API (LiteLLM docs)",
+      "url": "https://github.com/BerriAI/litellm-docs/blob/02b6918fe872206ae984eccd15acf0f938f36c4b/docs/providers/azure/azure_responses.md",
+      "publisher": "LiteLLM docs",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-berriai-litellm-docs-repo-v1-messages-to-responses-a",
+      "title": "/v1/messages to Responses API mapping (LiteLLM docs)",
+      "url": "https://github.com/BerriAI/litellm-docs/blob/02b6918fe872206ae984eccd15acf0f938f36c4b/docs/anthropic_unified/messages_to_responses_mapping.md",
+      "publisher": "LiteLLM docs",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-berriai-litellm-docs-repo-azure-ai-studio-litellm-do",
+      "title": "Azure AI Studio (LiteLLM docs)",
+      "url": "https://github.com/BerriAI/litellm-docs/blob/02b6918fe872206ae984eccd15acf0f938f36c4b/docs/providers/azure_ai.md",
+      "publisher": "LiteLLM docs",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-berriai-litellm-docs-repo-azure-anthropic-claude-via",
+      "title": "Azure Anthropic (Claude via Azure Foundry) (LiteLLM docs)",
+      "url": "https://github.com/BerriAI/litellm-docs/blob/02b6918fe872206ae984eccd15acf0f938f36c4b/docs/providers/azure/azure_anthropic.md",
+      "publisher": "LiteLLM docs",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-berriai-litellm-docs-repo-structured-output-v1-messa",
+      "title": "Structured Output /v1/messages (LiteLLM docs)",
+      "url": "https://github.com/BerriAI/litellm-docs/blob/02b6918fe872206ae984eccd15acf0f938f36c4b/docs/anthropic_unified/structured_output.md",
+      "publisher": "LiteLLM docs",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-berriai-litellm-docs-repo-anthropic-litellm-docs",
+      "title": "Anthropic (LiteLLM docs)",
+      "url": "https://github.com/BerriAI/litellm-docs/blob/02b6918fe872206ae984eccd15acf0f938f36c4b/docs/providers/anthropic.md",
+      "publisher": "LiteLLM docs",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-berriai-litellm-docs-repo-vertexai-gemini-litellm-do",
+      "title": "VertexAI [Gemini] (LiteLLM docs)",
+      "url": "https://github.com/BerriAI/litellm-docs/blob/02b6918fe872206ae984eccd15acf0f938f36c4b/docs/providers/vertex.md",
+      "publisher": "LiteLLM docs",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-berriai-litellm-docs-repo-v1-messages-litellm-docs",
+      "title": "/v1/messages (LiteLLM docs)",
+      "url": "https://github.com/BerriAI/litellm-docs/blob/02b6918fe872206ae984eccd15acf0f938f36c4b/docs/anthropic_unified/index.md",
+      "publisher": "LiteLLM docs",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-berriai-litellm-docs-repo-vertex-ai-anthropic-deepse",
+      "title": "Vertex AI - Anthropic, DeepSeek, Model Garden, xAI (LiteLLM docs)",
+      "url": "https://github.com/BerriAI/litellm-docs/blob/02b6918fe872206ae984eccd15acf0f938f36c4b/docs/providers/vertex_partner.md",
+      "publisher": "LiteLLM docs",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-berriai-litellm-docs-repo-computer-use-litellm-docs",
+      "title": "Computer Use (LiteLLM docs)",
+      "url": "https://github.com/BerriAI/litellm-docs/blob/02b6918fe872206ae984eccd15acf0f938f36c4b/docs/completion/computer_use.md",
+      "publisher": "LiteLLM docs",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-berriai-litellm-docs-repo-anthropic-tool-search-lite",
+      "title": "Anthropic Tool Search (LiteLLM docs)",
+      "url": "https://github.com/BerriAI/litellm-docs/blob/02b6918fe872206ae984eccd15acf0f938f36c4b/docs/providers/anthropic_tool_search.md",
+      "publisher": "LiteLLM docs",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-berriai-litellm-docs-repo-anthropic-programmatic-too",
+      "title": "Anthropic Programmatic Tool Calling (LiteLLM docs)",
+      "url": "https://github.com/BerriAI/litellm-docs/blob/02b6918fe872206ae984eccd15acf0f938f36c4b/docs/providers/anthropic_programmatic_tool_calling.md",
+      "publisher": "LiteLLM docs",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "github-berriai-bug-vertex-ai-claude-opus-5-5-rejects-respons",
+      "title": "[Bug]: Vertex AI claude-opus-5-5 rejects response_format json_schema: LiteLLM sends the deprecated `output_format` instead of `output_config.format`",
+      "url": "https://github.com/BerriAI/litellm/issues/47563",
+      "publisher": "LiteLLM GitHub issue",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "github-berriai-bug-bedrock-v1-messages-claude-opus-5-5-rejec",
+      "title": "[Bug]: Bedrock /v1/messages: claude-opus-5-5 rejects thinking.type=enabled, no adaptive translation and output_config is …",
+      "url": "https://github.com/BerriAI/litellm/issues/47382",
+      "publisher": "LiteLLM GitHub issue",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "github-berriai-bug-bedrock-adapter-rejects-tool-choice-any-d",
+      "title": "[Bug]: Bedrock adapter rejects tool_choice=\"any\" despite Bedrock Converse API supporting it",
+      "url": "https://github.com/BerriAI/litellm/issues/37980",
+      "publisher": "LiteLLM GitHub issue",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "github-berriai-bug-bedrock-converse-streaming-drops-request-",
+      "title": "[Bug]: Bedrock Converse streaming drops request timeout and can hang for 600s",
+      "url": "https://github.com/BerriAI/litellm/issues/45103",
+      "publisher": "LiteLLM GitHub issue",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "github-berriai-bug-image-inside-a-tool-result-400s-on-bedroc",
+      "title": "[Bug]: Image inside a tool result 400s on Bedrock gpt-6.1-sol",
+      "url": "https://github.com/BerriAI/litellm/issues/45576",
+      "publisher": "LiteLLM GitHub issue",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "github-berriai-bug-azure-responses-bridge-inherits-chat-era-",
+      "title": "[Bug] Azure Responses bridge inherits chat-era api-version, rejected by Azure (needs >= 2025-03-01-preview)",
+      "url": "https://github.com/BerriAI/litellm/issues/46038",
+      "publisher": "LiteLLM GitHub issue",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "github-berriai-bug-azure-prompt-content-filter-code-content-",
+      "title": "[Bug]: Azure prompt content filter (code=content_filter) not mapped to ContentPolicyViolationError",
+      "url": "https://github.com/BerriAI/litellm/issues/42247",
+      "publisher": "LiteLLM GitHub issue",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "github-berriai-bug-azure-ai-foundry-anthropic-endpoints-400-",
+      "title": "[Bug]: Azure AI Foundry Anthropic endpoints 400 when azure_ad_token leaks into request body",
+      "url": "https://github.com/BerriAI/litellm/issues/46701",
+      "publisher": "LiteLLM GitHub issue",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "github-berriai-bug-vertex-gemini-context-caching-reorders-th",
+      "title": "[Bug] Vertex/Gemini context caching reorders the conversation when the cache_control block is not a prefix, and modify_params drops system_instruction",
+      "url": "https://github.com/BerriAI/litellm/issues/47046",
+      "publisher": "LiteLLM GitHub issue",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "github-berriai-gemini-vertex-path-ignores-supports-sampling-",
+      "title": "Gemini/Vertex path ignores `supports_sampling_params: false`; temperature/top_p/top_k are sent to Gemini 3.6+ models that silently ignore them",
+      "url": "https://github.com/BerriAI/litellm/issues/47015",
+      "publisher": "LiteLLM GitHub issue",
+      "type": "github",
+      "accessed": "2026-10-20"
     }
   ]
 }

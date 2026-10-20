@@ -510,6 +510,26 @@ export interface SecurityAdvisory {
   sources: SourceRef[];
 }
 
+/**
+ * What LiteLLM's documentation (and the CSPs' own docs) say about each API surface for each provider route - researched,
+ * not measured. The measured counterpart is a gateway-csp run in runs/compat/ (tools/gateway_csp_check.py).
+ */
+export interface ProviderCompatibility {
+  asOf: ISODate;
+  providers: { id: string; title: string; litellmPrefix: string; cloud: Cloud; service?: Service; note?: string }[];
+  surfaces: { id: GatewaySurface | string; title: string }[];
+  cells: {
+    provider: string;
+    surface: string;
+    status: "supported" | "partial" | "not-supported" | "unknown";
+    note?: string;
+    verification: Verification;
+    sources: SourceRef[];
+  }[];
+  /** Open (or recently closed) upstream issues where a surface breaks for a provider. */
+  knownIssues?: { title: string; provider: string; surface: string; state: "open" | "closed"; date?: ISODate; summary: string; sources: SourceRef[] }[];
+}
+
 export interface LiteLLMFile {
   schema: "litellm/v1";
   generatedAt: ISODateTime;
@@ -524,6 +544,8 @@ export interface LiteLLMFile {
   advisories: SecurityAdvisory[];
   /** Cross-model parameter pitfalls seen through the gateway. */
   knownPitfalls: { title: string; affects: string; symptom: string; fix: string; sources: SourceRef[] }[];
+  /** Documented API compatibility per LiteLLM provider route (測試結果 → Gateway → CSP, next to the measured runs). */
+  providerCompatibility?: ProviderCompatibility;
   sources: SourceRef[];
 }
 
@@ -943,10 +965,54 @@ export interface CompatResult {
   httpStatus?: number;
   latencyMs?: number;
   detail?: string;
+  /** gateway-csp runs: the API surface the case belongs to (GatewaySurface). */
+  surface?: GatewaySurface;
+  /** gateway-csp runs: time to the first streamed content, ms. */
+  ttftMs?: number;
+  /** gateway-csp runs: the same case sent straight to the CSP endpoint behind the route (the baseline). */
+  direct?: { status: "pass" | "fail" | "error" | "skip"; httpStatus?: number; latencyMs?: number; ttftMs?: number; detail?: string };
+  /** gateway-csp runs: ok | gateway (fails only through the gateway) | provider (fails on the CSP too) | unknown (no baseline). */
+  attribution?: "ok" | "gateway" | "provider" | "unknown";
+  /** gateway-csp runs: HTTP 200, but the answer broke the contract (silent degradation). */
+  silent?: boolean;
+  /** gateway-csp runs: the gateway's x-litellm-* response headers (never a key). */
+  headers?: Record<string, string>;
+  usage?: { promptTokens?: number | null; completionTokens?: number | null; cachedTokens?: number | null };
+}
+
+/** The API surfaces a gateway-csp run groups its cases into (tools/gateway_csp_check.py SURFACES). */
+export type GatewaySurface =
+  | "chat" | "streaming" | "parameters" | "reasoning" | "tools" | "structured-output" | "vision" | "prompt-caching"
+  | "responses-api" | "messages-api" | "error-mapping" | "observability";
+
+export interface LatencyDelta { p50: number | null; p95: number | null; n: number }
+
+/** One route's metrics in a gateway-csp run (definitions: requirements.json metricDefinitions, "Gateway → CSP"). */
+export interface GatewayRouteMetrics {
+  route: string;
+  csp: string;
+  service: string;
+  applicable: number;
+  pass: number;
+  compatibilityRate: number | null;
+  requiredPassRate: number | null;
+  gatewayInduced: number;
+  providerLimited: number;
+  unattributed: number;
+  silentDegradations: number;
+  silentDegradationRate: number | null;
+  errorMappingRate: number | null;
+  costTrackingRate: number | null;
+  fallbackRate: number | null;
+  overheadMs: LatencyDelta;
+  ttftOverheadMs: LatencyDelta;
+  promptTokenDeltaPct: number | null;
 }
 
 export interface CompatRun {
   schema: "compat-run/v1";
+  /** "routes" (tools/compat_suite.py, the default) or "gateway-csp" (tools/gateway_csp_check.py: gateway vs. the CSP itself). */
+  kind?: "routes" | "gateway-csp";
   runId: string;
   startedAt: ISODateTime;
   finishedAt: ISODateTime;
@@ -955,10 +1021,23 @@ export interface CompatRun {
   /** Catalog model ids the run is about (otherwise matched from the routes). */
   modelIds?: string[];
   litellmVersion?: string;
+  /** gateway-csp runs: "direct" when the cases also ran straight against the CSP. */
+  baseline?: "direct" | "none";
   routes: string[];
-  cases: { id: string; title: string; required: boolean }[];
+  /** gateway-csp runs: where each route goes (the direct baseline as protocol and host only). */
+  routeInfo?: { route: string; modelId?: string; csp: string; service: string; region?: string; litellmModel?: string; direct?: { protocol: string; host: string } }[];
+  cases: { id: string; title: string; required: boolean; surface?: GatewaySurface }[];
   results: CompatResult[];
   summary: { route: string; pass: number; fail: number; error: number; skip: number; requiredFailures: string[] }[];
+  metrics?: {
+    byRoute: GatewayRouteMetrics[];
+    byCsp: {
+      csp: string; routes: number; applicable: number; pass: number; compatibilityRate: number | null; requiredPassRate: number | null;
+      gatewayInduced: number; providerLimited: number; silentDegradations: number; errorMappingRate: number | null;
+      costTrackingRate: number | null; fallbackRate: number | null; overheadMsP50: number | null;
+    }[];
+    bySurface: { surface: GatewaySurface; title: string; applicable: number; pass: number; gatewayInduced: number }[];
+  };
 }
 
 /** One target's result for one security test item (tools/secsuite: aggregate counts only, never prompt or response text). */

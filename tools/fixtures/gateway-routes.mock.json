@@ -1,0 +1,22 @@
+{
+  "comment": "Routes for the mock gateway (tools/mock_gateway.py): the selftest and runs/compat/example-mock-gateway-csp.json. Flags in the alias choose the mock's behaviour; ~gw.<flag> only on the gateway side.",
+  "routes": [
+    {"route": "mock-aws-claude~gw.silent-forced~drop-tools-stream", "csp": "aws", "service": "bedrock", "region": "ap-northeast-1",
+     "litellmModel": "bedrock/global.anthropic.mock-claude",
+     "direct": {"protocol": "anthropic-messages", "url": "http://127.0.0.1:${MOCK_PORT}/direct/anthropic/v1/messages", "stream": false,
+                "auth": {"type": "bearer", "env": "MOCK_DIRECT_TOKEN"}, "body": {"anthropic_version": "bedrock-2023-05-31"}}},
+    {"route": "mock-azure-gpt~no-temp~gw.no-cost", "csp": "azure", "service": "foundry", "region": "eastus2",
+     "litellmModel": "azure/mock-gpt",
+     "direct": {"protocol": "openai-chat", "url": "http://127.0.0.1:${MOCK_PORT}/direct/v1/chat/completions", "model": "mock-azure-gpt~no-temp",
+                "auth": {"type": "header", "name": "api-key", "env": "MOCK_DIRECT_TOKEN"}}},
+    {"route": "mock-gcp-gemini~no-schema~gw.err500~slow-gw", "csp": "gcp", "service": "agent-platform", "region": "global",
+     "litellmModel": "vertex_ai/mock-gemini",
+     "direct": {"protocol": "openai-chat", "url": "http://127.0.0.1:${MOCK_PORT}/direct/v1/chat/completions", "model": "mock-gcp-gemini~no-schema",
+                "auth": {"type": "bearer", "env": "MOCK_DIRECT_TOKEN"}}},
+    {"route": "mock-gcp-claude~gw.fallback", "csp": "gcp", "service": "agent-platform", "region": "us-east5",
+     "litellmModel": "vertex_ai/mock-claude",
+     "direct": {"protocol": "anthropic-messages", "url": "http://127.0.0.1:${MOCK_PORT}/direct/anthropic/v1/messages",
+                "streamUrl": "http://127.0.0.1:${MOCK_PORT}/direct/anthropic/v1/messages", "model": "mock-gcp-claude",
+                "auth": {"type": "bearer", "env": "MOCK_DIRECT_TOKEN"}}}
+  ]
+}

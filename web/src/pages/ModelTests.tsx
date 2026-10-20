@@ -49,6 +49,10 @@ function compatRows(runs: CompatRun[], m: Model): Row[] {
       body: (
         <>
           {r.litellmVersion && <div className="note">LiteLLM {r.litellmVersion}</div>}
+          {r.kind === "gateway-csp" && r.metrics && (
+            <div className="note">Gateway → CSP：{r.metrics.byRoute.filter((x) => rows.some((s) => s.route === x.route)).map((x) =>
+              `${x.route} 相容率 ${x.compatibilityRate === null ? "—" : Math.round(x.compatibilityRate * 100) + "%"}・Gateway 造成 ${x.gatewayInduced}・CSP 限制 ${x.providerLimited}・靜默降級 ${x.silentDegradations}`).join("；")}
+              {" "}<a href="#/tests/gateway-csp">詳細</a></div>)}
           {rows.map((s) => (
             <div key={s.route}>
               <span className="mono">{s.route}</span>：<span className="pass">{s.pass} 過</span>

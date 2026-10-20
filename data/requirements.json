@@ -1293,6 +1293,83 @@
       "pitfalls": [
         "不同 tokenizer 差異大；用於成本與 context 容量估算。"
       ]
+    },
+    {
+      "metric": "Gateway → CSP 相容率",
+      "definition": "一條 gateway 路由上，適用的 API 案例有幾成通過：通過 /（通過 + 失敗 + 錯誤）；略過的不算。必要案例另算通過率，發布關卡 G3 要求 100%。",
+      "howMeasured": "tools/gateway_csp_check.py 對每條路由送出同一組案例（Chat、串流、參數、推理、tool calling、structured output、影像、prompt caching、Responses、Messages、錯誤對應、可觀測性），結果寫入 runs/compat/（kind: gateway-csp）。",
+      "pitfalls": [
+        "案例數不同的兩條路由，相容率不能直接比較：先看必要案例，再看失敗的是哪一類功能。",
+        "一次執行只是一個樣本：flaky 的 429 / 5xx 要重跑確認，不要直接當成不相容。"
+      ]
+    },
+    {
+      "metric": "Gateway 造成的失敗（gateway-induced）",
+      "definition": "經 gateway 失敗、但同一個請求直連 CSP 原生端點通過的案例數：問題在 LiteLLM 的轉換、drop_params 或 proxy 設定，修 gateway（升級、改 prefix、改 model_info）就能解決。",
+      "howMeasured": "--direct：每個案例另外送到路由背後的 CSP 端點（openai-chat 或 anthropic-messages 協定），兩邊結果比對後標為 ok / gateway / provider / unknown。",
+      "pitfalls": [
+        "直連的基準必須是同一個模型、同一個區域與部署，否則差異來自別的地方。",
+        "原生 API 沒有對應的請求（例如 Responses API 之於 Bedrock 上的 Claude）時直連會略過，該失敗標成「無法歸因」。"
+      ]
+    },
+    {
+      "metric": "CSP / 模型限制（provider-limited）",
+      "definition": "直連 CSP 也失敗的案例數：平台或模型本身不支援，gateway 無能為力；要在 client 端避開、在 gateway 設 drop_params，或改走別的 CSP 路由。",
+      "howMeasured": "同上：gateway 與直連兩邊都失敗。",
+      "pitfalls": [
+        "同一個模型在不同 CSP 的支援範圍不同（例如 forced tool_choice、structured output）：每條路由都要測，不能拿一條的結果代表其他。"
+      ]
+    },
+    {
+      "metric": "靜默降級率（silent degradation）",
+      "definition": "回 HTTP 200、但回應違反請求約定的比例：forced tool_choice 變成 auto、要求 JSON 卻回散文、串流沒有 usage 或 finish_reason、tool call delta 遺失。分母是所有 HTTP 200 的回應（不含刻意送出的錯誤請求）。",
+      "howMeasured": "每個案例除了 HTTP 狀態，還檢查回應內容是否符合約定（compat_suite 與 gateway_csp_check 的 check 函式）。",
+      "pitfalls": [
+        "這是最危險的一類：client 不會報錯，只會悄悄得到錯的結果。只看錯誤率的監控抓不到。"
+      ]
+    },
+    {
+      "metric": "錯誤對應率（error mapping）",
+      "definition": "刻意送出的無效請求（max_tokens = -1、指定不存在的工具、壞掉的影像）有幾成得到 4xx 與 OpenAI 格式的 error 物件。",
+      "howMeasured": "err.* 案例；直連 CSP 也送一次，確認 CSP 本身回的是 4xx。",
+      "pitfalls": [
+        "gateway 把 CSP 的 400 變成 500，client 的重試邏輯會把一個永遠不會成功的請求一直重送（費用與配額都會被吃掉）。",
+        "回 200 代表錯誤被吞掉或請求被改寫了。"
+      ]
+    },
+    {
+      "metric": "成本追蹤率（cost tracking）",
+      "definition": "gateway 回應中帶有 x-litellm-response-cost 且大於 0 的比例。",
+      "howMeasured": "gw.cost_header 案例讀取 gateway 的回應標頭。",
+      "pitfalls": [
+        "低於 100% 通常是 cost map 沒有這個模型或價格為 0（新模型上架初期最常見）：FinOps 報表與預算上限都會失準。",
+        "有值不代表價格正確：仍要定期和 CSP 帳單核對（例如 cache read 單價）。"
+      ]
+    },
+    {
+      "metric": "Fallback 率",
+      "definition": "gateway 回應中 x-litellm-attempted-fallbacks 大於 0 的比例：使用者以為呼叫的是 A，實際上是 fallback 的 B 回答。",
+      "howMeasured": "gw.no_fallback 案例讀取回應標頭，並記錄回應的 model 欄位。",
+      "pitfalls": [
+        "fallback 會改變延遲、價格與資料落地區域；測試時應該是 0，生產環境要監控它的比例。"
+      ]
+    },
+    {
+      "metric": "Gateway 延遲開銷（overhead）",
+      "definition": "同一個請求經 gateway 與直連 CSP 的延遲差，取 p50 / p95（非串流的 chat.basic）；TTFT 開銷是串流第一個內容的時間差（chat.stream）。",
+      "howMeasured": "--samples N：兩邊各送 N 次、成對相減，只用兩邊都成功的請求。",
+      "pitfalls": [
+        "量測點要和應用程式在同一個網路位置；gateway 與直連走不同出口時，差異包含網路距離。",
+        "樣本數小（預設 3）時 p95 不穩定，正式比較請加大 --samples。"
+      ]
+    },
+    {
+      "metric": "Prompt token 差異",
+      "definition": "同一個請求，gateway 回報的 prompt_tokens 與 CSP 直接回報的差距（%）。",
+      "howMeasured": "chat.basic 兩邊的 usage 比對。",
+      "pitfalls": [
+        "差異來自 gateway 加的 system prompt、tool 定義的序列化方式或 cache 計算方式；超過幾個百分點就會讓成本分攤失準。"
+      ]
     }
   ],
   "securityTestCatalog": [

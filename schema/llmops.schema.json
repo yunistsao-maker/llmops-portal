@@ -177,11 +177,59 @@
     "CompatResult": {
       "additionalProperties": false,
       "properties": {
+        "attribution": {
+          "description": "gateway-csp runs: ok | gateway (fails only through the gateway) | provider (fails on the CSP too) | unknown (no baseline).",
+          "enum": [
+            "ok",
+            "gateway",
+            "provider",
+            "unknown"
+          ],
+          "type": "string"
+        },
         "caseId": {
           "type": "string"
         },
         "detail": {
           "type": "string"
+        },
+        "direct": {
+          "additionalProperties": false,
+          "description": "gateway-csp runs: the same case sent straight to the CSP endpoint behind the route (the baseline).",
+          "properties": {
+            "detail": {
+              "type": "string"
+            },
+            "httpStatus": {
+              "type": "number"
+            },
+            "latencyMs": {
+              "type": "number"
+            },
+            "status": {
+              "enum": [
+                "pass",
+                "fail",
+                "error",
+                "skip"
+              ],
+              "type": "string"
+            },
+            "ttftMs": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "status"
+          ],
+          "type": "object"
+        },
+        "headers": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "gateway-csp runs: the gateway's x-litellm-* response headers (never a key).",
+          "type": "object"
         },
         "httpStatus": {
           "type": "number"
@@ -192,6 +240,10 @@
         "route": {
           "type": "string"
         },
+        "silent": {
+          "description": "gateway-csp runs: HTTP 200, but the answer broke the contract (silent degradation).",
+          "type": "boolean"
+        },
         "status": {
           "enum": [
             "pass",
@@ -200,6 +252,38 @@
             "skip"
           ],
           "type": "string"
+        },
+        "surface": {
+          "$ref": "#/definitions/GatewaySurface",
+          "description": "gateway-csp runs: the API surface the case belongs to (GatewaySurface)."
+        },
+        "ttftMs": {
+          "description": "gateway-csp runs: time to the first streamed content, ms.",
+          "type": "number"
+        },
+        "usage": {
+          "additionalProperties": false,
+          "properties": {
+            "cachedTokens": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "completionTokens": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "promptTokens": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
         }
       },
       "required": [
@@ -212,6 +296,14 @@
     "CompatRun": {
       "additionalProperties": false,
       "properties": {
+        "baseline": {
+          "description": "gateway-csp runs: \"direct\" when the cases also ran straight against the CSP.",
+          "enum": [
+            "direct",
+            "none"
+          ],
+          "type": "string"
+        },
         "cases": {
           "items": {
             "additionalProperties": false,
@@ -221,6 +313,9 @@
               },
               "required": {
                 "type": "boolean"
+              },
+              "surface": {
+                "$ref": "#/definitions/GatewaySurface"
               },
               "title": {
                 "type": "string"
@@ -241,8 +336,145 @@
         "gateway": {
           "type": "string"
         },
+        "kind": {
+          "description": "\"routes\" (tools/compat_suite.py, the default) or \"gateway-csp\" (tools/gateway_csp_check.py: gateway vs. the CSP itself).",
+          "enum": [
+            "routes",
+            "gateway-csp"
+          ],
+          "type": "string"
+        },
         "litellmVersion": {
           "type": "string"
+        },
+        "metrics": {
+          "additionalProperties": false,
+          "properties": {
+            "byCsp": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "applicable": {
+                    "type": "number"
+                  },
+                  "compatibilityRate": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "costTrackingRate": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "csp": {
+                    "type": "string"
+                  },
+                  "errorMappingRate": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "fallbackRate": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "gatewayInduced": {
+                    "type": "number"
+                  },
+                  "overheadMsP50": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "pass": {
+                    "type": "number"
+                  },
+                  "providerLimited": {
+                    "type": "number"
+                  },
+                  "requiredPassRate": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "routes": {
+                    "type": "number"
+                  },
+                  "silentDegradations": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "csp",
+                  "routes",
+                  "applicable",
+                  "pass",
+                  "compatibilityRate",
+                  "requiredPassRate",
+                  "gatewayInduced",
+                  "providerLimited",
+                  "silentDegradations",
+                  "errorMappingRate",
+                  "costTrackingRate",
+                  "fallbackRate",
+                  "overheadMsP50"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "byRoute": {
+              "items": {
+                "$ref": "#/definitions/GatewayRouteMetrics"
+              },
+              "type": "array"
+            },
+            "bySurface": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "applicable": {
+                    "type": "number"
+                  },
+                  "gatewayInduced": {
+                    "type": "number"
+                  },
+                  "pass": {
+                    "type": "number"
+                  },
+                  "surface": {
+                    "$ref": "#/definitions/GatewaySurface"
+                  },
+                  "title": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "surface",
+                  "title",
+                  "applicable",
+                  "pass",
+                  "gatewayInduced"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "byRoute",
+            "byCsp",
+            "bySurface"
+          ],
+          "type": "object"
         },
         "modelIds": {
           "description": "Catalog model ids the run is about (otherwise matched from the routes).",
@@ -257,6 +489,55 @@
         "results": {
           "items": {
             "$ref": "#/definitions/CompatResult"
+          },
+          "type": "array"
+        },
+        "routeInfo": {
+          "description": "gateway-csp runs: where each route goes (the direct baseline as protocol and host only).",
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "csp": {
+                "type": "string"
+              },
+              "direct": {
+                "additionalProperties": false,
+                "properties": {
+                  "host": {
+                    "type": "string"
+                  },
+                  "protocol": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "protocol",
+                  "host"
+                ],
+                "type": "object"
+              },
+              "litellmModel": {
+                "type": "string"
+              },
+              "modelId": {
+                "type": "string"
+              },
+              "region": {
+                "type": "string"
+              },
+              "route": {
+                "type": "string"
+              },
+              "service": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "route",
+              "csp",
+              "service"
+            ],
+            "type": "object"
           },
           "type": "array"
         },
@@ -936,6 +1217,126 @@
       ],
       "type": "object"
     },
+    "GatewayRouteMetrics": {
+      "additionalProperties": false,
+      "description": "One route's metrics in a gateway-csp run (definitions: requirements.json metricDefinitions, \"Gateway → CSP\").",
+      "properties": {
+        "applicable": {
+          "type": "number"
+        },
+        "compatibilityRate": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "costTrackingRate": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "csp": {
+          "type": "string"
+        },
+        "errorMappingRate": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "fallbackRate": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "gatewayInduced": {
+          "type": "number"
+        },
+        "overheadMs": {
+          "$ref": "#/definitions/LatencyDelta"
+        },
+        "pass": {
+          "type": "number"
+        },
+        "promptTokenDeltaPct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "providerLimited": {
+          "type": "number"
+        },
+        "requiredPassRate": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "route": {
+          "type": "string"
+        },
+        "service": {
+          "type": "string"
+        },
+        "silentDegradationRate": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "silentDegradations": {
+          "type": "number"
+        },
+        "ttftOverheadMs": {
+          "$ref": "#/definitions/LatencyDelta"
+        },
+        "unattributed": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "route",
+        "csp",
+        "service",
+        "applicable",
+        "pass",
+        "compatibilityRate",
+        "requiredPassRate",
+        "gatewayInduced",
+        "providerLimited",
+        "unattributed",
+        "silentDegradations",
+        "silentDegradationRate",
+        "errorMappingRate",
+        "costTrackingRate",
+        "fallbackRate",
+        "overheadMs",
+        "ttftOverheadMs",
+        "promptTokenDeltaPct"
+      ],
+      "type": "object"
+    },
+    "GatewaySurface": {
+      "description": "The API surfaces a gateway-csp run groups its cases into (tools/gateway_csp_check.py SURFACES).",
+      "enum": [
+        "chat",
+        "streaming",
+        "parameters",
+        "reasoning",
+        "tools",
+        "structured-output",
+        "vision",
+        "prompt-caching",
+        "responses-api",
+        "messages-api",
+        "error-mapping",
+        "observability"
+      ],
+      "type": "string"
+    },
     "ISODate": {
       "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
       "type": "string"
@@ -1030,6 +1431,32 @@
         "modelName",
         "litellmModel",
         "risk"
+      ],
+      "type": "object"
+    },
+    "LatencyDelta": {
+      "additionalProperties": false,
+      "properties": {
+        "n": {
+          "type": "number"
+        },
+        "p50": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "p95": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "p50",
+        "p95",
+        "n"
       ],
       "type": "object"
     },
@@ -1320,6 +1747,10 @@
             "rationale"
           ],
           "type": "object"
+        },
+        "providerCompatibility": {
+          "$ref": "#/definitions/ProviderCompatibility",
+          "description": "Documented API compatibility per LiteLLM provider route (測試結果 → Gateway → CSP, next to the measured runs)."
         },
         "recommended": {
           "additionalProperties": false,
@@ -2668,6 +3099,170 @@
         "P2"
       ],
       "type": "string"
+    },
+    "ProviderCompatibility": {
+      "additionalProperties": false,
+      "description": "What LiteLLM's documentation (and the CSPs' own docs) say about each API surface for each provider route - researched, not measured. The measured counterpart is a gateway-csp run in runs/compat/ (tools/gateway_csp_check.py).",
+      "properties": {
+        "asOf": {
+          "$ref": "#/definitions/ISODate"
+        },
+        "cells": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "note": {
+                "type": "string"
+              },
+              "provider": {
+                "type": "string"
+              },
+              "sources": {
+                "items": {
+                  "$ref": "#/definitions/SourceRef"
+                },
+                "type": "array"
+              },
+              "status": {
+                "enum": [
+                  "supported",
+                  "partial",
+                  "not-supported",
+                  "unknown"
+                ],
+                "type": "string"
+              },
+              "surface": {
+                "type": "string"
+              },
+              "verification": {
+                "$ref": "#/definitions/Verification"
+              }
+            },
+            "required": [
+              "provider",
+              "surface",
+              "status",
+              "verification",
+              "sources"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "knownIssues": {
+          "description": "Open (or recently closed) upstream issues where a surface breaks for a provider.",
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "date": {
+                "$ref": "#/definitions/ISODate"
+              },
+              "provider": {
+                "type": "string"
+              },
+              "sources": {
+                "items": {
+                  "$ref": "#/definitions/SourceRef"
+                },
+                "type": "array"
+              },
+              "state": {
+                "enum": [
+                  "open",
+                  "closed"
+                ],
+                "type": "string"
+              },
+              "summary": {
+                "type": "string"
+              },
+              "surface": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "title",
+              "provider",
+              "surface",
+              "state",
+              "summary",
+              "sources"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "providers": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "cloud": {
+                "$ref": "#/definitions/Cloud"
+              },
+              "id": {
+                "type": "string"
+              },
+              "litellmPrefix": {
+                "type": "string"
+              },
+              "note": {
+                "type": "string"
+              },
+              "service": {
+                "$ref": "#/definitions/Service"
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "title",
+              "litellmPrefix",
+              "cloud"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "surfaces": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/GatewaySurface"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "title"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "asOf",
+        "providers",
+        "surfaces",
+        "cells"
+      ],
+      "type": "object"
     },
     "QuotaNote": {
       "additionalProperties": false,
