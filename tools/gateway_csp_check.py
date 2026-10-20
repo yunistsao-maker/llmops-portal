@@ -9,8 +9,8 @@ For every route (a gateway alias such as "claude-sonnet-5-5@bedrock") the same c
 
 and every result is attributed: ok / gateway (fails only through the gateway: LiteLLM translation, drop_params,
 proxy config) / provider (fails on the CSP itself) / unknown (no baseline). The run is a CompatRun
-(schema/llmops.schema.json, kind "gateway-csp") in runs/compat/; the portal's 測試結果 → Gateway → CSP tab shows it,
-and the model pages' 內部測試 tab counts it like any compatibility run.
+(schema/llmops.schema.json, kind "gateway-csp") in runs/compat/; each model page's 內部測試 tab shows it for that model's
+routes (give every route its modelId), and 方法與來源 → 測試方法 explains the cases and the attribution.
 
 Metrics (definitions in data/requirements.json → metricDefinitions, page 方法與來源):
   compatibilityRate      passed / (passed + failed + errors) of the cases that apply to the route (skips excluded)

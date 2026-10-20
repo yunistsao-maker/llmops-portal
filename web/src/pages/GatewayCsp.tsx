@@ -1,12 +1,12 @@
-import { useState } from "react";
-import type { CompatResult, CompatRun, GatewayRouteMetrics, LiteLLMFile, ProviderCompatibility } from "../../../schema/types";
-import { fmt, linkTo } from "../data";
+import type { CompatResult, CompatRun, GatewayRouteMetrics, ProviderCompatibility } from "../../../schema/types";
+import { fmt } from "../data";
 import { Sources, Verif } from "../ui";
 
 /**
- * 測試結果 → Gateway → CSP: does each API feature survive the trip through the LiteLLM gateway to Bedrock / Foundry /
- * Agent Platform, and when it does not, is it the gateway or the provider? Measured runs (tools/gateway_csp_check.py,
- * CompatRun kind "gateway-csp") next to what the documentation says (litellm.json providerCompatibility).
+ * Gateway → CSP: does each API feature survive the trip through the LiteLLM gateway to Bedrock / Foundry / Agent Platform,
+ * and when it does not, is it the gateway or the provider? `Measured` shows a run of tools/gateway_csp_check.py (CompatRun
+ * kind "gateway-csp") for one model's routes on its 「內部測試」 tab; `Documented` is what the LiteLLM docs say
+ * (litellm.json providerCompatibility), on 方法與來源 → 測試方法.
  */
 
 const CSP_LABEL: Record<string, string> = { aws: "AWS", azure: "Azure", gcp: "Google Cloud", "vendor-direct": "Vendor API", unknown: "未知" };
@@ -19,75 +19,37 @@ const DOC: Record<string, [string, string]> = {
 const pctOf = (v: number | null | undefined, d = 0) => (v === null || v === undefined ? "—" : `${fmt(v * 100, d)}%`);
 const isMock = (gw: string) => /127\.0\.0\.1|localhost|mock/i.test(gw);
 
-/** The metrics shown here, in the words of requirements.json → metricDefinitions (方法與來源). */
-const METRICS: [string, string][] = [
-  ["相容率", "適用案例中通過的比例（略過不算）。必要案例的通過率是發布關卡 G3 的門檻：100%。"],
-  ["Gateway 造成", "經 gateway 失敗、但同一個請求直連 CSP 通過：LiteLLM 的轉換、drop_params 或 proxy 設定造成，修 gateway。"],
-  ["CSP / 模型限制", "直連 CSP 也失敗：是平台或模型本身不支援，gateway 無能為力（要在 client 端避開或換路由）。"],
-  ["靜默降級", "HTTP 200、但回應違反了請求的約定（forced tool_choice 變成 auto、沒有 JSON、沒有 usage）：最危險，因為 client 不會報錯。"],
-  ["錯誤對應率", "刻意送出的無效請求，有幾成得到 4xx 與 OpenAI 格式的 error（5xx 會讓 client 重試、200 會讓錯誤被吞掉）。"],
-  ["成本追蹤率", "回應帶有 x-litellm-response-cost > 0 的比例：低於 100% 代表 cost map 缺這個模型或價格為 0，FinOps 報表會失準。"],
-  ["Fallback 率", "回應帶有 x-litellm-attempted-fallbacks > 0 的比例：使用者以為呼叫的是 A，其實是 B 回答。"],
-  ["延遲開銷", "同一個請求經 gateway 與直連 CSP 的延遲差（p50 / p95，非串流）；TTFT 開銷是第一個串流內容的時間差。"],
-  ["Prompt token 差異", "同一個請求 gateway 與 CSP 回報的 prompt_tokens 差距（%）：成本計算的偏差來源。"],
-];
-
-export default function GatewayCsp({ runs, files, litellm }: { runs: CompatRun[]; files: string[]; litellm?: LiteLLMFile }) {
-  const mine = runs.map((r, i) => ({ r, f: files[i] })).filter((x) => x.r.kind === "gateway-csp").sort((a, b) => (a.r.startedAt < b.r.startedAt ? 1 : -1));
-  const [pick, setPick] = useState(0);
-  const cur = mine[pick];
-  return (
-    <>
-      <div className="empty">
-        把同一組請求<b>經 LiteLLM gateway</b> 與<b>直連 CSP</b>（Bedrock、Foundry、Agent Platform 各自的原生端點）各送一次，
-        判斷每一項 API 功能是否正常，以及失敗時是 gateway 造成、還是 CSP / 模型本身的限制。結果是 <span className="mono">runs/compat/</span> 裡
-        <span className="mono"> kind: "gateway-csp"</span> 的紀錄，也會算進各模型頁的「內部測試」（G3）。在你們的網路裡執行：
-        <pre className="code">{`export LITELLM_API_KEY=sk-...   AWS_BEARER_TOKEN_BEDROCK=...   AZURE_API_KEY=...
-export GOOGLE_ACCESS_TOKEN=$(gcloud auth print-access-token)
-python3 tools/gateway_csp_check.py --gateway <GW>/v1 \\
-  --routes-file gateway-routes.yaml --direct --litellm-version <版本> --purpose regression \\
-  --out runs/compat/$(date +%F)-gateway-csp.json --fail-on-required`}</pre>
-        路由檔的格式見 <span className="mono">tools/fixtures/gateway-routes.example.yaml</span>（每條 alias 標明 CSP、區域與直連端點；金鑰只從環境變數讀，不會寫進結果）。
-        沒有 <span className="mono">--direct</span> 時只跑 gateway 端，失敗會標成「無法歸因」。
-      </div>
-
-      <section className="card">
-        <div className="pagehead">
-          <h2 style={{ margin: 0 }}>實測：Gateway → CSP</h2>
-          {mine.length > 0 && (
-            <label className="note">執行紀錄{" "}
-              <select value={pick} onChange={(e) => setPick(Number(e.target.value))}>
-                {mine.map((x, i) => <option key={x.r.runId} value={i}>{x.f}</option>)}
-              </select></label>)}
-        </div>
-        {!cur ? <p className="note">還沒有 gateway → CSP 的實測紀錄。下面的「依公開文件」矩陣是目前唯一的參考——跑一次上面的指令，結果就會出現在這裡。</p> : <Measured run={cur.r} />}
-      </section>
-
-      {litellm?.providerCompatibility && <Documented doc={litellm.providerCompatibility} runs={mine.map((x) => x.r)} />}
-
-      <section className="card">
-        <h2>指標定義</h2>
-        <dl className="kv" style={{ gridTemplateColumns: "150px 1fr" }}>
-          {METRICS.map(([k, v]) => <><dt key={k}>{k}</dt><dd key={k + "d"}>{v}</dd></>)}
-        </dl>
-        <p className="note">完整定義與量測陷阱在 <a href={linkTo("methods")}>方法與來源</a>。延遲開銷只用兩邊都成功的請求計算；直連的基準必須和 gateway 走同一個區域與部署，否則差異包含了網路距離。</p>
-      </section>
-    </>
-  );
+/** Per-CSP totals of some routes' metrics (the run's own byCsp counts every route of the run, other models too). */
+function cspCards(rows: GatewayRouteMetrics[]) {
+  const by = new Map<string, GatewayRouteMetrics[]>();
+  rows.forEach((r) => by.set(r.csp, [...(by.get(r.csp) ?? []), r]));
+  const mean = (xs: (number | null)[]) => { const v = xs.filter((x): x is number => x !== null); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
+  const median = (xs: (number | null)[]) => { const v = xs.filter((x): x is number => x !== null).sort((a, b) => a - b); return v.length ? v[Math.floor((v.length - 1) / 2)] : null; };
+  return [...by].map(([csp, rs]) => {
+    const applicable = rs.reduce((n, r) => n + r.applicable, 0), pass = rs.reduce((n, r) => n + r.pass, 0);
+    return { csp, routes: rs.length, applicable, pass, compatibilityRate: applicable ? pass / applicable : null, requiredPassRate: mean(rs.map((r) => r.requiredPassRate)),
+             gatewayInduced: rs.reduce((n, r) => n + r.gatewayInduced, 0), providerLimited: rs.reduce((n, r) => n + r.providerLimited, 0),
+             silentDegradations: rs.reduce((n, r) => n + r.silentDegradations, 0), errorMappingRate: mean(rs.map((r) => r.errorMappingRate)),
+             costTrackingRate: mean(rs.map((r) => r.costTrackingRate)), overheadMsP50: median(rs.map((r) => r.overheadMs.p50)) };
+  });
 }
 
-function Measured({ run }: { run: CompatRun }) {
-  const m = run.metrics;
+/** A gateway-csp run, limited to `routes` (one model's gateway aliases). */
+export function Measured({ run, routes }: { run: CompatRun; routes: string[] }) {
+  const keep = new Set(routes);
+  const byRoute = (run.metrics?.byRoute ?? []).filter((r) => keep.has(r.route));
+  const m = run.metrics ? { byRoute, byCsp: cspCards(byRoute), bySurface: run.metrics.bySurface } : undefined;
   const info = new Map((run.routeInfo ?? []).map((r) => [r.route, r]));
   const res = (route: string, caseId: string) => run.results.find((x) => x.route === route && x.caseId === caseId);
   const surfaces = m?.bySurface ?? [];
-  const problems = run.results.filter((r) => r.status !== "pass" && r.status !== "skip");
+  const problems = run.results.filter((r) => keep.has(r.route) && r.status !== "pass" && r.status !== "skip");
+  run = { ...run, routes: run.routes.filter((r) => keep.has(r)) };
   return (
     <>
       <p className="note">
         {run.startedAt.slice(0, 16).replace("T", " ")} UTC · gateway {run.gateway} · LiteLLM {run.litellmVersion ?? "未標示"} ·
         基準 {run.baseline === "direct" ? "直連 CSP" : "沒有（只跑 gateway）"}{run.purpose && <> · {run.purpose}</>}{" "}
-        {isMock(run.gateway) && <span className="verif weak">模擬資料：對 tools/mock_gateway.py 跑的範例，不代表任何模型或 CSP 的真實表現</span>}
+        {isMock(run.gateway) && <span className="verif weak">模擬資料</span>}
       </p>
 
       {m && (
@@ -183,14 +145,13 @@ function Measured({ run }: { run: CompatRun }) {
   );
 }
 
-function Documented({ doc, runs }: { doc: ProviderCompatibility; runs: CompatRun[] }) {
+export function Documented({ doc }: { doc: ProviderCompatibility }) {
   const cell = (p: string, s: string) => doc.cells.find((c) => c.provider === p && c.surface === s);
-  const measured = runs.length > 0;
   return (
     <section className="card">
       <div className="pagehead"><h2 style={{ margin: 0 }}>依公開文件：LiteLLM 各 provider 的支援範圍</h2><span className="note">資料日期 {doc.asOf}</span></div>
       <p className="note">
-        依 LiteLLM 與各 CSP 的官方文件整理，<b>不是實測</b>{measured ? "；和上面的實測不一致時，以實測為準，並回報給維護這份資料的人" : "；在你們的 gateway 跑過上面的實測之前，這是唯一的參考"}。
+        依 LiteLLM 與各 CSP 的官方文件整理，<b>不是實測</b>：各模型的實測在模型頁的「內部測試」分頁；兩者不一致時以實測為準，並回報給維護這份資料的人。
         「部分」代表有條件（某些模型、需要特定 prefix 或設定）——看格子裡的說明。
       </p>
       <div style={{ overflowX: "auto" }}>

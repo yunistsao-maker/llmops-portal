@@ -8,12 +8,12 @@ export interface Manifest { generatedAt: string; digests: string[]; models: stri
 
 /**
  * Which portal this build is (VITE_EDITION, set by `npm run build:clean`): "full" for the platform team, "clean" for
- * everyone who needs the latest LLM information - without 測試結果, 發布流程, LiteLLM 與安全, 上手指南, the model
+ * everyone who needs the latest LLM information - without 發布流程, LiteLLM 與安全, 上手指南, the model
  * page's Onboarding tab and the AI security test demo.
  */
 export const EDITION: "full" | "clean" = import.meta.env.VITE_EDITION === "clean" ? "clean" : "full";
 /** Pages the clean edition does not have (their routes fall back to the Release Radar). */
-export const CLEAN_HIDDEN = new Set(["tests", "release", "gateway", "onboarding"]);
+export const CLEAN_HIDDEN = new Set(["release", "gateway", "onboarding"]);
 export const hasPage = (section: string) => EDITION === "full" || !CLEAN_HIDDEN.has(section);
 
 /** One daily version of the site's data: the release that was live at the end of that day (Asia/Taipei). */
@@ -21,8 +21,8 @@ export interface VersionInfo { date: string; releaseId: string | null; published
 export interface VersionsFile { schema: string; today: string; versions: VersionInfo[] }
 
 const VERSION = /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/;
-/** Pages that show the team's own records (測試結果, 發布流程): never versioned, whatever the address says. */
-export const UNVERSIONED = new Set(["tests", "release"]);
+/** Pages that show the team's own records (發布流程): never versioned, whatever the address says. */
+export const UNVERSIONED = new Set(["release"]);
 /** How many dated versions a build keeps (today + 29 days): tools/fetch_release.mjs DAYS. */
 export const VERSION_DAYS = 30;
 /** The daily version named in the address (#/models?v=2026-10-10), kept while moving between pages. */

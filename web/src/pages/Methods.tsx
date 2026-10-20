@@ -1,13 +1,18 @@
 import { useState } from "react";
+import { go } from "../App";
 import { loaders, useData } from "../data";
 import { Bullets, Filters, PageHead, Status, Tabs, Verif } from "../ui";
+import TestMethods from "./TestMethods";
 
-const VIEWS = ["指標定義", "AI 安全測試目錄", "可信度說明", "來源"] as const;
+/** The page's views and their addresses: #/methods/<slug> (#/tests, the old 測試結果 page, opens 測試方法). */
+const VIEWS = [["metrics", "指標定義"], ["tests", "測試方法"], ["security", "AI 安全測試目錄"], ["verification", "可信度說明"], ["sources", "來源"]] as const;
+type View = (typeof VIEWS)[number][1];
 
-export default function Methods() {
+export default function Methods({ slug }: { slug?: string }) {
   const req = useData(loaders.requirements);
   const src = useData(loaders.sources);
-  const [view, setView] = useState<(typeof VIEWS)[number]>("指標定義");
+  const view: View = (VIEWS.find(([s]) => s === slug) ?? VIEWS[0])[1];
+  const setView = (label: View) => go("methods/" + VIEWS.find(([, l]) => l === label)![0]);
   const [q, setQ] = useState("");
   const [type, setType] = useState<string>("all");
   if (!req.data || !src.data) return <Status error={req.error || src.error} />;
@@ -16,7 +21,8 @@ export default function Methods() {
   return (
     <>
       <PageHead eyebrow="portal 上數字的定義與出處" title="方法與來源" />
-      <Tabs tabs={VIEWS} value={view} onChange={setView} />
+      <Tabs tabs={VIEWS.map(([, l]) => l)} value={view} onChange={setView} />
+      {view === "測試方法" && <TestMethods />}
       {view === "指標定義" && (
         <section className="card">
           <table><thead><tr><th>指標</th><th>定義</th><th>怎麼量</th><th>常見陷阱</th></tr></thead><tbody>
