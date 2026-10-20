@@ -1416,5 +1416,1182 @@
     {
       "id": "litellm-gh-v1-104-4"
     }
-  ]
+  ],
+  "providerCompatibility": {
+    "asOf": "2026-10-20",
+    "providers": [
+      {
+        "id": "bedrock-converse",
+        "title": "Bedrock（Converse）",
+        "litellmPrefix": "bedrock/converse/",
+        "cloud": "aws",
+        "service": "bedrock",
+        "note": "Claude 等模型的預設路徑"
+      },
+      {
+        "id": "bedrock-openai",
+        "title": "Bedrock（OpenAI 模型）",
+        "litellmPrefix": "bedrock/",
+        "cloud": "aws",
+        "service": "bedrock",
+        "note": "GPT 系列在 Bedrock 的原生 Chat Completions"
+      },
+      {
+        "id": "azure-openai",
+        "title": "Foundry（Azure OpenAI）",
+        "litellmPrefix": "azure/",
+        "cloud": "azure",
+        "service": "foundry"
+      },
+      {
+        "id": "azure-ai",
+        "title": "Foundry（azure_ai，含 Claude）",
+        "litellmPrefix": "azure_ai/",
+        "cloud": "azure",
+        "service": "foundry"
+      },
+      {
+        "id": "vertex-gemini",
+        "title": "Agent Platform（Gemini）",
+        "litellmPrefix": "vertex_ai/gemini-",
+        "cloud": "gcp",
+        "service": "agent-platform"
+      },
+      {
+        "id": "vertex-anthropic",
+        "title": "Agent Platform（Claude）",
+        "litellmPrefix": "vertex_ai/claude-",
+        "cloud": "gcp",
+        "service": "agent-platform"
+      }
+    ],
+    "surfaces": [
+      {
+        "id": "chat",
+        "title": "Chat Completions 基本"
+      },
+      {
+        "id": "streaming",
+        "title": "串流（SSE）"
+      },
+      {
+        "id": "parameters",
+        "title": "參數處理"
+      },
+      {
+        "id": "reasoning",
+        "title": "推理參數"
+      },
+      {
+        "id": "tools",
+        "title": "Tool calling"
+      },
+      {
+        "id": "structured-output",
+        "title": "Structured output"
+      },
+      {
+        "id": "vision",
+        "title": "影像 / 文件輸入"
+      },
+      {
+        "id": "prompt-caching",
+        "title": "Prompt caching"
+      },
+      {
+        "id": "responses-api",
+        "title": "Responses API"
+      },
+      {
+        "id": "messages-api",
+        "title": "Anthropic Messages"
+      },
+      {
+        "id": "error-mapping",
+        "title": "錯誤對應"
+      },
+      {
+        "id": "observability",
+        "title": "成本與用量追蹤"
+      }
+    ],
+    "cells": [
+      {
+        "provider": "bedrock-converse",
+        "surface": "chat",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-aws-bedrock-litellm-docs"
+          }
+        ],
+        "note": "Claude 走 bedrock/ 預設 Converse（模型支援時）；bedrock/converse/ 可強制，bedrock/invoke/ 走 Invoke。"
+      },
+      {
+        "provider": "bedrock-converse",
+        "surface": "streaming",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-input-params-litellm-docs"
+          },
+          {
+            "id": "litellm-berriai-litellm-docs-repo-usage-litellm-docs"
+          }
+        ],
+        "note": "支援 stream=True；stream_options.include_usage 對所有 provider 在最後一個 chunk 回傳 usage（通用聲明）。"
+      },
+      {
+        "provider": "bedrock-converse",
+        "surface": "parameters",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-input-params-litellm-docs"
+          },
+          {
+            "id": "litellm-berriai-litellm-docs-repo-drop-unsupported-params-li"
+          }
+        ],
+        "note": "Bedrock Claude 支援 temperature/max_tokens/max_completion_tokens/top_p/stop；不支援的參數預設報錯，drop_params=True 時丟棄。"
+      },
+      {
+        "provider": "bedrock-converse",
+        "surface": "reasoning",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-aws-bedrock-litellm-docs"
+          },
+          {
+            "id": "litellm-berriai-litellm-docs-repo-thinking-reasoning-content"
+          }
+        ],
+        "note": "Claude 支援 reasoning_effort/thinking，回 reasoning_content 與 thinking_blocks；Opus 4.8 adaptive 需 v1.89+。"
+      },
+      {
+        "provider": "bedrock-converse",
+        "surface": "tools",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-aws-bedrock-litellm-docs"
+          }
+        ],
+        "note": "Converse/Invoke 皆支援 tool calling；eager_input_streaming 轉 fine-grained 串流 beta。tool_choice=\"any\" 有未解 issue。"
+      },
+      {
+        "provider": "bedrock-converse",
+        "surface": "structured-output",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-structured-outputs-json-mo"
+          },
+          {
+            "id": "litellm-berriai-litellm-docs-repo-aws-bedrock-litellm-docs"
+          }
+        ],
+        "note": "支援 json_schema/Pydantic；Converse 以強制呼叫 json_tool_call 工具模擬結構化輸出。"
+      },
+      {
+        "provider": "bedrock-converse",
+        "surface": "vision",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-aws-bedrock-litellm-docs"
+          }
+        ],
+        "note": "支援影像輸入與文件（pdf/csv/doc/docx/xls/xlsx/html/txt/md），可用 image_url 或 base64 傳入。"
+      },
+      {
+        "provider": "bedrock-converse",
+        "surface": "prompt-caching",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-prompt-caching-litellm-doc"
+          }
+        ],
+        "note": "cache_control 自動轉為 Bedrock cachePoint；低於模型最低 token 數時靜默不快取；回報 cached_tokens/cache_creation。"
+      },
+      {
+        "provider": "bedrock-converse",
+        "surface": "responses-api",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-responses-litellm-docs"
+          }
+        ],
+        "note": "/v1/responses 以 chat completions bridge 轉譯至 Bedrock（Claude 範例見文件）。"
+      },
+      {
+        "provider": "bedrock-converse",
+        "surface": "messages-api",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-native-v1-messages-and-v1-"
+          }
+        ],
+        "note": "bedrock/ 屬內建 Anthropic Messages 支援，/v1/messages 原生轉送並保留 cache_control。"
+      },
+      {
+        "provider": "bedrock-converse",
+        "surface": "error-mapping",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-exception-mapping-litellm-"
+          }
+        ],
+        "note": "bedrock 可拋 ContextWindowExceededError、RateLimitError(429)、Timeout、NotFound 等 OpenAI 相容例外。"
+      },
+      {
+        "provider": "bedrock-converse",
+        "surface": "observability",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-spend-tracking-litellm-doc"
+          },
+          {
+            "id": "litellm-berriai-litellm-docs-repo-response-headers-litellm-d"
+          }
+        ],
+        "note": "自動依 model cost map 計費（含 service tier）；Proxy 回 x-litellm-response-cost，分項 header 僅非串流。"
+      },
+      {
+        "provider": "bedrock-openai",
+        "surface": "chat",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-aws-bedrock-litellm-docs"
+          }
+        ],
+        "note": "GPT-5.6+ 經 bedrock/ 預設走 AWS 原生 Chat Completions；GPT-OSS 需 bedrock/chat_completions/ 前綴，否則走 Converse。"
+      },
+      {
+        "provider": "bedrock-openai",
+        "surface": "streaming",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-input-params-litellm-docs"
+          },
+          {
+            "id": "litellm-berriai-litellm-docs-repo-aws-bedrock-litellm-docs"
+          }
+        ],
+        "note": "include_usage 為通用聲明；原生 Responses 路由「串流同 OpenAI」。原生 Chat Completions 串流細節未單獨說明。"
+      },
+      {
+        "provider": "bedrock-openai",
+        "surface": "parameters",
+        "status": "partial",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-aws-bedrock-litellm-docs"
+          }
+        ],
+        "note": "max_tokens 轉 max_completion_tokens；GPT-5.6+ 僅 reasoning_effort=none 才可送 temperature/top_p，否則 400 或 drop_params 丟棄。"
+      },
+      {
+        "provider": "bedrock-openai",
+        "surface": "reasoning",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-aws-bedrock-litellm-docs"
+          }
+        ],
+        "note": "reasoning_effort 原生送出；GPT-OSS 推理拆入 reasoning_content（無 thinking_blocks）；GPT-6.1 不接受 none；thinking 區塊會退回 Converse。"
+      },
+      {
+        "provider": "bedrock-openai",
+        "surface": "tools",
+        "status": "partial",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-aws-bedrock-litellm-docs"
+          }
+        ],
+        "note": "GPT-5.6/6/6.1 僅在 reasoning_effort=none 時原生接受 function tools，否則退回 Converse；GPT-6.1 工具呼叫一律走 Converse。"
+      },
+      {
+        "provider": "bedrock-openai",
+        "surface": "structured-output",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-aws-bedrock-litellm-docs"
+          }
+        ],
+        "note": "GPT-5.6+ 原生強制 json_schema；GPT-OSS 與 json_object 退回 Converse，以強制 json_tool_call 工具模擬。"
+      },
+      {
+        "provider": "bedrock-openai",
+        "surface": "vision",
+        "status": "partial",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-aws-bedrock-litellm-docs"
+          }
+        ],
+        "note": "原生路由下 http(s) 圖片由 LiteLLM 下載轉 data: URL；PDF/文件於原生 Chat Completions 路由未記載。"
+      },
+      {
+        "provider": "bedrock-openai",
+        "surface": "prompt-caching",
+        "status": "partial",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-aws-bedrock-litellm-docs"
+          }
+        ],
+        "note": "原生 /v1/responses 可傳 prompt_cache_key 並回報 cached tokens；舊 bridge 會 400；Chat Completions 路由快取未記載。"
+      },
+      {
+        "provider": "bedrock-openai",
+        "surface": "responses-api",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-aws-bedrock-litellm-docs"
+          }
+        ],
+        "note": "GPT-5.4~GPT-6 的 us./global. profile 走原生 Responses；GPT-OSS 走 bridge；background 與 web_search 會被丟棄。"
+      },
+      {
+        "provider": "bedrock-openai",
+        "surface": "messages-api",
+        "status": "partial",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-aws-bedrock-litellm-docs"
+          }
+        ],
+        "note": "/v1/messages 轉譯至原生端點，thinking 對應為 reasoning_effort；屬轉譯非原生 Anthropic 協定。"
+      },
+      {
+        "provider": "bedrock-openai",
+        "surface": "error-mapping",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-exception-mapping-litellm-"
+          },
+          {
+            "id": "litellm-berriai-litellm-docs-repo-aws-bedrock-litellm-docs"
+          }
+        ],
+        "note": "同屬 bedrock provider 例外對應（ContextWindowExceeded、RateLimit）；原生路由不支援的取樣參數會先回 400。"
+      },
+      {
+        "provider": "bedrock-openai",
+        "surface": "observability",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-aws-bedrock-litellm-docs"
+          },
+          {
+            "id": "litellm-berriai-litellm-docs-repo-response-headers-litellm-d"
+          }
+        ],
+        "note": "成本追蹤在原生與 Converse 路由行為相同；Proxy 回 x-litellm-response-cost。"
+      },
+      {
+        "provider": "azure-openai",
+        "surface": "chat",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-azure-openai-litellm-docs"
+          }
+        ],
+        "note": "所有 Azure 部署以 azure/<deployment name> 呼叫；o1/o3 與 gpt-5 名稱會自動套用對應轉換。"
+      },
+      {
+        "provider": "azure-openai",
+        "surface": "streaming",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-input-params-litellm-docs"
+          }
+        ],
+        "note": "stream 支援；stream_options.include_usage 對所有 provider 回傳最終 usage（通用聲明）。"
+      },
+      {
+        "provider": "azure-openai",
+        "surface": "parameters",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-input-params-litellm-docs"
+          },
+          {
+            "id": "litellm-berriai-litellm-docs-repo-drop-unsupported-params-li"
+          }
+        ],
+        "note": "gpt-4o 列出全部 OpenAI 參數；o-series/gpt-5 依部署名稱轉換；不支援參數預設報錯，可用 drop_params。"
+      },
+      {
+        "provider": "azure-openai",
+        "surface": "reasoning",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-thinking-reasoning-content"
+          }
+        ],
+        "note": "gpt-5.4+ 同時帶 reasoning_effort 與 tools 會自動走 Responses bridge；自訂部署名需 azure/responses/ 或 mode: responses。"
+      },
+      {
+        "provider": "azure-openai",
+        "surface": "tools",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-function-calling-litellm-d"
+          },
+          {
+            "id": "litellm-berriai-litellm-docs-repo-azure-openai-litellm-docs"
+          }
+        ],
+        "note": "支援 tool calling 與 parallel function calling（文件有 Azure 範例）。"
+      },
+      {
+        "provider": "azure-openai",
+        "surface": "structured-output",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-structured-outputs-json-mo"
+          }
+        ],
+        "note": "response_format json_schema（strict）原生支援，直接轉送 Azure。"
+      },
+      {
+        "provider": "azure-openai",
+        "surface": "vision",
+        "status": "partial",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-azure-openai-litellm-docs"
+          },
+          {
+            "id": "litellm-berriai-litellm-docs-repo-using-pdf-input-litellm-do"
+          }
+        ],
+        "note": "影像輸入有記載（Vision Models）；LiteLLM PDF 輸入文件的支援清單未列 Azure OpenAI。"
+      },
+      {
+        "provider": "azure-openai",
+        "surface": "prompt-caching",
+        "status": "partial",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-auto-inject-prompt-caching"
+          },
+          {
+            "id": "microsoft-learn-prompt-caching-with-azure-openai-in-microsof"
+          }
+        ],
+        "note": "Azure 端自動隱式快取，cached_tokens 於 prompt_tokens_details 回報；LiteLLM 不對 Azure 映射 cache_control 標記。"
+      },
+      {
+        "provider": "azure-openai",
+        "surface": "responses-api",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-azure-responses-api-litell"
+          }
+        ],
+        "note": "azure/ 原生支援 /v1/responses，所有 OpenAI 參數皆可用，並記錄成本。api-version 需較新版本（見 issue）。"
+      },
+      {
+        "provider": "azure-openai",
+        "surface": "messages-api",
+        "status": "partial",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-v1-messages-to-responses-a"
+          }
+        ],
+        "note": "/v1/messages 對 Azure 模型內部轉經 OpenAI Responses API 翻譯（非原生 Anthropic 協定）。"
+      },
+      {
+        "provider": "azure-openai",
+        "surface": "error-mapping",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-exception-mapping-litellm-"
+          }
+        ],
+        "note": "回傳原始 OpenAI 例外（含 429 RateLimitError）並加 llm_provider；可拋 ContextWindowExceeded 與 ContentPolicyViolation。"
+      },
+      {
+        "provider": "azure-openai",
+        "surface": "observability",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-azure-openai-litellm-docs"
+          },
+          {
+            "id": "litellm-berriai-litellm-docs-repo-response-headers-litellm-d"
+          }
+        ],
+        "note": "自動計費，但 Azure 回應的 model 名可能不精確，需設定 base_model 才能正確計算成本。"
+      },
+      {
+        "provider": "azure-ai",
+        "surface": "chat",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-azure-ai-studio-litellm-do"
+          },
+          {
+            "id": "litellm-berriai-litellm-docs-repo-azure-anthropic-claude-via"
+          }
+        ],
+        "note": "azure_ai/ 支援所有 Azure AI 模型；Claude on Foundry 支援 /chat/completions 與 /anthropic/v1/messages。"
+      },
+      {
+        "provider": "azure-ai",
+        "surface": "streaming",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-azure-anthropic-claude-via"
+          },
+          {
+            "id": "litellm-berriai-litellm-docs-repo-input-params-litellm-docs"
+          }
+        ],
+        "note": "Claude on Foundry 的串流與 Anthropic provider 相同；include_usage 為通用聲明。"
+      },
+      {
+        "provider": "azure-ai",
+        "surface": "parameters",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-azure-anthropic-claude-via"
+          }
+        ],
+        "note": "Claude 支援 max_tokens/max_completion_tokens/temperature 等；未給 max_tokens 時自動帶 4096。"
+      },
+      {
+        "provider": "azure-ai",
+        "surface": "reasoning",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-thinking-reasoning-content"
+          }
+        ],
+        "note": "Claude 支援 thinking/reasoning_effort；非 Claude 的 azure_ai 模型需設 reasoning_effort_levels 才接受 reasoning_effort。"
+      },
+      {
+        "provider": "azure-ai",
+        "surface": "tools",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-azure-anthropic-claude-via"
+          },
+          {
+            "id": "litellm-berriai-litellm-docs-repo-azure-ai-studio-litellm-do"
+          }
+        ],
+        "note": "Claude on Foundry 的 tool calling（含 tool_choice、parallel_tool_calls）與 Anthropic 相同；一般 azure_ai 模型亦有範例。"
+      },
+      {
+        "provider": "azure-ai",
+        "surface": "structured-output",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-structured-output-v1-messa"
+          },
+          {
+            "id": "litellm-berriai-litellm-docs-repo-anthropic-litellm-docs"
+          }
+        ],
+        "note": "Claude：Sonnet/Opus 4.5+ 用原生 output_format，較舊模型以強制 json_tool_call 模擬；/v1/messages 結構化輸出亦支援。"
+      },
+      {
+        "provider": "azure-ai",
+        "surface": "vision",
+        "status": "partial",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-azure-anthropic-claude-via"
+          }
+        ],
+        "note": "Claude on Foundry 記載影像輸入；PDF/文件輸入未在 LiteLLM 文件明列。"
+      },
+      {
+        "provider": "azure-ai",
+        "surface": "prompt-caching",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-auto-inject-prompt-caching"
+          }
+        ],
+        "note": "Claude 支援 cache_control 標記；但 enable_anthropic_prompt_caching 自動注入不涵蓋 azure_ai，需用 cache_control_injection_points。"
+      },
+      {
+        "provider": "azure-ai",
+        "surface": "responses-api",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-responses-litellm-docs"
+          },
+          {
+            "id": "litellm-berriai-litellm-docs-repo-thinking-reasoning-content"
+          }
+        ],
+        "note": "/v1/responses 支援 azure_ai（bridge）；Claude 可用 reasoning 物件控制推理深度。"
+      },
+      {
+        "provider": "azure-ai",
+        "surface": "messages-api",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-azure-anthropic-claude-via"
+          }
+        ],
+        "note": "Claude on Foundry 原生支援 Anthropic Messages API；/v1/messages 路由讀 AZURE_API_BASE，completion 讀 AZURE_AI_API_BASE。"
+      },
+      {
+        "provider": "azure-ai",
+        "surface": "error-mapping",
+        "status": "partial",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-exception-mapping-litellm-"
+          }
+        ],
+        "note": "僅有「所有 provider 皆映射為 OpenAI 例外」通用聲明；例外對應表未列 azure_ai，具體型別未記載。"
+      },
+      {
+        "provider": "azure-ai",
+        "surface": "observability",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-spend-tracking-litellm-doc"
+          },
+          {
+            "id": "litellm-berriai-litellm-docs-repo-response-headers-litellm-d"
+          }
+        ],
+        "note": "通用聲明：所有已知模型自動計費並回 x-litellm-response-cost；Azure AI model router 有成本追蹤 issue。"
+      },
+      {
+        "provider": "vertex-gemini",
+        "surface": "chat",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-vertexai-gemini-litellm-do"
+          }
+        ],
+        "note": "vertex_ai/ 使用 Vertex REST API；更名 Gemini Enterprise Agent Platform 僅品牌變更，route 與 API 不變。"
+      },
+      {
+        "provider": "vertex-gemini",
+        "surface": "streaming",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-input-params-litellm-docs"
+          }
+        ],
+        "note": "stream 支援；include_usage 為通用聲明。"
+      },
+      {
+        "provider": "vertex-gemini",
+        "surface": "parameters",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-input-params-litellm-docs"
+          },
+          {
+            "id": "litellm-berriai-litellm-docs-repo-drop-unsupported-params-li"
+          }
+        ],
+        "note": "gemini-2.5-flash 支援 temperature/max_tokens/max_completion_tokens 等；不支援參數預設報錯，可 drop_params。"
+      },
+      {
+        "provider": "vertex-gemini",
+        "surface": "reasoning",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-vertexai-gemini-litellm-do"
+          }
+        ],
+        "note": "reasoning_effort 轉為 Gemini thinking budget（low=1024、medium=2048、high=4096），另有 disable=0。"
+      },
+      {
+        "provider": "vertex-gemini",
+        "surface": "tools",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-vertexai-gemini-litellm-do"
+          }
+        ],
+        "note": "支援 Gemini function calling，tool_choice=\"required\" 可強制呼叫工具。"
+      },
+      {
+        "provider": "vertex-gemini",
+        "surface": "structured-output",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-structured-outputs-json-mo"
+          },
+          {
+            "id": "litellm-berriai-litellm-docs-repo-vertexai-gemini-litellm-do"
+          }
+        ],
+        "note": "Gemini 2.0+ 用原生 responseJsonSchema；不支援原生 schema 的模型改以 prompt 注入 schema 模擬。"
+      },
+      {
+        "provider": "vertex-gemini",
+        "surface": "vision",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-vertexai-gemini-litellm-do"
+          }
+        ],
+        "note": "支援影像、PDF、影片、音訊（gs://、https 或 base64），file 訊息型別自 v1.65.1。"
+      },
+      {
+        "provider": "vertex-gemini",
+        "surface": "prompt-caching",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-prompt-caching-litellm-doc"
+          }
+        ],
+        "note": "cache_control 轉為 cachedContents 顯式快取（≥1024 tokens）；Gemini 2.5+ 預設隱式快取，加標記會失去隱式快取並產生儲存費。"
+      },
+      {
+        "provider": "vertex-gemini",
+        "surface": "responses-api",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-responses-litellm-docs"
+          }
+        ],
+        "note": "/v1/responses 透過 bridge 支援 vertex_ai Gemini（文件有範例）。"
+      },
+      {
+        "provider": "vertex-gemini",
+        "surface": "messages-api",
+        "status": "partial",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-v1-messages-litellm-docs"
+          },
+          {
+            "id": "litellm-berriai-litellm-docs-repo-native-v1-messages-and-v1-"
+          }
+        ],
+        "note": "/v1/messages 可用，但非 Claude 模型經 /v1/chat/completions 轉譯：cache_control 被丟棄、thinking 映射。"
+      },
+      {
+        "provider": "vertex-gemini",
+        "surface": "error-mapping",
+        "status": "partial",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-exception-mapping-litellm-"
+          }
+        ],
+        "note": "對應表中 vertex_ai 僅勾 Timeout/BadRequest/APIError/UnprocessableEntity；ContextWindowExceeded 與 RateLimit 未勾。"
+      },
+      {
+        "provider": "vertex-gemini",
+        "surface": "observability",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-vertexai-gemini-litellm-do"
+          },
+          {
+            "id": "litellm-berriai-litellm-docs-repo-response-headers-litellm-d"
+          }
+        ],
+        "note": "依 usageMetadata.trafficType 自動套用 PayGo/priority/flex 價格；Proxy 回 x-litellm-response-cost。"
+      },
+      {
+        "provider": "vertex-anthropic",
+        "surface": "chat",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-vertex-ai-anthropic-deepse"
+          }
+        ],
+        "note": "Claude on Vertex 以 vertex_ai/claude-* 路由呼叫 completion。"
+      },
+      {
+        "provider": "vertex-anthropic",
+        "surface": "streaming",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-input-params-litellm-docs"
+          }
+        ],
+        "note": "僅有通用聲明：stream_options.include_usage 對所有 provider 回傳最終 usage；Vertex Claude 串流無專屬說明。"
+      },
+      {
+        "provider": "vertex-anthropic",
+        "surface": "parameters",
+        "status": "unknown",
+        "verification": "unverified",
+        "sources": [],
+        "note": "LiteLLM 文件未說明 vertex_ai/claude-* 支援的 OpenAI 參數清單或 max_tokens 預設值。"
+      },
+      {
+        "provider": "vertex-anthropic",
+        "surface": "reasoning",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-thinking-reasoning-content"
+          },
+          {
+            "id": "litellm-berriai-litellm-docs-repo-vertex-ai-anthropic-deepse"
+          }
+        ],
+        "note": "支援 thinking（budget_tokens）與 reasoning_content；Claude 4.6+ adaptive 需較新版（Opus 4.8 需 v1.89+）。"
+      },
+      {
+        "provider": "vertex-anthropic",
+        "surface": "tools",
+        "status": "partial",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-computer-use-litellm-docs"
+          },
+          {
+            "id": "litellm-berriai-litellm-docs-repo-anthropic-tool-search-lite"
+          },
+          {
+            "id": "litellm-berriai-litellm-docs-repo-anthropic-programmatic-too"
+          }
+        ],
+        "note": "Computer use 與 Tool Search 支援；Programmatic Tool Calling 不支援；一般 tool_choice/平行呼叫未專門記載。"
+      },
+      {
+        "provider": "vertex-anthropic",
+        "surface": "structured-output",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-structured-outputs-json-mo"
+          }
+        ],
+        "note": "json_schema 支援 Vertex Claude；但 2026-10 issue 指 claude-opus-5-5 送出已棄用 output_format 被拒。"
+      },
+      {
+        "provider": "vertex-anthropic",
+        "surface": "vision",
+        "status": "partial",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-using-pdf-input-litellm-do"
+          }
+        ],
+        "note": "PDF 輸入明列支援 Vertex Anthropic；影像輸入未於 Vertex Claude 文件專門記載。"
+      },
+      {
+        "provider": "vertex-anthropic",
+        "surface": "prompt-caching",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-auto-inject-prompt-caching"
+          }
+        ],
+        "note": "支援 cache_control 標記；enable_anthropic_prompt_caching 自動注入不涵蓋 vertex_ai，需用 cache_control_injection_points。"
+      },
+      {
+        "provider": "vertex-anthropic",
+        "surface": "responses-api",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-thinking-reasoning-content"
+          },
+          {
+            "id": "litellm-berriai-litellm-docs-repo-responses-litellm-docs"
+          }
+        ],
+        "note": "/v1/responses 支援 vertex_ai Claude（bridge），reasoning 物件可控制推理深度。"
+      },
+      {
+        "provider": "vertex-anthropic",
+        "surface": "messages-api",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-native-v1-messages-and-v1-"
+          }
+        ],
+        "note": "vertex_ai/ 內建 Anthropic Messages 支援，原生轉送並保留 cache_control。"
+      },
+      {
+        "provider": "vertex-anthropic",
+        "surface": "error-mapping",
+        "status": "partial",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-exception-mapping-litellm-"
+          }
+        ],
+        "note": "與 vertex_ai 同列：ContextWindowExceeded 與 RateLimit 未在對應表勾選。"
+      },
+      {
+        "provider": "vertex-anthropic",
+        "surface": "observability",
+        "status": "supported",
+        "verification": "official",
+        "sources": [
+          {
+            "id": "litellm-berriai-litellm-docs-repo-spend-tracking-litellm-doc"
+          },
+          {
+            "id": "litellm-berriai-litellm-docs-repo-response-headers-litellm-d"
+          }
+        ],
+        "note": "通用聲明：所有已知模型自動計費並回 x-litellm-response-cost；無 Vertex Claude 專屬說明。"
+      }
+    ],
+    "knownIssues": [
+      {
+        "title": "[Bug]: Vertex AI claude-opus-5-5 rejects response_format json_schema: LiteLLM sends the deprecated `output_format` instead of `output_config.format`",
+        "provider": "vertex-anthropic",
+        "surface": "structured-output",
+        "state": "open",
+        "summary": "Vertex 上 claude-opus-5-5 使用 json_schema 會被拒，因 LiteLLM 仍送已棄用的 output_format。",
+        "sources": [
+          {
+            "id": "github-berriai-bug-vertex-ai-claude-opus-5-5-rejects-respons"
+          }
+        ],
+        "date": "2026-10-20"
+      },
+      {
+        "title": "[Bug]: Bedrock /v1/messages: claude-opus-5-5 rejects thinking.type=enabled, no adaptive translation and output_config is …",
+        "provider": "bedrock-converse",
+        "surface": "messages-api",
+        "state": "open",
+        "summary": "Bedrock /v1/messages 對 claude-opus-5-5 未轉成 adaptive thinking，thinking.type=enabled 被拒。",
+        "sources": [
+          {
+            "id": "github-berriai-bug-bedrock-v1-messages-claude-opus-5-5-rejec"
+          }
+        ],
+        "date": "2026-10-19"
+      },
+      {
+        "title": "[Bug]: Bedrock adapter rejects tool_choice=\"any\" despite Bedrock Converse API supporting it",
+        "provider": "bedrock-converse",
+        "surface": "tools",
+        "state": "open",
+        "summary": "Converse 本身支援 tool_choice=any，但 LiteLLM Bedrock adapter 直接拒絕。",
+        "sources": [
+          {
+            "id": "github-berriai-bug-bedrock-adapter-rejects-tool-choice-any-d"
+          }
+        ],
+        "date": "2026-08-22"
+      },
+      {
+        "title": "[Bug]: Bedrock Converse streaming drops request timeout and can hang for 600s",
+        "provider": "bedrock-converse",
+        "surface": "streaming",
+        "state": "open",
+        "summary": "Converse 串流未套用 request timeout，可能卡住 600 秒。",
+        "sources": [
+          {
+            "id": "github-berriai-bug-bedrock-converse-streaming-drops-request-"
+          }
+        ],
+        "date": "2026-10-07"
+      },
+      {
+        "title": "[Bug]: Image inside a tool result 400s on Bedrock gpt-6.1-sol",
+        "provider": "bedrock-openai",
+        "surface": "vision",
+        "state": "closed",
+        "summary": "Bedrock gpt-6.1-sol 的 tool result 內含圖片會 400；已於 2026-10-10 關閉。",
+        "sources": [
+          {
+            "id": "github-berriai-bug-image-inside-a-tool-result-400s-on-bedroc"
+          }
+        ],
+        "date": "2026-10-09"
+      },
+      {
+        "title": "[Bug] Azure Responses bridge inherits chat-era api-version, rejected by Azure (needs >= 2025-03-01-preview)",
+        "provider": "azure-openai",
+        "surface": "responses-api",
+        "state": "open",
+        "summary": "Azure Responses bridge 沿用舊 chat api-version，Azure 拒絕（需 ≥ 2025-03-01-preview）。",
+        "sources": [
+          {
+            "id": "github-berriai-bug-azure-responses-bridge-inherits-chat-era-"
+          }
+        ],
+        "date": "2026-10-12"
+      },
+      {
+        "title": "[Bug]: Azure prompt content filter (code=content_filter) not mapped to ContentPolicyViolationError",
+        "provider": "azure-openai",
+        "surface": "error-mapping",
+        "state": "open",
+        "summary": "Azure prompt 內容過濾錯誤未對應為 ContentPolicyViolationError，影響 fallback。",
+        "sources": [
+          {
+            "id": "github-berriai-bug-azure-prompt-content-filter-code-content-"
+          }
+        ],
+        "date": "2026-09-21"
+      },
+      {
+        "title": "[Bug]: Azure AI Foundry Anthropic endpoints 400 when azure_ad_token leaks into request body",
+        "provider": "azure-ai",
+        "surface": "chat",
+        "state": "open",
+        "summary": "使用 Entra ID 時 azure_ad_token 被帶入 request body，Foundry Claude 端點回 400。",
+        "sources": [
+          {
+            "id": "github-berriai-bug-azure-ai-foundry-anthropic-endpoints-400-"
+          }
+        ],
+        "date": "2026-10-15"
+      },
+      {
+        "title": "[Bug] Vertex/Gemini context caching reorders the conversation when the cache_control block is not a prefix, and modify_params drops system_instruction",
+        "provider": "vertex-gemini",
+        "surface": "prompt-caching",
+        "state": "open",
+        "summary": "cache_control 非前綴時 Gemini 快取會重排對話，modify_params 會丟 system_instruction。",
+        "sources": [
+          {
+            "id": "github-berriai-bug-vertex-gemini-context-caching-reorders-th"
+          }
+        ],
+        "date": "2026-10-17"
+      },
+      {
+        "title": "Gemini/Vertex path ignores `supports_sampling_params: false`; temperature/top_p/top_k are sent to Gemini 3.6+ models that silently ignore them",
+        "provider": "vertex-gemini",
+        "surface": "parameters",
+        "state": "open",
+        "summary": "Gemini 3.6+ 會靜默忽略 temperature/top_p/top_k，LiteLLM 未依旗標丟棄。",
+        "sources": [
+          {
+            "id": "github-berriai-gemini-vertex-path-ignores-supports-sampling-"
+          }
+        ],
+        "date": "2026-10-16"
+      }
+    ]
+  }
 }
