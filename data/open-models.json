@@ -1,23 +1,22 @@
 {
   "schema": "open-models/v1",
-  "generatedAt": "2026-10-11T13:30:00Z",
+  "generatedAt": "2026-10-20T10:00:00Z",
   "locale": "zh-TW",
-  "asOf": "2026-10-11",
+  "asOf": "2026-10-20",
   "method": [
     "收錄範圍：權重可以下載、或官方已承諾釋出的語言模型（含多模態輸入），發布或宣布大約在四個月內；更早的只在仍有明顯市場訊號時保留。影像、影片、語音生成模型，以及社群做的量化版與移除安全限制（uncensored / abliterated）的衍生 repo 不收。gpt-oss、Gemma 4、Llama 4 這類已在三雲上架多時的模型不重複列。",
     "熱度每次更新重算。hit：以下四項至少符合兩項——(1) OpenRouter 週 token 用量前 10（免費版本不算）；(2) Hugging Face 官方 repo 讚數 2,500 以上，或近 30 天下載 100 萬次以上；(3) Artificial Analysis 的 Intelligence Index 在開放權重模型中排前 5；(4) Bedrock、Foundry、Agent Platform 至少一個提供按 token 計費的託管版本。rising：發布或宣布未滿 30 天、還不到 hit，但已有至少一項外部訊號（Hugging Face trending 前 60、OpenRouter 週榜前 20、Artificial Analysis 已收錄，或主要科技媒體報導）。watch：因為開發者、授權或三雲上架情況值得追蹤，但訊號不足。",
     "訊號怎麼讀：OpenRouter 的用量只代表經過 OpenRouter 的流量，以開發者與 coding agent 為主，免費或促銷期的模型會被放大，而且週榜只公布前 20 名。Hugging Face 的下載數是近 30 天、包含 CI 與鏡像抓取；讚數是累計值。Artificial Analysis 的 Intelligence Index（v4.3.2）是第三方實測，同一模型的不同推理強度分開計分，這裡取最高的一檔；「每項任務成本」是它排行榜上的 Cost per Task 欄位（美元）。三者都不等於企業採用率。",
     "三雲託管怎麼判定：Bedrock 看模型卡索引（Models at a glance）與各模型卡；Agent Platform 看 open models（MaaS）頁與 release notes，這兩份是完整清單，沒列就標 not-offered。Foundry 看「Fireworks models on Microsoft Foundry」文件的模型表與模型目錄的個別頁面——目錄是動態頁、文件的表也會落後，所以查不到的標 unknown。「沒有託管版本」不排除自行部署（例如 Foundry 的 Hugging Face collection 以 managed compute 部署、Agent Platform 的 Model Garden，或在 AWS 上自管 GPU）。",
-    "OpenRouter 排行資料的引用聲明——Source: OpenRouter (openrouter.ai/rankings), as of 2026-10-10. Licensed under CC BY 4.0.",
+    "OpenRouter 排行資料的引用聲明——Source: OpenRouter (openrouter.ai/rankings), as of 2026-10-18. Licensed under CC BY 4.0.",
     "這是市場雷達，不是導入清單：列入不代表平台會提供。要評估其中任何一個，仍然要走發布流程——先由法遵確認來源地限制與授權，再做相容性與效能測試。"
   ],
   "marketNotes": [
-    "本期（10-06 → 10-11）的變化：13 個追蹤中的模型熱度都沒有變，三雲的託管情況也沒有變；新進一個 rising——階躍星辰的 Step 5 Preview（10-08 上架 OpenRouter，第一週週榜第 8）。Qwen3.8 的 hit 很脆弱：它的第二項訊號是 Artificial Analysis 並列第 5，Step 5 若在 10-15 釋出權重就會被擠出。",
-    "OpenRouter 截至 10-10 的週榜：DeepSeek V4.1 Flash 拉大領先（38.71T tokens，週增 51%），GLM 5.3 Flash（11.63T）與 MiMo-V2.6-Flash（11.33T）分列 2、3；上週第 1 的匿名模型 Space Bunny Alpha 週減 70%、已從 OpenRouter 的模型清單消失，身分仍未公布。前 10 名有 6 個是已釋出權重的開放模型（加上 Step 5 是 7 個）。",
-    "非中國的模型仍在等權重：Reflection AI 的 Beam 與 Mistral Large 4 在 Hugging Face 都還沒有權重（官方都說 10 月內）；Mistral Large 4 已上 OpenRouter（第一週 89B tokens）。Moonshot Kimi K3.1 沒有任何官方跡象。",
-    "Artificial Analysis（v4.3.2）的開放權重前五名不變：MiMo-V2.6-Pro 46、GLM 5.3 45、Kimi K3 44、GLM 5.3 Flash 42、Qwen3.8 2.4T 40。對照：Claude Haiku 5.5 為 43 分、每項任務 $0.21——託管的小模型已經和中國開放權重模型的前段班同級，而且三雲都有。",
-    "三雲託管不變：GLM 5.3 在 Bedrock 仍限符合資格的客戶；Foundry 的 DeepSeek V4.1 Flash（Direct from Azure）仍是 Preview，Fireworks 模型表（10-08 更新）沒有新增追蹤中的模型；Agent Platform 的 MaaS 最新仍是 GLM 5.2，16 個較舊的開源端點 10-21 退役，官方只建議改用 Model Garden 自行部署。",
-    "決策模型這個類別在擴大：Cloudflare 10-09 再釋出 Clef-Omni（多模態輸入），Perplexity 釋出 pplx-decider-v1.1-27b，Typesafe 的 Jev 1.13 一週仍超過 10 億次請求；LiteLLM 也在 v1.104.2 加入 /v1/decisions 路由——適合 gateway 上的分類、路由與 guardrail 判斷。"
+    "本期（10-12 → 10-20）的變化：Step 5 Preview（10-15，StepFun 自訂授權）、Muse Spark Open（10-15，Meta 自訂授權）、Beam 1.0（10-16，Apache 2.0）釋出權重，DeepSeek 10-17 發布 V4.1 Flash 1017 快照。Step 5 升為 hit；Qwen3.8 掉出 Artificial Analysis 開放權重前五，降為 watch；新增 Muse Spark Open（rising）。Mistral Large 4 權重仍未釋出（Hugging Face ETA 10-31），Kimi K3.1 沒有官方跡象。",
+    "OpenRouter 截至 10-18 的週榜：DeepSeek V4.1 Flash 32.8T（週減 20%）仍居第 1，GLM 5.3 Flash 12.2T、Step 5 Preview 11.5T（週增 30%）分列 2、3；前 10 名有 8 個是開放權重模型（含 Nemotron 3 Ultra 免費版）。",
+    "Artificial Analysis 開放權重前五（頁面沒有標日期）：MiMo-V2.6-Pro 46、DeepSeek V4.1 Flash 1017 45、GLM 5.3 45、Step 5 Preview 44、Kimi K3 44——五個都是中國開發。非中國的最高是 Muse Spark Open 39（第 7），Beam 1.0 為 30（第 10）。",
+    "三雲託管：Agent Platform 10-14 新增 deepseek-v4.1-flash-maas（Public Preview），同時 16 個舊的開源 MaaS 端點 10-21 退役；Fireworks on Foundry 10-08 退役三個舊模型的 pay-per-token、FW-GLM-5.2-Fast Data Zone 10-29 退役；本期新釋出權重的模型都還沒有三雲按 token 的代管（Muse Spark Open 在 AWS 只有 SageMaker JumpStart）。",
+    "法規訊號：中國 10-16 公布 AI 出口管制清單草案，擬限制 2 兆參數以上或能力前 10 名的模型出口，已公開的開源成果不在範圍內——之後中國模型的權重釋出節奏可能改變。"
   ],
   "models": [
     {
@@ -31,11 +30,12 @@
       "weights": {
         "available": true,
         "repos": [
-          "deepseek-ai/DeepSeek-V4.1-Flash"
+          "deepseek-ai/DeepSeek-V4.1-Flash",
+          "deepseek-ai/DeepSeek-V4.1-Flash-1017"
         ],
         "license": "mit",
         "customLicense": false,
-        "note": "Hugging Face repo 約 510 GB。"
+        "note": "Hugging Face repo 約 510 GB。 2026-10-17 另釋出 DeepSeek-V4.1-Flash-1017 快照（MIT），廠商自報 HLE（無工具）42.6、Terminal-Bench 4.0 42.3，高於原版。"
       },
       "size": "552B backbone，另有 196B 的 Engram 記憶參數",
       "contextWindow": 1000000,
@@ -44,13 +44,13 @@
         "image"
       ],
       "heat": "hit",
-      "heatReason": "四項訊號符合三項：OpenRouter 週榜第 1（38.71T tokens，週增 51%）；Hugging Face 4,342 讚、近 30 天下載 138 萬次；Foundry 有按 token 計費的託管版本（FW-DeepSeek-V4.1-Flash）。",
+      "heatReason": "四項訊號符合四項：OpenRouter 週榜第 1（32.8T tokens，週減 20%）；Hugging Face 4.65k 讚、近 30 天下載 137 萬次；1017 快照在 Artificial Analysis 開放權重第 2（45）；Foundry（Fireworks）有按 token 計費的託管版本，Agent Platform 10-14 起有 MaaS Preview。",
       "summary": "DeepSeek 9 月 10 日釋出的多模態 MoE 模型，設計重點是壓低長 context 的成本：encoder–decoder 式的架構讓 prefill 階段每個 token 只啟用 8B 參數（decode 16B），KV cache 也大幅壓縮；reasoning effort 可在 1–100 之間連續調整。它是 OpenRouter 上用量最大的具名模型，Artificial Analysis 量到 222 tokens/s，也是這份清單裡最快的。前一版 DeepSeek V4 Flash 0731 仍排 OpenRouter 第 7（5.9T tokens），因為已被 V4.1 取代，不另列。",
       "signals": [
         {
           "kind": "openrouter-usage",
-          "value": "週用量第 1：38.71T tokens，週增 51%（前一版 V4 Flash 0731 第 9：5.04T）",
-          "asOf": "2026-10-10",
+          "value": "週用量第 1：32.8T tokens（週減 20%）",
+          "asOf": "2026-10-18",
           "sources": [
             {
               "id": "openrouter-rankings"
@@ -59,31 +59,24 @@
         },
         {
           "kind": "hf-likes",
-          "value": "4,342 讚",
-          "asOf": "2026-10-11",
+          "value": "4.65k 讚；近 30 天下載 1,367,081 次（1017 快照另有 1.85k 讚、27,737 次）",
+          "asOf": "2026-10-20",
           "sources": [
             {
               "id": "hf-deepseek-v41-flash"
-            }
-          ]
-        },
-        {
-          "kind": "hf-downloads",
-          "value": "近 30 天 1,382,367 次",
-          "asOf": "2026-10-11",
-          "sources": [
+            },
             {
-              "id": "hf-deepseek-v41-flash"
+              "id": "hf-deepseek-v41-flash-1017"
             }
           ]
         },
         {
           "kind": "aa-index",
-          "value": "Intelligence Index 39（max），每項任務 $0.27，開放權重模型第 7",
-          "asOf": "2026-10-11",
+          "value": "DeepSeek V4.1 Flash 1017（Max）45，開放權重模型第 2（頁面沒有標日期）",
+          "asOf": "2026-10-20",
           "sources": [
             {
-              "id": "aa-leaderboard-models"
+              "id": "aa-open-source-models"
             }
           ]
         }
@@ -93,7 +86,7 @@
           "cloud": "aws",
           "service": "bedrock",
           "status": "not-offered",
-          "note": "Bedrock 的 DeepSeek 只有 V3.2、V3.1 與 R1。 10-11 複查未變。",
+          "note": "Bedrock 的 DeepSeek 只有 V3.2、V3.1 與 R1。 10-20 複查未變。",
           "sources": [
             {
               "id": "aws-bedrock-model-cards"
@@ -105,7 +98,7 @@
           "service": "foundry",
           "status": "preview",
           "modelId": "DeepSeek-V4.1-Flash",
-          "note": "Direct from Azure（Microsoft 代管）：Preview，version 2026-09-10，部署選項只有 Global Standard；目錄頁只列文字輸入、output 上限 128K。 2026-10-11 複查：目錄頁仍是 Lifecycle Preview。",
+          "note": "Direct from Azure（Microsoft 代管）：Preview，version 2026-09-10，部署選項只有 Global Standard；目錄頁只列文字輸入、output 上限 128K。 2026-10-20 複查：目錄頁仍是 Lifecycle Preview。",
           "sources": [
             {
               "id": "ms-foundry-catalog-deepseek-v41"
@@ -133,22 +126,22 @@
         {
           "cloud": "gcp",
           "service": "agent-platform",
-          "status": "not-offered",
-          "note": "MaaS 的 DeepSeek 只有 V3.2、V3.1、R1 與 OCR，而且這四個端點 10-21 退役。 10-11 複查未變。",
+          "status": "preview",
+          "note": "Agent Platform MaaS：2026-10-14 Public Preview，只有 global endpoint，文字與影像輸入、1M context；只有 Standard pay-as-you-go（沒有 Provisioned Throughput 與 batch）；保證可用到至少 2026-11-28。",
           "sources": [
             {
-              "id": "google-agentplatform-open-models"
-            },
-            {
-              "id": "google-agentplatform-release-notes"
+              "id": "agentplatform-deepseek-v41-flash"
             }
-          ]
+          ],
+          "modelId": "deepseek-v4.1-flash-maas"
         }
       ],
       "priceNotes": [
         "Foundry Direct from Azure（Global Standard，Preview）：input $0.30、output $1.20、cache $0.006（每百萬 token）。",
         "Fireworks on Foundry（Global）：input $0.37、output $1.50、cache $0.007。",
-        "Artificial Analysis 每項任務成本 $0.27（max）。"
+        "Artificial Analysis 每項任務成本 $0.27（max）。",
+        "Agent Platform MaaS（Preview，global）：input $0.30、output $1.20、cache hit $0.03。",
+        "OpenRouter 的 1017 快照：$0.07 / $0.50（每百萬 token）。"
       ],
       "enterpriseNotes": [
         "授權是 MIT，沒有附加條件；但開發者是中國公司，不論用託管 API 或自架，都要先過貴單位對中國開發模型的規範。",
@@ -174,10 +167,16 @@
         },
         {
           "id": "hf-trending-models"
+        },
+        {
+          "id": "agentplatform-deepseek-v41-flash"
+        },
+        {
+          "id": "hf-deepseek-v41-flash-1017"
         }
       ],
       "verification": "independent",
-      "lastVerified": "2026-10-11"
+      "lastVerified": "2026-10-20"
     },
     {
       "id": "glm-5-3",
@@ -209,8 +208,8 @@
       "signals": [
         {
           "kind": "openrouter-usage",
-          "value": "GLM 5.3 Flash 週用量第 2：11.63T tokens（週增 22%）；GLM 5.3 第 11：3.44T",
-          "asOf": "2026-10-10",
+          "value": "GLM 5.3 Flash 週用量第 2：12.2T tokens（持平）；GLM 5.3 第 8：5.19T（週增 37%）",
+          "asOf": "2026-10-18",
           "sources": [
             {
               "id": "openrouter-rankings"
@@ -345,7 +344,7 @@
         }
       ],
       "verification": "independent",
-      "lastVerified": "2026-10-11"
+      "lastVerified": "2026-10-20"
     },
     {
       "id": "qwen3-8",
@@ -372,49 +371,10 @@
         "image",
         "video"
       ],
-      "heat": "hit",
-      "heatReason": "四項訊號符合兩項（勉強）：Qwen3.8-27B 17,475 讚、近 30 天下載 684 萬次；2.4T 與 Flash-Next 在 Artificial Analysis 的開放權重模型並列第 5（40）。若 StepFun Step 5（44 分）如期釋出權重，Qwen3.8 會掉到第 6、只剩一項，降為 watch。",
+      "heat": "watch",
+      "heatReason": "只剩一項：Qwen3.8-27B 約 1.8 萬讚、近 30 天下載 746 萬次。Step 5 Preview 與 DeepSeek V4.1 Flash 1017 進入 Artificial Analysis 開放權重前五後，2.4T 與 Flash-Next 已不在前五（本期讀到的前 10 名甚至沒有 2.4T，原因未確認），依規則由 hit 降為 watch。",
       "summary": "阿里巴巴 8 月釋出的 Qwen3.8 系列。最受歡迎的是 27B 的 dense 多模態模型（看得懂影像與影片、Apache 2.0、單張高階 GPU 可跑），社群以它為基礎做了大量衍生版——包括 Cloudflare 的 Clef 與 JEV 這類決策模型。Flash-Next（180B）與 2.4T-A95B（Qwen3.8 Max 的開放權重版）是自訂授權。27B 的原生 context 是 262K，可延伸到 1M。阿里雲自家 API 上的 Qwen3.8 Max（0902）是另一個封閉版本，Artificial Analysis 給 45。",
       "signals": [
-        {
-          "kind": "hf-likes",
-          "value": "27B 17,475 讚；Flash-Next 6,099；2.4T 1,303",
-          "asOf": "2026-10-11",
-          "sources": [
-            {
-              "id": "hf-qwen38-27b"
-            },
-            {
-              "id": "hf-qwen38-flash-next"
-            },
-            {
-              "id": "hf-qwen38-2-4t"
-            }
-          ]
-        },
-        {
-          "kind": "hf-downloads",
-          "value": "近 30 天：27B 6,843,108 次；Flash-Next 1,870,465 次",
-          "asOf": "2026-10-11",
-          "sources": [
-            {
-              "id": "hf-qwen38-27b"
-            },
-            {
-              "id": "hf-qwen38-flash-next"
-            }
-          ]
-        },
-        {
-          "kind": "aa-index",
-          "value": "2.4T 與 Flash-Next 都是 40（未四捨五入為 39.9 / 39.8），開放權重模型並列第 5；27B（xhigh）34",
-          "asOf": "2026-10-11",
-          "sources": [
-            {
-              "id": "aa-leaderboard-models"
-            }
-          ]
-        },
         {
           "kind": "openrouter-usage",
           "value": "不在週榜前 20",
@@ -422,6 +382,26 @@
           "sources": [
             {
               "id": "openrouter-rankings"
+            }
+          ]
+        },
+        {
+          "kind": "hf-likes",
+          "value": "27B 約 18k 讚；近 30 天下載 7.46M 次（trending 清單）",
+          "asOf": "2026-10-20",
+          "sources": [
+            {
+              "id": "hf-trending-models"
+            }
+          ]
+        },
+        {
+          "kind": "aa-index",
+          "value": "開放權重前 10 名中只有 Qwen3.8 27B（Xhigh）34，排第 8；2.4T 未出現",
+          "asOf": "2026-10-20",
+          "sources": [
+            {
+              "id": "aa-open-source-models"
             }
           ]
         }
@@ -502,7 +482,7 @@
         }
       ],
       "verification": "independent",
-      "lastVerified": "2026-10-11"
+      "lastVerified": "2026-10-20"
     },
     {
       "id": "mimo-v2-6",
@@ -536,8 +516,8 @@
       "signals": [
         {
           "kind": "openrouter-usage",
-          "value": "MiMo-V2.6-Flash 週用量第 3：11.33T tokens（週增 19%）",
-          "asOf": "2026-10-10",
+          "value": "MiMo-V2.6-Flash 週用量第 4：9.94T tokens（週減 13%）",
+          "asOf": "2026-10-18",
           "sources": [
             {
               "id": "openrouter-rankings"
@@ -647,7 +627,7 @@
         }
       ],
       "verification": "independent",
-      "lastVerified": "2026-10-11"
+      "lastVerified": "2026-10-20"
     },
     {
       "id": "kimi-k3",
@@ -673,7 +653,7 @@
         "image"
       ],
       "heat": "hit",
-      "heatReason": "四項訊號符合三項：Hugging Face 11,660 讚、近 30 天下載 113 萬次；Artificial Analysis 開放權重模型第 3（44）；Bedrock 與 Foundry 都有按 token 計費的託管版本。",
+      "heatReason": "四項訊號符合三項：Hugging Face 11,660 讚；Artificial Analysis 開放權重模型並列第 4（44，Step 5 Preview 同分）；Bedrock 與 Foundry 都有按 token 計費的託管版本。",
       "summary": "Moonshot AI 7 月釋出的 2.8T 參數多模態 MoE，官方稱是第一個 3T 級的開放權重模型，定位長時程 coding 與知識工作，1M context。它是三雲上架最完整的中國開放權重模型：Bedrock 9 月 18 日上架（Global 與 US cross-Region），Foundry 經 Fireworks 提供，兩邊價格相同，都是 $3／$15——以開放權重模型來說很貴。Reflection AI、Z.ai、騰訊與 Mistral 發表新模型時都拿它當比較對象。",
       "signals": [
         {
@@ -708,8 +688,8 @@
         },
         {
           "kind": "openrouter-usage",
-          "value": "週用量第 15：2.07T tokens（週增 29%）",
-          "asOf": "2026-10-10",
+          "value": "不在週榜前 10（10-10 為第 15）",
+          "asOf": "2026-10-18",
           "sources": [
             {
               "id": "openrouter-rankings"
@@ -723,7 +703,7 @@
           "service": "bedrock",
           "status": "ga",
           "modelId": "global.moonshotai.kimi-k3",
-          "note": "2026-09-18 上架。只有 cross-Region inference：global.moonshotai.kimi-k3（台北 ap-east-2 可作為 source Region）與 us.moonshotai.kimi-k3，沒有 In-Region；只在 bedrock-runtime。支援 Responses、Chat Completions（AWS 建議用這個）、Converse 與 Invoke；service tier 只有 Responses 與 Chat Completions 支援。生命週期只保證 45 天前通知。 10-11 複查未變。",
+          "note": "2026-09-18 上架。只有 cross-Region inference：global.moonshotai.kimi-k3（台北 ap-east-2 可作為 source Region）與 us.moonshotai.kimi-k3，沒有 In-Region；只在 bedrock-runtime。支援 Responses、Chat Completions（AWS 建議用這個）、Converse 與 Invoke；service tier 只有 Responses 與 Chat Completions 支援。生命週期只保證 45 天前通知。 10-11 複查未變。 模型卡另有 India geo profile in.moonshotai.kimi-k3（ap-south-1、ap-south-2，doc history 10-06）。",
           "sources": [
             {
               "id": "aws-bedrock-kimi-k3-card"
@@ -799,7 +779,7 @@
         }
       ],
       "verification": "independent",
-      "lastVerified": "2026-10-11"
+      "lastVerified": "2026-10-20"
     },
     {
       "id": "stepfun-step-5-preview",
@@ -808,24 +788,30 @@
       "vendor": "other",
       "origin": "中國",
       "releaseDate": "2026-10-08",
-      "status": "preview",
+      "status": "released",
       "weights": {
-        "available": false,
-        "note": "OpenRouter 上的 preview API（2026-10-08）。開源時程只有媒體轉述（ifanr：「官方计划于 10 月 15 日将模型开源」）；StepFun 自己的公告與授權條款本次未讀到，Hugging Face 上的 repo 目前無法公開讀取。"
+        "available": true,
+        "repos": [
+          "stepfun-ai/Step-5-Preview"
+        ],
+        "license": "StepFun Model License 1.0（自訂）",
+        "customLicense": true,
+        "note": "2026-10-15 釋出 BF16 與 FP8 權重（Hugging Face 與 ModelScope）。Hugging Face 的 license 標為 other：StepFun Model License 1.0，以 Apache 2.0 的寫法為底，另加標示與商用授權條件——法務要讀全文。Safetensors 中繼資料為 604B 參數。"
       },
       "size": "600B（27B active）sparse MoE",
       "contextWindow": 1000000,
       "modalities": [
-        "text"
+        "text",
+        "image"
       ],
-      "heat": "rising",
-      "heatReason": "10-08 上架 OpenRouter，第一週就進週榜第 8（6.37T tokens）；Artificial Analysis 44 分（但標示尚非開放權重）。權重若如期在 10-15 釋出，很可能成為 hit。",
-      "summary": "中國新創階躍星辰（StepFun）的新一代 MoE 模型，600B 總參數、27B active、1M context，2026-10-08 以 preview API 上架 OpenRouter（每 1M tokens $1 / $2.70）。媒體轉述官方計畫 10-15 開源；在權重實際釋出前，它不是開放權重模型。",
+      "heat": "hit",
+      "heatReason": "四項訊號符合兩項：OpenRouter 週榜第 3（11.5T tokens，週增 30%）；Artificial Analysis 開放權重模型第 4（44）。Hugging Face 只有 115 讚、近 30 天下載 1,430 次（權重才釋出五天）。三雲都沒有。",
+      "summary": "中國新創階躍星辰（StepFun）的 MoE 模型，600B 總參數、27B active、1M context，文字與影像輸入。10-08 以 preview API 上架 OpenRouter，10-15 釋出權重（自訂授權）。上架兩週已是 OpenRouter 用量第 3、Artificial Analysis 開放權重模型第 4——它進入前五後，Qwen3.8 的 hit 訊號已不成立。",
       "signals": [
         {
           "kind": "openrouter-usage",
-          "value": "週用量第 8：6.37T tokens（新進榜）；排行頁的 total_usage 欄位只有約 $6,293，推測有促銷價（推測）",
-          "asOf": "2026-10-10",
+          "value": "週用量第 3：11.5T tokens（週增 30%）",
+          "asOf": "2026-10-18",
           "sources": [
             {
               "id": "openrouter-rankings"
@@ -834,21 +820,31 @@
         },
         {
           "kind": "aa-index",
-          "value": "44，每項任務 $1.03（標示 isOpenWeights: false）",
-          "asOf": "2026-10-11",
+          "value": "44，開放權重模型第 4（頁面沒有標日期）",
+          "asOf": "2026-10-20",
           "sources": [
             {
-              "id": "aa-leaderboard-models"
+              "id": "aa-open-source-models"
+            }
+          ]
+        },
+        {
+          "kind": "hf-likes",
+          "value": "115 讚；近 30 天下載 1,430 次",
+          "asOf": "2026-10-20",
+          "sources": [
+            {
+              "id": "hf-step5-preview"
             }
           ]
         },
         {
           "kind": "press",
-          "value": "ifanr：官方計畫 10 月 15 日開源",
-          "asOf": "2026-09-21",
+          "value": "ifanr：10-15 權重在 Hugging Face 與 ModelScope 上線",
+          "asOf": "2026-10-15",
           "sources": [
             {
-              "id": "ifanr-step5-preview"
+              "id": "ifanr-step5-weights"
             }
           ]
         }
@@ -858,7 +854,7 @@
           "cloud": "aws",
           "service": "bedrock",
           "status": "not-offered",
-          "note": "Bedrock 的模型卡索引沒有。",
+          "note": "Bedrock 沒有。 10-20 複查。",
           "sources": [
             {
               "id": "aws-bedrock-model-cards"
@@ -869,7 +865,7 @@
           "cloud": "azure",
           "service": "foundry",
           "status": "not-offered",
-          "note": "權重還沒釋出；Fireworks 模型表沒有。",
+          "note": "Fireworks 模型表（10-14 更新）沒有。 10-20 複查。",
           "sources": [
             {
               "id": "ms-foundry-fireworks-models"
@@ -880,7 +876,7 @@
           "cloud": "gcp",
           "service": "agent-platform",
           "status": "not-offered",
-          "note": "Agent Platform 的 open models（MaaS）頁沒有。",
+          "note": "Agent Platform 的 open models（MaaS）頁沒有。 10-20 複查。",
           "sources": [
             {
               "id": "google-agentplatform-open-models"
@@ -889,28 +885,32 @@
         }
       ],
       "priceNotes": [
-        "OpenRouter（preview，單一供應商）：$1 / $2.70 每 1M tokens。"
+        "OpenRouter（單一供應商）：$1 / $2.70 每 1M tokens。"
       ],
       "enterpriseNotes": [
-        "權重與授權都還沒公開，現在只能透過 StepFun 或 OpenRouter 的 API 使用——資料會送到中國開發商或第三方路由，先由法遵確認。",
-        "開源時程只有媒體轉述，研究任務 10-15 之後要查證權重、授權與三雲上架。"
+        "開發者是中國公司；先過貴單位對中國開發模型的規範。授權是 StepFun 自訂授權，商用條件要法務讀全文。",
+        "三雲都沒有代管；現在只能經 StepFun、OpenRouter 的 API 或自架（600B 級，多節點）。",
+        "中國 10-16 公布的 AI 出口管制清單草案擬限制能力前 10 名的模型出口（已公開的開源成果不在範圍內，見法規一節）——之後版本的權重釋出可能受影響。"
       ],
       "sources": [
+        {
+          "id": "hf-step5-preview"
+        },
+        {
+          "id": "ifanr-step5-weights"
+        },
         {
           "id": "openrouter-step5-preview"
         },
         {
-          "id": "openrouter-models-api"
+          "id": "openrouter-rankings"
         },
         {
-          "id": "aa-leaderboard-models"
-        },
-        {
-          "id": "ifanr-step5-preview"
+          "id": "aa-open-source-models"
         }
       ],
-      "verification": "community",
-      "lastVerified": "2026-10-11"
+      "verification": "official",
+      "lastVerified": "2026-10-20"
     },
     {
       "id": "mistral-large-4",
@@ -922,7 +922,7 @@
       "status": "preview",
       "weights": {
         "available": false,
-        "note": "官方說 10 月底前釋出權重，授權條款還沒公布。截至 10-06，Hugging Face 的 mistralai 組織下沒有對應的 repo。"
+        "note": "Hugging Face 只有「Planned artifacts」頁（mistralai/Mistral-Large-4-1T-A52B），Current ETA October 31, 2026，未列授權；Mistral 文件仍寫 Coming soon。"
       },
       "size": "1T（49B active）",
       "contextWindow": 524288,
@@ -932,7 +932,7 @@
       ],
       "heat": "rising",
       "heatReason": "10-06 發表、權重還沒釋出；Artificial Analysis 收錄 38 分（與 GPT-6 Luna 同分），是這份清單裡分數最高的非中國模型，OpenRouter 第一週 89B tokens。",
-      "summary": "Mistral 10-06 發表的 public preview（官方暱稱 le Chonk）：1 兆參數、49B active 的原生多模態模型，官方說是在自家歐洲資料中心從頭訓練。目前只有 Mistral Studio 的 preview API，權重預定 10 月底前釋出。官方主打資安、agentic coding、視覺 grounding，以及法律與金融工作——這些都是廠商自報。context 524K 是 Artificial Analysis 與 OpenRouter 的標示。",
+      "summary": "Mistral 10-06 發表的 public preview（官方暱稱 le Chonk）：1 兆參數、49B active 的原生多模態模型，官方說是在自家歐洲資料中心從頭訓練。目前只有 Mistral Studio 的 preview API，權重預定 10 月底前釋出。官方主打資安、agentic coding、視覺 grounding，以及法律與金融工作——這些都是廠商自報。context 524K 是 Artificial Analysis 與 OpenRouter 的標示。 2026-10-20：Mistral 文件把規格寫成 1.05T total / 52B active（含 embedding）、1M context，與發表時的 1T / 49B 不同。",
       "signals": [
         {
           "kind": "aa-index",
@@ -956,6 +956,16 @@
               "id": "openrouter-models-api"
             }
           ]
+        },
+        {
+          "kind": "other",
+          "value": "Hugging Face planned-artifacts 頁：ETA 2026-10-31，860 人等待",
+          "asOf": "2026-10-20",
+          "sources": [
+            {
+              "id": "hf-mistral-large-4"
+            }
+          ]
         }
       ],
       "hosting": [
@@ -963,7 +973,7 @@
           "cloud": "aws",
           "service": "bedrock",
           "status": "not-offered",
-          "note": "發表文沒有提到三雲；Bedrock 的 Mistral 最新是 Mistral Large 3。 10-11 複查未變。",
+          "note": "發表文沒有提到三雲；Bedrock 的 Mistral 最新是 Mistral Large 3。 10-20 複查未變。",
           "sources": [
             {
               "id": "mistral-large-4-announce"
@@ -977,7 +987,7 @@
           "cloud": "azure",
           "service": "foundry",
           "status": "not-offered",
-          "note": "權重還沒釋出；Fireworks 模型表沒有，社群追蹤表列的是 Mistral-Large-3。 10-11 複查未變。",
+          "note": "權重還沒釋出；Fireworks 模型表沒有，社群追蹤表列的是 Mistral-Large-3。 10-20 複查未變。",
           "sources": [
             {
               "id": "ms-foundry-fireworks-models"
@@ -991,7 +1001,7 @@
           "cloud": "gcp",
           "service": "agent-platform",
           "status": "not-offered",
-          "note": "open models 頁的 Mistral 只有 Mistral Medium 3、Small 3.1 與 OCR。 10-11 複查未變。",
+          "note": "open models 頁的 Mistral 只有 Mistral Medium 3、Small 3.1 與 OCR。 10-20 複查未變。",
           "sources": [
             {
               "id": "google-agentplatform-open-models"
@@ -1001,7 +1011,8 @@
       ],
       "priceNotes": [
         "Mistral 自家 API（preview）：input $1.36、output $4.18（每百萬 token，取自發表頁的模型卡）。",
-        "Artificial Analysis 每項任務成本 $1.13。"
+        "Artificial Analysis 每項任務成本 $1.13。",
+        "Mistral 文件（2026-10-20 讀）列 sale price input $0.68、output $2.09（每百萬 token），與發表頁的 $1.36 / $4.18 不同——是否為促銷價沒有說明。"
       ],
       "enterpriseNotes": [
         "現在只有 Mistral 自家的 preview API。權重官方說 10 月底前釋出，授權條款還沒公布，能否商用要等那時確認。",
@@ -1024,21 +1035,24 @@
         }
       ],
       "verification": "official",
-      "lastVerified": "2026-10-11"
+      "lastVerified": "2026-10-20"
     },
     {
       "id": "reflection-beam",
-      "name": "Beam",
+      "name": "Beam 1.0",
       "developer": "Reflection AI",
       "vendor": "other",
       "origin": "美國（紐約布魯克林）",
       "releaseDate": "2026-10-05",
-      "status": "preview",
+      "status": "released",
       "weights": {
-        "available": false,
+        "available": true,
+        "repos": [
+          "reflection/Beam-1.0-501B-A23B"
+        ],
         "license": "apache-2.0",
         "customLicense": false,
-        "note": "官方預告 10 月內以 Apache 2.0 釋出權重，連同 technical report、model card，以及執行、評測、微調用的完整工具。截至 10-06，Hugging Face 上還沒有官方 repo。"
+        "note": "2026-10-16 釋出；Hugging Face 的 reflection org 另有 -FP8、-NVFP4 與 -DFlash2 三個 repo。模型卡寫 501.3B total / 23.4B active，知識截止 2026-06-30。SiliconANGLE 報導同時公開了 post-training recipe。"
       },
       "size": "501B（23B active）sparse MoE",
       "contextWindow": 1000000,
@@ -1046,35 +1060,49 @@
         "text"
       ],
       "heat": "rising",
-      "heatReason": "10-05 宣布、權重還沒釋出，沒有用量數據；列為 rising 是因為主要科技媒體都有報導，而且它是美國新創第一個直接對標中國開放權重模型的大型模型。",
-      "summary": "Reflection AI（2024 年由兩位前 Google DeepMind 研究員創立）的第一個 open-weight 模型：純文字的 sparse MoE，針對 coding、推理與 agent 工作負載，以 23.8 兆 token 預訓練，再用 10.5K 顆 NVIDIA GB300 做四週的大規模 RL；可用 reasoning effort 參數調整推理長度。官方的說法是：進階推理測試與 GLM 5.2 相當、推論運算量少 3–4 倍，coding 與 agent 能力接近 Qwen 3.8-Max，但 Kimi K3 這類模型的絕對能力仍領先。目前還在最後的 red-teaming，只開放 early access 候補名單。",
+      "heatReason": "發布未滿 30 天：權重 10-16 釋出，Artificial Analysis 收錄為 30（開放權重第 10），已上架 OpenRouter；Hugging Face 171 讚、近 30 天下載 2,097 次，還沒有任何一項 hit 訊號。",
+      "summary": "Reflection AI 的第一個開放權重模型：純文字 sparse MoE（501B / 23B active、1M context），針對 coding、推理與 agent。10-05 發表、10-16 以 Apache 2.0 釋出權重。美國開發、寬鬆授權是它最大的價值；第三方量到的能力（Artificial Analysis 30）明顯落後中國的前段班（44–46）。",
       "signals": [
         {
-          "kind": "press",
-          "value": "TechCrunch、SiliconANGLE（10-05）與 SCMP 報導",
-          "asOf": "2026-10-11",
+          "kind": "aa-index",
+          "value": "30，開放權重模型第 10（頁面沒有標日期）",
+          "asOf": "2026-10-20",
           "sources": [
             {
-              "id": "techcrunch-reflection-beam-2026-10-05"
-            },
-            {
-              "id": "siliconangle-reflection-beam"
-            },
-            {
-              "id": "scmp-reflection-beam"
+              "id": "aa-open-source-models"
             }
           ]
         },
         {
-          "kind": "other",
-          "value": "Hugging Face 仍查不到 Beam 的權重；OpenRouter 與 Artificial Analysis 都沒有收錄",
-          "asOf": "2026-10-11",
+          "kind": "hf-likes",
+          "value": "171 讚；近 30 天下載 2,097 次",
+          "asOf": "2026-10-20",
+          "sources": [
+            {
+              "id": "hf-beam-1"
+            }
+          ]
+        },
+        {
+          "kind": "openrouter-usage",
+          "value": "已上架（reflection/beam-1.0-501b-a23b，10-16）；不在週榜前 10",
+          "asOf": "2026-10-18",
           "sources": [
             {
               "id": "openrouter-models-api"
             },
             {
-              "id": "aa-leaderboard-models"
+              "id": "openrouter-rankings"
+            }
+          ]
+        },
+        {
+          "kind": "press",
+          "value": "SiliconANGLE（10-16）：釋出權重與 post-training recipe",
+          "asOf": "2026-10-16",
+          "sources": [
+            {
+              "id": "siliconangle-beam-weights"
             }
           ]
         }
@@ -1084,14 +1112,8 @@
           "cloud": "aws",
           "service": "bedrock",
           "status": "not-offered",
-          "note": "權重還沒釋出。官方只說會與「distribution partners」一起上線；TechCrunch 轉述為透過 hyperscaler 與 neocloud 發行，沒有點名是哪幾家。 10-11 複查未變。",
+          "note": "Bedrock 沒有。 10-20 複查。",
           "sources": [
-            {
-              "id": "reflection-beam-announce"
-            },
-            {
-              "id": "techcrunch-reflection-beam-2026-10-05"
-            },
             {
               "id": "aws-bedrock-model-cards"
             }
@@ -1101,7 +1123,7 @@
           "cloud": "azure",
           "service": "foundry",
           "status": "not-offered",
-          "note": "權重還沒釋出；Fireworks 模型表沒有。 10-11 複查未變。",
+          "note": "Fireworks 模型表（10-14 更新）沒有。 10-20 複查。",
           "sources": [
             {
               "id": "ms-foundry-fireworks-models"
@@ -1112,7 +1134,7 @@
           "cloud": "gcp",
           "service": "agent-platform",
           "status": "not-offered",
-          "note": "權重還沒釋出；open models（MaaS）頁沒有。 10-11 複查未變。",
+          "note": "Agent Platform 的 open models（MaaS）頁沒有。 10-20 複查。",
           "sources": [
             {
               "id": "google-agentplatform-open-models"
@@ -1121,27 +1143,36 @@
         }
       ],
       "priceNotes": [
-        "還沒有公布 API 價格。"
+        "沒有讀到三雲或 Reflection 自家 API 的價格。"
       ],
       "enterpriseNotes": [
-        "現在還不能用：只有 early access 候補名單。權重、model card、technical report 與安全評測結果，官方都說 10 月內公布。",
-        "預告的授權是 Apache 2.0，開發者是美國公司——對不能用中國模型的單位，這是它最主要的價值；條款要等權重與 model card 出來才能確認。",
-        "效能數字全部是廠商自報。它自己的表上，多數 coding 測試仍落後 GLM 5.3、Kimi K3 與 DeepSeek V4.1 Flash；賣點是同等推理能力下的推論成本。等第三方實測再評估。",
-        "純文字，不收影像。501B 參數的自架門檻高（同量級的 Nemotron 3 Ultra 550B，官方最低需求是 8× H200）；實務上要看哪一朵雲代管。"
+        "Apache 2.0、美國開發：對不能用中國模型的單位是目前能力最高的寬鬆授權選項之一，但能力差距大，先做自家任務的評測。",
+        "純文字，不收影像。501B 參數，自架屬多節點等級（有 FP8 / NVFP4 版本）。",
+        "三雲都沒有代管；官方只說會與 distribution partners 合作。",
+        "有媒體轉述 Nvidia 正洽談收購或加碼投資（FT，未證實）——長期維護方可能改變。"
       ],
       "sources": [
         {
-          "id": "reflection-beam-announce"
+          "id": "hf-beam-1"
         },
         {
-          "id": "techcrunch-reflection-beam-2026-10-05"
+          "id": "huggingface-reflection-org"
+        },
+        {
+          "id": "siliconangle-beam-weights"
         },
         {
           "id": "siliconangle-reflection-beam"
+        },
+        {
+          "id": "aa-open-source-models"
+        },
+        {
+          "id": "openrouter-models-api"
         }
       ],
       "verification": "official",
-      "lastVerified": "2026-10-11"
+      "lastVerified": "2026-10-20"
     },
     {
       "id": "aleph-alpha-kolibri-1",
@@ -1412,8 +1443,8 @@
       "signals": [
         {
           "kind": "openrouter-usage",
-          "value": "週用量第 5：8.41T tokens（週增 28%），以免費或促銷流量為主",
-          "asOf": "2026-10-10",
+          "value": "週用量第 5：7.55T tokens（週減 9%），以免費或促銷流量為主",
+          "asOf": "2026-10-18",
           "sources": [
             {
               "id": "openrouter-rankings"
@@ -1487,7 +1518,7 @@
         }
       ],
       "verification": "independent",
-      "lastVerified": "2026-10-11"
+      "lastVerified": "2026-10-20"
     },
     {
       "id": "nvidia-nemotron-3-ultra",
@@ -1517,8 +1548,8 @@
       "signals": [
         {
           "kind": "openrouter-usage",
-          "value": "免費版本週用量第 7：6.63T tokens（免費版不計入）",
-          "asOf": "2026-10-10",
+          "value": "免費版本週用量第 9：4.97T tokens（週減 28%，免費版不計入）",
+          "asOf": "2026-10-18",
           "sources": [
             {
               "id": "openrouter-rankings"
@@ -1615,7 +1646,7 @@
         }
       ],
       "verification": "independent",
-      "lastVerified": "2026-10-11"
+      "lastVerified": "2026-10-20"
     },
     {
       "id": "thinkingmachines-inkling",
@@ -1854,6 +1885,129 @@
       ],
       "verification": "independent",
       "lastVerified": "2026-10-11"
+    },
+    {
+      "id": "meta-muse-spark-open",
+      "name": "Muse Spark Open",
+      "developer": "Meta（Meta Superintelligence Lab）",
+      "vendor": "meta",
+      "origin": "美國",
+      "releaseDate": "2026-10-15",
+      "status": "released",
+      "weights": {
+        "available": true,
+        "repos": [
+          "meta-models/Muse-Spark-Open-816B-A42B"
+        ],
+        "license": "Muse model license（自訂）",
+        "customLicense": true,
+        "note": "Hugging Face 的 license 標為 muse-model-license。媒體報導的條件：12 個月營收超過 2,000 萬美元的模型服務業者要另簽協議，產品要標示「Built with Muse Spark Open」（TechRepublic，法務要讀全文）。模型卡寫 816B / 42B active，Safetensors 中繼資料為 822B。"
+      },
+      "size": "816B（42B active）",
+      "contextWindow": 1000000,
+      "modalities": [
+        "text"
+      ],
+      "heat": "rising",
+      "heatReason": "10-15 發布未滿 30 天：Artificial Analysis 開放權重第 7（39，Xhigh），已上架 OpenRouter 與 Fireworks；Hugging Face 585 讚、近 30 天下載 2,109 次。",
+      "summary": "Meta 10-15 釋出的開放權重大模型，是封閉旗艦 Muse Spark 系列的開放版本（8 月的 Muse Glimmer 30B 是小型蒸餾版）。1M context。AWS 只在 SageMaker JumpStart 提供（us-east-1、us-east-2），不是 Bedrock 的按 token 服務。",
+      "signals": [
+        {
+          "kind": "aa-index",
+          "value": "Muse Spark Open（Xhigh）39，開放權重模型第 7（頁面沒有標日期）",
+          "asOf": "2026-10-20",
+          "sources": [
+            {
+              "id": "aa-open-source-models"
+            }
+          ]
+        },
+        {
+          "kind": "hf-likes",
+          "value": "585 讚；近 30 天下載 2,109 次",
+          "asOf": "2026-10-20",
+          "sources": [
+            {
+              "id": "hf-muse-spark-open"
+            }
+          ]
+        },
+        {
+          "kind": "openrouter-usage",
+          "value": "已上架（meta/muse-spark-open，10-15）；不在週榜前 10",
+          "asOf": "2026-10-18",
+          "sources": [
+            {
+              "id": "openrouter-models-api"
+            },
+            {
+              "id": "openrouter-rankings"
+            }
+          ]
+        }
+      ],
+      "hosting": [
+        {
+          "cloud": "aws",
+          "service": "bedrock",
+          "status": "not-offered",
+          "note": "AWS 只在 SageMaker JumpStart 提供（us-east-1、us-east-2，自管端點），Bedrock 沒有。",
+          "sources": [
+            {
+              "id": "aws-sagemaker-muse-spark-open"
+            }
+          ]
+        },
+        {
+          "cloud": "azure",
+          "service": "foundry",
+          "status": "unknown",
+          "note": "TechRepublic 報導列 Microsoft Foundry Models，但沒有讀到 Foundry 的目錄頁；Fireworks 模型表（10-14 更新）沒有。",
+          "sources": [
+            {
+              "id": "ms-foundry-fireworks-models"
+            }
+          ]
+        },
+        {
+          "cloud": "gcp",
+          "service": "agent-platform",
+          "status": "not-offered",
+          "note": "Agent Platform 的 open models（MaaS）頁沒有；媒體報導列 Model Garden（自行部署），未讀到官方頁面。",
+          "sources": [
+            {
+              "id": "google-agentplatform-open-models"
+            }
+          ]
+        }
+      ],
+      "priceNotes": [
+        "Fireworks serverless（limited preview 到 10-29）：input $1.25、cached $0.15、output $4.25（每百萬 token）。"
+      ],
+      "enterpriseNotes": [
+        "美國開發，但不是寬鬆授權：自訂授權有營收門檻與標示義務，法務要讀全文。",
+        "816B，自架屬多節點等級；AWS 上只能用 SageMaker JumpStart 自管端點，而且只在美國區域。",
+        "發布不到一週：除 Artificial Analysis 外，效能數字都是廠商自報。"
+      ],
+      "sources": [
+        {
+          "id": "hf-muse-spark-open"
+        },
+        {
+          "id": "aws-sagemaker-muse-spark-open"
+        },
+        {
+          "id": "fireworks-muse-spark-open"
+        },
+        {
+          "id": "aa-open-source-models"
+        },
+        {
+          "id": "openrouter-models-api"
+        }
+      ],
+      "verification": "official",
+      "lastVerified": "2026-10-20"
     }
   ]
 }

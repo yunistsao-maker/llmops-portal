@@ -196,6 +196,21 @@
       "id": "ai-61e46319a5",
       "on": "2026-10-11",
       "reason": "已完成：Sonnet 5.5（09-28）與 Haiku 5.5（10-07）都已上線並在 catalog.json；Haiku 4.5 退役由 lifecycle.json 的 azure-claude-haiku-4-5-eol / anthropic-haiku-4-5-nst 與 ai-d3b94938bd 追蹤。"
+    },
+    {
+      "id": "ai-b6b64b2278",
+      "on": "2026-10-20",
+      "reason": "已到期：Bedrock Legacy 表把 Claude Sonnet 4（anthropic.claude-sonnet-4-20250514-v1:0）列為 2026-10-14 已 EOL。"
+    },
+    {
+      "id": "ai-0bc93971d2",
+      "on": "2026-10-20",
+      "reason": "已被取代：建議版本改為 v1.105.1，升級由 2026-10-20 的 LiteLLM 行動項目接手。"
+    },
+    {
+      "id": "ai-2add0cc03b",
+      "on": "2026-10-20",
+      "reason": "前提已變：Gemini 4 Argon 10-13 在 Gemini API 與 Agent Platform GA（gemini-4-argon），評估由 2026-10-20 的 Argon 行動項目接手。"
     }
   ],
   "rewrite": [
@@ -230,6 +245,20 @@
       "on": "2026-10-11",
       "reason": "v1.102.4 已在 1.102 線修正 Chat→Responses bridge 的重複記帳（litellm.json）。",
       "action": "LiteLLM #44500（Chat→Responses bridge 重複記帳，v1.102.0 起）：1.102 線已在 v1.102.4 修正，1.103 / 1.104 線的 notes 尚未見修正。修正版上線前，FinOps 以 litellm_call_id 去重並對照 CSP 帳單檢查 10 月以來的 spend 與團隊預算。"
+    },
+    {
+      "id": "ai-2c41e818f4",
+      "on": "2026-10-20",
+      "reason": "v1.105.1 已修正 #44500；1.103 / 1.104 線的 notes 仍沒有。",
+      "action": "LiteLLM #44500（Chat→Responses bridge 重複記帳）：已在 v1.102.4 與 v1.105.1 修正，1.103 / 1.104 線的 notes 沒有。升到 v1.105.1 之前，FinOps 以 litellm_call_id 去重並對照 CSP 帳單檢查 10 月以來的 spend 與團隊預算。"
+    },
+    {
+      "id": "ai-25ad8ccff8",
+      "on": "2026-10-20",
+      "priority": "P2",
+      "due": null,
+      "reason": "Gemini 4 Argon 已 GA、Step 5 / Beam 已釋出權重，由 10-20 的追蹤清單取代。",
+      "action": "追蹤清單：GPT-6 Cyber、Gemini 3.5 Pro、DeepSeek-V4.1-Flash（Foundry Direct from Azure）GA、Mistral Large 4 權重（Hugging Face ETA 10-31）與授權；已釋出權重的 Step 5 Preview、Beam 1.0、Muse Spark Open——三雲出現按 token 的代管前不進 catalog；Bedrock 上 Claude 5.5 的牌價；數發部「AI 代理」資安參考指引與機關 AI 內控範本。"
     }
   ],
   "topics": [

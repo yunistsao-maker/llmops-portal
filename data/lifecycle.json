@@ -1,8 +1,8 @@
 {
   "schema": "lifecycle/v1",
-  "generatedAt": "2026-10-11T13:30:00Z",
+  "generatedAt": "2026-10-20T10:00:00Z",
   "locale": "zh-TW",
-  "asOf": "2026-10-11",
+  "asOf": "2026-10-20",
   "policies": [
     {
       "service": "bedrock",
@@ -2329,6 +2329,210 @@
       "sources": [
         {
           "id": "agentplatform-claude-haiku55"
+        }
+      ],
+      "verification": "official"
+    },
+    {
+      "id": "openai-gpt-4o-4-1-snapshots-eol",
+      "modelName": "GPT-4o / GPT-4o mini / GPT-4.1 / GPT-4.1 mini（dated snapshots）",
+      "vendor": "openai",
+      "providerModelId": "gpt-4o-2024-08-06, gpt-4o-2024-11-20, gpt-4o-mini-2024-07-18, gpt-4.1-2025-04-14, gpt-4.1-mini-2025-04-14",
+      "cloud": "vendor-direct",
+      "service": "openai-api",
+      "event": "retirement",
+      "date": "2027-01-14",
+      "replacement": "gpt-6-luna",
+      "scopeNote": "只限 OpenAI 一方 API；fine-tuned 模型跟隨 base model。Azure 上的同名模型依 Foundry 退役表。",
+      "notes": [
+        "2026-10-14 公告。"
+      ],
+      "sources": [
+        {
+          "id": "openai-deprecations"
+        }
+      ],
+      "verification": "official"
+    },
+    {
+      "id": "bedrock-claude-3-x-regional-eol-1113",
+      "modelName": "Claude 3 Haiku / Claude 3 Sonnet / Claude 3.5 Sonnet v1、v2 / Claude 3.7 Sonnet（部分區域）",
+      "vendor": "anthropic",
+      "providerModelId": "anthropic.claude-3-haiku-*, anthropic.claude-3-sonnet-*, anthropic.claude-3-5-sonnet-*, anthropic.claude-3-7-sonnet-*",
+      "cloud": "aws",
+      "service": "bedrock",
+      "event": "retirement",
+      "date": "2026-11-13",
+      "scopeNote": "Legacy 表的區域列：Claude 3 Haiku——ap-northeast-2、ap-south-1、ap-southeast-1（10-10 Legacy）、eu-central-2、sa-east-1（10-13）、ca-central-1（10-15）；Claude 3 Sonnet——ap-south-1、ap-southeast-1、eu-west-2（10-10）、sa-east-1（10-13）、ca-central-1（10-15）；Claude 3.5 Sonnet v1 / v2 與 3.7 Sonnet——10-10 Legacy（區域見 Legacy 表）。",
+      "notes": [
+        "2026-10-20 讀取 Legacy 表新增的區域列；完整 model ID 與區域以 Legacy 表為準。"
+      ],
+      "sources": [
+        {
+          "id": "aws-bedrock-lifecycle-legacy"
+        }
+      ],
+      "verification": "official"
+    },
+    {
+      "id": "vertex-gemini-4-argon-nst",
+      "modelName": "Gemini 4 Argon",
+      "vendor": "google",
+      "providerModelId": "gemini-4-argon",
+      "cloud": "gcp",
+      "service": "agent-platform",
+      "event": "eol-no-sooner-than",
+      "date": "2027-10-13",
+      "notes": [
+        "模型版本頁：October 13, 2027 or later（10-19 更新）。gemini-4-argon-cyber-permissive 為短期提供類，沒有退役日。"
+      ],
+      "sources": [
+        {
+          "id": "google-agentplatform-model-versions"
+        }
+      ],
+      "verification": "official"
+    },
+    {
+      "id": "vertex-gemini-4-argon-price",
+      "modelName": "Gemini 4 Argon",
+      "vendor": "google",
+      "providerModelId": "gemini-4-argon",
+      "cloud": "gcp",
+      "service": "agent-platform",
+      "event": "price-change",
+      "date": "2026-12-01",
+      "notes": [
+        "促銷到 2026-11-30：global $2 / $10（cached $0.10）、非 global $2.2 / $11；2026-12-01 起 global $4 / $20（cached $0.20）、非 global $4.4 / $22（cached $0.22），每百萬 token。",
+        "2026-11-13 起超過 32K tokens 的 completion 即使 timeout 失敗也對可取回的 token 計費。"
+      ],
+      "sources": [
+        {
+          "id": "google-agentplatform-pricing"
+        },
+        {
+          "id": "google-agentplatform-release-notes"
+        }
+      ],
+      "verification": "official"
+    },
+    {
+      "id": "gemini-api-gemini-4-argon-price",
+      "modelName": "Gemini 4 Argon",
+      "vendor": "google",
+      "providerModelId": "gemini-4-argon",
+      "cloud": "vendor-direct",
+      "service": "gemini-api",
+      "event": "price-change",
+      "date": "2026-12-01",
+      "notes": [
+        "Standard 至 2026-11-30 為 $2 / $10 / cache $0.10，12-01 起 $4 / $20 / $0.20；Batch / Flex 一半；Priority $3.60 / $18 → $7.20 / $36（每百萬 token）。"
+      ],
+      "sources": [
+        {
+          "id": "google-gemini-api-pricing"
+        }
+      ],
+      "verification": "official"
+    },
+    {
+      "id": "vertex-gemini-3-8-flash-nst",
+      "modelName": "Gemini 3.8 Flash",
+      "vendor": "google",
+      "providerModelId": "gemini-3.8-flash",
+      "cloud": "gcp",
+      "service": "agent-platform",
+      "event": "eol-no-sooner-than",
+      "date": "2027-09-02",
+      "notes": [
+        "模型版本頁：September 2, 2027 or later（10-19 更新）。Gemini API 棄用頁仍是 None announced。"
+      ],
+      "sources": [
+        {
+          "id": "google-agentplatform-model-versions"
+        },
+        {
+          "id": "google-gemini-api-deprecations"
+        }
+      ],
+      "verification": "official"
+    },
+    {
+      "id": "vertex-deepseek-v4-1-flash-maas-nst",
+      "modelName": "DeepSeek-V4.1-Flash（MaaS）",
+      "vendor": "deepseek",
+      "providerModelId": "deepseek-v4.1-flash-maas",
+      "cloud": "gcp",
+      "service": "agent-platform",
+      "event": "eol-no-sooner-than",
+      "date": "2026-11-28",
+      "notes": [
+        "Public Preview（2026-10-14）；模型頁寫保證可用到至少 2026-11-28。"
+      ],
+      "sources": [
+        {
+          "id": "agentplatform-deepseek-v41-flash"
+        }
+      ],
+      "verification": "official"
+    },
+    {
+      "id": "azure-fw-glm-5-2-fast-dz-eol",
+      "modelName": "GLM 5.2 Fast（Fireworks on Foundry）",
+      "vendor": "other",
+      "providerModelId": "FW-GLM-5.2-Fast",
+      "cloud": "azure",
+      "service": "foundry",
+      "event": "retirement",
+      "date": "2026-10-29",
+      "scopeNote": "Data Zone Standard 部署。",
+      "notes": [
+        "Fireworks 模型目錄文件（10-14 更新）沒有列替代；pay-per-token 通知期 15 天。"
+      ],
+      "sources": [
+        {
+          "id": "ms-foundry-fireworks-models"
+        }
+      ],
+      "verification": "official"
+    },
+    {
+      "id": "azure-fw-ppt-1008-eol",
+      "modelName": "DeepSeek V4 Flash 0731 / DeepSeek V4 Pro / GLM 5.2（Fireworks on Foundry）",
+      "vendor": "other",
+      "providerModelId": "FW-DeepSeek-V4-Flash-0731, FW-DeepSeek-V4-Pro, FW-GLM-5.2",
+      "cloud": "azure",
+      "service": "foundry",
+      "event": "retirement",
+      "date": "2026-10-08",
+      "replacement": "FW-DeepSeek-V4.1-Flash（DeepSeek 兩者）、FW-GLM-5.3（GLM 5.2）",
+      "scopeNote": "只有 pay-per-token 退役。",
+      "notes": [
+        "2026-10-20 首次讀到（文件 10-14 更新）。"
+      ],
+      "sources": [
+        {
+          "id": "ms-foundry-fireworks-models"
+        }
+      ],
+      "verification": "official"
+    },
+    {
+      "id": "azure-claude-opus-5-5-fast-eol",
+      "modelName": "Claude Opus 5.5 fast",
+      "vendor": "anthropic",
+      "providerModelId": "claude-opus-5-5-fast",
+      "version": "2",
+      "cloud": "azure",
+      "service": "foundry",
+      "event": "retirement",
+      "date": "2027-01-15",
+      "notes": [
+        "en-us 的 model lifecycle 頁（09-23 更新）列出；en-my 版的退役排程頁沒有這一列。"
+      ],
+      "sources": [
+        {
+          "id": "ms-foundry-lifecycle-retirement-enus"
         }
       ],
       "verification": "official"
