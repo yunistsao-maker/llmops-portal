@@ -40,7 +40,7 @@ export default function Compare({ ids }: { ids: string[] }) {
             go(`compare/${next.join(",")}`);
           }}>{m.name}</button>))}
       </div>
-      {models.length < 2 ? <Empty>選兩到三個模型開始比較。價格、效能與分數都來自外部參考，上線決策請搭配內部實測（測試結果頁）。</Empty> : (
+      {models.length < 2 ? <Empty>選兩到三個模型開始比較。價格、效能與分數都來自外部參考，上線決策請搭配內部實測（各模型頁的「內部測試」分頁）。</Empty> : (
         <section className="card">
           <table>
             <thead><tr><th style={{ width: 180 }}></th>{models.map((m) => <th key={m.id}><a href={linkTo(`models/${m.id}`)} style={{ fontWeight: 700, fontSize: 16 }}>{m.name}</a></th>)}</tr></thead>

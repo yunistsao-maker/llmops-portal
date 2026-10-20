@@ -3,7 +3,7 @@
 // app reads to discover digests, models and runs. Data-only changes need no JS rebuild.
 //
 // PORTAL_EDITION (Amplify environment variable): "full" (default) = the platform team's portal (site/);
-// "clean" = the portal for everyone who needs the latest LLM information (site-clean/): no 測試結果, 發布流程,
+// "clean" = the portal for everyone who needs the latest LLM information (site-clean/): no 發布流程,
 // LiteLLM 與安全, 上手指南, Onboarding tab or AI security test demo - and none of their data: the deep dives lose
 // `onboarding`; data/litellm.json and config/ (the gateway example) are left out. Test results (runs/) stay: the
 // model page's 內部測試 tab shows them.

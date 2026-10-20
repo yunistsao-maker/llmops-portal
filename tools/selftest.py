@@ -174,6 +174,19 @@ def main():
             if "tok" in open(gw_out).read().replace("tokens", ""):
                 failures.append("gateway-csp run file contains the direct token")
 
+        # 方法與來源 → 測試方法 lists the cases: it must be the tools' own list
+        import re as _re
+        sys.path.insert(0, HERE)
+        import gateway_csp_check as _g
+        page = Path(ROOT, "web/src/pages/TestMethods.tsx").read_text(encoding="utf-8")
+        listed = _re.findall(r'^\s*\["([a-z_.]+)", "', page.split("export const CASES", 1)[1].split("];", 1)[0], _re.M)
+        if len(listed) != len(set(listed)) or set(listed) != {c.id for c in _g.ALL_CASES}:
+            failures.append(f"TestMethods.tsx CASES differ from the tools: missing {sorted({c.id for c in _g.ALL_CASES} - set(listed))}, extra {sorted(set(listed) - {c.id for c in _g.ALL_CASES})}")
+        required = {c.id for c in _g.ALL_CASES if c.required}
+        marked = set(_re.findall(r'^\s*\["([a-z_.]+)", "[^"]*", true,', page, _re.M))
+        if marked != required:
+            failures.append(f"TestMethods.tsx marks {sorted(marked)} as required, the tools {sorted(required)}")
+
         r = run([PY, "tools/perf_probe.py", "--gateway", gw + "/v1", "--route", "mock-reasoning", "--profile", "tiny",
                  "--effort", "low", "--concurrency", "4", "--requests", "16", "--slo-ttfat-ms", "2000", "--slo-ttlt-ms", "5000",
                  "--client-location", "selftest", "--out", perf_out], env=env)

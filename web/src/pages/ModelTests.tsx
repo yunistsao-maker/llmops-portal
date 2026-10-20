@@ -1,7 +1,9 @@
 import type { CompatRun, Model, PerfRun, SecurityRunSummary, TestPurpose } from "../../../schema/types";
-import { fmt, loaders, useData } from "../data";
+import { fmt, linkTo, loaders, useData } from "../data";
 import { Empty, Status } from "../ui";
+import { Measured } from "./GatewayCsp";
 import SecurityPanel from "./SecurityPanel";
+import { CompatCaseTable, PerfCard } from "./testViews";
 
 /**
  * 模型頁的「內部測試」：這個模型在平台 gateway 上的每一層測試（發布關卡 G3 相容性、G4 效能、G5 品質、G6 AI 安全），
@@ -26,6 +28,14 @@ const mockGateway = (gw: string) => /127\.0\.0\.1|localhost|mock/i.test(gw);
 /** the routes of a gateway alias that stand for this model: "<id>" or "<id>@<where>" */
 const routeOf = (m: Model) => (route: string) => route === m.id || route.startsWith(m.id + "@");
 
+/** this model's routes in a compatibility run: the run names its models (modelIds / routeInfo), else by route name */
+function compatRoutes(r: CompatRun, m: Model): string[] {
+  const named = (r.routeInfo ?? []).filter((x) => x.modelId).map((x) => x.route);
+  if (r.routeInfo?.some((x) => x.modelId)) return (r.routeInfo ?? []).filter((x) => x.modelId === m.id).map((x) => x.route);
+  if (r.modelIds?.length) return r.modelIds.includes(m.id) ? r.routes.filter((x) => !named.includes(x)) : [];
+  return r.routes.filter(routeOf(m));
+}
+
 function securityTargets(run: SecurityRunSummary, m: Model): string[] {
   const names = new Set<string>([m.id, ...(m.vendorModelId ? [m.vendorModelId] : [])]);
   for (const o of m.offerings) {
@@ -38,9 +48,9 @@ function securityTargets(run: SecurityRunSummary, m: Model): string[] {
 }
 
 function compatRows(runs: CompatRun[], m: Model): Row[] {
-  const mine = routeOf(m);
   return runs.flatMap((r) => {
-    const rows = r.summary.filter((s) => (r.modelIds?.length ? r.modelIds.includes(m.id) && r.routes.includes(s.route) : mine(s.route)));
+    const routes = compatRoutes(r, m);
+    const rows = r.summary.filter((s) => routes.includes(s.route));
     if (!rows.length) return [];
     const requiredFails = rows.reduce((n, s) => n + s.requiredFailures.length, 0);
     return [{
@@ -52,7 +62,7 @@ function compatRows(runs: CompatRun[], m: Model): Row[] {
           {r.kind === "gateway-csp" && r.metrics && (
             <div className="note">Gateway → CSP：{r.metrics.byRoute.filter((x) => rows.some((s) => s.route === x.route)).map((x) =>
               `${x.route} 相容率 ${x.compatibilityRate === null ? "—" : Math.round(x.compatibilityRate * 100) + "%"}・Gateway 造成 ${x.gatewayInduced}・CSP 限制 ${x.providerLimited}・靜默降級 ${x.silentDegradations}`).join("；")}
-              {" "}<a href="#/tests/gateway-csp">詳細</a></div>)}
+              {" "}（詳細見下方「詳細結果」）</div>)}
           {rows.map((s) => (
             <div key={s.route}>
               <span className="mono">{s.route}</span>：<span className="pass">{s.pass} 過</span>
@@ -145,6 +155,9 @@ export default function ModelTests({ m }: { m: Model }) {
   const other = all.filter((r) => r.purpose !== "pre-release");
   const latestPre = (layer: Layer) => pre.find((r) => r.layer === layer);
   const secRuns = sec.data.filter((r) => securityTargets(r, m).length > 0);
+  const compatMine = compat.data.map((r) => ({ r, routes: compatRoutes(r, m) })).filter((x) => x.routes.length > 0)
+    .sort((a, b) => (a.r.finishedAt < b.r.finishedAt ? 1 : -1));
+  const perfMine = perf.data.filter((r) => (r.modelId ? r.modelId === m.id : routeOf(m)(r.route))).sort((a, b) => (a.finishedAt < b.finishedAt ? 1 : -1));
 
   return (
     <>
@@ -177,6 +190,21 @@ export default function ModelTests({ m }: { m: Model }) {
 
       {pre.length > 0 && <section className="card"><h2>上線前測試紀錄（{pre.length}）</h2><RunList rows={pre} /></section>}
       {other.length > 0 && <section className="card"><h2>其他測試紀錄（{other.length}）</h2><p className="note" style={{ marginTop: -6 }}>回歸、臨時或未標示目的的測試。</p><RunList rows={other} /></section>}
+
+      {(compatMine.length > 0 || perfMine.length > 0) && (
+        <section className="card">
+          <h2>詳細結果</h2>
+          <p className="note" style={{ marginTop: -6 }}>只列這個模型的路由；最新的在前、預設展開。案例與指標的說明見 <a href={linkTo("methods/tests")}>方法與來源 → 測試方法</a>。</p>
+          {compatMine.map(({ r, routes }, i) => (
+            <details key={r.runId} open={i === 0}>
+              <summary>
+                {day(r.finishedAt)} · {r.kind === "gateway-csp" ? "G3 Gateway → CSP 相容性" : "G3 API 相容性"} · {PURPOSE[r.purpose ?? "none"]}
+                {r.litellmVersion && <> · LiteLLM {r.litellmVersion}</>} <span className="note mono">{r.runId}</span>
+              </summary>
+              {r.kind === "gateway-csp" ? <Measured run={r} routes={routes} /> : <CompatCaseTable run={r} routes={routes} />}
+            </details>))}
+          {perfMine.map((r) => <PerfCard key={r.runId} r={r} mock={mockGateway(r.gateway)} />)}
+        </section>)}
 
       {all.length === 0 && (
         <Empty>

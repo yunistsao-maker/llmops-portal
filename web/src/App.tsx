@@ -6,7 +6,6 @@ import Compare from "./pages/Compare";
 import OpenModels from "./pages/OpenModels";
 import ModelPage from "./pages/ModelPage";
 import Eol from "./pages/Eol";
-import Tests from "./pages/Tests";
 import Release from "./pages/Release";
 import Gateway from "./pages/Gateway";
 import Onboarding from "./pages/Onboarding";
@@ -21,7 +20,7 @@ const parse = (h: string) => h.replace(/^#\/?/, "").split("?")[0].split("/").map
 
 const NAV: [string, string][] = [
   ["", "Release Radar"], ["models", "模型目錄"], ["compare", "比較"], ["open", "開源模型"], ["eol", "平台清單與 EOL"],
-  ["tests", "測試結果"], ["release", "發布流程"], ["gateway", "LiteLLM 與安全"], ["onboarding", "上手指南"], ["methods", "方法與來源"],
+  ["release", "發布流程"], ["gateway", "LiteLLM 與安全"], ["onboarding", "上手指南"], ["methods", "方法與來源"],
 ];
 
 export default function App() {
@@ -41,18 +40,18 @@ export default function App() {
   const srcMap = useMemo(() => new Map((sources.data?.sources ?? []).map((s) => [s.id, s])), [sources.data]);
   const [p0, a] = parts;
   const p = hasPage(p0 ?? "") ? p0 : ""; // a page this edition does not have opens the Release Radar
-  const section = p === "models" && a ? "models" : p ?? "";
+  const section = p === "models" && a ? "models" : p === "tests" ? "methods" : p ?? "";
   let page;
   switch (p) {
     case "models": page = a ? <ModelPage id={a} /> : <Catalog />; break;
     case "compare": page = <Compare ids={a ? a.split(",") : []} />; break;
     case "open": page = <OpenModels id={a} />; break;
     case "eol": page = <Eol />; break;
-    case "tests": page = <Tests view={a} />; break;
+    case "tests": page = <Methods slug="tests" />; break; // the old 測試結果 page: results are on each model page now
     case "release": page = <Release model={a} />; break;
     case "gateway": page = <Gateway />; break;
     case "onboarding": page = <Onboarding />; break;
-    case "methods": page = <Methods />; break;
+    case "methods": page = <Methods slug={a} />; break;
     default: page = <Radar digestId={p === "digest" ? a : undefined} />;
   }
   return (

@@ -38,7 +38,7 @@ tools/
   build_versions.py        Amplify build：替今天以前 29 天的每日版本各建一份 Radar（versions/<日期>/，由 fetch_release.mjs 抓下）
   fetch_release.mjs        Amplify build 時抓 pipeline 上線中的 release（release 還沒有的 open-models.json 沿用 repo 的版本）
   sec_suite.py + secsuite/ AI 安全測試（G6）：核准後下載公開資料集、抽樣、執行、本機 UI（見 tools/secsuite/README.md）
-runs/compat, runs/perf    測試結果（UI「測試結果」頁讀取，由 manifest 列出）
+runs/compat, runs/perf    測試結果（各模型頁的「內部測試」分頁讀取，由 manifest 列出；只放真實的量測，示範用的模擬結果在 tools/fixtures/examples/）
 radar/curation.json       合併 Release Radar 時套用的人工決定：合併同義項目、替舊紀錄補 topic、標出複查紀錄、關閉已完成的行動項目、改寫過時的說法
 site/                     由 web/ build 出來的 portal UI（Amplify 直接使用，不在雲端 build JS）
 web/                      portal UI 原始碼（React + Vite）；改畫面後 `cd web && npm run build`，再把 dist 的 index.html、assets/、security-tests.html 複製到 site/
@@ -78,7 +78,8 @@ npm run selftest                  # 不需憑證，約 20 秒
 | 平台清單與 EOL | `internal/platform-inventory.json`、`lifecycle.json` | risk：retired / act-now / watch / unknown |
 | LiteLLM 與 gateway 安全 | `litellm.json` | 支援窗口、avoid 清單、公告、陷阱 |
 | 發布流程 | `requirements.json` → `gates`、`requirements` | 每個模型的 release record（G0–G10） |
-| 方法說明 | `requirements.json` → `metricDefinitions`、`securityTestCatalog` | 指標定義與量測陷阱 |
+| 模型頁 · 內部測試 | `runs/compat`、`runs/perf`、`runs/security` | 這個模型的所有實測：各層上線前結論、紀錄，以及詳細結果（各路由案例表、Gateway → CSP 指標與歸因、效能數字），只列這個模型的路由 |
+| 方法與來源 | `requirements.json` → `metricDefinitions`、`securityTestCatalog`；`litellm.json` → `providerCompatibility` | 指標定義、**測試方法**（測試分層、G3 案例清單、Gateway → CSP 歸因、執行與發布指令、依公開文件的 LiteLLM 支援矩陣）、AI 安全測試目錄、來源 |
 
 ### UI 呈現規則（避免誤導）
 
@@ -112,7 +113,7 @@ python3 tools/compat_suite.py --gateway https://llm-gateway.example.internal/v1 
 python3 tools/compat_suite.py --list      # 看所有案例
 ```
 
-### Gateway → CSP 相容性與指標（測試結果 → 「Gateway → CSP 相容性」分頁）
+### Gateway → CSP 相容性與指標（結果在模型頁「內部測試」，方法在「方法與來源 → 測試方法」）
 
 同一組案例（compat_suite 的 17 個，加上串流結尾、串流 tool call、成本標頭、fallback、3 個錯誤對應案例，共 24 個）**經 gateway 送一次、直連路由背後的 CSP 端點再送一次**，
 每個失敗都會被歸因：`gateway`（只有經 gateway 才失敗：LiteLLM 轉換、drop_params、proxy 設定，要修 gateway）、`provider`（直連也失敗：CSP 或模型的限制）、
@@ -138,9 +139,9 @@ python3 tools/gateway_csp_check.py --list      # 24 個案例與所屬的 API �
 | 延遲開銷 | gateway − 直連的 p50 / p95（`--samples` 成對），串流另算 TTFT 開銷 | 直連要和 gateway 同區域、同部署 |
 | Prompt token 差異 | 兩邊回報的 prompt_tokens 差距（%） | 成本分攤的偏差 |
 
-同一頁也列出「依公開文件」的支援矩陣（`data/litellm.json` → `providerCompatibility`，LiteLLM 各 provider × 12 類 API 功能），在實測之前先有參考；
-實測與文件不一致時以實測為準。完整定義在 `requirements.json` → `metricDefinitions`（「方法與來源」頁）。`runs/compat/example-mock-gateway-csp.json` 是對
-`tools/mock_gateway.py` 跑的示範資料，頁面上標示為模擬。
+「方法與來源 → 測試方法」列出「依公開文件」的支援矩陣（`data/litellm.json` → `providerCompatibility`，LiteLLM 各 provider × 12 類 API 功能），在實測之前先有參考；
+實測與文件不一致時以實測為準。完整定義在 `requirements.json` → `metricDefinitions`（「方法與來源」頁）。`tools/fixtures/examples/` 是對
+`tools/mock_gateway.py` 跑的示範結果（不在 `runs/`，所以不會出現在網站上）；要在本機看版面，把它們複製進 `runs/` 再 build。
 
 效能（固定 effort 與 profile；從實際網路出口量測；每天 3 個時段 × 3 天）：
 
@@ -217,7 +218,7 @@ python3 tools/build_radar.py --as-of 2026-10-10 --out /tmp/radar-1010.json   # �
   沒有發布的日子沿用前一天；同一個 release 在好幾天上線也只抓一次）；`tools/build_versions.py` 替每一天建當天的 Radar；`tools/build_site.mjs` 把它們放到
   `dist/data/versions/<日期>/`，並寫 `dist/data/versions.json`（選單的內容）。
 - UI：`?v=<日期>` 寫在網址裡（例如 `#/models?v=2026-10-10`），切換頁面時保留；看舊版本時剩餘天數以那一天為準。
-  `測試結果`、`發布流程` 不分版本。沒有設定 `PORTAL_DATA_BASE_URL`（用 repo 的資料 build）時只有今天一版。
+  `發布流程` 與模型頁的「內部測試」不分版本。沒有設定 `PORTAL_DATA_BASE_URL`（用 repo 的資料 build）時只有今天一版。
 
 ## 兩個版本：完整版與乾淨版
 
@@ -226,7 +227,7 @@ python3 tools/build_radar.py --as-of 2026-10-10 --out /tmp/radar-1010.json   # �
 | | 完整版（`full`，預設） | 乾淨版（`clean`） |
 | --- | --- | --- |
 | 給誰 | 平台團隊 | 公司裡需要知道最新 LLM 資訊的所有人 |
-| 沒有的頁面 | — | 測試結果、發布流程、LiteLLM 與安全、上手指南（網址會導回 Release Radar）；模型頁的 Onboarding 分頁與「發布關卡紀錄」按鈕；「AI 安全測試（示範・模擬資料）」 |
+| 沒有的頁面 | — | 發布流程、LiteLLM 與安全、上手指南（網址會導回 Release Radar）；「方法與來源 → 測試方法」不顯示執行指令與文件支援矩陣；模型頁的 Onboarding 分頁與「發布關卡紀錄」按鈕；「AI 安全測試（示範・模擬資料）」 |
 | 沒有的資料 | — | deep dive 的 `onboarding`、`data/litellm.json`、`config/`、`security-tests.html` |
 | App 外殼 | `site/` | `site-clean/` |
 
