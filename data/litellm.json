@@ -1,32 +1,32 @@
 {
   "schema": "litellm/v1",
-  "generatedAt": "2026-10-11T13:30:00Z",
+  "generatedAt": "2026-10-20T10:00:00Z",
   "locale": "zh-TW",
-  "asOf": "2026-10-11",
-  "supportPolicy": "LiteLLM 只維護最近四條 stable minor 線（含其中所有 patch）；自 1.84.0 起每週的 stable 升 MINOR、PATCH 只用於 hotfix，因此每條線約有一個月維護期。企業客戶可洽談更長支援，重大漏洞可能例外修補。注意：官方政策頁（2026-06-20，2026-10-06 複查未改）列的仍是 1.86–1.89，下方 supportedLines 是依政策與 1.104.0 stable 發布（PyPI 2026-10-03）推導：v1.101–v1.104，v1.100 線已移出窗口。與 1.104.0 同時切出的回移植 patch 只有 1.103.3，與此推導一致。 2026-10-06 複查：PyPI 最新 stable 仍是 1.104.0，窗口不變；v1.105.0 還只有 rc.1。",
+  "asOf": "2026-10-20",
+  "supportPolicy": "LiteLLM 只維護最近四條 stable minor 線（含其中所有 patch）；自 1.84.0 起每週的 stable 升 MINOR、PATCH 只用於 hotfix，因此每條線約有一個月維護期。企業客戶可洽談更長支援，重大漏洞可能例外修補。注意：官方政策頁（2026-06-20，2026-10-06 複查未改）列的仍是 1.86–1.89，下方 supportedLines 是依政策與 1.104.0 stable 發布（PyPI 2026-10-03）推導：v1.101–v1.104，v1.100 線已移出窗口。與 1.104.0 同時切出的回移植 patch 只有 1.103.3，與此推導一致。 2026-10-06 複查：PyPI 最新 stable 仍是 1.104.0，窗口不變；v1.105.0 還只有 rc.1。 2026-10-20：依政策與 1.106.0 stable（2026-10-18）推導，窗口為 v1.103–v1.106，v1.102 線移出。",
   "supportedLines": [
-    "1.105.x",
-    "1.104.x",
-    "1.103.x",
-    "1.102.x"
+    "v1.106.x",
+    "v1.105.x",
+    "v1.104.x",
+    "v1.103.x"
   ],
   "recommended": {
-    "version": "v1.104.2",
-    "pinning": "以 image digest 釘選（docker.litellm.ai/berriai/litellm:1.104.2 的 sha256；image 以 cosign 簽章），不要用 main-latest、*-dev、*-rc；PyPI 以 hash 釘選並經私有 mirror。",
+    "version": "v1.105.1",
+    "pinning": "以 image digest 釘選（docker.litellm.ai/berriai/litellm:1.105.1 的 sha256；image 以 cosign 簽章），不要用 main-latest、*-dev、*-rc；PyPI 以 hash 釘選並經私有 mirror。",
     "rationale": [
-      "2026-10-11：1.104 線上有官方 release notes 的最新 patch。v1.104.1（10-07）把 image 內建的 pgbouncer 升到 1.26.0（Wolfi 改用 OpenSSL 4.0 後舊版 image build 失敗）並更新相依套件；v1.104.2（10-08）把 Decisions API（/v1/decisions、/v1/systemone）回移植到 1.104——是新增功能、不是安全修正。兩者都沒有 DB migration、沒有 breaking change。",
-      "v1.104.3（PyPI 2026-10-11 10:31 UTC）已發布，但官方 notes 頁還是 404、內容不明——notes 出來後再評估（可能是 hotfix）。",
-      "1.105.0 stable 已在 PyPI（2026-10-11 09:47 UTC），但官方 notes 尚未發布；rc1 的 notes 列了三項會直接影響這個 gateway 的 breaking change：Bedrock 上的 GPT-5.6 / GPT-6 / GPT-6.1 由 Converse 改走原生 Chat Completions（response id、service_tier 與 reasoning 欄位格式改變；要留在 Converse 請寫 bedrock/converse/<model>）、ENFORCE_PRISMA_MIGRATION_CHECK=false 不再有效、/sso/debug/* 預設回 404。等正式 notes 與 staging 結果。",
-      "1.105.0 發布後支援窗口變成 1.105 / 1.104 / 1.103 / 1.102：1.101.x 已出窗口（含 10-08 的 1.101.6）。",
-      "OSV 的 litellm 公告仍是 82 筆（最新修改 2026-10-05），沒有任何一筆涵蓋目前的 1.10x patch；GitHub 的 advisory 頁本期讀不到。",
-      "1.104.0 的 breaking changes：(1) master key 未設、為空或為公開已知值（例如 sk-1234）時 proxy 拒絕啟動；(2) 預算用盡由 HTTP 429 改回 422（litellm_settings.budget_exceeded_status_code: 429 可還原）；(3) stdio MCP server 預設關閉（LITELLM_ENABLE_MCP_STDIO=true 才啟用）；(4) 啟動時 DB setup 失敗會直接退出（ENFORCE_PRISMA_MIGRATION_CHECK=false 可還原）；(5) 自 v1.103.0 以前升級，Admin UI 與 lite CLI 使用者要重新登入。"
+      "有官方 notes 的最新 stable patch，修正 Chat→Responses bridge 對 ≥256 KiB non-streaming 請求重複寫 SpendLogs（#44500 / PR #44508），以及高流量下 LiteLLM_DailyModelUsage 鎖競爭造成 SpendLogs 掉列（PR #44243）；沒有 migration 與 breaking change。依 notes，#44508 只在 1.102.4 與 1.105.1 修正，1.103 / 1.104 線沒有。",
+      "自 v1.104.x 升級要吸收 1.105 的 breaking changes：(1) Bedrock 上的 GPT-5.6 / GPT-6 / GPT-6.1 預設改走原生 Chat Completions（response id、service_tier、reasoning 欄位格式改變；要留在 Converse 寫 bedrock/converse/<model>——本平台 catalog 的 provider 字串已明寫）；(2) ENFORCE_PRISMA_MIGRATION_CHECK=false 被忽略，migration 失敗一律不啟動；(3) /sso/debug/* 預設 404（ENABLE_SSO_DEBUG=true 才開）；(4) Decisions 請求對非 OpenAI provider 送 safety_identifier 回 400（drop_params: true 可還原）。",
+      "v1.106.0（2026-10-18）是最新 stable，但改了 MCP 憑證轉送、response cache 與 Responses WebSocket 的預設行為，剛發布兩天；先在 staging 評估，不當建議版本。",
+      "這是依各版 release notes 推導的建議，不是 LiteLLM 官方說法；上 production 前在 staging 跑 compat suite 與負載測試。"
     ]
   },
   "minimumBaseline": {
-    "version": "v1.102.4",
+    "version": "v1.103.5",
     "rationale": [
-      "2026-10-11 起支援窗口是 1.105 / 1.104 / 1.103 / 1.102，最低要在 1.102 線。",
-      "1.102.4（10-08）修正自 1.102.0 起 /v1/chat/completions 呼叫 openai/responses/* 模型時重複記帳的問題（大型 non-streaming 請求記兩次）——1.102.0–1.102.3 有這個問題。"
+      "1.106.0 stable 發布後，依「最近四條 stable minor 線」推導的支援窗口是 v1.103–v1.106；1.103 是最舊的一條線，用該線最新 patch v1.103.5（2026-10-17，Responses API tool call 修正）。",
+      "不要停在 v1.103.0 / v1.103.1（pass-through endpoint 問題）。",
+      "1.103 線的 notes 沒有 #44500 重複記帳的修正：留在這條線的環境，FinOps 繼續以 litellm_call_id 去重。",
+      "LiteLLM 約每週一個 stable minor：1.107（rc 已上 PyPI）一發布，1.103 線就會移出窗口——不要把 1.103 當長期落點。"
     ]
   },
   "avoid": [
@@ -100,21 +100,6 @@
       ]
     },
     {
-      "versions": "≤ v1.100.x",
-      "reason": "1.104.0 stable（2026-10-03）發布後已超出「最近四條 stable 線」支援窗口（v1.101–v1.104，依政策推導）；v1.100 線另落在 CVE-2026-89032 的受影響範圍。",
-      "sources": [
-        {
-          "id": "litellm-version-support"
-        },
-        {
-          "id": "pypi-litellm-rss"
-        },
-        {
-          "id": "osv-cve-2026-89032"
-        }
-      ]
-    },
-    {
       "versions": "main-latest、*-dev、*-rc",
       "reason": "非穩定版，不適用正式環境。",
       "sources": [
@@ -164,9 +149,86 @@
           "id": "litellm-v1-102-4"
         }
       ]
+    },
+    {
+      "versions": "v1.105.0",
+      "reason": "Chat→Responses bridge 重複記帳（#44500）與高流量下 SpendLogs 掉列，兩者都在 v1.105.1 修正；直接用 v1.105.1。",
+      "sources": [
+        {
+          "id": "litellm-v1-105-1"
+        }
+      ]
+    },
+    {
+      "versions": "≤ v1.102.x",
+      "reason": "1.106.0 stable（2026-10-18）發布後已超出「最近四條 stable 線」支援窗口（v1.103–v1.106，依政策推導）。",
+      "sources": [
+        {
+          "id": "litellm-version-support"
+        },
+        {
+          "id": "litellm-v1-106-0"
+        }
+      ]
     }
   ],
   "releases": [
+    {
+      "version": "v1.106.0",
+      "channel": "stable",
+      "date": "2026-10-18",
+      "highlights": [
+        "呼叫者的 LiteLLM key 不再轉送給 MCP server（上游 MCP 要有自己的憑證）。",
+        "response cache 跳過超過 4 則訊息的請求（cache_params.max_messages）。",
+        "Responses WebSocket session 預設 60 分鐘關閉（上限 7200 秒），移除 30 秒首訊息 timeout。",
+        "PATCH /credentials/{name} 不再改名（改用 display_name）；Decisions 不支援的 media 欄位回 400（drop_params 可放寬）。",
+        "/v1/responses/compact 套用 previous_response_id 檢查，未授權或非本 proxy 發出的 ID 回 403（allow_unmanaged_response_ids）。",
+        "內建 cost map 加入 Claude Haiku 5.5。"
+      ],
+      "caution": "讀到的 notes 內容沒有涵蓋 Bedrock 變更、#44508 與 migration；剛發布，先在 staging 評估。",
+      "sources": [
+        {
+          "id": "litellm-v1-106-0"
+        },
+        {
+          "id": "litellm-release-notes"
+        }
+      ],
+      "supported": true
+    },
+    {
+      "version": "v1.105.1",
+      "channel": "patch",
+      "highlights": [
+        "PR #44508：Chat→Responses bridge 對 ≥256 KiB non-streaming 請求只寫一筆 SpendLogs（修正 #44500 的重複扣款）。",
+        "PR #44243：批次寫入 LiteLLM_DailyModelUsage，修正高流量下鎖競爭造成 SpendLogs 掉列。",
+        "沒有 migration 與 breaking change（回移植 PR #46313）。"
+      ],
+      "sources": [
+        {
+          "id": "litellm-v1-105-1"
+        }
+      ],
+      "supported": true
+    },
+    {
+      "version": "v1.105.0",
+      "channel": "stable",
+      "date": "2026-10-11",
+      "highlights": [
+        "Bedrock 上的 GPT-5.6 / GPT-6 / GPT-6.1 預設改走原生 Chat Completions（留在 Converse 寫 bedrock/converse/<model>）。",
+        "ENFORCE_PRISMA_MIGRATION_CHECK=false 被忽略；/sso/debug/* 預設 404（ENABLE_SSO_DEBUG=true 才開）。",
+        "Decisions 對非 OpenAI provider 送 safety_identifier 回 400（drop_params: true 可還原）；/v1/systemone 記為 asystemone。",
+        "內建 cost map 加入 Claude Sonnet 5.5、GPT-6.1 Sol。"
+      ],
+      "caution": "仍有 #44500 重複記帳與 SpendLogs 掉列，用 v1.105.1。",
+      "sources": [
+        {
+          "id": "litellm-v1-105-0"
+        }
+      ],
+      "supported": true
+    },
     {
       "version": "v1.105.0-rc.1",
       "date": "2026-10-04",
@@ -189,6 +251,63 @@
           "id": "litellm-v1-105-0-rc1"
         }
       ]
+    },
+    {
+      "version": "v1.104.4",
+      "channel": "patch",
+      "highlights": [
+        "修正 supported_decisions_providers（#45935）、team 範圍的 batch model 存取（#47344）、count_tokens（#47389、#47446、#47454）。"
+      ],
+      "caution": "只有 GitHub release notes，docs 還沒有頁面；notes 沒有 #44508 修正。",
+      "sources": [
+        {
+          "id": "litellm-gh-v1-104-4"
+        }
+      ],
+      "supported": true
+    },
+    {
+      "version": "v1.104.3",
+      "channel": "patch",
+      "date": "2026-10-11",
+      "highlights": [
+        "Decisions providers（hosted_vllm/、azure_ai/）、litellm.systemone()；litellm.decisions(state=...) 棄用。",
+        "Decisions 對非 OpenAI provider 送 safety_identifier 回 400（drop_params: true 可還原）。"
+      ],
+      "caution": "notes 沒有 #44508（重複記帳）的修正。",
+      "sources": [
+        {
+          "id": "litellm-v1-104-3"
+        }
+      ],
+      "supported": true
+    },
+    {
+      "version": "v1.104.2",
+      "channel": "patch",
+      "highlights": [
+        "/v1/systemone、/v1/decisions 與 OpenAI Decisions provider 回移植到 1.104 線；沒有 migration 與 breaking change。"
+      ],
+      "caution": "沒有 #44508（重複記帳）的修正；建議改用 v1.105.1。",
+      "sources": [
+        {
+          "id": "litellm-v1-104-2"
+        }
+      ],
+      "supported": true
+    },
+    {
+      "version": "v1.104.1",
+      "channel": "patch",
+      "highlights": [
+        "相依套件更新、pgbouncer 1.26.0 build 修正。"
+      ],
+      "sources": [
+        {
+          "id": "litellm-v1-104-1"
+        }
+      ],
+      "supported": true
     },
     {
       "version": "v1.104.0",
@@ -215,6 +334,38 @@
           "id": "pypi-litellm-rss"
         }
       ]
+    },
+    {
+      "version": "v1.103.5",
+      "channel": "patch",
+      "date": "2026-10-17",
+      "highlights": [
+        "Responses API：tool call 不再落在 choices[1]（PR #46099）；non-streaming 的每個 tool call 有自己的 index（PR #46109）。"
+      ],
+      "caution": "notes 沒有 #44508（重複記帳）的修正。",
+      "sources": [
+        {
+          "id": "litellm-v1-103-5"
+        }
+      ],
+      "supported": true
+    },
+    {
+      "caution": "官方 release notes 頁（docs）沒有 v1.103.4；內容取自 GitHub release 的 What's Changed。",
+      "channel": "patch",
+      "highlights": [
+        "PyPI 2026-10-07 上傳。GitHub release 的變更：stable/1.103.x 刷新相依套件並切出 1.103.4（#44776）。"
+      ],
+      "sources": [
+        {
+          "id": "pypi-litellm-1-103-4"
+        },
+        {
+          "id": "litellm-github-releases"
+        }
+      ],
+      "supported": true,
+      "version": "v1.103.4"
     },
     {
       "version": "v1.103.3",
@@ -322,13 +473,26 @@
       ]
     },
     {
+      "version": "v1.102.4",
+      "channel": "patch",
+      "highlights": [
+        "修正 Chat→Responses bridge 重複記帳（PR #44508，回移植 PR #45215）。"
+      ],
+      "sources": [
+        {
+          "id": "litellm-v1-102-4"
+        }
+      ],
+      "supported": false
+    },
+    {
       "version": "v1.102.2",
       "date": "2026-09-29",
       "channel": "patch",
       "highlights": [
         "v1.102 線最新 patch。只有一項變更：Admin UI / lite CLI 的 session token 格式（與 1.103.1 相同）。"
       ],
-      "supported": true,
+      "supported": false,
       "sources": [
         {
           "id": "litellm-v1-102-2"
@@ -346,7 +510,7 @@
       "highlights": [
         "v1.102 線的 patch：回移植 Anthropic 相關修正（#42152 / #42288）等；image 以 cosign 簽章。"
       ],
-      "supported": true,
+      "supported": false,
       "sources": [
         {
           "id": "litellm-release-notes"
@@ -369,11 +533,26 @@
         "可選共用 PgBouncer、減少 DB/Redis 呼叫、Redis 故障處理",
         "99 個新模型定價條目"
       ],
-      "supported": true,
+      "supported": false,
       "caution": "Breaking：organization 相關 endpoint 需 enterprise license、response ID 授權更嚴格、Rust OCR 為預設、Auto Router 以 tier 模型上限取代 caller 的 output cap——升級前在 staging 回歸測試。",
       "sources": [
         {
           "id": "litellm-v1-102-0"
+        }
+      ]
+    },
+    {
+      "version": "v1.101.6",
+      "date": "2026-10-08",
+      "channel": "patch",
+      "highlights": [
+        "修正 Responses→Chat bridge（例如 Bedrock Converse）丟掉 Codex CLI additional_tools。"
+      ],
+      "supported": false,
+      "caution": "1.101 線已出支援窗口。",
+      "sources": [
+        {
+          "id": "litellm-v1-101-6"
         }
       ]
     },
@@ -531,122 +710,6 @@
       "sources": [
         {
           "id": "litellm-v1-95-0"
-        }
-      ]
-    },
-    {
-      "caution": "官方 release notes 頁（docs）沒有 v1.104.2；內容取自 GitHub release 的 What's Changed。回移植的是新功能，升級前先在 staging 驗證。",
-      "channel": "patch",
-      "highlights": [
-        "PyPI 2026-10-08 上傳（GitHub 標為 Latest）。GitHub release 唯一一項變更：把 /v1/systemone、OpenAI 格式的 /v1/decisions 與 OpenAI Decisions provider 回移植到 stable/1.104.x（#44236、#45184、#45214，合併於 #45190）。是新功能回移植，不是安全修正。"
-      ],
-      "sources": [
-        {
-          "id": "pypi-litellm-1-104-2"
-        },
-        {
-          "id": "litellm-github-releases"
-        }
-      ],
-      "supported": true,
-      "version": "v1.104.2"
-    },
-    {
-      "caution": "官方 release notes 頁（docs）沒有 v1.104.1；內容取自 GitHub release 的 What's Changed。",
-      "channel": "patch",
-      "highlights": [
-        "PyPI 2026-10-07 上傳。GitHub release 的變更：stable/1.104.x 刷新相依套件並切出 1.104.1（#44777）。"
-      ],
-      "sources": [
-        {
-          "id": "pypi-litellm-json"
-        },
-        {
-          "id": "litellm-github-releases"
-        }
-      ],
-      "supported": true,
-      "version": "v1.104.1"
-    },
-    {
-      "caution": "官方 release notes 頁（docs）沒有 v1.103.4；內容取自 GitHub release 的 What's Changed。",
-      "channel": "patch",
-      "highlights": [
-        "PyPI 2026-10-07 上傳。GitHub release 的變更：stable/1.103.x 刷新相依套件並切出 1.103.4（#44776）。"
-      ],
-      "sources": [
-        {
-          "id": "pypi-litellm-1-103-4"
-        },
-        {
-          "id": "litellm-github-releases"
-        }
-      ],
-      "supported": true,
-      "version": "v1.103.4"
-    },
-    {
-      "caution": "官方 release notes 頁（docs）沒有 v1.102.4；#44508 的內容未讀到。",
-      "channel": "patch",
-      "highlights": [
-        "PyPI 2026-10-08 上傳。GitHub release 的變更：把 #44508 回移植到 stable/1.102.x 並切出 1.102.4（#45215）。release 沒有說明 #44508 的內容。"
-      ],
-      "sources": [
-        {
-          "id": "pypi-litellm-1-102-4"
-        },
-        {
-          "id": "litellm-github-releases"
-        }
-      ],
-      "supported": true,
-      "version": "v1.102.4"
-    },
-    {
-      "version": "v1.105.0",
-      "date": "2026-10-11",
-      "channel": "stable",
-      "highlights": [
-        "PyPI 已發布（09:47 UTC），官方 release notes 尚未公開（404）。rc1 notes 的 breaking changes 見推薦版本說明。"
-      ],
-      "supported": true,
-      "caution": "等官方 notes 與 staging 結果再升。",
-      "sources": [
-        {
-          "id": "pypi-litellm-json"
-        },
-        {
-          "id": "litellm-v1-105-0-rc1"
-        }
-      ]
-    },
-    {
-      "version": "v1.104.3",
-      "date": "2026-10-11",
-      "channel": "patch",
-      "highlights": [
-        "PyPI 已發布（10:31 UTC），notes 尚未公開，內容不明。"
-      ],
-      "supported": true,
-      "caution": "notes 出來前不要升。",
-      "sources": [
-        {
-          "id": "pypi-litellm-json"
-        }
-      ]
-    },
-    {
-      "version": "v1.101.6",
-      "date": "2026-10-08",
-      "channel": "patch",
-      "highlights": [
-        "修正 Responses→Chat bridge（例如 Bedrock Converse）丟掉 Codex CLI additional_tools。"
-      ],
-      "supported": false,
-      "caution": "1.101 線已出支援窗口。",
-      "sources": [
-        {
-          "id": "litellm-v1-101-6"
         }
       ]
     }
@@ -1111,15 +1174,18 @@
     },
     {
       "title": "Chat→Responses bridge 對大型請求重複寫入 spend log（預算被重複扣款）",
-      "affects": "v1.102.0 以後（issue #44500 列 v1.102.0、v1.103.2、v1.103.3、v1.104.0、v1.105.0-rc.1；v1.100.0 不受影響）：經 /v1/chat/completions 呼叫、被橋接到 Responses API 的 non-streaming 請求，且訊息文字（含 system prompt）達 262,144 字元（256 KiB）",
-      "symptom": "同一個請求在 LiteLLM_SpendLogs 出現兩筆（litellm_call_id 與 cost 相同、request_id 不同），key / team / 每日花費被扣兩次；回報者某日 LiteLLM 記為 $86.93，OpenAI 用量頁為 $55.68。",
-      "fix": "暫時設 MAX_BASE64_LENGTH_FOR_LOGGING=0（issue 提供的 workaround）；修正 PR #44508 在 10-05 讀取時未合併；2026-10-06 讀到的 v1.105.0rc1 notes 沒有列這個 PR（issue 頁本期讀不到）。FinOps 對帳時以 litellm_call_id 去重並比對 CSP 帳單；長 context 的 GPT-6 / GPT-5.4+ 工具呼叫流量最容易遇到。",
+      "affects": "v1.102.0 以後的 1.102.0–1.102.3、1.103.x、1.104.x、1.105.0（依 notes，1.106.0 未確認）",
+      "symptom": "≥256 KiB 的 non-streaming 請求經 Chat→Responses bridge 時寫兩筆 SpendLogs，key / team 預算被扣兩次（#44500）。",
+      "fix": "升級到 v1.105.1（或 1.102 線的 v1.102.4）；留在 1.103 / 1.104 線的環境設 MAX_BASE64_LENGTH_FOR_LOGGING=0，FinOps 以 litellm_call_id 去重並對照 CSP 帳單。",
       "sources": [
         {
-          "id": "litellm-issue-44500"
+          "id": "litellm-v1-105-1"
         },
         {
-          "id": "litellm-v1-105-0-rc1"
+          "id": "litellm-v1-102-4"
+        },
+        {
+          "id": "litellm-issue-44500"
         }
       ]
     },
@@ -1221,6 +1287,42 @@
           "id": "litellm-cost-map-main"
         }
       ]
+    },
+    {
+      "title": "1.106：呼叫者的 LiteLLM key 不再轉送給 MCP server",
+      "affects": "v1.106.0 以後",
+      "symptom": "依賴 proxy 轉送呼叫者 key 來驗證身分的內部 MCP server，升級後回 401 / 403。",
+      "fix": "升級前為每個上游 MCP server 設定自己的憑證。",
+      "sources": [
+        {
+          "id": "litellm-v1-106-0"
+        }
+      ]
+    },
+    {
+      "title": "1.105：Bedrock GPT-6 系列預設改走原生 Chat Completions",
+      "affects": "v1.105.0 以後",
+      "symptom": "未明寫 converse/ 的 Bedrock GPT-5.6 / GPT-6 / GPT-6.1 deployment，response id、service_tier 與 reasoning 欄位格式改變。",
+      "fix": "要維持原行為就把 model 寫成 bedrock/converse/<model>；決定改走 Chat Completions 的話重跑 compat suite。",
+      "sources": [
+        {
+          "id": "litellm-v1-105-0"
+        }
+      ]
+    },
+    {
+      "title": "1.104.3 / 1.105：Decisions 請求送 safety_identifier 給非 OpenAI provider 回 400",
+      "affects": "v1.104.3、v1.105.0 以後",
+      "symptom": "經 Decisions API 呼叫非 OpenAI provider 時帶 safety_identifier，回 HTTP 400。",
+      "fix": "在 deployment 設 drop_params: true，或由 gateway 移除該欄位。",
+      "sources": [
+        {
+          "id": "litellm-v1-104-3"
+        },
+        {
+          "id": "litellm-v1-105-0"
+        }
+      ]
     }
   ],
   "sources": [
@@ -1295,6 +1397,24 @@
     },
     {
       "id": "osv-api-litellm"
+    },
+    {
+      "id": "litellm-v1-105-0"
+    },
+    {
+      "id": "litellm-v1-105-1"
+    },
+    {
+      "id": "litellm-v1-106-0"
+    },
+    {
+      "id": "litellm-v1-104-3"
+    },
+    {
+      "id": "litellm-v1-103-5"
+    },
+    {
+      "id": "litellm-gh-v1-104-4"
     }
   ]
 }

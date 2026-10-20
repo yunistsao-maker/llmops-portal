@@ -3113,6 +3113,326 @@
       "publisher": "SpaceXAI (xAI)",
       "type": "vendor-doc",
       "accessed": "2026-10-15"
+    },
+    {
+      "id": "anthropic-usage-policy-2026",
+      "title": "2026 Usage Policy update",
+      "url": "https://www.anthropic.com/news/2026-usage-policy-update",
+      "publisher": "Anthropic",
+      "type": "vendor-blog",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "aws-blog-claude-structured-outputs",
+      "title": "Structured outputs for Anthropic Claude models on Amazon Bedrock",
+      "url": "https://aws.amazon.com/blogs/machine-learning/structured-outputs-for-anthropic-claude-models-on-amazon-bedrock/",
+      "publisher": "AWS",
+      "type": "csp-blog",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "aws-bedrock-claude-structured-outputs-doc",
+      "title": "Structured outputs (Claude Messages API) - Amazon Bedrock",
+      "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/claude-messages-structured-outputs.html",
+      "publisher": "AWS",
+      "type": "csp-doc",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "aws-bedrock-structured-output-doc",
+      "title": "Structured output - Amazon Bedrock",
+      "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/structured-output.md",
+      "publisher": "AWS",
+      "type": "csp-doc",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "aws-blog-gpt-global-cris-apac",
+      "title": "Accessing OpenAI GPT models on Amazon Bedrock with global cross-Region inference in Thailand, Malaysia, Singapore, Indonesia, and Taiwan",
+      "url": "https://aws.amazon.com/blogs/machine-learning/accessing-openai-gpt-models-on-amazon-bedrock-with-global-cross-region-inference-in-thailand-malaysia-singapore-indonesia-and-taiwan/",
+      "publisher": "AWS",
+      "type": "csp-blog",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "aws-blog-haiku55",
+      "title": "Introducing Claude Haiku 5.5 on AWS",
+      "url": "https://aws.amazon.com/blogs/machine-learning/introducing-claude-haiku-5-5-on-aws/",
+      "publisher": "AWS",
+      "type": "csp-blog",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "aws-bedrock-pricing-page",
+      "title": "Amazon Bedrock pricing",
+      "url": "https://aws.amazon.com/bedrock/pricing/",
+      "publisher": "AWS",
+      "type": "csp-doc",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "aws-sagemaker-muse-spark-open",
+      "title": "Meta's Muse Spark Open now available in Amazon SageMaker JumpStart",
+      "url": "https://aws.amazon.com/blogs/machine-learning/metas-muse-spark-open-now-available-in-amazon-sagemaker-jumpstart/",
+      "publisher": "AWS",
+      "type": "csp-blog",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "openai-help-text-provenance",
+      "title": "Provenance signals in OpenAI-generated content",
+      "url": "https://help.openai.com/en/articles/8912793-text-watermarking",
+      "publisher": "OpenAI",
+      "type": "vendor-doc",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "ms-decision-1-announce",
+      "title": "Introducing Microsoft-Decision-1, our model for fast decision-making",
+      "url": "https://commandline.microsoft.com/microsoft-decision-1-model-foundry/",
+      "publisher": "Microsoft",
+      "type": "csp-blog",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "ms-foundry-catalog-decision-1",
+      "title": "Microsoft-Decision-1 (Foundry model catalog)",
+      "url": "https://ai.azure.com/catalog/models/Microsoft-Decision-1",
+      "publisher": "Microsoft",
+      "type": "csp-doc",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "ms-foundry-catalog-haiku55",
+      "title": "claude-haiku-5-5 (Foundry model catalog)",
+      "url": "https://ai.azure.com/catalog/models/claude-haiku-5-5",
+      "publisher": "Microsoft",
+      "type": "csp-doc",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "ms-foundry-whats-new-sep2026",
+      "title": "What's new in Microsoft Foundry | September 2026",
+      "url": "https://devblogs.microsoft.com/foundry/whats-new-in-microsoft-foundry-september-2026/",
+      "publisher": "Microsoft",
+      "type": "csp-blog",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "ms-foundry-lifecycle-retirement-enus",
+      "title": "Model lifecycle and retirement (Foundry)",
+      "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/model-lifecycle-retirement",
+      "publisher": "Microsoft",
+      "type": "csp-doc",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "gcp-blog-gemini-4-argon",
+      "title": "Gemini 4 Argon available on Google Cloud, built to help solve your business' hardest problems",
+      "url": "https://cloud.google.com/blog/products/ai-machine-learning/gemini-4-argon-available-on-google-cloud",
+      "publisher": "Google Cloud",
+      "type": "csp-blog",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "gemini-api-argon-latest",
+      "title": "What's new in Gemini 4 Argon",
+      "url": "https://ai.google.dev/gemini-api/docs/latest-model",
+      "publisher": "Google",
+      "type": "vendor-doc",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "gemini-api-argon-model",
+      "title": "Gemini 4 Argon (Gemini API model page)",
+      "url": "https://ai.google.dev/gemini-api/docs/models/gemini-4-argon",
+      "publisher": "Google",
+      "type": "vendor-doc",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "agentplatform-deepseek-v41-flash",
+      "title": "DeepSeek-V4.1-Flash | Gemini Enterprise Agent Platform",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/maas/deepseek/deepseek-v41-flash",
+      "publisher": "Google Cloud",
+      "type": "csp-doc",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "agentplatform-grok-4-7",
+      "title": "Grok 4.7 | Gemini Enterprise Agent Platform",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/partner-models/grok/grok-4-7",
+      "publisher": "Google Cloud",
+      "type": "csp-doc",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-v1-106-0",
+      "title": "v1.106.0: Claude Haiku 5.5, Lens Rust Service, Admin Home Page & MCP Rate Limits",
+      "url": "https://docs.litellm.ai/release_notes/v1.106.0/v1-106-0",
+      "publisher": "LiteLLM",
+      "type": "vendor-doc",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-v1-104-3",
+      "title": "v1.104.3 - Decisions Providers, SDK and Guardrail",
+      "url": "https://docs.litellm.ai/release_notes/v1.104.3/v1-104-3",
+      "publisher": "LiteLLM",
+      "type": "vendor-doc",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-v1-103-5",
+      "title": "v1.103.5 - Responses API Tool Call Fixes",
+      "url": "https://docs.litellm.ai/release_notes/v1.103.5/v1-103-5",
+      "publisher": "LiteLLM",
+      "type": "vendor-doc",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-gh-v1-104-4",
+      "title": "Release v1.104.4 · BerriAI/litellm",
+      "url": "https://github.com/BerriAI/litellm/releases/tag/v1.104.4",
+      "publisher": "BerriAI",
+      "type": "github",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "hf-step5-preview",
+      "title": "stepfun-ai/Step-5-Preview",
+      "url": "https://huggingface.co/stepfun-ai/Step-5-Preview",
+      "publisher": "Hugging Face",
+      "type": "community",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "ifanr-step5-weights",
+      "title": "10 月 15 日，星期四（ifanr 早報：階躍開放 Step 5 Preview 權重）",
+      "url": "https://www.ifanr.com/digest/1684406",
+      "publisher": "ifanr 愛范兒",
+      "type": "news",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "hf-beam-1",
+      "title": "reflection/Beam-1.0-501B-A23B",
+      "url": "https://huggingface.co/reflection/Beam-1.0-501B-A23B",
+      "publisher": "Hugging Face",
+      "type": "community",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "siliconangle-beam-weights",
+      "title": "Reflection AI open-sources Beam's weights, post-training recipes",
+      "url": "https://siliconangle.com/2026/10/16/reflection-ai-open-sources-beams-weights-post-training-recipes/",
+      "publisher": "SiliconANGLE",
+      "type": "news",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "hf-muse-spark-open",
+      "title": "meta-models/Muse-Spark-Open-816B-A42B",
+      "url": "https://huggingface.co/meta-models/Muse-Spark-Open-816B-A42B",
+      "publisher": "Hugging Face",
+      "type": "community",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "hf-deepseek-v41-flash-1017",
+      "title": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash-1017",
+      "publisher": "Hugging Face",
+      "type": "community",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "hf-mistral-large-4",
+      "title": "Mistral Large 4 (planned artifacts page)",
+      "url": "https://huggingface.co/mistralai/Mistral-Large-4-1T-A52B",
+      "publisher": "Hugging Face",
+      "type": "community",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "mistral-docs-large-4",
+      "title": "Mistral Large 4 (model docs)",
+      "url": "https://docs.mistral.ai/models/mistral-large-4-0.md",
+      "publisher": "Mistral AI",
+      "type": "vendor-doc",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "fireworks-muse-spark-open",
+      "title": "Muse Spark Open (Fireworks model page)",
+      "url": "https://fireworks.ai/models/fireworks/muse-spark-open",
+      "publisher": "Fireworks AI",
+      "type": "vendor-doc",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "fsc-agentic-ai-consult-20261013",
+      "title": "金管會發布「金融業運用代理AI安全諮詢文件」，徵詢各界意見",
+      "url": "https://www.fsc.gov.tw/ch/home.jsp?id=96&parentpath=0,2&mcustomize=news_view.jsp&dataserno=202610130003&dtable=News",
+      "publisher": "金融監督管理委員會",
+      "type": "regulator",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "fsc-ai-survey-20261015",
+      "title": "115年金融業應用人工智慧(AI)調查結果",
+      "url": "https://www.fsc.gov.tw/ch/home.jsp?id=96&parentpath=0,2&mcustomize=news_view.jsp&dataserno=202610150002&dtable=News",
+      "publisher": "金融監督管理委員會",
+      "type": "regulator",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "cna-fsc-agentic-ai",
+      "title": "盯新興風險 金管會發布金融業運用代理AI諮詢文件",
+      "url": "https://cna.com.tw/news/afe/202610130306.aspx",
+      "publisher": "中央社",
+      "type": "news",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "ithome-fsc-agentic-ai",
+      "title": "金管會擬推出金融業代理AI安全指引",
+      "url": "https://www.ithome.com.tw/news/179681",
+      "publisher": "iThome",
+      "type": "news",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "eu-ai-scientific-panel-special",
+      "title": "Special meeting of the AI Scientific Panel",
+      "url": "https://digital-strategy.ec.europa.eu/en/news/special-meeting-ai-scientific-panel",
+      "publisher": "European Commission",
+      "type": "regulator",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "dealroom-eu-loss-of-control-probe",
+      "title": "EU opens probe into AI 'loss-of-control' incidents",
+      "url": "https://dealroom.co/news/162389-eu-opens-probe-into-ai-loss-of-control-incidents/",
+      "publisher": "Dealroom News",
+      "type": "news",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "pbs-china-ai-export-controls",
+      "title": "China says it will curb tech exports, including AI, citing national security risks",
+      "url": "https://www.pbs.org/newshour/world/china-says-it-will-curb-tech-exports-including-ai-citing-national-security-risks",
+      "publisher": "PBS NewsHour (AP)",
+      "type": "news",
+      "accessed": "2026-10-20"
+    },
+    {
+      "id": "taipeitimes-china-ai-export",
+      "title": "China proposes AI export curbs to manage security",
+      "url": "https://www.taipeitimes.com/News/biz/archives/2026/10/17/2003866098",
+      "publisher": "Taipei Times (Bloomberg)",
+      "type": "news",
+      "accessed": "2026-10-20"
     }
   ]
 }

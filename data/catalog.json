@@ -10284,7 +10284,7 @@
       "vendor": "google",
       "status": "limited-preview",
       "expected": "未公布",
-      "note": "已宣布但沒有 GA 日期與公開價格。 2026-10-06 查：Gemini API 的 models 頁仍沒有 3.5 Pro，Agent Platform 的模型版本頁與定價頁也沒有；DeepMind 的 Pro 頁仍寫「3.5 Pro coming soon」。Google 已先發表 Gemini 4 Argon。 2026-10-15 查：DeepMind 的 Pro 頁仍寫「3.5 Pro coming soon」；Gemini API models 頁（2026-10-13 更新）與 Agent Platform 模型版本頁都沒有 3.5 Pro。Google 已於 2026-10-13 讓 Gemini 4 Argon GA（見目錄）。",
+      "note": "已宣布但沒有 GA 日期與公開價格。 2026-10-06 查：Gemini API 的 models 頁仍沒有 3.5 Pro，Agent Platform 的模型版本頁與定價頁也沒有；DeepMind 的 Pro 頁仍寫「3.5 Pro coming soon」。Google 已先發表 Gemini 4 Argon。 2026-10-15 查：DeepMind 的 Pro 頁仍寫「3.5 Pro coming soon」；Gemini API models 頁（2026-10-13 更新）與 Agent Platform 模型版本頁都沒有 3.5 Pro。Google 已於 2026-10-13 讓 Gemini 4 Argon GA（見目錄）。 2026-10-20 查：Agent Platform 的模型版本頁（10-19 更新）與 Gemini API changelog（最新 10-13）都沒有 3.5 Pro；Google 已先讓 Gemini 4 Argon GA。",
       "sources": [
         {
           "id": "capitalandcompute-sept"
@@ -10303,6 +10303,9 @@
         },
         {
           "id": "google-agentplatform-model-versions"
+        },
+        {
+          "id": "google-gemini-api-changelog"
         }
       ]
     },
@@ -10311,7 +10314,7 @@
       "vendor": "deepseek",
       "status": "limited-preview",
       "expected": "未公布",
-      "note": "Microsoft 貼文（2026-09-23，09-25 修訂）：Direct from Azure 為 public preview、Fireworks on Foundry 為 GA；文字 + 影像輸入、1M context、reasoning effort 1–100。價格（input / output / cache，每百萬 token）：Direct Global Standard $0.3 / $1.2 / $0.006、Fireworks $0.37 / $1.50 / $0.007。模型目錄（2026-10-02 查）：兩種部署都只有 Global Standard，29 個區域，APAC 為 australiaeast、japaneast、japanwest、koreacentral、southindia，沒有 Data Zone；中繼資料 inferenceDeprecationDate 為 Direct 2026-12-15、Fireworks 2027-09-15。退役表沒有這個模型的列。 2026-10-06 查：Foundry 模型目錄頁仍為 version 2026-09-10、Lifecycle Preview、Direct from Azure；退役表、Azure 直售模型頁與夥伴模型頁都沒有這個模型的列。LiteLLM v1.105.0rc1 的 release notes 列有 Azure 直售價的 cost map 修正（PR #43566）；issue #43473（兩條 Foundry 路徑都以 $0.375 / $1.50 計價）的狀態本期讀不到。 2026-10-11 複查：Direct from Azure 的目錄頁仍是 Lifecycle Preview（version 2026-09-10）；Fireworks on Foundry 的 FW-DeepSeek-V4.1-Flash 已是 GA（按 token 計費，見「開源模型」頁）。",
+      "note": "Microsoft 貼文（2026-09-23，09-25 修訂）：Direct from Azure 為 public preview、Fireworks on Foundry 為 GA；文字 + 影像輸入、1M context、reasoning effort 1–100。價格（input / output / cache，每百萬 token）：Direct Global Standard $0.3 / $1.2 / $0.006、Fireworks $0.37 / $1.50 / $0.007。模型目錄（2026-10-02 查）：兩種部署都只有 Global Standard，29 個區域，APAC 為 australiaeast、japaneast、japanwest、koreacentral、southindia，沒有 Data Zone；中繼資料 inferenceDeprecationDate 為 Direct 2026-12-15、Fireworks 2027-09-15。退役表沒有這個模型的列。 2026-10-06 查：Foundry 模型目錄頁仍為 version 2026-09-10、Lifecycle Preview、Direct from Azure；退役表、Azure 直售模型頁與夥伴模型頁都沒有這個模型的列。LiteLLM v1.105.0rc1 的 release notes 列有 Azure 直售價的 cost map 修正（PR #43566）；issue #43473（兩條 Foundry 路徑都以 $0.375 / $1.50 計價）的狀態本期讀不到。 2026-10-11 複查：Direct from Azure 的目錄頁仍是 Lifecycle Preview（version 2026-09-10）；Fireworks on Foundry 的 FW-DeepSeek-V4.1-Flash 已是 GA（按 token 計費，見「開源模型」頁）。 2026-10-20 查：Foundry 模型目錄仍是 Version 2026-09-10、Lifecycle Preview，沒有價格與區域；Fireworks on Foundry 的 FW-DeepSeek-V4.1-Flash 是 GA。Agent Platform 10-14 另有 deepseek-v4.1-flash-maas（Public Preview）。",
       "sources": [
         {
           "id": "ms-techcommunity-deepseek-v41"
@@ -10333,6 +10336,12 @@
         },
         {
           "id": "ms-foundry-catalog-deepseek-v41"
+        },
+        {
+          "id": "ms-foundry-fireworks-models"
+        },
+        {
+          "id": "agentplatform-deepseek-v41-flash"
         }
       ]
     },
@@ -10341,7 +10350,7 @@
       "vendor": "openai",
       "status": "rumoured",
       "expected": "未公布",
-      "note": "2026-10-06 查：OpenAI 官方仍未發布（models、changelog、pricing 與 deprecations 頁都沒有；changelog 最新是 10-05 的 HIPAA BAA 流程；cyber 模型仍是 gpt-5.6-cyber，另有 gpt-daybreak-red-latest / gpt-daybreak-blue-latest 別名）。PYMNTS 2026-09-25 引述 Fortune：OpenAI 準備推出 GPT-6 Cyber 與資安 gateway 產品，無日期、價格與平台資訊。openai.com 的 news 頁本期讀不到（403）。 2026-10-15 查：OpenAI models 頁的資安模型仍是 gpt-5.6-cyber（Daybreak Red 另行核准存取），沒有 GPT-6 Cyber；changelog 也沒有。",
+      "note": "2026-10-06 查：OpenAI 官方仍未發布（models、changelog、pricing 與 deprecations 頁都沒有；changelog 最新是 10-05 的 HIPAA BAA 流程；cyber 模型仍是 gpt-5.6-cyber，另有 gpt-daybreak-red-latest / gpt-daybreak-blue-latest 別名）。PYMNTS 2026-09-25 引述 Fortune：OpenAI 準備推出 GPT-6 Cyber 與資安 gateway 產品，無日期、價格與平台資訊。openai.com 的 news 頁本期讀不到（403）。 2026-10-15 查：OpenAI models 頁的資安模型仍是 gpt-5.6-cyber（Daybreak Red 另行核准存取），沒有 GPT-6 Cyber；changelog 也沒有。 2026-10-20 查：OpenAI API changelog（最新 10-16）、deprecations 頁都沒有 GPT-6 Cyber；只有 9 月下旬的媒體報導（Fortune 轉述）。",
       "sources": [
         {
           "id": "fortune-gpt6-cyber"
@@ -10360,6 +10369,9 @@
         },
         {
           "id": "openai-pricing"
+        },
+        {
+          "id": "openai-deprecations"
         }
       ]
     },
@@ -10367,8 +10379,8 @@
       "name": "Mistral Large 4",
       "vendor": "mistral",
       "status": "limited-preview",
-      "expected": "權重：官方稱 2026 年 10 月底前釋出；三雲上架未公布",
-      "note": "Mistral 2026-10-06 發表的 public preview（官方暱稱 le Chonk）：1 兆參數、49B active 的原生多模態 open-weight 模型。目前只有 Mistral Studio 的 preview API，權重「by the end of the month」釋出；發表頁的模型卡列價為 input $1.36、output $4.18（每百萬 token，Mistral 自家 API）。發表文沒有提到 Bedrock、Foundry 或 Agent Platform。官方自述強項是資安（稱在 Artificial Analysis Cyber Index 進全球前五、其中重現並修補真實漏洞的測試得 82%）、agentic coding 與視覺 grounding，並稱訓練與 preview 都在自家歐洲資料中心——以上都是廠商自報。Artificial Analysis 10-06 的評測紀錄為 Mistral Large 4 Preview：Intelligence Index 38（GPT-6 Luna 為 38、Gemini 3.8 Flash 為 41）。追蹤重點：權重釋出後是否由 Bedrock / Foundry / Agent Platform 代管，以及授權條款。2026-10-06 首次收錄。 2026-10-11：Hugging Face 仍沒有權重；OpenRouter 已上架 preview API（mistralai/mistral-large-4-0）。 2026-10-15 查：發表頁仍寫權重 end of the month 釋出；Hugging Face 的 mistralai 組織頁沒有 Mistral Large 4（最新的 Large 仍是 Mistral-Large-3）。",
+      "expected": "權重：Hugging Face 頁 ETA 2026-10-31；三雲上架未公布",
+      "note": "Mistral 2026-10-06 發表的 public preview（官方暱稱 le Chonk）：1 兆參數、49B active 的原生多模態 open-weight 模型。目前只有 Mistral Studio 的 preview API，權重「by the end of the month」釋出；發表頁的模型卡列價為 input $1.36、output $4.18（每百萬 token，Mistral 自家 API）。發表文沒有提到 Bedrock、Foundry 或 Agent Platform。官方自述強項是資安（稱在 Artificial Analysis Cyber Index 進全球前五、其中重現並修補真實漏洞的測試得 82%）、agentic coding 與視覺 grounding，並稱訓練與 preview 都在自家歐洲資料中心——以上都是廠商自報。Artificial Analysis 10-06 的評測紀錄為 Mistral Large 4 Preview：Intelligence Index 38（GPT-6 Luna 為 38、Gemini 3.8 Flash 為 41）。追蹤重點：權重釋出後是否由 Bedrock / Foundry / Agent Platform 代管，以及授權條款。2026-10-06 首次收錄。 2026-10-11：Hugging Face 仍沒有權重；OpenRouter 已上架 preview API（mistralai/mistral-large-4-0）。 2026-10-15 查：發表頁仍寫權重 end of the month 釋出；Hugging Face 的 mistralai 組織頁沒有 Mistral Large 4（最新的 Large 仍是 Mistral-Large-3）。 2026-10-20 查：Hugging Face 只有「Planned artifacts」頁（ETA October 31, 2026，未列授權）；Mistral 文件仍寫 Public Preview、權重 Coming soon，規格寫 1.05T total / 52B active、1M context（與 10-06 發表頁的 1T / 49B、Artificial Analysis 與 OpenRouter 標的 524K 不同）。三雲都沒有。",
       "sources": [
         {
           "id": "mistral-large-4-announce"
@@ -10387,27 +10399,12 @@
         },
         {
           "id": "hf-mistralai-org"
-        }
-      ]
-    },
-    {
-      "name": "Reflection AI Beam",
-      "vendor": "other",
-      "status": "limited-preview",
-      "expected": "權重：官方稱 2026 年 10 月內釋出（Apache 2.0）；三雲代管未公布",
-      "note": "501B（23B active）text-only MoE、1M context，2026-10-05 發表，目前只有 early access API。2026-10-11 複查：Hugging Face 仍查不到權重，Bedrock、Foundry、Agent Platform 都沒有。官方 benchmark 為廠商自述、未經獨立驗證；市場訊號見「開源模型」頁。 2026-10-15 查：Hugging Face 的 reflection 組織仍是 models 0（None public yet）。",
-      "sources": [
-        {
-          "id": "reflection-beam-announce"
         },
         {
-          "id": "techcrunch-reflection-beam-2026-10-05"
+          "id": "hf-mistral-large-4"
         },
         {
-          "id": "aws-bedrock-model-cards"
-        },
-        {
-          "id": "huggingface-reflection-org"
+          "id": "mistral-docs-large-4"
         }
       ]
     },
