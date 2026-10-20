@@ -1,0 +1,2793 @@
+{
+  "schema": "compat-run/v1",
+  "kind": "gateway-csp",
+  "runId": "gwcsp-20261020T151329Z-adccd4",
+  "startedAt": "2026-10-20T15:13:29.239738Z",
+  "finishedAt": "2026-10-20T15:14:04.087923Z",
+  "gateway": "http://127.0.0.1:4171/v1",
+  "baseline": "direct",
+  "routes": [
+    "mock-aws-claude~gw.silent-forced~drop-tools-stream",
+    "mock-azure-gpt~no-temp~gw.no-cost",
+    "mock-gcp-gemini~no-schema~gw.err500~slow-gw",
+    "mock-gcp-claude~gw.fallback"
+  ],
+  "routeInfo": [
+    {
+      "route": "mock-aws-claude~gw.silent-forced~drop-tools-stream",
+      "csp": "aws",
+      "service": "bedrock",
+      "region": "ap-northeast-1",
+      "litellmModel": "bedrock/global.anthropic.mock-claude",
+      "direct": {
+        "protocol": "anthropic-messages",
+        "host": "127.0.0.1"
+      }
+    },
+    {
+      "route": "mock-azure-gpt~no-temp~gw.no-cost",
+      "csp": "azure",
+      "service": "foundry",
+      "region": "eastus2",
+      "litellmModel": "azure/mock-gpt",
+      "direct": {
+        "protocol": "openai-chat",
+        "host": "127.0.0.1"
+      }
+    },
+    {
+      "route": "mock-gcp-gemini~no-schema~gw.err500~slow-gw",
+      "csp": "gcp",
+      "service": "agent-platform",
+      "region": "global",
+      "litellmModel": "vertex_ai/mock-gemini",
+      "direct": {
+        "protocol": "openai-chat",
+        "host": "127.0.0.1"
+      }
+    },
+    {
+      "route": "mock-gcp-claude~gw.fallback",
+      "csp": "gcp",
+      "service": "agent-platform",
+      "region": "us-east5",
+      "litellmModel": "vertex_ai/mock-claude",
+      "direct": {
+        "protocol": "anthropic-messages",
+        "host": "127.0.0.1"
+      }
+    }
+  ],
+  "cases": [
+    {
+      "id": "chat.basic",
+      "title": "Chat Completions 基本回應",
+      "required": true,
+      "surface": "chat"
+    },
+    {
+      "id": "chat.system",
+      "title": "System prompt",
+      "required": false,
+      "surface": "chat"
+    },
+    {
+      "id": "chat.stream",
+      "title": "串流（SSE）",
+      "required": true,
+      "surface": "streaming"
+    },
+    {
+      "id": "chat.stream_usage",
+      "title": "串流 usage（stream_options.include_usage）",
+      "required": false,
+      "surface": "streaming"
+    },
+    {
+      "id": "params.max_tokens",
+      "title": "max_tokens 參數",
+      "required": true,
+      "surface": "parameters"
+    },
+    {
+      "id": "params.max_completion_tokens",
+      "title": "max_completion_tokens 參數",
+      "required": false,
+      "surface": "parameters"
+    },
+    {
+      "id": "params.temperature",
+      "title": "temperature=0（reasoning 模型常拒收，gateway 應丟棄）",
+      "required": false,
+      "surface": "parameters"
+    },
+    {
+      "id": "params.reasoning_effort",
+      "title": "reasoning_effort=low",
+      "required": false,
+      "surface": "reasoning"
+    },
+    {
+      "id": "tools.auto",
+      "title": "Tool calling（tool_choice=auto）",
+      "required": true,
+      "surface": "tools"
+    },
+    {
+      "id": "tools.forced",
+      "title": "Forced tool_choice（指定函式）",
+      "required": false,
+      "surface": "tools"
+    },
+    {
+      "id": "structured.json_schema",
+      "title": "Structured output（response_format json_schema）",
+      "required": false,
+      "surface": "structured-output"
+    },
+    {
+      "id": "vision.image",
+      "title": "影像輸入（data URL）",
+      "required": false,
+      "surface": "vision"
+    },
+    {
+      "id": "usage.cache",
+      "title": "Prompt caching（重複長前綴，第二次應有 cached tokens）",
+      "required": false,
+      "surface": "prompt-caching"
+    },
+    {
+      "id": "responses.basic",
+      "title": "Responses API（/v1/responses）",
+      "required": false,
+      "surface": "responses-api"
+    },
+    {
+      "id": "responses.tools",
+      "title": "Responses API + function tool",
+      "required": false,
+      "surface": "responses-api"
+    },
+    {
+      "id": "messages.basic",
+      "title": "Anthropic Messages（/v1/messages）",
+      "required": false,
+      "surface": "messages-api"
+    },
+    {
+      "id": "meta.response_model",
+      "title": "回應的 model 欄位（偵測 fallback / alias）",
+      "required": false,
+      "surface": "observability"
+    },
+    {
+      "id": "stream.finish",
+      "title": "串流結尾（finish_reason 與 [DONE]）",
+      "required": true,
+      "surface": "streaming"
+    },
+    {
+      "id": "stream.tools",
+      "title": "串流 tool call（delta 組回完整 JSON）",
+      "required": false,
+      "surface": "tools"
+    },
+    {
+      "id": "gw.cost_header",
+      "title": "成本追蹤（x-litellm-response-cost）",
+      "required": false,
+      "surface": "observability"
+    },
+    {
+      "id": "gw.no_fallback",
+      "title": "沒有偷偷 fallback（x-litellm-attempted-fallbacks）",
+      "required": false,
+      "surface": "observability"
+    },
+    {
+      "id": "err.invalid_max_tokens",
+      "title": "錯誤對應：max_tokens = -1 應回 4xx",
+      "required": false,
+      "surface": "error-mapping"
+    },
+    {
+      "id": "err.unknown_tool",
+      "title": "錯誤對應：指定不存在的工具應回 4xx",
+      "required": false,
+      "surface": "error-mapping"
+    },
+    {
+      "id": "err.bad_image",
+      "title": "錯誤對應：壞掉的影像應回 4xx",
+      "required": false,
+      "surface": "error-mapping"
+    }
+  ],
+  "results": [
+    {
+      "route": "mock-aws-claude~gw.silent-forced~drop-tools-stream",
+      "caseId": "chat.basic",
+      "surface": "chat",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 74.8,
+      "detail": "非空回應",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 8,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 92.9,
+        "detail": "非空回應"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-aws-claude~gw.silent-forced~drop-tools-stream",
+      "caseId": "chat.system",
+      "surface": "chat",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 111.9,
+      "detail": "非空回應",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 12,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 96.0,
+        "detail": "非空回應"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-aws-claude~gw.silent-forced~drop-tools-stream",
+      "caseId": "chat.stream",
+      "surface": "streaming",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 333.0,
+      "detail": "17 chunks",
+      "ttftMs": 72.0,
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "direct": {
+        "status": "skip",
+        "detail": "原生 API 沒有對應的請求（gateway 才有的轉換）"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-aws-claude~gw.silent-forced~drop-tools-stream",
+      "caseId": "chat.stream_usage",
+      "surface": "streaming",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 334.9,
+      "detail": "usage={'prompt_tokens': 1, 'completion_tokens': 17, 'total_tokens': 18, 'completion_tokens_details': {'reasoning_tokens': 0}, 'prompt_tokens_details': {'cached_tokens': 0}}",
+      "ttftMs": 72.3,
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 1,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "skip",
+        "detail": "原生 API 沒有對應的請求（gateway 才有的轉換）"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-aws-claude~gw.silent-forced~drop-tools-stream",
+      "caseId": "params.max_tokens",
+      "surface": "parameters",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 73.1,
+      "detail": "accepted",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 1,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 94.4,
+        "detail": "accepted"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-aws-claude~gw.silent-forced~drop-tools-stream",
+      "caseId": "params.max_completion_tokens",
+      "surface": "parameters",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 116.0,
+      "detail": "accepted",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 1,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 96.2,
+        "detail": "accepted"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-aws-claude~gw.silent-forced~drop-tools-stream",
+      "caseId": "params.temperature",
+      "surface": "parameters",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 115.6,
+      "detail": "accepted or dropped by gateway",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 1,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 96.3,
+        "detail": "accepted or dropped by gateway"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-aws-claude~gw.silent-forced~drop-tools-stream",
+      "caseId": "params.reasoning_effort",
+      "surface": "reasoning",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 118.7,
+      "detail": "accepted",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 7,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "skip",
+        "detail": "原生 API 沒有對應的請求（gateway 才有的轉換）"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-aws-claude~gw.silent-forced~drop-tools-stream",
+      "caseId": "tools.auto",
+      "surface": "tools",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 116.8,
+      "detail": "有 tool_calls",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 13,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 99.1,
+        "detail": "有 tool_calls"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-aws-claude~gw.silent-forced~drop-tools-stream",
+      "caseId": "tools.forced",
+      "surface": "tools",
+      "status": "fail",
+      "httpStatus": 200,
+      "latencyMs": 115.7,
+      "detail": "HTTP 200 但沒有 tool_calls：forced tool_choice 可能被 gateway 靜默降級為 auto",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 1,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 96.2,
+        "detail": "有 tool_calls"
+      },
+      "attribution": "gateway",
+      "silent": true
+    },
+    {
+      "route": "mock-aws-claude~gw.silent-forced~drop-tools-stream",
+      "caseId": "structured.json_schema",
+      "surface": "structured-output",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 115.3,
+      "detail": "符合 schema 必填欄位",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 7,
+        "completionTokens": 4,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "skip",
+        "detail": "原生 API 沒有對應的請求（gateway 才有的轉換）"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-aws-claude~gw.silent-forced~drop-tools-stream",
+      "caseId": "vision.image",
+      "surface": "vision",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 115.9,
+      "detail": "非空回應",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 9,
+        "completionTokens": 1,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 96.3,
+        "detail": "非空回應"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-aws-claude~gw.silent-forced~drop-tools-stream",
+      "caseId": "usage.cache",
+      "surface": "prompt-caching",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 115.8,
+      "detail": "cached_tokens=4099",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 4102,
+        "completionTokens": 17,
+        "cachedTokens": 4099
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 95.7,
+        "detail": "cached_tokens=4099"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-aws-claude~gw.silent-forced~drop-tools-stream",
+      "caseId": "responses.basic",
+      "surface": "responses-api",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 64.1,
+      "detail": "有 output_text",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "direct": {
+        "status": "skip",
+        "detail": "原生 API 沒有對應的請求（gateway 才有的轉換）"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-aws-claude~gw.silent-forced~drop-tools-stream",
+      "caseId": "responses.tools",
+      "surface": "responses-api",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 63.6,
+      "detail": "有 function_call",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "direct": {
+        "status": "skip",
+        "detail": "原生 API 沒有對應的請求（gateway 才有的轉換）"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-aws-claude~gw.silent-forced~drop-tools-stream",
+      "caseId": "messages.basic",
+      "surface": "messages-api",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 63.9,
+      "detail": "stop_reason=end_turn",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 95.8,
+        "detail": "stop_reason=end_turn"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-aws-claude~gw.silent-forced~drop-tools-stream",
+      "caseId": "meta.response_model",
+      "surface": "observability",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 115.5,
+      "detail": "response.model=mock-aws-claude~silent-forced~drop-tools-stream",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 1,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-aws-claude~gw.silent-forced~drop-tools-stream",
+      "caseId": "stream.finish",
+      "surface": "streaming",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 332.7,
+      "detail": "finish_reason=stop · [DONE]",
+      "ttftMs": 71.9,
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "direct": {
+        "status": "skip",
+        "detail": "原生 API 沒有對應的請求（gateway 才有的轉換）"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-aws-claude~gw.silent-forced~drop-tools-stream",
+      "caseId": "stream.tools",
+      "surface": "tools",
+      "status": "fail",
+      "httpStatus": 200,
+      "latencyMs": 333.9,
+      "detail": "串流裡沒有 tool_call delta",
+      "ttftMs": 72.2,
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "direct": {
+        "status": "skip",
+        "detail": "原生 API 沒有對應的請求（gateway 才有的轉換）"
+      },
+      "attribution": "unknown",
+      "silent": true
+    },
+    {
+      "route": "mock-aws-claude~gw.silent-forced~drop-tools-stream",
+      "caseId": "gw.cost_header",
+      "surface": "observability",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 72.6,
+      "detail": "x-litellm-response-cost=0.000123",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 1,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-aws-claude~gw.silent-forced~drop-tools-stream",
+      "caseId": "gw.no_fallback",
+      "surface": "observability",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 112.2,
+      "detail": "沒有 fallback · model=mock-aws-claude~silent-forced~drop-tools-stream",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 1,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-aws-claude~gw.silent-forced~drop-tools-stream",
+      "caseId": "err.invalid_max_tokens",
+      "surface": "error-mapping",
+      "status": "pass",
+      "httpStatus": 400,
+      "latencyMs": 64.0,
+      "detail": "HTTP 400",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 400,
+        "latencyMs": 43.8,
+        "detail": "HTTP 400"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-aws-claude~gw.silent-forced~drop-tools-stream",
+      "caseId": "err.unknown_tool",
+      "surface": "error-mapping",
+      "status": "pass",
+      "httpStatus": 400,
+      "latencyMs": 63.7,
+      "detail": "HTTP 400",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 400,
+        "latencyMs": 43.9,
+        "detail": "HTTP 400"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-aws-claude~gw.silent-forced~drop-tools-stream",
+      "caseId": "err.bad_image",
+      "surface": "error-mapping",
+      "status": "pass",
+      "httpStatus": 400,
+      "latencyMs": 63.9,
+      "detail": "HTTP 400",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 400,
+        "latencyMs": 44.0,
+        "detail": "HTTP 400"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-azure-gpt~no-temp~gw.no-cost",
+      "caseId": "chat.basic",
+      "surface": "chat",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 115.8,
+      "detail": "非空回應",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "usage": {
+        "promptTokens": 8,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 95.9,
+        "detail": "非空回應"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-azure-gpt~no-temp~gw.no-cost",
+      "caseId": "chat.system",
+      "surface": "chat",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 115.9,
+      "detail": "非空回應",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "usage": {
+        "promptTokens": 12,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 92.7,
+        "detail": "非空回應"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-azure-gpt~no-temp~gw.no-cost",
+      "caseId": "chat.stream",
+      "surface": "streaming",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 336.1,
+      "detail": "17 chunks",
+      "ttftMs": 72.3,
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 314.5,
+        "detail": "17 chunks",
+        "ttftMs": 51.8
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-azure-gpt~no-temp~gw.no-cost",
+      "caseId": "chat.stream_usage",
+      "surface": "streaming",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 333.9,
+      "detail": "usage={'prompt_tokens': 1, 'completion_tokens': 17, 'total_tokens': 18, 'completion_tokens_details': {'reasoning_tokens': 0}, 'prompt_tokens_details': {'cached_tokens': 0}}",
+      "ttftMs": 72.4,
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "usage": {
+        "promptTokens": 1,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 313.6,
+        "detail": "usage={'prompt_tokens': 1, 'completion_tokens': 17, 'total_tokens': 18, 'completion_tokens_details': {'reasoning_tokens': 0}, 'prompt_tokens_details': {'cached_tokens': 0}}",
+        "ttftMs": 51.7
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-azure-gpt~no-temp~gw.no-cost",
+      "caseId": "params.max_tokens",
+      "surface": "parameters",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 72.6,
+      "detail": "accepted",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "usage": {
+        "promptTokens": 1,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 94.6,
+        "detail": "accepted"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-azure-gpt~no-temp~gw.no-cost",
+      "caseId": "params.max_completion_tokens",
+      "surface": "parameters",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 115.8,
+      "detail": "accepted",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "usage": {
+        "promptTokens": 1,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 96.4,
+        "detail": "accepted"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-azure-gpt~no-temp~gw.no-cost",
+      "caseId": "params.temperature",
+      "surface": "parameters",
+      "status": "fail",
+      "httpStatus": 400,
+      "latencyMs": 63.5,
+      "detail": "{\"error\": {\"message\": \"Unsupported parameter: 'temperature'\", \"type\": \"invalid_request_error\", \"code\": \"400\"}}",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "direct": {
+        "status": "fail",
+        "httpStatus": 400,
+        "latencyMs": 43.9,
+        "detail": "{\"error\": {\"message\": \"Unsupported parameter: 'temperature'\", \"type\": \"invalid_request_error\", \"code\": \"400\"}}"
+      },
+      "attribution": "provider"
+    },
+    {
+      "route": "mock-azure-gpt~no-temp~gw.no-cost",
+      "caseId": "params.reasoning_effort",
+      "surface": "reasoning",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 115.7,
+      "detail": "accepted",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "usage": {
+        "promptTokens": 7,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 95.9,
+        "detail": "accepted"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-azure-gpt~no-temp~gw.no-cost",
+      "caseId": "tools.auto",
+      "surface": "tools",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 116.1,
+      "detail": "有 tool_calls",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "usage": {
+        "promptTokens": 13,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 95.8,
+        "detail": "有 tool_calls"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-azure-gpt~no-temp~gw.no-cost",
+      "caseId": "tools.forced",
+      "surface": "tools",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 115.7,
+      "detail": "有 tool_calls",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "usage": {
+        "promptTokens": 1,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 95.9,
+        "detail": "有 tool_calls"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-azure-gpt~no-temp~gw.no-cost",
+      "caseId": "structured.json_schema",
+      "surface": "structured-output",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 115.8,
+      "detail": "符合 schema 必填欄位",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "usage": {
+        "promptTokens": 7,
+        "completionTokens": 4,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 95.7,
+        "detail": "符合 schema 必填欄位"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-azure-gpt~no-temp~gw.no-cost",
+      "caseId": "vision.image",
+      "surface": "vision",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 115.8,
+      "detail": "非空回應",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "usage": {
+        "promptTokens": 9,
+        "completionTokens": 1,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 95.9,
+        "detail": "非空回應"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-azure-gpt~no-temp~gw.no-cost",
+      "caseId": "usage.cache",
+      "surface": "prompt-caching",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 115.9,
+      "detail": "cached_tokens=4099",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "usage": {
+        "promptTokens": 4102,
+        "completionTokens": 17,
+        "cachedTokens": 4099
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 96.0,
+        "detail": "cached_tokens=4099"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-azure-gpt~no-temp~gw.no-cost",
+      "caseId": "responses.basic",
+      "surface": "responses-api",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 63.7,
+      "detail": "有 output_text",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "direct": {
+        "status": "skip",
+        "detail": "原生 API 沒有對應的請求（gateway 才有的轉換）"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-azure-gpt~no-temp~gw.no-cost",
+      "caseId": "responses.tools",
+      "surface": "responses-api",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 63.7,
+      "detail": "有 function_call",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "direct": {
+        "status": "skip",
+        "detail": "原生 API 沒有對應的請求（gateway 才有的轉換）"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-azure-gpt~no-temp~gw.no-cost",
+      "caseId": "messages.basic",
+      "surface": "messages-api",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 64.0,
+      "detail": "stop_reason=end_turn",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "direct": {
+        "status": "skip",
+        "detail": "原生 API 沒有對應的請求（gateway 才有的轉換）"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-azure-gpt~no-temp~gw.no-cost",
+      "caseId": "meta.response_model",
+      "surface": "observability",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 115.7,
+      "detail": "response.model=mock-azure-gpt~no-temp~no-cost",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "usage": {
+        "promptTokens": 1,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-azure-gpt~no-temp~gw.no-cost",
+      "caseId": "stream.finish",
+      "surface": "streaming",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 334.8,
+      "detail": "finish_reason=stop · [DONE]",
+      "ttftMs": 72.0,
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 314.4,
+        "detail": "finish_reason=stop · [DONE]",
+        "ttftMs": 51.9
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-azure-gpt~no-temp~gw.no-cost",
+      "caseId": "stream.tools",
+      "surface": "tools",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 72.8,
+      "detail": "get_weather({\"city\": \"Taipei\"})",
+      "ttftMs": 72.5,
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 52.3,
+        "detail": "get_weather({\"city\": \"Taipei\"})",
+        "ttftMs": 52.0
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-azure-gpt~no-temp~gw.no-cost",
+      "caseId": "gw.cost_header",
+      "surface": "observability",
+      "status": "fail",
+      "httpStatus": 200,
+      "latencyMs": 74.3,
+      "detail": "沒有 x-litellm-response-cost（cost map 缺這個模型或價格為 0，成本追蹤失準）",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "usage": {
+        "promptTokens": 1,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "attribution": "gateway",
+      "silent": true
+    },
+    {
+      "route": "mock-azure-gpt~no-temp~gw.no-cost",
+      "caseId": "gw.no_fallback",
+      "surface": "observability",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 115.9,
+      "detail": "沒有 fallback · model=mock-azure-gpt~no-temp~no-cost",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "usage": {
+        "promptTokens": 1,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-azure-gpt~no-temp~gw.no-cost",
+      "caseId": "err.invalid_max_tokens",
+      "surface": "error-mapping",
+      "status": "pass",
+      "httpStatus": 400,
+      "latencyMs": 66.6,
+      "detail": "HTTP 400",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 400,
+        "latencyMs": 43.9,
+        "detail": "HTTP 400"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-azure-gpt~no-temp~gw.no-cost",
+      "caseId": "err.unknown_tool",
+      "surface": "error-mapping",
+      "status": "pass",
+      "httpStatus": 400,
+      "latencyMs": 63.7,
+      "detail": "HTTP 400",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 400,
+        "latencyMs": 44.6,
+        "detail": "HTTP 400"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-azure-gpt~no-temp~gw.no-cost",
+      "caseId": "err.bad_image",
+      "surface": "error-mapping",
+      "status": "pass",
+      "httpStatus": 400,
+      "latencyMs": 63.4,
+      "detail": "HTTP 400",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 400,
+        "latencyMs": 47.6,
+        "detail": "HTTP 400"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-gemini~no-schema~gw.err500~slow-gw",
+      "caseId": "chat.basic",
+      "surface": "chat",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 175.7,
+      "detail": "非空回應",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 8,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 96.0,
+        "detail": "非空回應"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-gemini~no-schema~gw.err500~slow-gw",
+      "caseId": "chat.system",
+      "surface": "chat",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 177.2,
+      "detail": "非空回應",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 12,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 94.6,
+        "detail": "非空回應"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-gemini~no-schema~gw.err500~slow-gw",
+      "caseId": "chat.stream",
+      "surface": "streaming",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 393.7,
+      "detail": "17 chunks",
+      "ttftMs": 131.7,
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 313.4,
+        "detail": "17 chunks",
+        "ttftMs": 52.1
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-gemini~no-schema~gw.err500~slow-gw",
+      "caseId": "chat.stream_usage",
+      "surface": "streaming",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 393.6,
+      "detail": "usage={'prompt_tokens': 1, 'completion_tokens': 17, 'total_tokens': 18, 'completion_tokens_details': {'reasoning_tokens': 0}, 'prompt_tokens_details': {'cached_tokens': 0}}",
+      "ttftMs": 132.3,
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 1,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 313.5,
+        "detail": "usage={'prompt_tokens': 1, 'completion_tokens': 17, 'total_tokens': 18, 'completion_tokens_details': {'reasoning_tokens': 0}, 'prompt_tokens_details': {'cached_tokens': 0}}",
+        "ttftMs": 52.3
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-gemini~no-schema~gw.err500~slow-gw",
+      "caseId": "params.max_tokens",
+      "surface": "parameters",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 132.4,
+      "detail": "accepted",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 1,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 94.2,
+        "detail": "accepted"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-gemini~no-schema~gw.err500~slow-gw",
+      "caseId": "params.max_completion_tokens",
+      "surface": "parameters",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 176.2,
+      "detail": "accepted",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 1,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 95.6,
+        "detail": "accepted"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-gemini~no-schema~gw.err500~slow-gw",
+      "caseId": "params.temperature",
+      "surface": "parameters",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 175.8,
+      "detail": "accepted or dropped by gateway",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 1,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 97.0,
+        "detail": "accepted or dropped by gateway"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-gemini~no-schema~gw.err500~slow-gw",
+      "caseId": "params.reasoning_effort",
+      "surface": "reasoning",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 175.0,
+      "detail": "accepted",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 7,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 95.7,
+        "detail": "accepted"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-gemini~no-schema~gw.err500~slow-gw",
+      "caseId": "tools.auto",
+      "surface": "tools",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 175.9,
+      "detail": "有 tool_calls",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 13,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 95.7,
+        "detail": "有 tool_calls"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-gemini~no-schema~gw.err500~slow-gw",
+      "caseId": "tools.forced",
+      "surface": "tools",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 175.7,
+      "detail": "有 tool_calls",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 1,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 95.9,
+        "detail": "有 tool_calls"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-gemini~no-schema~gw.err500~slow-gw",
+      "caseId": "structured.json_schema",
+      "surface": "structured-output",
+      "status": "fail",
+      "httpStatus": 200,
+      "latencyMs": 175.8,
+      "detail": "不是合法 JSON：'pong. This is a mock answer that streams a few words so that latency can be meas'",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 7,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "fail",
+        "httpStatus": 200,
+        "latencyMs": 95.9,
+        "detail": "不是合法 JSON：'pong. This is a mock answer that streams a few words so that latency can be meas'"
+      },
+      "attribution": "provider",
+      "silent": true
+    },
+    {
+      "route": "mock-gcp-gemini~no-schema~gw.err500~slow-gw",
+      "caseId": "vision.image",
+      "surface": "vision",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 175.7,
+      "detail": "非空回應",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 9,
+        "completionTokens": 1,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 95.7,
+        "detail": "非空回應"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-gemini~no-schema~gw.err500~slow-gw",
+      "caseId": "usage.cache",
+      "surface": "prompt-caching",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 175.7,
+      "detail": "cached_tokens=4099",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 4102,
+        "completionTokens": 17,
+        "cachedTokens": 4099
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 95.8,
+        "detail": "cached_tokens=4099"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-gemini~no-schema~gw.err500~slow-gw",
+      "caseId": "responses.basic",
+      "surface": "responses-api",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 124.0,
+      "detail": "有 output_text",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "direct": {
+        "status": "skip",
+        "detail": "原生 API 沒有對應的請求（gateway 才有的轉換）"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-gemini~no-schema~gw.err500~slow-gw",
+      "caseId": "responses.tools",
+      "surface": "responses-api",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 123.7,
+      "detail": "有 function_call",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "direct": {
+        "status": "skip",
+        "detail": "原生 API 沒有對應的請求（gateway 才有的轉換）"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-gemini~no-schema~gw.err500~slow-gw",
+      "caseId": "messages.basic",
+      "surface": "messages-api",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 123.9,
+      "detail": "stop_reason=end_turn",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "direct": {
+        "status": "skip",
+        "detail": "原生 API 沒有對應的請求（gateway 才有的轉換）"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-gemini~no-schema~gw.err500~slow-gw",
+      "caseId": "meta.response_model",
+      "surface": "observability",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 176.0,
+      "detail": "response.model=mock-gcp-gemini~no-schema~err500~slow-gw",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 1,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-gemini~no-schema~gw.err500~slow-gw",
+      "caseId": "stream.finish",
+      "surface": "streaming",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 394.1,
+      "detail": "finish_reason=stop · [DONE]",
+      "ttftMs": 131.9,
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 313.7,
+        "detail": "finish_reason=stop · [DONE]",
+        "ttftMs": 51.8
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-gemini~no-schema~gw.err500~slow-gw",
+      "caseId": "stream.tools",
+      "surface": "tools",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 132.6,
+      "detail": "get_weather({\"city\": \"Taipei\"})",
+      "ttftMs": 132.4,
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 52.4,
+        "detail": "get_weather({\"city\": \"Taipei\"})",
+        "ttftMs": 52.1
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-gemini~no-schema~gw.err500~slow-gw",
+      "caseId": "gw.cost_header",
+      "surface": "observability",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 132.4,
+      "detail": "x-litellm-response-cost=0.000123",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 1,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-gemini~no-schema~gw.err500~slow-gw",
+      "caseId": "gw.no_fallback",
+      "surface": "observability",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 174.4,
+      "detail": "沒有 fallback · model=mock-gcp-gemini~no-schema~err500~slow-gw",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 1,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-gemini~no-schema~gw.err500~slow-gw",
+      "caseId": "err.invalid_max_tokens",
+      "surface": "error-mapping",
+      "status": "fail",
+      "httpStatus": 500,
+      "latencyMs": 123.6,
+      "detail": "HTTP 500：應該是 4xx（client 會把它當成可重試的伺服器錯誤）",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 400,
+        "latencyMs": 43.8,
+        "detail": "HTTP 400"
+      },
+      "attribution": "gateway"
+    },
+    {
+      "route": "mock-gcp-gemini~no-schema~gw.err500~slow-gw",
+      "caseId": "err.unknown_tool",
+      "surface": "error-mapping",
+      "status": "fail",
+      "httpStatus": 500,
+      "latencyMs": 123.9,
+      "detail": "HTTP 500：應該是 4xx（client 會把它當成可重試的伺服器錯誤）",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 400,
+        "latencyMs": 43.9,
+        "detail": "HTTP 400"
+      },
+      "attribution": "gateway"
+    },
+    {
+      "route": "mock-gcp-gemini~no-schema~gw.err500~slow-gw",
+      "caseId": "err.bad_image",
+      "surface": "error-mapping",
+      "status": "fail",
+      "httpStatus": 500,
+      "latencyMs": 123.9,
+      "detail": "HTTP 500：應該是 4xx（client 會把它當成可重試的伺服器錯誤）",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "0",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 400,
+        "latencyMs": 43.5,
+        "detail": "HTTP 400"
+      },
+      "attribution": "gateway"
+    },
+    {
+      "route": "mock-gcp-claude~gw.fallback",
+      "caseId": "chat.basic",
+      "surface": "chat",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 111.9,
+      "detail": "非空回應",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "1",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 8,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 95.9,
+        "detail": "非空回應"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-claude~gw.fallback",
+      "caseId": "chat.system",
+      "surface": "chat",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 115.9,
+      "detail": "非空回應",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "1",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 12,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 93.2,
+        "detail": "非空回應"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-claude~gw.fallback",
+      "caseId": "chat.stream",
+      "surface": "streaming",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 333.1,
+      "detail": "17 chunks",
+      "ttftMs": 71.7,
+      "headers": {
+        "x-litellm-attempted-fallbacks": "1",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 94.9,
+        "detail": "9 chunks",
+        "ttftMs": 1.6
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-claude~gw.fallback",
+      "caseId": "chat.stream_usage",
+      "surface": "streaming",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 340.7,
+      "detail": "usage={'prompt_tokens': 1, 'completion_tokens': 17, 'total_tokens': 18, 'completion_tokens_details': {'reasoning_tokens': 0}, 'prompt_tokens_details': {'cached_tokens': 0}}",
+      "ttftMs": 72.0,
+      "headers": {
+        "x-litellm-attempted-fallbacks": "1",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 1,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 94.6,
+        "detail": "usage={'prompt_tokens': 1, 'completion_tokens': 9}",
+        "ttftMs": 1.4
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-claude~gw.fallback",
+      "caseId": "params.max_tokens",
+      "surface": "parameters",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 77.9,
+      "detail": "accepted",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "1",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 1,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 92.6,
+        "detail": "accepted"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-claude~gw.fallback",
+      "caseId": "params.max_completion_tokens",
+      "surface": "parameters",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 115.9,
+      "detail": "accepted",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "1",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 1,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 96.4,
+        "detail": "accepted"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-claude~gw.fallback",
+      "caseId": "params.temperature",
+      "surface": "parameters",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 115.4,
+      "detail": "accepted or dropped by gateway",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "1",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 1,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 96.0,
+        "detail": "accepted or dropped by gateway"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-claude~gw.fallback",
+      "caseId": "params.reasoning_effort",
+      "surface": "reasoning",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 116.0,
+      "detail": "accepted",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "1",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 7,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "skip",
+        "detail": "原生 API 沒有對應的請求（gateway 才有的轉換）"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-claude~gw.fallback",
+      "caseId": "tools.auto",
+      "surface": "tools",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 115.7,
+      "detail": "有 tool_calls",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "1",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 13,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 91.9,
+        "detail": "有 tool_calls"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-claude~gw.fallback",
+      "caseId": "tools.forced",
+      "surface": "tools",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 115.8,
+      "detail": "有 tool_calls",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "1",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 1,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 101.7,
+        "detail": "有 tool_calls"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-claude~gw.fallback",
+      "caseId": "structured.json_schema",
+      "surface": "structured-output",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 122.1,
+      "detail": "符合 schema 必填欄位",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "1",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 7,
+        "completionTokens": 4,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "skip",
+        "detail": "原生 API 沒有對應的請求（gateway 才有的轉換）"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-claude~gw.fallback",
+      "caseId": "vision.image",
+      "surface": "vision",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 115.9,
+      "detail": "非空回應",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "1",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 9,
+        "completionTokens": 1,
+        "cachedTokens": 0
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 95.5,
+        "detail": "非空回應"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-claude~gw.fallback",
+      "caseId": "usage.cache",
+      "surface": "prompt-caching",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 115.5,
+      "detail": "cached_tokens=4099",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "1",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 4102,
+        "completionTokens": 17,
+        "cachedTokens": 4099
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 95.7,
+        "detail": "cached_tokens=4099"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-claude~gw.fallback",
+      "caseId": "responses.basic",
+      "surface": "responses-api",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 63.5,
+      "detail": "有 output_text",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "1",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "direct": {
+        "status": "skip",
+        "detail": "原生 API 沒有對應的請求（gateway 才有的轉換）"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-claude~gw.fallback",
+      "caseId": "responses.tools",
+      "surface": "responses-api",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 63.9,
+      "detail": "有 function_call",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "1",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "direct": {
+        "status": "skip",
+        "detail": "原生 API 沒有對應的請求（gateway 才有的轉換）"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-claude~gw.fallback",
+      "caseId": "messages.basic",
+      "surface": "messages-api",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 64.1,
+      "detail": "stop_reason=end_turn",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "1",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 95.6,
+        "detail": "stop_reason=end_turn"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-claude~gw.fallback",
+      "caseId": "meta.response_model",
+      "surface": "observability",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 115.7,
+      "detail": "response.model=mock-gcp-claude~fallback-fallback",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "1",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 1,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-claude~gw.fallback",
+      "caseId": "stream.finish",
+      "surface": "streaming",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 334.3,
+      "detail": "finish_reason=stop · [DONE]",
+      "ttftMs": 71.9,
+      "headers": {
+        "x-litellm-attempted-fallbacks": "1",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 96.9,
+        "detail": "finish_reason=end_turn · [DONE]",
+        "ttftMs": 2.3
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-claude~gw.fallback",
+      "caseId": "stream.tools",
+      "surface": "tools",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 74.1,
+      "detail": "get_weather({\"city\": \"Taipei\"})",
+      "ttftMs": 72.1,
+      "headers": {
+        "x-litellm-attempted-fallbacks": "1",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 200,
+        "latencyMs": 1.7,
+        "detail": "get_weather({\"city\": \"Taipei\"})",
+        "ttftMs": 1.6
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-claude~gw.fallback",
+      "caseId": "gw.cost_header",
+      "surface": "observability",
+      "status": "pass",
+      "httpStatus": 200,
+      "latencyMs": 73.8,
+      "detail": "x-litellm-response-cost=0.000123",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "1",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 1,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-claude~gw.fallback",
+      "caseId": "gw.no_fallback",
+      "surface": "observability",
+      "status": "fail",
+      "httpStatus": 200,
+      "latencyMs": 114.5,
+      "detail": "x-litellm-attempted-fallbacks=1，回應的 model=mock-gcp-claude~fallback-fallback：這次其實是 fallback 回答的",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "1",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock",
+        "x-litellm-response-cost": "0.000123"
+      },
+      "usage": {
+        "promptTokens": 1,
+        "completionTokens": 17,
+        "cachedTokens": 0
+      },
+      "attribution": "gateway",
+      "silent": true
+    },
+    {
+      "route": "mock-gcp-claude~gw.fallback",
+      "caseId": "err.invalid_max_tokens",
+      "surface": "error-mapping",
+      "status": "pass",
+      "httpStatus": 400,
+      "latencyMs": 63.9,
+      "detail": "HTTP 400",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "1",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 400,
+        "latencyMs": 44.0,
+        "detail": "HTTP 400"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-claude~gw.fallback",
+      "caseId": "err.unknown_tool",
+      "surface": "error-mapping",
+      "status": "pass",
+      "httpStatus": 400,
+      "latencyMs": 63.9,
+      "detail": "HTTP 400",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "1",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 400,
+        "latencyMs": 43.9,
+        "detail": "HTTP 400"
+      },
+      "attribution": "ok"
+    },
+    {
+      "route": "mock-gcp-claude~gw.fallback",
+      "caseId": "err.bad_image",
+      "surface": "error-mapping",
+      "status": "pass",
+      "httpStatus": 400,
+      "latencyMs": 63.9,
+      "detail": "HTTP 400",
+      "headers": {
+        "x-litellm-attempted-fallbacks": "1",
+        "x-litellm-model-api-base": "https://provider.mock.invalid",
+        "x-litellm-version": "1.104.2-mock"
+      },
+      "direct": {
+        "status": "pass",
+        "httpStatus": 400,
+        "latencyMs": 43.8,
+        "detail": "HTTP 400"
+      },
+      "attribution": "ok"
+    }
+  ],
+  "summary": [
+    {
+      "route": "mock-aws-claude~gw.silent-forced~drop-tools-stream",
+      "pass": 22,
+      "fail": 2,
+      "error": 0,
+      "skip": 0,
+      "requiredFailures": []
+    },
+    {
+      "route": "mock-azure-gpt~no-temp~gw.no-cost",
+      "pass": 22,
+      "fail": 2,
+      "error": 0,
+      "skip": 0,
+      "requiredFailures": []
+    },
+    {
+      "route": "mock-gcp-gemini~no-schema~gw.err500~slow-gw",
+      "pass": 20,
+      "fail": 4,
+      "error": 0,
+      "skip": 0,
+      "requiredFailures": []
+    },
+    {
+      "route": "mock-gcp-claude~gw.fallback",
+      "pass": 23,
+      "fail": 1,
+      "error": 0,
+      "skip": 0,
+      "requiredFailures": []
+    }
+  ],
+  "metrics": {
+    "byRoute": [
+      {
+        "route": "mock-aws-claude~gw.silent-forced~drop-tools-stream",
+        "applicable": 24,
+        "pass": 22,
+        "compatibilityRate": 0.9167,
+        "requiredPassRate": 1.0,
+        "gatewayInduced": 1,
+        "providerLimited": 0,
+        "unattributed": 1,
+        "silentDegradations": 2,
+        "silentDegradationRate": 0.0952,
+        "errorMappingRate": 1.0,
+        "costTrackingRate": 1.0,
+        "fallbackRate": 0.0,
+        "overheadMs": {
+          "p50": 23.8,
+          "p95": 24.1,
+          "n": 5
+        },
+        "ttftOverheadMs": {
+          "p50": null,
+          "p95": null,
+          "n": 0
+        },
+        "promptTokenDeltaPct": 0.0,
+        "csp": "aws",
+        "service": "bedrock"
+      },
+      {
+        "route": "mock-azure-gpt~no-temp~gw.no-cost",
+        "applicable": 24,
+        "pass": 22,
+        "compatibilityRate": 0.9167,
+        "requiredPassRate": 1.0,
+        "gatewayInduced": 1,
+        "providerLimited": 1,
+        "unattributed": 0,
+        "silentDegradations": 1,
+        "silentDegradationRate": 0.05,
+        "errorMappingRate": 1.0,
+        "costTrackingRate": 0.0,
+        "fallbackRate": 0.0,
+        "overheadMs": {
+          "p50": 21.9,
+          "p95": 23.7,
+          "n": 5
+        },
+        "ttftOverheadMs": {
+          "p50": 19.9,
+          "p95": 20.4,
+          "n": 5
+        },
+        "promptTokenDeltaPct": 0.0,
+        "csp": "azure",
+        "service": "foundry"
+      },
+      {
+        "route": "mock-gcp-gemini~no-schema~gw.err500~slow-gw",
+        "applicable": 24,
+        "pass": 20,
+        "compatibilityRate": 0.8333,
+        "requiredPassRate": 1.0,
+        "gatewayInduced": 3,
+        "providerLimited": 1,
+        "unattributed": 0,
+        "silentDegradations": 1,
+        "silentDegradationRate": 0.0476,
+        "errorMappingRate": 0.0,
+        "costTrackingRate": 1.0,
+        "fallbackRate": 0.0,
+        "overheadMs": {
+          "p50": 80.2,
+          "p95": 83.8,
+          "n": 5
+        },
+        "ttftOverheadMs": {
+          "p50": 80.4,
+          "p95": 80.7,
+          "n": 5
+        },
+        "promptTokenDeltaPct": 0.0,
+        "csp": "gcp",
+        "service": "agent-platform"
+      },
+      {
+        "route": "mock-gcp-claude~gw.fallback",
+        "applicable": 24,
+        "pass": 23,
+        "compatibilityRate": 0.9583,
+        "requiredPassRate": 1.0,
+        "gatewayInduced": 1,
+        "providerLimited": 0,
+        "unattributed": 0,
+        "silentDegradations": 1,
+        "silentDegradationRate": 0.0476,
+        "errorMappingRate": 1.0,
+        "costTrackingRate": 1.0,
+        "fallbackRate": 1.0,
+        "overheadMs": {
+          "p50": 23.6,
+          "p95": 24.0,
+          "n": 5
+        },
+        "ttftOverheadMs": {
+          "p50": 70.2,
+          "p95": 71.2,
+          "n": 5
+        },
+        "promptTokenDeltaPct": 0.0,
+        "csp": "gcp",
+        "service": "agent-platform"
+      }
+    ],
+    "byCsp": [
+      {
+        "csp": "aws",
+        "routes": 1,
+        "applicable": 24,
+        "pass": 22,
+        "compatibilityRate": 0.9167,
+        "requiredPassRate": 1.0,
+        "gatewayInduced": 1,
+        "providerLimited": 0,
+        "silentDegradations": 2,
+        "errorMappingRate": 1.0,
+        "costTrackingRate": 1.0,
+        "fallbackRate": 0.0,
+        "overheadMsP50": 23.8
+      },
+      {
+        "csp": "azure",
+        "routes": 1,
+        "applicable": 24,
+        "pass": 22,
+        "compatibilityRate": 0.9167,
+        "requiredPassRate": 1.0,
+        "gatewayInduced": 1,
+        "providerLimited": 1,
+        "silentDegradations": 1,
+        "errorMappingRate": 1.0,
+        "costTrackingRate": 0.0,
+        "fallbackRate": 0.0,
+        "overheadMsP50": 21.9
+      },
+      {
+        "csp": "gcp",
+        "routes": 2,
+        "applicable": 48,
+        "pass": 43,
+        "compatibilityRate": 0.8958,
+        "requiredPassRate": 1.0,
+        "gatewayInduced": 4,
+        "providerLimited": 1,
+        "silentDegradations": 2,
+        "errorMappingRate": 0.5,
+        "costTrackingRate": 1.0,
+        "fallbackRate": 0.5,
+        "overheadMsP50": 51.9
+      }
+    ],
+    "bySurface": [
+      {
+        "surface": "chat",
+        "title": "Chat Completions 基本",
+        "applicable": 8,
+        "pass": 8,
+        "gatewayInduced": 0
+      },
+      {
+        "surface": "streaming",
+        "title": "串流（SSE）",
+        "applicable": 12,
+        "pass": 12,
+        "gatewayInduced": 0
+      },
+      {
+        "surface": "parameters",
+        "title": "參數處理",
+        "applicable": 12,
+        "pass": 11,
+        "gatewayInduced": 0
+      },
+      {
+        "surface": "reasoning",
+        "title": "推理參數",
+        "applicable": 4,
+        "pass": 4,
+        "gatewayInduced": 0
+      },
+      {
+        "surface": "tools",
+        "title": "Tool calling",
+        "applicable": 12,
+        "pass": 10,
+        "gatewayInduced": 1
+      },
+      {
+        "surface": "structured-output",
+        "title": "Structured output",
+        "applicable": 4,
+        "pass": 3,
+        "gatewayInduced": 0
+      },
+      {
+        "surface": "vision",
+        "title": "影像輸入",
+        "applicable": 4,
+        "pass": 4,
+        "gatewayInduced": 0
+      },
+      {
+        "surface": "prompt-caching",
+        "title": "Prompt caching",
+        "applicable": 4,
+        "pass": 4,
+        "gatewayInduced": 0
+      },
+      {
+        "surface": "responses-api",
+        "title": "Responses API",
+        "applicable": 8,
+        "pass": 8,
+        "gatewayInduced": 0
+      },
+      {
+        "surface": "messages-api",
+        "title": "Anthropic Messages",
+        "applicable": 4,
+        "pass": 4,
+        "gatewayInduced": 0
+      },
+      {
+        "surface": "error-mapping",
+        "title": "錯誤對應",
+        "applicable": 12,
+        "pass": 9,
+        "gatewayInduced": 3
+      },
+      {
+        "surface": "observability",
+        "title": "成本與路由可觀測性",
+        "applicable": 12,
+        "pass": 10,
+        "gatewayInduced": 2
+      }
+    ]
+  },
+  "litellmVersion": "1.105.1-mock",
+  "purpose": "adhoc"
+}

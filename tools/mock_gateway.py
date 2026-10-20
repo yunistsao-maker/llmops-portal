@@ -10,13 +10,26 @@ Behaviour is picked by substrings in the requested model name:
   silent-forced  forced tool_choice silently becomes auto and no tool is called (drop_params downgrade)
   no-schema      ignores response_format and answers in prose
   flaky          ~25% HTTP 429
+  err500         an invalid request (max_tokens < 0, unknown forced tool, bad image) answers HTTP 500 instead of 400
+  drop-tools-stream  streaming with tools: the tool-call deltas never arrive
+  no-cost        no x-litellm-response-cost header (cost tracking blind)
+  fallback       x-litellm-attempted-fallbacks: 1 and another model answers
+  slow-gw        the gateway adds ~60 ms more than the provider
 Endpoints: /v1/chat/completions, /v1/responses, /v1/messages, /model/info, /health/readiness
+
+Gateway and provider in one process (tools/gateway_csp_check.py --direct): /v1/... answers as the LiteLLM gateway (with
+x-litellm-* headers and a little overhead); /direct/v1/chat/completions answers as an OpenAI-compatible provider endpoint
+and /direct/anthropic/v1/messages as an Anthropic Messages endpoint. Flags written "~gw.<flag>" in the model name apply
+to the gateway only ("mock-aws-claude~gw.silent-forced": the gateway downgrades forced tool_choice, the provider does not).
 """
 from __future__ import annotations
 
 import argparse
+import base64
+import binascii
 import json
 import random
+import re
 import threading
 import time
 import uuid
@@ -59,7 +72,31 @@ def _prompt_text(messages) -> str:
 
 
 def _has_image(messages) -> bool:
-    return any(isinstance(m.get("content"), list) and any(p.get("type") == "image_url" for p in m["content"]) for m in messages or [])
+    return any(isinstance(m.get("content"), list) and any(p.get("type") in ("image_url", "image") for p in m["content"]) for m in messages or [])
+
+
+def _bad_image(messages) -> bool:
+    """An image whose data is not base64 (the gateway-check's error case sends one)."""
+    for m in messages or []:
+        for p in m.get("content") if isinstance(m.get("content"), list) else []:
+            data = ""
+            if p.get("type") == "image_url":
+                url = (p.get("image_url") or {}).get("url", "")
+                data = url.split(",", 1)[1] if url.startswith("data:") and "," in url else "x"
+            elif p.get("type") == "image":
+                data = (p.get("source") or {}).get("data", "")
+            else:
+                continue
+            try:
+                base64.b64decode(data, validate=True)
+            except (binascii.Error, ValueError):
+                return True
+    return False
+
+
+def effective(model: str, direct: bool) -> str:
+    """The behaviour flags that apply: "~gw.<flag>" only on the gateway side."""
+    return re.sub(r"~gw\.[^~]+", "", model) if direct else model.replace("~gw.", "~")
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -69,16 +106,42 @@ class Handler(BaseHTTPRequestHandler):
         pass
 
     # ------------------------------------------------------------------ helpers
+    direct = False  # set per request: True on /direct/... (the provider), False on /v1/... (the gateway)
+    model = ""
+
+    def _gateway_headers(self, ok: bool):
+        if self.direct:
+            return
+        m = self.model
+        self.send_header("x-litellm-attempted-fallbacks", "1" if "fallback" in m else "0")
+        self.send_header("x-litellm-model-api-base", "https://provider.mock.invalid")
+        self.send_header("x-litellm-version", "1.104.2-mock")
+        if ok and "no-cost" not in m:
+            self.send_header("x-litellm-response-cost", "0.000123")
+
     def _json(self, code, obj):
         body = json.dumps(obj).encode()
         self.send_response(code)
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(body)))
+        self._gateway_headers(code == 200)
         self.end_headers()
         self.wfile.write(body)
 
     def _err(self, code, msg):
+        if self.direct and self.path.endswith("/messages"):  # the provider's own error shape
+            return self._json(code, {"type": "error", "error": {"type": "invalid_request_error", "message": msg}})
         self._json(code, {"error": {"message": msg, "type": "invalid_request_error", "code": str(code)}})
+
+    def _invalid(self, msg):
+        """A request the provider refuses: 400 - or, behind a gateway that maps errors badly (err500), 500."""
+        if not self.direct and "err500" in self.model:
+            return self._json(500, {"error": {"message": "Internal Server Error", "type": "internal_server_error", "code": "500"}})
+        return self._err(400, msg)
+
+    def _overhead(self):
+        if not self.direct:
+            time.sleep(0.02 + (0.06 if "slow-gw" in self.model else 0))
 
     def _read(self):
         n = int(self.headers.get("Content-Length") or 0)
@@ -94,9 +157,14 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         body = self._read()
-        model = body.get("model", "")
+        self.direct = self.path.startswith("/direct/")
+        model = effective(body.get("model", ""), self.direct)
+        self.model = model
+        self._overhead()
         if "flaky" in model and random.random() < 0.25:
             return self._err(429, "rate limited (mock)")
+        if self.path.endswith("/messages") and self.path.startswith("/direct/anthropic/"):
+            return self._anthropic(body, model)
         if self.path.endswith("/chat/completions"):
             return self._chat(body, model)
         if self.path.endswith("/responses"):
@@ -108,7 +176,15 @@ class Handler(BaseHTTPRequestHandler):
     def _chat(self, body, model):
         if "no-temp" in model and "temperature" in body:
             return self._err(400, "Unsupported parameter: 'temperature'")
+        mt = body.get("max_tokens", body.get("max_completion_tokens"))
+        if isinstance(mt, int) and mt < 1:
+            return self._invalid("max_tokens must be at least 1")
+        if _bad_image(body.get("messages")):
+            return self._invalid("Could not process image")
         tc = body.get("tool_choice")
+        names = [t.get("function", {}).get("name") for t in body.get("tools") or []]
+        if isinstance(tc, dict) and (tc.get("function") or {}).get("name") not in names:
+            return self._invalid("tool_choice names a function that is not in tools")
         forced = isinstance(tc, dict) or tc in ("required", "any")
         if "no-forced" in model and forced:
             return self._err(400, 'tool_choice: type "tool" and "any" are not supported for this model.')
@@ -139,6 +215,8 @@ class Handler(BaseHTTPRequestHandler):
         completion_tokens = len(answer.split()) + (len(reasoning.split()) if reasoning else 0)
         usage = _usage(prompt_tokens, completion_tokens, len(reasoning.split()) if reasoning else 0, cached)
         cid = "chatcmpl-" + uuid.uuid4().hex[:12]
+        if "fallback" in model and not self.direct:
+            model = model + "-fallback"
         if not body.get("stream"):
             msg = {"role": "assistant", "content": None if tool_calls else answer}
             if tool_calls:
@@ -151,6 +229,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", "text/event-stream")
         self.send_header("Cache-Control", "no-cache")
         self.send_header("Connection", "close")
+        self._gateway_headers(True)
         self.end_headers()
 
         def send(obj):
@@ -162,8 +241,14 @@ class Handler(BaseHTTPRequestHandler):
         for w in reasoning.split():
             send({**base, "choices": [{"index": 0, "delta": {"reasoning_content": w + " "}, "finish_reason": None}]})
             time.sleep(0.06)
+        if tool_calls and "drop-tools-stream" in model and not self.direct:
+            tool_calls = None  # the gateway loses the tool-call deltas
         if tool_calls:
-            send({**base, "choices": [{"index": 0, "delta": {"tool_calls": [{"index": 0, **tool_calls[0]}]}, "finish_reason": None}]})
+            first = {"index": 0, "id": tool_calls[0]["id"], "type": "function", "function": {"name": tool_calls[0]["function"]["name"], "arguments": ""}}
+            send({**base, "choices": [{"index": 0, "delta": {"tool_calls": [first]}, "finish_reason": None}]})
+            args = tool_calls[0]["function"]["arguments"]
+            for i in range(0, len(args), 6):  # arguments arrive in pieces, as providers send them
+                send({**base, "choices": [{"index": 0, "delta": {"tool_calls": [{"index": 0, "function": {"arguments": args[i:i + 6]}}]}, "finish_reason": None}]})
         else:
             for w in answer.split():
                 send({**base, "choices": [{"index": 0, "delta": {"content": w + " "}, "finish_reason": None}]})
@@ -186,6 +271,67 @@ class Handler(BaseHTTPRequestHandler):
             output = [{"type": "message", "role": "assistant", "content": [{"type": "output_text", "text": "pong"}]}]
         self._json(200, {"id": rid, "object": "response", "model": model, "status": "completed", "output": output,
                          "usage": {"input_tokens": 10, "output_tokens": 2, "total_tokens": 12}})
+
+    def _anthropic(self, body, model):
+        """An Anthropic Messages endpoint (the provider side of /v1/messages)."""
+        mt = body.get("max_tokens")
+        if not isinstance(mt, int) or mt < 1:
+            return self._err(400, "max_tokens: must be at least 1")
+        if "no-temp" in model and "temperature" in body:
+            return self._err(400, "temperature is not supported for this model")
+        messages = body.get("messages", [])
+        if _bad_image(messages):
+            return self._err(400, "Could not process image")
+        tools = body.get("tools") or []
+        tc = body.get("tool_choice") or {}
+        forced = tc.get("type") in ("tool", "any")
+        if tc.get("type") == "tool" and tc.get("name") not in [t.get("name") for t in tools]:
+            return self._err(400, "tool_choice.name is not one of the tools")
+        if "no-forced" in model and forced:
+            return self._err(400, 'tool_choice: type "tool" and "any" are not supported for this model.')
+        system = body.get("system") or ""
+        sys_text = system if isinstance(system, str) else "".join(b.get("text", "") for b in system if isinstance(b, dict))
+        cached = 0
+        if len(sys_text) > 4000 and not isinstance(system, str) and any(isinstance(b, dict) and b.get("cache_control") for b in system):
+            with _lock:
+                if ("A:" + sys_text) in _seen_prefixes:
+                    cached = len(sys_text) // 4
+                _seen_prefixes.add("A:" + sys_text)
+        prompt = sys_text + _prompt_text(messages)
+        use_tool = bool(tools) and tc.get("type") != "none"
+        answer = "Red" if _has_image(messages) else "pong. This is a mock answer from the provider."
+        content = ([{"type": "tool_use", "id": "toolu_" + uuid.uuid4().hex[:8], "name": tools[0]["name"], "input": {"city": "Taipei"}}]
+                   if use_tool else [{"type": "text", "text": answer}])
+        usage = {"input_tokens": max(len(prompt) // 4, 1) - cached, "output_tokens": len(answer.split()), "cache_read_input_tokens": cached,
+                 "cache_creation_input_tokens": 0}
+        mid = "msg_" + uuid.uuid4().hex[:12]
+        stop = "tool_use" if use_tool else "end_turn"
+        if not body.get("stream"):
+            time.sleep(0.05)
+            return self._json(200, {"id": mid, "type": "message", "role": "assistant", "model": body.get("model", model), "content": content,
+                                    "stop_reason": stop, "usage": usage})
+        self.send_response(200)
+        self.send_header("Content-Type", "text/event-stream")
+        self.send_header("Connection", "close")
+        self.end_headers()
+
+        def ev(name, obj):
+            self.wfile.write(f"event: {name}\ndata: {json.dumps(obj)}\n\n".encode())
+            self.wfile.flush()
+        ev("message_start", {"type": "message_start", "message": {"id": mid, "type": "message", "role": "assistant", "content": [],
+                                                                   "usage": {"input_tokens": usage["input_tokens"], "output_tokens": 0}}})
+        if use_tool:
+            ev("content_block_start", {"type": "content_block_start", "index": 0, "content_block": {**content[0], "input": {}}})
+            ev("content_block_delta", {"type": "content_block_delta", "index": 0, "delta": {"type": "input_json_delta", "partial_json": json.dumps(content[0]["input"])}})
+        else:
+            ev("content_block_start", {"type": "content_block_start", "index": 0, "content_block": {"type": "text", "text": ""}})
+            for w in answer.split():
+                ev("content_block_delta", {"type": "content_block_delta", "index": 0, "delta": {"type": "text_delta", "text": w + " "}})
+                time.sleep(0.01)
+        ev("content_block_stop", {"type": "content_block_stop", "index": 0})
+        ev("message_delta", {"type": "message_delta", "delta": {"stop_reason": stop}, "usage": {"output_tokens": usage["output_tokens"]}})
+        ev("message_stop", {"type": "message_stop"})
+        self.close_connection = True
 
     def _messages(self, body, model):
         self._json(200, {"id": "msg_" + uuid.uuid4().hex[:12], "type": "message", "role": "assistant", "model": model,

@@ -1,0 +1,76 @@
+# Routes for tools/gateway_csp_check.py: one entry per gateway alias the teams call.
+# route         the alias in the LiteLLM config (model_name)
+# modelId       the catalog model it stands for (the model page's 內部測試 tab finds the run by it)
+# csp/service   aws/bedrock · azure/foundry · gcp/agent-platform · vendor-direct/<api>  (read from /model/info when left out)
+# direct        optional baseline: the same request straight to the CSP (--direct). Secrets come from environment
+#               variables only (auth.env); nothing of them is written to the run file - only protocol and host.
+#   protocol    openai-chat         = an OpenAI-compatible Chat Completions endpoint (Foundry /openai/v1, Agent Platform
+#                                     .../endpoints/openapi, Bedrock's OpenAI-compatible endpoint for OpenAI models)
+#               anthropic-messages  = an Anthropic Messages endpoint (Foundry /anthropic/v1/messages, Bedrock InvokeModel,
+#                                     Agent Platform rawPredict); streamUrl for the streaming variant, stream: false when
+#                                     the endpoint does not stream SSE (Bedrock's invoke-with-response-stream is not SSE)
+#   model       the model / deployment field of the body (leave out when the model is part of the URL)
+#   body        fields merged into every native request (e.g. anthropic_version)
+routes:
+  - route: claude-sonnet-5-5@bedrock
+    modelId: claude-sonnet-5-5
+    csp: aws
+    service: bedrock
+    region: ap-northeast-1
+    direct:
+      protocol: anthropic-messages
+      url: https://bedrock-runtime.ap-northeast-1.amazonaws.com/model/global.anthropic.claude-sonnet-5-5/invoke
+      stream: false
+      auth: {type: bearer, env: AWS_BEARER_TOKEN_BEDROCK}
+      body: {anthropic_version: bedrock-2023-05-31}
+  - route: claude-sonnet-5-5@foundry
+    modelId: claude-sonnet-5-5
+    csp: azure
+    service: foundry
+    region: eastus2
+    direct:
+      protocol: anthropic-messages
+      url: https://<your-resource>.services.ai.azure.com/anthropic/v1/messages
+      model: claude-sonnet-5-5
+      auth: {type: header, name: x-api-key, env: AZURE_AI_API_KEY}
+  - route: claude-sonnet-5-5@agent-platform
+    modelId: claude-sonnet-5-5
+    csp: gcp
+    service: agent-platform
+    region: global
+    direct:
+      protocol: anthropic-messages
+      url: https://aiplatform.googleapis.com/v1/projects/<project>/locations/global/publishers/anthropic/models/claude-sonnet-5-5:rawPredict
+      streamUrl: https://aiplatform.googleapis.com/v1/projects/<project>/locations/global/publishers/anthropic/models/claude-sonnet-5-5:streamRawPredict
+      auth: {type: bearer, env: GOOGLE_ACCESS_TOKEN}
+      body: {anthropic_version: vertex-2023-10-16}
+  - route: gpt-6-1-sol@foundry
+    modelId: gpt-6-1-sol
+    csp: azure
+    service: foundry
+    region: eastus2
+    direct:
+      protocol: openai-chat
+      url: https://<your-resource>.openai.azure.com/openai/v1/chat/completions
+      model: <your-deployment-name>
+      auth: {type: header, name: api-key, env: AZURE_API_KEY}
+  - route: gpt-6-1-sol@bedrock
+    modelId: gpt-6-1-sol
+    csp: aws
+    service: bedrock
+    region: us-west-2
+    direct:
+      protocol: openai-chat
+      url: https://bedrock-runtime.us-west-2.amazonaws.com/openai/v1/chat/completions
+      model: openai.gpt-6-1-sol
+      auth: {type: bearer, env: AWS_BEARER_TOKEN_BEDROCK}
+  - route: gemini-3-8-flash@agent-platform
+    modelId: gemini-3-8-flash
+    csp: gcp
+    service: agent-platform
+    region: global
+    direct:
+      protocol: openai-chat
+      url: https://aiplatform.googleapis.com/v1/projects/<project>/locations/global/endpoints/openapi/chat/completions
+      model: google/gemini-3.8-flash
+      auth: {type: bearer, env: GOOGLE_ACCESS_TOKEN}

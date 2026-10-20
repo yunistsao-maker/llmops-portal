@@ -48,7 +48,7 @@ export default function App() {
     case "compare": page = <Compare ids={a ? a.split(",") : []} />; break;
     case "open": page = <OpenModels id={a} />; break;
     case "eol": page = <Eol />; break;
-    case "tests": page = <Tests />; break;
+    case "tests": page = <Tests view={a} />; break;
     case "release": page = <Release model={a} />; break;
     case "gateway": page = <Gateway />; break;
     case "onboarding": page = <Onboarding />; break;

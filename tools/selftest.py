@@ -142,6 +142,38 @@ def main():
             if by.get(k) != v:
                 failures.append(f"compat expectation {k} -> {by.get(k)} (want {v})")
 
+        # gateway -> CSP: the same cases through the mock gateway and straight to the mock provider
+        gw_out = os.path.join(tmp, "runs/compat/selftest-gateway-csp.json")
+        r = run([PY, "tools/gateway_csp_check.py", "--gateway", gw + "/v1", "--routes-file", "tools/fixtures/gateway-routes.mock.json",
+                 "--direct", "--samples", "2", "--litellm-version", "1.104.2-mock", "--out", gw_out],
+                env={**env, "MOCK_PORT": str(port), "MOCK_DIRECT_TOKEN": "tok"})
+        print(r.stdout[-1200:], r.stderr[-800:])
+        if r.returncode != 0:
+            failures.append("gateway_csp_check exited non-zero")
+        else:
+            gwr = json.load(open(gw_out))
+            att = {(x["route"].split("~")[0], x["caseId"]): (x["status"], x.get("attribution")) for x in gwr["results"]}
+            expect_gw = {
+                ("mock-aws-claude", "tools.forced"): ("fail", "gateway"),        # downgraded by the gateway only
+                ("mock-aws-claude", "chat.basic"): ("pass", "ok"),
+                ("mock-azure-gpt", "params.temperature"): ("fail", "provider"),  # refused by the provider itself
+                ("mock-azure-gpt", "gw.cost_header"): ("fail", "gateway"),
+                ("mock-gcp-gemini", "err.invalid_max_tokens"): ("fail", "gateway"),  # 500 instead of the provider's 400
+                ("mock-gcp-gemini", "structured.json_schema"): ("fail", "provider"),
+                ("mock-gcp-claude", "gw.no_fallback"): ("fail", "gateway"),
+                ("mock-gcp-claude", "err.bad_image"): ("pass", "ok"),
+            }
+            for k, v in expect_gw.items():
+                if att.get(k) != v:
+                    failures.append(f"gateway-csp expectation {k} -> {att.get(k)} (want {v})")
+            by_route = {m["route"].split("~")[0]: m for m in gwr["metrics"]["byRoute"]}
+            if by_route["mock-gcp-gemini"]["errorMappingRate"] != 0:
+                failures.append("gateway-csp: err500 route should map no error correctly")
+            if not (by_route["mock-aws-claude"]["silentDegradations"] >= 1 and by_route["mock-azure-gpt"]["overheadMs"]["n"] == 2):
+                failures.append(f"gateway-csp metrics: {by_route['mock-aws-claude']['silentDegradations']} silent, overhead n={by_route['mock-azure-gpt']['overheadMs']['n']}")
+            if "tok" in open(gw_out).read().replace("tokens", ""):
+                failures.append("gateway-csp run file contains the direct token")
+
         r = run([PY, "tools/perf_probe.py", "--gateway", gw + "/v1", "--route", "mock-reasoning", "--profile", "tiny",
                  "--effort", "low", "--concurrency", "4", "--requests", "16", "--slo-ttfat-ms", "2000", "--slo-ttlt-ms", "5000",
                  "--client-location", "selftest", "--out", perf_out], env=env)
