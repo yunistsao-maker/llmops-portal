@@ -6,7 +6,7 @@ import { Sources, Verif } from "../ui";
  * Gateway → CSP: does each API feature survive the trip through the LiteLLM gateway to Bedrock / Foundry / Agent Platform,
  * and when it does not, is it the gateway or the provider? `Measured` shows a run of tools/gateway_csp_check.py (CompatRun
  * kind "gateway-csp") for one model's routes on its 「內部測試」 tab; `Documented` is what the LiteLLM docs say
- * (litellm.json providerCompatibility), on 方法與來源 → 測試方法.
+ * (data/provider-compatibility.json, both editions), on 方法與來源 → 測試方法.
  */
 
 const CSP_LABEL: Record<string, string> = { aws: "AWS", azure: "Azure", gcp: "Google Cloud", "vendor-direct": "Vendor API", unknown: "未知" };

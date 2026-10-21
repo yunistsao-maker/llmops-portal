@@ -1750,7 +1750,7 @@
         },
         "providerCompatibility": {
           "$ref": "#/definitions/ProviderCompatibility",
-          "description": "Documented API compatibility per LiteLLM provider route (測試結果 → Gateway → CSP, next to the measured runs)."
+          "deprecated": "Moved to data/provider-compatibility.json (ProviderCompatibilityFile) so that the clean edition, which\nhas no litellm.json, shows it too. Still read from releases published before 2026-10-22."
         },
         "recommended": {
           "additionalProperties": false,
@@ -3261,6 +3261,183 @@
         "providers",
         "surfaces",
         "cells"
+      ],
+      "type": "object"
+    },
+    "ProviderCompatibilityFile": {
+      "additionalProperties": false,
+      "description": "data/provider-compatibility.json: the documented LiteLLM provider x API surface matrix (方法與來源 → 測試方法), in both editions. Researched, not measured; maintained by the platform team (the research agent does not write it).",
+      "properties": {
+        "asOf": {
+          "$ref": "#/definitions/ISODate"
+        },
+        "cells": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "note": {
+                "type": "string"
+              },
+              "provider": {
+                "type": "string"
+              },
+              "sources": {
+                "items": {
+                  "$ref": "#/definitions/SourceRef"
+                },
+                "type": "array"
+              },
+              "status": {
+                "enum": [
+                  "supported",
+                  "partial",
+                  "not-supported",
+                  "unknown"
+                ],
+                "type": "string"
+              },
+              "surface": {
+                "type": "string"
+              },
+              "verification": {
+                "$ref": "#/definitions/Verification"
+              }
+            },
+            "required": [
+              "provider",
+              "surface",
+              "status",
+              "verification",
+              "sources"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "generatedAt": {
+          "$ref": "#/definitions/ISODateTime"
+        },
+        "knownIssues": {
+          "description": "Open (or recently closed) upstream issues where a surface breaks for a provider.",
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "date": {
+                "$ref": "#/definitions/ISODate"
+              },
+              "provider": {
+                "type": "string"
+              },
+              "sources": {
+                "items": {
+                  "$ref": "#/definitions/SourceRef"
+                },
+                "type": "array"
+              },
+              "state": {
+                "enum": [
+                  "open",
+                  "closed"
+                ],
+                "type": "string"
+              },
+              "summary": {
+                "type": "string"
+              },
+              "surface": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "title",
+              "provider",
+              "surface",
+              "state",
+              "summary",
+              "sources"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "locale": {
+          "$ref": "#/definitions/Locale"
+        },
+        "providers": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "cloud": {
+                "$ref": "#/definitions/Cloud"
+              },
+              "id": {
+                "type": "string"
+              },
+              "litellmPrefix": {
+                "type": "string"
+              },
+              "note": {
+                "type": "string"
+              },
+              "service": {
+                "$ref": "#/definitions/Service"
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "title",
+              "litellmPrefix",
+              "cloud"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "schema": {
+          "const": "provider-compatibility/v1",
+          "type": "string"
+        },
+        "surfaces": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/GatewaySurface"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "title"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "asOf",
+        "cells",
+        "generatedAt",
+        "locale",
+        "providers",
+        "schema",
+        "surfaces"
       ],
       "type": "object"
     },

@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import type {
   BenchmarkResult, CatalogFile, CompatRun, DeepDive, DigestFile, LifecycleFile, LiteLLMFile, Model, OpenModelsFile, PerfRun,
-  PlatformInventory, RadarFile, RequirementsFile, SecurityRunCases, SecurityRunSummary, Source, SourceRef, SourcesFile,
+  PlatformInventory, ProviderCompatibility, RadarFile, RequirementsFile, SecurityRunCases, SecurityRunSummary, Source, SourceRef, SourcesFile,
 } from "../../schema/types";
 
 export interface Manifest { generatedAt: string; digests: string[]; models: string[]; compatRuns: string[]; perfRuns: string[]; securityRuns?: string[]; securityCases?: string[]; hasInventory: boolean }
@@ -59,6 +59,19 @@ export const loaders = {
   lifecycle: () => cached<LifecycleFile>(`${dataBase()}lifecycle.json`),
   litellm: () => cached<LiteLLMFile>(`${dataBase()}litellm.json`),
   requirements: () => cached<RequirementsFile>(`${dataBase()}requirements.json`),
+  /**
+   * The documented LiteLLM provider matrix (方法與來源 → 測試方法), in both editions: data/provider-compatibility.json, or -
+   * in the full edition, for a version published before the file existed - litellm.json's providerCompatibility. null when
+   * neither has it.
+   */
+  providerCompatibility: async (): Promise<ProviderCompatibility | null> => {
+    try {
+      return await cached<ProviderCompatibility>(`${dataBase()}provider-compatibility.json`);
+    } catch {
+      if (EDITION !== "full") return null;
+      return loaders.litellm().then((l) => l.providerCompatibility ?? null, () => null);
+    }
+  },
   /** Optional file: the open-weight model radar. Rejects when the file is not there; pages show an empty state. */
   openModels: () => cached<OpenModelsFile>(`${dataBase()}open-models.json`),
   /** Optional file: the merged Release Radar (tools/build_radar.py). Without it the Radar page falls back to the newest digest. */

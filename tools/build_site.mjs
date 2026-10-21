@@ -5,7 +5,8 @@
 // PORTAL_EDITION (Amplify environment variable): "full" (default) = the platform team's portal (site/);
 // "clean" = the portal for everyone who needs the latest LLM information (site-clean/): no 發布流程,
 // LiteLLM 與安全, 上手指南, Onboarding tab or AI security test demo - and none of their data: the deep dives lose
-// `onboarding`; data/litellm.json and config/ (the gateway example) are left out. Test results (runs/) stay: the
+// `onboarding`; data/litellm.json and config/ (the gateway example) are left out. Test results (runs/) and the documented
+// LiteLLM provider matrix (data/provider-compatibility.json, 方法與來源 → 測試方法) stay. Test results: the
 // model page's 內部測試 tab shows them.
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 
@@ -85,8 +86,22 @@ if (edition === "clean") {
       writeFileSync(`${dir}/${f}`, JSON.stringify(doc, null, 2) + "\n");
     }
   }
-  // data/litellm.json is the LiteLLM 與安全 page (a model's own LiteLLM facts are in catalog.json and stay)
-  for (const dir of [`${dist}/data`, ...versions.map((d) => `${dist}/data/versions/${d}`)]) rmSync(`${dir}/litellm.json`, { force: true });
+  // data/litellm.json is the LiteLLM 與安全 page (a model's own LiteLLM facts are in catalog.json and stay). A version
+  // published before data/provider-compatibility.json existed has the documented matrix inside litellm.json: it is
+  // written out as that file first, so the clean edition's 測試方法 shows it for that version too.
+  let carried = 0;
+  for (const dir of [`${dist}/data`, ...versions.map((d) => `${dist}/data/versions/${d}`)]) {
+    const ll = `${dir}/litellm.json`, pc = `${dir}/provider-compatibility.json`;
+    if (existsSync(ll) && !existsSync(pc)) {
+      const doc = JSON.parse(readFileSync(ll, "utf8"));
+      if (doc.providerCompatibility) {
+        writeFileSync(pc, JSON.stringify({ schema: "provider-compatibility/v1", generatedAt: doc.generatedAt, locale: doc.locale, ...doc.providerCompatibility }));
+        carried++;
+      }
+    }
+    rmSync(ll, { force: true });
+  }
+  if (carried) console.log(`clean edition: provider matrix carried out of litellm.json for ${carried} version(s)`);
   rmSync(`${dist}/security-tests.html`, { force: true });
   // security test cases (even redacted, they are case-by-case results): the clean portal shows only the totals
   for (const f of jsonIn(`${dist}/runs/security`)) if (f.endsWith(".cases.json")) rmSync(`${dist}/runs/security/${f}`, { force: true });

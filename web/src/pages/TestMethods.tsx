@@ -51,7 +51,7 @@ const ATTRIBUTION: [string, string][] = [
 ];
 
 export default function TestMethods() {
-  const litellm = useData(loaders.litellm); // not in the clean edition: the documented matrix is then left out
+  const documented = useData(loaders.providerCompatibility); // both editions (data/provider-compatibility.json)
   const full = EDITION === "full";
   return (
     <>
@@ -119,7 +119,7 @@ python3 tools/sec_suite.py run --gateway <GW>/v1 --routes <id> --purpose pre-rel
 portalctl push --portal <portal repo> --only runs --note "<模型> 上線前測試"`}</pre>
         </section>)}
 
-      {litellm.data?.providerCompatibility && <Documented doc={litellm.data.providerCompatibility} />}
+      {documented.data && <Documented doc={documented.data} />}
     </>
   );
 }
