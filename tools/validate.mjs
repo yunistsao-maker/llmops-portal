@@ -21,6 +21,7 @@ const targets = [
   ["data/lifecycle.json", "LifecycleFile"],
   ["data/litellm.json", "LiteLLMFile"],
   ["data/requirements.json", "RequirementsFile"],
+  ...(existsSync(join(root, "data/provider-compatibility.json")) ? [["data/provider-compatibility.json", "ProviderCompatibilityFile"]] : []),
   ...(existsSync(join(root, "data/open-models.json")) ? [["data/open-models.json", "OpenModelsFile"]] : []),
   ...(existsSync(join(root, "data/radar.json")) ? [["data/radar.json", "RadarFile"]] : []),
   ...(existsSync(join(root, "radar/curation.json")) ? [["radar/curation.json", "RadarCuration"]] : []),

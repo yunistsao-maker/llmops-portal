@@ -29,6 +29,7 @@ FILE_TYPES = [
     ("data/catalog.json", "CatalogFile"),
     ("data/lifecycle.json", "LifecycleFile"),
     ("data/litellm.json", "LiteLLMFile"),
+    ("data/provider-compatibility.json", "ProviderCompatibilityFile"),  # optional: documented LiteLLM provider matrix
     ("data/requirements.json", "RequirementsFile"),
     ("data/open-models.json", "OpenModelsFile"),  # optional: open-weight model radar
     ("data/radar.json", "RadarFile"),  # optional: Release Radar roll-up (tools/build_radar.py)
@@ -43,7 +44,7 @@ FILE_TYPES = [
 ]
 
 
-OPTIONAL_TYPES = {"OpenModelsFile", "RadarFile", "RadarCuration", "SecurityRunSummary", "SecurityRunCases"}
+OPTIONAL_TYPES = {"ProviderCompatibilityFile", "OpenModelsFile", "RadarFile", "RadarCuration", "SecurityRunSummary", "SecurityRunCases"}
 
 
 def load(path):

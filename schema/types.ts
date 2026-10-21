@@ -530,6 +530,16 @@ export interface ProviderCompatibility {
   knownIssues?: { title: string; provider: string; surface: string; state: "open" | "closed"; date?: ISODate; summary: string; sources: SourceRef[] }[];
 }
 
+/**
+ * data/provider-compatibility.json: the documented LiteLLM provider x API surface matrix (方法與來源 → 測試方法), in
+ * both editions. Researched, not measured; maintained by the platform team (the research agent does not write it).
+ */
+export interface ProviderCompatibilityFile extends ProviderCompatibility {
+  schema: "provider-compatibility/v1";
+  generatedAt: ISODateTime;
+  locale: Locale;
+}
+
 export interface LiteLLMFile {
   schema: "litellm/v1";
   generatedAt: ISODateTime;
@@ -544,7 +554,10 @@ export interface LiteLLMFile {
   advisories: SecurityAdvisory[];
   /** Cross-model parameter pitfalls seen through the gateway. */
   knownPitfalls: { title: string; affects: string; symptom: string; fix: string; sources: SourceRef[] }[];
-  /** Documented API compatibility per LiteLLM provider route (測試結果 → Gateway → CSP, next to the measured runs). */
+  /**
+   * @deprecated Moved to data/provider-compatibility.json (ProviderCompatibilityFile) so that the clean edition, which
+   * has no litellm.json, shows it too. Still read from releases published before 2026-10-22.
+   */
   providerCompatibility?: ProviderCompatibility;
   sources: SourceRef[];
 }

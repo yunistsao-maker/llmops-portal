@@ -79,7 +79,7 @@ npm run selftest                  # 不需憑證，約 20 秒
 | LiteLLM 與 gateway 安全 | `litellm.json` | 支援窗口、avoid 清單、公告、陷阱 |
 | 發布流程 | `requirements.json` → `gates`、`requirements` | 每個模型的 release record（G0–G10） |
 | 模型頁 · 內部測試 | `runs/compat`、`runs/perf`、`runs/security` | 這個模型的所有實測：各層上線前結論、紀錄，以及詳細結果（各路由案例表、Gateway → CSP 指標與歸因、效能數字），只列這個模型的路由 |
-| 方法與來源 | `requirements.json` → `metricDefinitions`、`securityTestCatalog`；`litellm.json` → `providerCompatibility` | 指標定義、**測試方法**（測試分層、G3 案例清單、Gateway → CSP 歸因、執行與發布指令、依公開文件的 LiteLLM 支援矩陣）、AI 安全測試目錄、來源 |
+| 方法與來源 | `requirements.json` → `metricDefinitions`、`securityTestCatalog`；`provider-compatibility.json` | 指標定義、**測試方法**（測試分層、G3 案例清單、Gateway → CSP 歸因、執行與發布指令、依公開文件的 LiteLLM 支援矩陣）、AI 安全測試目錄、來源 |
 
 ### UI 呈現規則（避免誤導）
 
@@ -139,7 +139,7 @@ python3 tools/gateway_csp_check.py --list      # 24 個案例與所屬的 API �
 | 延遲開銷 | gateway − 直連的 p50 / p95（`--samples` 成對），串流另算 TTFT 開銷 | 直連要和 gateway 同區域、同部署 |
 | Prompt token 差異 | 兩邊回報的 prompt_tokens 差距（%） | 成本分攤的偏差 |
 
-「方法與來源 → 測試方法」列出「依公開文件」的支援矩陣（`data/litellm.json` → `providerCompatibility`，LiteLLM 各 provider × 12 類 API 功能），在實測之前先有參考；
+「方法與來源 → 測試方法」列出「依公開文件」的支援矩陣（`data/provider-compatibility.json`，LiteLLM 各 provider × 12 類 API 功能；完整版與 clean 版都有。2026-10-22 以前發布的版本放在 `litellm.json` 的 `providerCompatibility`，UI 與 clean build 都還讀得到），在實測之前先有參考；
 實測與文件不一致時以實測為準。完整定義在 `requirements.json` → `metricDefinitions`（「方法與來源」頁）。`tools/fixtures/examples/` 是對
 `tools/mock_gateway.py` 跑的示範結果（不在 `runs/`，所以不會出現在網站上）；要在本機看版面，把它們複製進 `runs/` 再 build。
 
