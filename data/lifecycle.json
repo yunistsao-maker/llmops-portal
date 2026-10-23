@@ -1,8 +1,8 @@
 {
   "schema": "lifecycle/v1",
-  "generatedAt": "2026-10-20T10:00:00Z",
+  "generatedAt": "2026-10-24T03:00:00Z",
   "locale": "zh-TW",
-  "asOf": "2026-10-20",
+  "asOf": "2026-10-24",
   "policies": [
     {
       "service": "bedrock",
@@ -2533,6 +2533,251 @@
       "sources": [
         {
           "id": "ms-foundry-lifecycle-retirement-enus"
+        }
+      ],
+      "verification": "official"
+    },
+    {
+      "id": "gemini-api-gemini-omni-flash-preview-shutdown",
+      "modelName": "Gemini Omni Flash Preview",
+      "vendor": "google",
+      "providerModelId": "gemini-omni-flash-preview",
+      "cloud": "vendor-direct",
+      "service": "gemini-api",
+      "event": "retirement",
+      "date": "2026-10-22",
+      "sources": [
+        {
+          "id": "google-gemini-api-deprecations"
+        }
+      ],
+      "verification": "official",
+      "replacement": "gemini-omni-1.1-flash",
+      "notes": [
+        "已關閉。"
+      ]
+    },
+    {
+      "id": "gemini-api-gemini-3-1-flash-live-preview-shutdown",
+      "modelName": "Gemini 3.1 Flash Live Preview",
+      "vendor": "google",
+      "providerModelId": "gemini-3.1-flash-live-preview",
+      "cloud": "vendor-direct",
+      "service": "gemini-api",
+      "event": "retirement",
+      "date": "2026-11-17",
+      "sources": [
+        {
+          "id": "google-gemini-api-deprecations"
+        }
+      ],
+      "verification": "official",
+      "replacement": "gemini-3.8-live"
+    },
+    {
+      "id": "gemini-api-gemini-2-5-flash-native-audio-preview-shutdown",
+      "modelName": "Gemini 2.5 Flash Native Audio Preview (12-2025)",
+      "vendor": "google",
+      "providerModelId": "gemini-2.5-flash-native-audio-preview-12-2025",
+      "cloud": "vendor-direct",
+      "service": "gemini-api",
+      "event": "retirement",
+      "date": "2026-11-17",
+      "sources": [
+        {
+          "id": "google-gemini-api-deprecations"
+        }
+      ],
+      "verification": "official",
+      "replacement": "gemini-3.8-live"
+    },
+    {
+      "id": "gemini-api-gemini-3-1-flash-tts-preview-shutdown",
+      "modelName": "Gemini 3.1 Flash TTS Preview",
+      "vendor": "google",
+      "providerModelId": "gemini-3.1-flash-tts-preview",
+      "cloud": "vendor-direct",
+      "service": "gemini-api",
+      "event": "retirement",
+      "date": "2026-11-17",
+      "sources": [
+        {
+          "id": "google-gemini-api-deprecations"
+        }
+      ],
+      "verification": "official",
+      "replacement": "gemini-3.8-flash-tts / gemini-3.8-flash-lite-tts"
+    },
+    {
+      "id": "gemini-api-gemini-2-5-flash-preview-tts-shutdown",
+      "modelName": "Gemini 2.5 Flash Preview TTS",
+      "vendor": "google",
+      "providerModelId": "gemini-2.5-flash-preview-tts",
+      "cloud": "vendor-direct",
+      "service": "gemini-api",
+      "event": "retirement",
+      "date": "2026-11-17",
+      "sources": [
+        {
+          "id": "google-gemini-api-deprecations"
+        }
+      ],
+      "verification": "official",
+      "replacement": "gemini-3.8-flash-tts / gemini-3.8-flash-lite-tts"
+    },
+    {
+      "id": "gemini-api-gemini-2-5-pro-preview-tts-shutdown",
+      "modelName": "Gemini 2.5 Pro Preview TTS",
+      "vendor": "google",
+      "providerModelId": "gemini-2.5-pro-preview-tts",
+      "cloud": "vendor-direct",
+      "service": "gemini-api",
+      "event": "retirement",
+      "date": "2026-11-17",
+      "sources": [
+        {
+          "id": "google-gemini-api-deprecations"
+        }
+      ],
+      "verification": "official",
+      "replacement": "gemini-3.8-flash-tts / gemini-3.8-flash-lite-tts"
+    },
+    {
+      "id": "foundry-llama-4-maverick-retirement",
+      "modelName": "Llama 4 Maverick 17B 128E Instruct FP8",
+      "vendor": "meta",
+      "providerModelId": "Llama-4-Maverick-17B-128E-Instruct-FP8",
+      "cloud": "azure",
+      "service": "foundry",
+      "event": "retirement",
+      "date": "2026-11-19",
+      "sources": [
+        {
+          "id": "ms-foundry-retirement-schedule"
+        }
+      ],
+      "verification": "official"
+    },
+    {
+      "id": "foundry-ministral-3b-retirement",
+      "modelName": "Ministral 3B",
+      "vendor": "mistral",
+      "providerModelId": "Ministral-3B",
+      "cloud": "azure",
+      "service": "foundry",
+      "event": "retirement",
+      "date": "2026-12-09",
+      "sources": [
+        {
+          "id": "ms-foundry-retirement-schedule"
+        }
+      ],
+      "verification": "official",
+      "replacement": "ministral-ministral-4b-instruct"
+    },
+    {
+      "id": "foundry-mistral-medium-2505-retirement",
+      "modelName": "Mistral Medium (2505)",
+      "vendor": "mistral",
+      "providerModelId": "mistral-medium-2505",
+      "cloud": "azure",
+      "service": "foundry",
+      "event": "retirement",
+      "date": "2026-12-09",
+      "sources": [
+        {
+          "id": "ms-foundry-retirement-schedule"
+        }
+      ],
+      "verification": "official",
+      "replacement": "mistral-medium-3-5"
+    },
+    {
+      "id": "bedrock-deepseek-r1-eol",
+      "modelName": "DeepSeek R1",
+      "vendor": "deepseek",
+      "providerModelId": "deepseek.r1-v1:0",
+      "cloud": "aws",
+      "service": "bedrock",
+      "event": "retirement",
+      "date": "2027-03-30",
+      "sources": [
+        {
+          "id": "aws-bedrock-lifecycle-legacy"
+        }
+      ],
+      "verification": "official",
+      "scopeNote": "us-east-1、us-east-2、us-west-2",
+      "notes": [
+        "2026-09-30 起 Legacy；public extended access「To be announced」。"
+      ]
+    },
+    {
+      "id": "bedrock-kimi-k2-thinking-eol",
+      "modelName": "Kimi K2 Thinking",
+      "vendor": "moonshot",
+      "providerModelId": "moonshot.kimi-k2-thinking",
+      "cloud": "aws",
+      "service": "bedrock",
+      "event": "retirement",
+      "date": "2027-03-30",
+      "sources": [
+        {
+          "id": "aws-bedrock-lifecycle-legacy"
+        }
+      ],
+      "verification": "official",
+      "notes": [
+        "2026-09-30 起 Legacy；區域依 Legacy 表。"
+      ]
+    },
+    {
+      "id": "bedrock-glm-4-7-eol",
+      "modelName": "GLM 4.7",
+      "vendor": "other",
+      "providerModelId": "zai.glm-4.7",
+      "cloud": "aws",
+      "service": "bedrock",
+      "event": "retirement",
+      "date": "2027-03-30",
+      "sources": [
+        {
+          "id": "aws-bedrock-lifecycle-legacy"
+        }
+      ],
+      "verification": "official",
+      "notes": [
+        "2026-09-30 起 Legacy；zai.glm-4.7-flash 同日。"
+      ]
+    },
+    {
+      "id": "bedrock-palmyra-x4-eol",
+      "modelName": "Writer Palmyra X4",
+      "vendor": "other",
+      "providerModelId": "writer.palmyra-x4-v1:0",
+      "cloud": "aws",
+      "service": "bedrock",
+      "event": "retirement",
+      "date": "2027-03-09",
+      "sources": [
+        {
+          "id": "aws-bedrock-lifecycle-legacy"
+        }
+      ],
+      "verification": "official"
+    },
+    {
+      "id": "bedrock-palmyra-x5-eol",
+      "modelName": "Writer Palmyra X5",
+      "vendor": "other",
+      "providerModelId": "writer.palmyra-x5-v1:0",
+      "cloud": "aws",
+      "service": "bedrock",
+      "event": "retirement",
+      "date": "2027-03-21",
+      "sources": [
+        {
+          "id": "aws-bedrock-lifecycle-legacy"
         }
       ],
       "verification": "official"

@@ -1,9 +1,9 @@
 {
   "schema": "litellm/v1",
-  "generatedAt": "2026-10-20T10:00:00Z",
+  "generatedAt": "2026-10-24T03:00:00Z",
   "locale": "zh-TW",
-  "asOf": "2026-10-20",
-  "supportPolicy": "LiteLLM 只維護最近四條 stable minor 線（含其中所有 patch）；自 1.84.0 起每週的 stable 升 MINOR、PATCH 只用於 hotfix，因此每條線約有一個月維護期。企業客戶可洽談更長支援，重大漏洞可能例外修補。注意：官方政策頁（2026-06-20，2026-10-06 複查未改）列的仍是 1.86–1.89，下方 supportedLines 是依政策與 1.104.0 stable 發布（PyPI 2026-10-03）推導：v1.101–v1.104，v1.100 線已移出窗口。與 1.104.0 同時切出的回移植 patch 只有 1.103.3，與此推導一致。 2026-10-06 複查：PyPI 最新 stable 仍是 1.104.0，窗口不變；v1.105.0 還只有 rc.1。 2026-10-20：依政策與 1.106.0 stable（2026-10-18）推導，窗口為 v1.103–v1.106，v1.102 線移出。",
+  "asOf": "2026-10-24",
+  "supportPolicy": "LiteLLM 只維護最近四條 stable minor 線（含其中所有 patch）；自 1.84.0 起每週的 stable 升 MINOR、PATCH 只用於 hotfix，因此每條線約有一個月維護期。企業客戶可洽談更長支援，重大漏洞可能例外修補。注意：官方政策頁（2026-06-20，2026-10-06 複查未改）列的仍是 1.86–1.89，下方 supportedLines 是依政策與 1.104.0 stable 發布（PyPI 2026-10-03）推導：v1.101–v1.104，v1.100 線已移出窗口。與 1.104.0 同時切出的回移植 patch 只有 1.103.3，與此推導一致。 2026-10-06 複查：PyPI 最新 stable 仍是 1.104.0，窗口不變；v1.105.0 還只有 rc.1。 2026-10-20：依政策與 1.106.0 stable（2026-10-18）推導，窗口為 v1.103–v1.106，v1.102 線移出。 2026-10-24：1.107.0 的發布物被汙染並下架、沒有乾淨的重新發布，窗口維持 v1.103–v1.106；乾淨的 1.107.x 發布後改為 v1.104–v1.107。",
   "supportedLines": [
     "v1.106.x",
     "v1.105.x",
@@ -11,25 +11,46 @@
     "v1.103.x"
   ],
   "recommended": {
-    "version": "v1.105.1",
-    "pinning": "以 image digest 釘選（docker.litellm.ai/berriai/litellm:1.105.1 的 sha256；image 以 cosign 簽章），不要用 main-latest、*-dev、*-rc；PyPI 以 hash 釘選並經私有 mirror。",
+    "version": "v1.105.2",
+    "pinning": "以 image digest 釘選（docker.litellm.ai/berriai/litellm:1.105.2 的 sha256；image 以 cosign 簽章），不要用 main-latest、*-dev、*-rc；PyPI 以 hash 釘選並經私有 mirror。 1.107.0 供應鏈事件之後：image 一律以 digest 釘選並驗證 cosign 簽章，禁用 latest、main-stable、main-latest 等浮動 tag。",
     "rationale": [
-      "有官方 notes 的最新 stable patch，修正 Chat→Responses bridge 對 ≥256 KiB non-streaming 請求重複寫 SpendLogs（#44500 / PR #44508），以及高流量下 LiteLLM_DailyModelUsage 鎖競爭造成 SpendLogs 掉列（PR #44243）；沒有 migration 與 breaking change。依 notes，#44508 只在 1.102.4 與 1.105.1 修正，1.103 / 1.104 線沒有。",
-      "自 v1.104.x 升級要吸收 1.105 的 breaking changes：(1) Bedrock 上的 GPT-5.6 / GPT-6 / GPT-6.1 預設改走原生 Chat Completions（response id、service_tier、reasoning 欄位格式改變；要留在 Converse 寫 bedrock/converse/<model>——本平台 catalog 的 provider 字串已明寫）；(2) ENFORCE_PRISMA_MIGRATION_CHECK=false 被忽略，migration 失敗一律不啟動；(3) /sso/debug/* 預設 404（ENABLE_SSO_DEBUG=true 才開）；(4) Decisions 請求對非 OpenAI provider 送 safety_identifier 回 400（drop_params: true 可還原）。",
-      "v1.106.0（2026-10-18）是最新 stable，但改了 MCP 憑證轉送、response cache 與 Responses WebSocket 的預設行為，剛發布兩天；先在 staging 評估，不當建議版本。",
+      "有官方 notes 的最新 1.105 patch（2026-10-20），notes 稱沒有新的 database migration；它在 1.105.1 之上修正 streamed alias 請求以 deployment 的模型計價（#44341）、team key 只能存取自己的 batch 與 file / vector store ID（#47067）、Responses bridge 的輸出合併為單一 choices[0]。保留 1.105.1 的 #44508 重複記帳修正。",
+      "v1.105.3 與 v1.106.2（2026-10-21）含標為 breaking 的 batch 計費修正（fix(batches)!），而且沒有 notes 頁，暫不當建議版本；已在 1.106 線的環境用 1.106.2（官方事件公告指定的乾淨版本）。",
+      "1.107.0 的 PyPI / Docker 發布物在 2026-10-21 被植入惡意程式（見 advisories）；1.107.x 在官方發布乾淨版本與 notes 前一律不採用。",
+      "自 v1.104.x 升級要吸收 1.105 的 breaking changes：Bedrock 上 GPT-5.6 / GPT-6 / GPT-6.1 預設改走原生 Chat Completions（要留在 Converse 寫 bedrock/converse/<model>）、ENFORCE_PRISMA_MIGRATION_CHECK=false 被忽略、/sso/debug/* 預設 404、Decisions 請求對非 OpenAI provider 送 safety_identifier 回 400。",
       "這是依各版 release notes 推導的建議，不是 LiteLLM 官方說法；上 production 前在 staging 跑 compat suite 與負載測試。"
     ]
   },
   "minimumBaseline": {
-    "version": "v1.103.5",
+    "version": "v1.103.6",
     "rationale": [
-      "1.106.0 stable 發布後，依「最近四條 stable minor 線」推導的支援窗口是 v1.103–v1.106；1.103 是最舊的一條線，用該線最新 patch v1.103.5（2026-10-17，Responses API tool call 修正）。",
-      "不要停在 v1.103.0 / v1.103.1（pass-through endpoint 問題）。",
-      "1.103 線的 notes 沒有 #44500 重複記帳的修正：留在這條線的環境，FinOps 繼續以 litellm_call_id 去重。",
-      "LiteLLM 約每週一個 stable minor：1.107（rc 已上 PyPI）一發布，1.103 線就會移出窗口——不要把 1.103 當長期落點。"
+      "支援窗口維持 v1.103–v1.106（1.107.0 的發布物已下架、沒有乾淨的重新發布，本期視為尚未發布）；1.103 是最舊的一條線。",
+      "v1.103.6（2026-10-20）回移植了重複記帳修正 #44508，1.103.5 沒有；沒有 migration。v1.103.7（10-21）含標為 breaking 的 batch 計費修正且沒有 notes，暫不當基準。",
+      "乾淨的 1.107.x 一發布，窗口就變成 v1.104–v1.107，最低基準要移到 1.104.x 的最新 patch（目前 v1.104.5）——不要把 1.103 當長期落點。"
     ]
   },
   "avoid": [
+    {
+      "versions": "1.107.0",
+      "reason": "2026-10-21 PyPI 與 Docker Hub / GHCR 的發布物被植入竊密與遠端執行程式（供應鏈攻擊）；曾安裝者視為主機已遭入侵並輪替所有憑證。",
+      "sources": [
+        {
+          "id": "litellm-incident-2026-10-21"
+        },
+        {
+          "id": "osv-mal-2026-2144"
+        }
+      ]
+    },
+    {
+      "versions": "latest、main-stable",
+      "reason": "浮動 tag：2026-10-21 曾在約 2.5 小時內指向被汙染的 1.107.0 image。一律以 digest 釘選。",
+      "sources": [
+        {
+          "id": "litellm-incident-2026-10-21"
+        }
+      ]
+    },
     {
       "versions": "1.82.7、1.82.8",
       "reason": "PyPI 供應鏈攻擊的惡意版本。",
@@ -174,6 +195,61 @@
   ],
   "releases": [
     {
+      "version": "v1.107.0",
+      "channel": "stable",
+      "date": "2026-10-21",
+      "highlights": [
+        "PyPI wheel 與 Docker Hub / GHCR image 被植入竊密與遠端執行程式，已下架——不要使用。",
+        "原始碼 changelog 含多項 breaking change：預設強制 fallback 模型的存取權（#46127）、Bedrock guardrail 會掃描或拒收附件（#43383）、Gemini 4 Argon 價格列整理（#46246）、Bedrock 上 Grok 預設改走原生 Chat Completions（#45473）。"
+      ],
+      "sources": [
+        {
+          "id": "litellm-gh-v1-107-0"
+        },
+        {
+          "id": "litellm-incident-2026-10-21"
+        }
+      ],
+      "supported": false,
+      "caution": "發布物被汙染（2026-10-21）；等官方的乾淨重新發布與 notes。"
+    },
+    {
+      "version": "v1.106.2",
+      "channel": "patch",
+      "date": "2026-10-21",
+      "highlights": [
+        "Bedrock Mantle 404 count_tokens fallback（#47742）。",
+        "batch 計費 / 定價 / 轉譯修正，標為 breaking（#47736）；LIT-145 計費修正（#47695）。",
+        "官方事件公告指定的乾淨釘選版本；10-24 時是 PyPI 上的最新版。"
+      ],
+      "sources": [
+        {
+          "id": "litellm-gh-v1-106-2"
+        },
+        {
+          "id": "litellm-incident-2026-10-21"
+        }
+      ],
+      "supported": true,
+      "caution": "只有 GitHub release，沒有 notes 頁；batch 修正標為 breaking。"
+    },
+    {
+      "version": "v1.106.1",
+      "channel": "patch",
+      "date": "2026-10-20",
+      "highlights": [
+        "同 1.105.2 的 count_tokens、thinking block 與 batch 存取修正。",
+        "單一 server scope 的 MCP 裸工具名稱路由到該 server。",
+        "vector store metadata 修正，附選用清理腳本 db_scripts/strip_vector_store_internal_metadata.py。"
+      ],
+      "sources": [
+        {
+          "id": "litellm-v1-106-1"
+        }
+      ],
+      "supported": true
+    },
+    {
       "version": "v1.106.0",
       "channel": "stable",
       "date": "2026-10-18",
@@ -192,6 +268,39 @@
         },
         {
           "id": "litellm-release-notes"
+        }
+      ],
+      "supported": true
+    },
+    {
+      "version": "v1.105.3",
+      "channel": "patch",
+      "date": "2026-10-21",
+      "highlights": [
+        "per-user auth 的 MCP 工具列表；Bedrock Mantle count_tokens fallback。",
+        "LIT-145 計費修正與 aiohttp 3.14.4；batch 修正標為 breaking（#47737）。"
+      ],
+      "sources": [
+        {
+          "id": "litellm-gh-v1-105-3"
+        }
+      ],
+      "supported": true,
+      "caution": "只有 GitHub release，沒有 notes 頁；batch 修正標為 breaking。"
+    },
+    {
+      "version": "v1.105.2",
+      "channel": "patch",
+      "date": "2026-10-20",
+      "highlights": [
+        "count_tokens 重寫；Responses bridge 的輸出合併為單一 choices[0]；保留有簽章的空 thinking block。",
+        "team key 可讀取 / 取消自己的 batch，並對 file / vector store / video ID 檢查模型權限（#47067）。",
+        "streamed alias 請求以 deployment 的模型計價（#44341）。",
+        "notes 稱沒有新的 database migration。"
+      ],
+      "sources": [
+        {
+          "id": "litellm-v1-105-2"
         }
       ],
       "supported": true
@@ -251,6 +360,21 @@
           "id": "litellm-v1-105-0-rc1"
         }
       ]
+    },
+    {
+      "version": "v1.104.5",
+      "channel": "patch",
+      "date": "2026-10-21",
+      "highlights": [
+        "只有 Bedrock Mantle count_tokens fallback（#47634）。"
+      ],
+      "sources": [
+        {
+          "id": "litellm-gh-v1-104-5"
+        }
+      ],
+      "supported": true,
+      "caution": "只有 GitHub release，沒有 notes 頁。"
     },
     {
       "version": "v1.104.4",
@@ -334,6 +458,38 @@
           "id": "pypi-litellm-rss"
         }
       ]
+    },
+    {
+      "version": "v1.103.7",
+      "channel": "patch",
+      "date": "2026-10-21",
+      "highlights": [
+        "Bedrock Mantle count_tokens fallback；LIT-145 計費修正。",
+        "batch 計費 / 定價 / 轉譯修正，標為 breaking（fix(batches)!，#47732）。"
+      ],
+      "sources": [
+        {
+          "id": "litellm-gh-v1-103-7"
+        }
+      ],
+      "supported": true,
+      "caution": "只有 GitHub release，沒有 notes 頁；batch 修正標為 breaking。"
+    },
+    {
+      "version": "v1.103.6",
+      "channel": "patch",
+      "date": "2026-10-20",
+      "highlights": [
+        "回移植 #44508：non-streaming bridged 請求 ≥256 KiB 的重複記帳修正。",
+        "上游拒絕 realtime handshake（例如 Azure 401）時送出 error event。",
+        "沒有 migration。"
+      ],
+      "sources": [
+        {
+          "id": "litellm-v1-103-6"
+        }
+      ],
+      "supported": true
     },
     {
       "version": "v1.103.5",
@@ -715,6 +871,48 @@
     }
   ],
   "advisories": [
+    {
+      "id": "CVE-2026-114612",
+      "title": "salt key 重用可升為 proxy admin，並經 MCP stdio 在主機執行指令（GHSA-7hp6-4w63-5g45）",
+      "affected": "≥1.91.0 <1.100.4；≥1.101.0 <1.101.3；≥1.102.0 <1.102.2；≥1.103.0 <1.103.1；1.104.0rc1；1.87–1.90 只在 EXPERIMENTAL_UI_LOGIN=true 時",
+      "fixedIn": "1.100.4、1.101.3、1.102.2、1.103.1、1.104.0rc2",
+      "severity": "critical",
+      "published": "2026-10-22",
+      "summary": "內部使用者可升為 proxy admin 並在主機執行任意指令。GHSA 09-30 公開（High，CVSS 4.0 7.7）；NVD 10-22 收錄，頁面上的 CVSS 3.1 9.9 為 GitHub 提供的評分。",
+      "action": "建議版本與最低基準都已修正；確認沒有環境停在 1.103.0。",
+      "sources": [
+        {
+          "id": "ghsa-7hp6-4w63-5g45"
+        },
+        {
+          "id": "nvd-cve-2026-114612"
+        }
+      ]
+    },
+    {
+      "id": "LITELLM-2026-10-21-SUPPLY-CHAIN",
+      "title": "LiteLLM v1.107.0 發布物被汙染：PyPI wheel 與 Docker image 植入竊密與遠端執行程式",
+      "affected": "PyPI litellm==1.107.0；Docker Hub / GHCR 的 v1.107.0、latest、main-latest、main-stable（2026-10-21 UTC 11:46–14:20 之間拉取者）",
+      "fixedIn": "已下架；乾淨釘選 1.106.2 或更早的明確版本",
+      "severity": "critical",
+      "published": "2026-10-21",
+      "summary": "攻擊者以外洩的 GitHub CLI token 從其控制的 repository 建置並發布 1.107.0。惡意程式放進 cook.pth、cook.py、sitecustomize.py，每次啟動 Python 都會竊取憑證外傳，並有常駐程式（/tmp/remote_code_loader.lock）每小時載入遠端程式。GitHub source tag 與 Enterprise 私有 registry 未受影響；docker.litellm.ai 是否受影響未說明。",
+      "action": "搜尋 litellm-1.107.0.dist-info、cook.pth、sitecustomize.py、lock 檔與惡意 image digest；有中招先刪檔、停常駐程式，再從頭重建並輪替 IAM role、provider keys、master / virtual keys 與 DATABASE_URL 密碼，查 CloudTrail；image 以 digest 釘選。",
+      "sources": [
+        {
+          "id": "litellm-incident-2026-10-21"
+        },
+        {
+          "id": "litellm-issue-47826"
+        },
+        {
+          "id": "osv-mal-2026-2144"
+        },
+        {
+          "id": "chainguard-litellm-1-107-0"
+        }
+      ]
+    },
     {
       "id": "PYPI-LITELLM-2026-03-24",
       "title": "PyPI 供應鏈攻擊：litellm 1.82.7 / 1.82.8 植入竊密程式",
@@ -1323,6 +1521,17 @@
           "id": "litellm-v1-105-0"
         }
       ]
+    },
+    {
+      "title": "Anthropic 新 SDK 以 Authorization: Bearer 送金鑰",
+      "affects": "Anthropic Python SDK 2.0.0、TypeScript 1.0.0、Go 2.0.0、Java 3.0.0、C# 13.0.0、PHP 1.0.0、Ruby 2.0.0、ant CLI 2.0.0（2026-10-21）經 gateway 呼叫 Claude",
+      "symptom": "只讀 X-Api-Key 的 proxy / gateway 回 401；改用 API 版本 2026-10-21 後，帶 temperature / top_p / top_k（即使是預設值）的 Claude 請求回 400。",
+      "fix": "確認 LiteLLM 的 Anthropic 端點與自建 proxy 接受 Authorization: Bearer；否則先釘住舊的 SDK 大版本。採用新 API 版本前移除取樣參數或設 drop_params。",
+      "sources": [
+        {
+          "id": "anthropic-migration-2026-10-21"
+        }
+      ]
     }
   ],
   "sources": [
@@ -1415,6 +1624,18 @@
     },
     {
       "id": "litellm-gh-v1-104-4"
+    },
+    {
+      "id": "litellm-incident-2026-10-21"
+    },
+    {
+      "id": "litellm-v1-105-2"
+    },
+    {
+      "id": "litellm-v1-103-6"
+    },
+    {
+      "id": "litellm-gh-v1-106-2"
     }
   ]
 }
