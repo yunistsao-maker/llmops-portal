@@ -1,6 +1,6 @@
 {
   "schema": "sources/v1",
-  "generatedAt": "2026-10-14T17:43:00Z",
+  "generatedAt": "2026-10-24T03:00:00Z",
   "sources": [
     {
       "id": "anthropic-opus55-announce",
@@ -40,7 +40,7 @@
       "url": "https://platform.claude.com/docs/en/about-claude/pricing",
       "publisher": "Anthropic",
       "type": "vendor-doc",
-      "accessed": "2026-10-15"
+      "accessed": "2026-10-24"
     },
     {
       "id": "anthropic-release-notes",
@@ -48,7 +48,7 @@
       "url": "https://platform.claude.com/docs/en/release-notes/overview",
       "publisher": "Anthropic",
       "type": "vendor-doc",
-      "accessed": "2026-10-15"
+      "accessed": "2026-10-24"
     },
     {
       "id": "anthropic-claude-on-gcp",
@@ -96,7 +96,7 @@
       "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-opus-5-5.html",
       "publisher": "AWS",
       "type": "csp-doc",
-      "accessed": "2026-10-10"
+      "accessed": "2026-10-24"
     },
     {
       "id": "aws-bedrock-astra-card",
@@ -144,7 +144,7 @@
       "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-lifecycle.html",
       "publisher": "AWS",
       "type": "csp-doc",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-24"
     },
     {
       "id": "aws-bedrock-lifecycle-legacy",
@@ -152,7 +152,7 @@
       "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-lifecycle-legacy.html",
       "publisher": "AWS",
       "type": "csp-doc",
-      "accessed": "2026-10-11"
+      "accessed": "2026-10-24"
     },
     {
       "id": "aws-bedrock-endpoints",
@@ -192,7 +192,7 @@
       "url": "https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/model-retirement-schedule",
       "publisher": "Microsoft",
       "type": "csp-doc",
-      "accessed": "2026-10-15"
+      "accessed": "2026-10-24"
     },
     {
       "id": "ms-foundry-models-sold-by-azure",
@@ -336,7 +336,7 @@
       "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/model-versions",
       "publisher": "Google Cloud",
       "type": "csp-doc",
-      "accessed": "2026-10-11"
+      "accessed": "2026-10-24"
     },
     {
       "id": "google-agentplatform-release-notes",
@@ -344,7 +344,7 @@
       "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/release-notes",
       "publisher": "Google Cloud",
       "type": "csp-doc",
-      "accessed": "2026-10-11"
+      "accessed": "2026-10-24"
     },
     {
       "id": "google-vertex-release-notes",
@@ -944,7 +944,7 @@
       "url": "https://moda.gov.tw/major-policies/ai/governance/19248",
       "publisher": "數位發展部",
       "type": "regulator",
-      "accessed": "2026-10-01"
+      "accessed": "2026-10-24"
     },
     {
       "id": "tw-ai-basic-act",
@@ -1056,7 +1056,7 @@
       "url": "https://ai.google.dev/gemini-api/docs/deprecations",
       "publisher": "Google",
       "type": "vendor-doc",
-      "accessed": "2026-10-11"
+      "accessed": "2026-10-24"
     },
     {
       "id": "google-gemini-api-changelog",
@@ -1248,7 +1248,7 @@
       "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-sonnet-5-5.html",
       "publisher": "AWS",
       "type": "csp-doc",
-      "accessed": "2026-10-15"
+      "accessed": "2026-10-24"
     },
     {
       "id": "aws-sonnet55-whatsnew",
@@ -1264,7 +1264,7 @@
       "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-openai-gpt-6-1-sol.html",
       "publisher": "AWS",
       "type": "csp-doc",
-      "accessed": "2026-10-11"
+      "accessed": "2026-10-24"
     },
     {
       "id": "aws-gpt61-sol-whatsnew",
@@ -1512,7 +1512,7 @@
       "url": "https://developers.openai.com/api/docs/changelog",
       "publisher": "OpenAI",
       "type": "vendor-doc",
-      "accessed": "2026-10-11"
+      "accessed": "2026-10-24"
     },
     {
       "id": "aws-whats-new-feed",
@@ -1824,7 +1824,7 @@
       "url": "https://aws.amazon.com/bedrock/pricing/",
       "publisher": "AWS",
       "type": "csp-doc",
-      "accessed": "2026-10-15"
+      "accessed": "2026-10-24"
     },
     {
       "id": "aws-bedrock-model-cards",
@@ -1936,7 +1936,7 @@
       "url": "https://developers.openai.com/api/docs/pricing",
       "publisher": "OpenAI",
       "type": "vendor-doc",
-      "accessed": "2026-10-11"
+      "accessed": "2026-10-24"
     },
     {
       "id": "openai-gpt6-family-guide",
@@ -1976,7 +1976,7 @@
       "url": "https://www.fsc.gov.tw/ch/home.jsp?id=2&parentpath=0",
       "publisher": "金融監督管理委員會",
       "type": "regulator",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-24"
     },
     {
       "id": "moda-acs-frontier-ai-policy",
@@ -2000,7 +2000,7 @@
       "url": "https://moda.gov.tw/press/press-releases/372",
       "publisher": "數位發展部",
       "type": "regulator",
-      "accessed": "2026-10-06"
+      "accessed": "2026-10-24"
     },
     {
       "id": "cna-moda-agent-governance",
@@ -2208,7 +2208,7 @@
       "publisher": "AWS",
       "type": "csp-doc",
       "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-haiku-5-5.html",
-      "accessed": "2026-10-15"
+      "accessed": "2026-10-24"
     },
     {
       "id": "pypi-litellm-1-104-2",
@@ -3745,6 +3745,286 @@
       "publisher": "LiteLLM GitHub issue",
       "type": "github",
       "accessed": "2026-10-20"
+    },
+    {
+      "id": "litellm-incident-2026-10-21",
+      "title": "Security incident: LiteLLM v1.107.0 release compromised (October 21, 2026)",
+      "url": "https://docs.litellm.ai/blog/security-incident-oct-21-2026",
+      "publisher": "LiteLLM",
+      "type": "security-advisory",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "litellm-issue-47826",
+      "title": "v1.107.0 PyPI / Docker artifacts compromised",
+      "url": "https://github.com/BerriAI/litellm/issues/47826",
+      "publisher": "LiteLLM GitHub issue",
+      "type": "github",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "osv-mal-2026-2144",
+      "title": "MAL-2026-2144: Malicious code in litellm (PyPI)",
+      "url": "https://osv.dev/vulnerability/MAL-2026-2144",
+      "publisher": "OSV",
+      "type": "security-advisory",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "chainguard-litellm-1-107-0",
+      "title": "LiteLLM attacked again: malicious 1.107.0 wheels on PyPI and Docker Hub",
+      "url": "https://www.chainguard.dev/unchained/litellm-attacked-again-malicious-1-107-0-wheels-on-pypi-and-docker-hub-october-2026",
+      "publisher": "Chainguard",
+      "type": "security-advisory",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "bleepingcomputer-litellm-2026-10-22",
+      "title": "LiteLLM release pipeline hacked to distribute info-stealer malware",
+      "url": "https://www.bleepingcomputer.com/news/security/litellm-release-pipeline-hacked-to-distribute-info-stealer-malware/",
+      "publisher": "BleepingComputer",
+      "type": "news",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "litellm-v1-103-6",
+      "title": "LiteLLM v1.103.6 release notes",
+      "url": "https://docs.litellm.ai/release_notes/v1.103.6/v1-103-6",
+      "publisher": "LiteLLM",
+      "type": "vendor-doc",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "litellm-v1-105-2",
+      "title": "LiteLLM v1.105.2 release notes",
+      "url": "https://docs.litellm.ai/release_notes/v1.105.2/v1-105-2",
+      "publisher": "LiteLLM",
+      "type": "vendor-doc",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "litellm-v1-106-1",
+      "title": "LiteLLM v1.106.1 release notes",
+      "url": "https://docs.litellm.ai/release_notes/v1.106.1/v1-106-1",
+      "publisher": "LiteLLM",
+      "type": "vendor-doc",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "litellm-gh-v1-103-7",
+      "title": "LiteLLM v1.103.7 (GitHub release)",
+      "url": "https://github.com/BerriAI/litellm/releases/tag/v1.103.7",
+      "publisher": "LiteLLM GitHub",
+      "type": "github",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "litellm-gh-v1-104-5",
+      "title": "LiteLLM v1.104.5 (GitHub release)",
+      "url": "https://github.com/BerriAI/litellm/releases/tag/v1.104.5",
+      "publisher": "LiteLLM GitHub",
+      "type": "github",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "litellm-gh-v1-105-3",
+      "title": "LiteLLM v1.105.3 (GitHub release)",
+      "url": "https://github.com/BerriAI/litellm/releases/tag/v1.105.3",
+      "publisher": "LiteLLM GitHub",
+      "type": "github",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "litellm-gh-v1-106-2",
+      "title": "LiteLLM v1.106.2 (GitHub release)",
+      "url": "https://github.com/BerriAI/litellm/releases/tag/v1.106.2",
+      "publisher": "LiteLLM GitHub",
+      "type": "github",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "litellm-gh-v1-107-0",
+      "title": "LiteLLM v1.107.0 (GitHub release; PyPI / Docker artifacts were compromised)",
+      "url": "https://github.com/BerriAI/litellm/releases/tag/v1.107.0",
+      "publisher": "LiteLLM GitHub",
+      "type": "github",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "ghsa-7hp6-4w63-5g45",
+      "title": "GHSA-7hp6-4w63-5g45: privilege escalation to proxy admin via salt key reuse",
+      "url": "https://github.com/BerriAI/litellm/security/advisories/GHSA-7hp6-4w63-5g45",
+      "publisher": "LiteLLM GitHub security advisory",
+      "type": "security-advisory",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "nvd-cve-2026-114612",
+      "title": "CVE-2026-114612",
+      "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-114612",
+      "publisher": "NIST NVD",
+      "type": "security-advisory",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "aws-bulletin-2026-146",
+      "title": "AWS security bulletin 2026-146-AWS: Strands Agents SDK A2A Server (CVE-2026-115419)",
+      "url": "https://aws.amazon.com/security/security-bulletins/2026-146-aws/",
+      "publisher": "AWS",
+      "type": "security-advisory",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "aws-bulletin-2026-142",
+      "title": "AWS security bulletin 2026-142-AWS: SageMaker Python SDK default_bucket() (CVE-2026-112408)",
+      "url": "https://aws.amazon.com/security/security-bulletins/2026-142-aws/",
+      "publisher": "AWS",
+      "type": "security-advisory",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "gcp-blog-openai-models",
+      "title": "Google Cloud brings OpenAI models to customers",
+      "url": "https://cloud.google.com/blog/products/ai-machine-learning/google-cloud-brings-openai-models-to-customers",
+      "publisher": "Google Cloud Blog",
+      "type": "csp-blog",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "openai-models-google-cloud",
+      "title": "OpenAI models on Google Cloud",
+      "url": "https://openai.com/index/openai-models-google-cloud/",
+      "publisher": "OpenAI",
+      "type": "vendor-blog",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "claude-on-gcp-anthropic-managed",
+      "title": "Claude Models on Google Cloud (Anthropic managed)",
+      "url": "https://claude.com/resources/articles/claude-models-on-google-cloud-anthropic-managed",
+      "publisher": "Anthropic",
+      "type": "vendor-blog",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "anthropic-migration-2026-10-21",
+      "title": "Migrating to API version 2026-10-21",
+      "url": "https://platform.claude.com/docs/en/api/migration-2026-10-21",
+      "publisher": "Anthropic",
+      "type": "vendor-doc",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "aws-whats-new-claude-structured-outputs",
+      "title": "Structured outputs for Claude models available on Amazon Bedrock",
+      "url": "https://aws.amazon.com/about-aws/whats-new/2026/10/claude-structured-outputs-bedrock/",
+      "publisher": "AWS",
+      "type": "csp-blog",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "aws-whats-new-agentcore-gateway-fallback",
+      "title": "AgentCore Gateway now supports Bedrock InvokeModel APIs and model fallback",
+      "url": "https://aws.amazon.com/about-aws/whats-new/2026/10/agentcore-gateway-invokemodel-fallback/",
+      "publisher": "AWS",
+      "type": "csp-blog",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "aws-whats-new-bedrock-cost-explorer",
+      "title": "Analyze Amazon Bedrock costs by product attributes in Cost Explorer",
+      "url": "https://aws.amazon.com/about-aws/whats-new/2026/10/aws-bedrock-attributes-in-cost-explorer/",
+      "publisher": "AWS",
+      "type": "csp-blog",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "aws-whats-new-guardrails-grounding-standard",
+      "title": "Amazon Bedrock Guardrails contextual grounding Standard tier",
+      "url": "https://aws.amazon.com/about-aws/whats-new/2026/10/bedrock-guardrails-grounding-standard/",
+      "publisher": "AWS",
+      "type": "csp-blog",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "aws-whats-new-reflection-beam-jumpstart",
+      "title": "Reflection Beam on SageMaker JumpStart and AWS Trainium",
+      "url": "https://aws.amazon.com/about-aws/whats-new/2026/01/reflection-beam-on-sagemaker-jumpstart-and-aws-trainium/",
+      "publisher": "AWS",
+      "type": "csp-blog",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "ms-foundry-model-router-whats-new",
+      "title": "What's new in model router in Microsoft Foundry Models",
+      "url": "https://learn.microsoft.com/en-us/azure/foundry/foundry-models/whats-new-model-router",
+      "publisher": "Microsoft Learn",
+      "type": "csp-doc",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "hf-minimax-m3-1-flash",
+      "title": "MiniMaxAI/MiniMax-M3.1-Flash",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-M3.1-Flash",
+      "publisher": "Hugging Face",
+      "type": "community",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "mofcom-2026-48",
+      "title": "商务部 科技部公告2026年第48号（人工智能相关技术出口管制目录调整征求意见）",
+      "url": "https://www.mofcom.gov.cn/zwgk/zcfb/art/2026/art_0a31a3c9ac404f7a9b0e917ce3412997.html",
+      "publisher": "中華人民共和國商務部",
+      "type": "regulator",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "eu-virkkunen-speech-2026-10-14",
+      "title": "Speech by Executive Vice-President Virkkunen (Dublin, 14 October 2026)",
+      "url": "https://ec.europa.eu/commission/presscorner/api/files/document/print/en/speech_26_2150/SPEECH_26_2150_EN.pdf",
+      "publisher": "European Commission",
+      "type": "regulator",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "eu-council-digital-omnibus-2026-10-21",
+      "title": "Digital rulebook: Council agrees position to simplify data protection, privacy and cyber reporting rules",
+      "url": "https://www.consilium.europa.eu/en/press/press-releases/2026/10/21/digital-rulebook-council-agrees-position-to-simplify-data-protection-privacy-and-cyber-reporting-rules/",
+      "publisher": "Council of the EU",
+      "type": "regulator",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "artificial-analysis-changelog",
+      "title": "Artificial Analysis changelog",
+      "url": "https://artificialanalysis.ai/changelog",
+      "publisher": "Artificial Analysis",
+      "type": "benchmark",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "openai-decisions-guide",
+      "title": "Decisions API guide",
+      "url": "https://developers.openai.com/api/docs/guides/decisions",
+      "publisher": "OpenAI",
+      "type": "vendor-doc",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "openai-prompt-caching-guide",
+      "title": "Prompt caching guide",
+      "url": "https://developers.openai.com/api/docs/guides/prompt-caching",
+      "publisher": "OpenAI",
+      "type": "vendor-doc",
+      "accessed": "2026-10-24"
+    },
+    {
+      "id": "azure-openai-pricing",
+      "title": "Azure OpenAI Service pricing",
+      "url": "https://azure.microsoft.com/en-us/pricing/details/azure-openai/",
+      "publisher": "Microsoft Azure",
+      "type": "csp-doc",
+      "accessed": "2026-10-24"
     }
   ]
 }
