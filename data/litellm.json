@@ -1,32 +1,28 @@
 {
   "schema": "litellm/v1",
-  "generatedAt": "2026-10-24T03:00:00Z",
+  "generatedAt": "2026-11-14T14:30:00Z",
   "locale": "zh-TW",
-  "asOf": "2026-10-24",
-  "supportPolicy": "LiteLLM 只維護最近四條 stable minor 線（含其中所有 patch）；自 1.84.0 起每週的 stable 升 MINOR、PATCH 只用於 hotfix，因此每條線約有一個月維護期。企業客戶可洽談更長支援，重大漏洞可能例外修補。注意：官方政策頁（2026-06-20，2026-10-06 複查未改）列的仍是 1.86–1.89，下方 supportedLines 是依政策與 1.104.0 stable 發布（PyPI 2026-10-03）推導：v1.101–v1.104，v1.100 線已移出窗口。與 1.104.0 同時切出的回移植 patch 只有 1.103.3，與此推導一致。 2026-10-06 複查：PyPI 最新 stable 仍是 1.104.0，窗口不變；v1.105.0 還只有 rc.1。 2026-10-20：依政策與 1.106.0 stable（2026-10-18）推導，窗口為 v1.103–v1.106，v1.102 線移出。 2026-10-24：1.107.0 的發布物被汙染並下架、沒有乾淨的重新發布，窗口維持 v1.103–v1.106；乾淨的 1.107.x 發布後改為 v1.104–v1.107。",
+  "asOf": "2026-11-14",
+  "supportPolicy": "LiteLLM 只維護最近四條 stable minor 線（含其中所有 patch）；自 1.84.0 起每週的 stable 升 MINOR、PATCH 只用於 hotfix，因此每條線約有一個月維護期。企業客戶可洽談更長支援，重大漏洞可能例外修補。注意：官方政策頁（2026-06-20，2026-10-06 複查未改）列的仍是 1.86–1.89，下方 supportedLines 是依政策與 1.104.0 stable 發布（PyPI 2026-10-03）推導：v1.101–v1.104，v1.100 線已移出窗口。與 1.104.0 同時切出的回移植 patch 只有 1.103.3，與此推導一致。 2026-10-06 複查：PyPI 最新 stable 仍是 1.104.0，窗口不變；v1.105.0 還只有 rc.1。 2026-10-20：依政策與 1.106.0 stable（2026-10-18）推導，窗口為 v1.103–v1.106，v1.102 線移出。 2026-10-24：1.107.0 的發布物被汙染並下架、沒有乾淨的重新發布，窗口維持 v1.103–v1.106；乾淨的 1.107.x 發布後改為 v1.104–v1.107。 2026-11-14：LiteLLM 11-02 宣布自當週起 rc 與 stable 改在週二發布，並試行一個月的 LTS 線（第一條是 1.108）；試行期間「patch 最近四條 stable 線」的政策暫停。v1.108.0 由 v1.107.0rc1 升為 stable，1.107.x 沒有乾淨的 stable。下方 supportedLines 只列確定會收到 patch 的 1.108；1.103–1.106 在試行期間不保證再有修補（官方沒有說明例外）。",
   "supportedLines": [
-    "v1.106.x",
-    "v1.105.x",
-    "v1.104.x",
-    "v1.103.x"
+    "v1.108.x（LTS 試行）"
   ],
   "recommended": {
-    "version": "v1.105.2",
-    "pinning": "以 image digest 釘選（docker.litellm.ai/berriai/litellm:1.105.2 的 sha256；image 以 cosign 簽章），不要用 main-latest、*-dev、*-rc；PyPI 以 hash 釘選並經私有 mirror。 1.107.0 供應鏈事件之後：image 一律以 digest 釘選並驗證 cosign 簽章，禁用 latest、main-stable、main-latest 等浮動 tag。",
+    "version": "v1.108.2",
+    "pinning": "以 image digest 釘選 docker.litellm.ai/berriai/litellm:1.108.2（或 ghcr.io/berriai/litellm:v1.108.2）並以 repo 的 cosign.pub 驗證簽章；PyPI 以 hash 釘選並經私有 mirror。不要在 production 用浮動的 lts、latest、main-stable、main-latest tag。",
     "rationale": [
-      "有官方 notes 的最新 1.105 patch（2026-10-20），notes 稱沒有新的 database migration；它在 1.105.1 之上修正 streamed alias 請求以 deployment 的模型計價（#44341）、team key 只能存取自己的 batch 與 file / vector store ID（#47067）、Responses bridge 的輸出合併為單一 choices[0]。保留 1.105.1 的 #44508 重複記帳修正。",
-      "v1.105.3 與 v1.106.2（2026-10-21）含標為 breaking 的 batch 計費修正（fix(batches)!），而且沒有 notes 頁，暫不當建議版本；已在 1.106 線的環境用 1.106.2（官方事件公告指定的乾淨版本）。",
-      "1.107.0 的 PyPI / Docker 發布物在 2026-10-21 被植入惡意程式（見 advisories）；1.107.x 在官方發布乾淨版本與 notes 前一律不採用。",
-      "自 v1.104.x 升級要吸收 1.105 的 breaking changes：Bedrock 上 GPT-5.6 / GPT-6 / GPT-6.1 預設改走原生 Chat Completions（要留在 Converse 寫 bedrock/converse/<model>）、ENFORCE_PRISMA_MIGRATION_CHECK=false 被忽略、/sso/debug/* 預設 404、Decisions 請求對非 OpenAI provider 送 safety_identifier 回 400。",
+      "LTS 試行期間只有 1.108 線保證會收到 patch；v1.108.2（notes 頁 2026-11-06）是本期讀過 notes 的最新 LTS patch，沒有新的 database migration。",
+      "1.108.2 修正 openai/ deployment api_key 為空時送出 OPENAI_ADMIN_KEY（#50218）、轉錄錯誤回傳完整逐字稿（#50325）、Postgres 重啟時 spend rows 遺失與有效 key 回 401（#50132）。",
+      "自 1.105.x 升級要吸收 1.108.0 / 1.108.1 的 breaking changes：fallback 權限預設強制（#46127）、字串 fallback 目標讓 proxy 起不來（#48943）、logging callback 載入失敗即停（#46378）、token count 路由改回 provider 錯誤、Bedrock guardrail 附件 400（#43383）、Helm lensWorker、refusal 欄位、OpenRouter cost map。",
+      "還沒完成 staging 驗證的環境暫留 v1.105.2；1.108.3 之後的 patch 讀過 notes 再更新建議。",
       "這是依各版 release notes 推導的建議，不是 LiteLLM 官方說法；上 production 前在 staging 跑 compat suite 與負載測試。"
     ]
   },
   "minimumBaseline": {
     "version": "v1.103.6",
     "rationale": [
-      "支援窗口維持 v1.103–v1.106（1.107.0 的發布物已下架、沒有乾淨的重新發布，本期視為尚未發布）；1.103 是最舊的一條線。",
-      "v1.103.6（2026-10-20）回移植了重複記帳修正 #44508，1.103.5 沒有；沒有 migration。v1.103.7（10-21）含標為 breaking 的 batch 計費修正且沒有 notes，暫不當基準。",
-      "乾淨的 1.107.x 一發布，窗口就變成 v1.104–v1.107，最低基準要移到 1.104.x 的最新 patch（目前 v1.104.5）——不要把 1.103 當長期落點。"
+      "1.103.6 含重複記帳修正 #44508 與 CVE-2026-114612 的修正；維持為過渡下限。",
+      "LTS 試行期間 1.103–1.106 不保證再有 patch：新的修正（例如 #50218）只會出現在 1.108；試行結束（約 12 月初）後重新評估下限，不要把 1.103 當長期落點。"
     ]
   },
   "avoid": [
@@ -195,6 +191,61 @@
   ],
   "releases": [
     {
+      "version": "v1.108.2",
+      "channel": "patch",
+      "date": "2026-11-06",
+      "highlights": [
+        "1.108 LTS 線的 patch；沒有新的 database migration。",
+        "openai/ deployment 的 api_key 為空時不再送出 OPENAI_ADMIN_KEY（#50218）；轉錄錯誤不再回傳完整逐字稿（#50325）。",
+        "Postgres 重啟時 spend rows 不再遺失、有效 key 不再回 401（#50132）；Bedrock Converse service_tier（#50360）、Invoke 保留 per-turn-control beta（#50362）；Claude base64 PDF（#50280）。"
+      ],
+      "supported": true,
+      "caution": "日期取自 notes 頁的 last_updated（2026-11-06）。",
+      "sources": [
+        {
+          "id": "litellm-v1-108-2"
+        },
+        {
+          "id": "litellm-cadence-lts-blog"
+        }
+      ]
+    },
+    {
+      "version": "v1.108.1",
+      "channel": "patch",
+      "highlights": [
+        "1.108 LTS 線的 patch；沒有新的 database migration。",
+        "Breaking：字串形式的 fallback 目標會讓 proxy 啟動失敗（#48943）。",
+        "Bedrock 原生 guardrail trace 與 Gemini 音訊分級計費；allowed_fails 下單一 deployment 不再被冷卻。"
+      ],
+      "supported": true,
+      "caution": "fallback 設定若有字串目標，升級前先改成清單格式。",
+      "sources": [
+        {
+          "id": "litellm-v1-108-1"
+        }
+      ]
+    },
+    {
+      "version": "v1.108.0",
+      "channel": "stable",
+      "date": "2026-11-04",
+      "highlights": [
+        "第一條 LTS 線；由 v1.107.0rc1 升為 stable（notes 涵蓋 v1.106.0 以來的變更）。新增 Gemini 4 Argon（Gemini API、Vertex）、Microsoft 365 Copilot、OpenAI Live。",
+        "Breaking：fallback 預設略過呼叫者沒有權限的模型（#46127）、logging callback 載入失敗即停（#46378）、OpenRouter 移出 cost map、refusal 移到 message.refusal（#44788）、token count 路由回 provider 錯誤、Bedrock guardrail 對無法掃描的附件回 400（#43383）、Helm 要移除 lensWorker、被拒請求 log 只留核心欄位（#48599）。"
+      ],
+      "supported": true,
+      "caution": "日期取自 notes 頁的 last_updated（2026-11-04）；breaking changes 多，請直接用 1.108.2。",
+      "sources": [
+        {
+          "id": "litellm-v1-108-0"
+        },
+        {
+          "id": "litellm-cadence-lts-blog"
+        }
+      ]
+    },
+    {
       "version": "v1.107.0",
       "channel": "stable",
       "date": "2026-10-21",
@@ -230,8 +281,8 @@
           "id": "litellm-incident-2026-10-21"
         }
       ],
-      "supported": true,
-      "caution": "只有 GitHub release，沒有 notes 頁；batch 修正標為 breaking。"
+      "supported": false,
+      "caution": "只有 GitHub release，沒有 notes 頁；batch 修正標為 breaking。 LTS 試行期間（2026-11 起）四條線政策暫停，這條線不保證再有 patch。"
     },
     {
       "version": "v1.106.1",
@@ -247,7 +298,8 @@
           "id": "litellm-v1-106-1"
         }
       ],
-      "supported": true
+      "supported": false,
+      "caution": "LTS 試行期間（2026-11 起）四條線政策暫停，這條線不保證再有 patch。"
     },
     {
       "version": "v1.106.0",
@@ -261,7 +313,7 @@
         "/v1/responses/compact 套用 previous_response_id 檢查，未授權或非本 proxy 發出的 ID 回 403（allow_unmanaged_response_ids）。",
         "內建 cost map 加入 Claude Haiku 5.5。"
       ],
-      "caution": "讀到的 notes 內容沒有涵蓋 Bedrock 變更、#44508 與 migration；剛發布，先在 staging 評估。",
+      "caution": "讀到的 notes 內容沒有涵蓋 Bedrock 變更、#44508 與 migration；剛發布，先在 staging 評估。 LTS 試行期間（2026-11 起）四條線政策暫停，這條線不保證再有 patch。",
       "sources": [
         {
           "id": "litellm-v1-106-0"
@@ -270,7 +322,7 @@
           "id": "litellm-release-notes"
         }
       ],
-      "supported": true
+      "supported": false
     },
     {
       "version": "v1.105.3",
@@ -285,8 +337,8 @@
           "id": "litellm-gh-v1-105-3"
         }
       ],
-      "supported": true,
-      "caution": "只有 GitHub release，沒有 notes 頁；batch 修正標為 breaking。"
+      "supported": false,
+      "caution": "只有 GitHub release，沒有 notes 頁；batch 修正標為 breaking。 LTS 試行期間（2026-11 起）四條線政策暫停，這條線不保證再有 patch。"
     },
     {
       "version": "v1.105.2",
@@ -303,7 +355,8 @@
           "id": "litellm-v1-105-2"
         }
       ],
-      "supported": true
+      "supported": false,
+      "caution": "LTS 試行期間（2026-11 起）四條線政策暫停，這條線不保證再有 patch。"
     },
     {
       "version": "v1.105.1",
@@ -318,7 +371,8 @@
           "id": "litellm-v1-105-1"
         }
       ],
-      "supported": true
+      "supported": false,
+      "caution": "LTS 試行期間（2026-11 起）四條線政策暫停，這條線不保證再有 patch。"
     },
     {
       "version": "v1.105.0",
@@ -330,13 +384,13 @@
         "Decisions 對非 OpenAI provider 送 safety_identifier 回 400（drop_params: true 可還原）；/v1/systemone 記為 asystemone。",
         "內建 cost map 加入 Claude Sonnet 5.5、GPT-6.1 Sol。"
       ],
-      "caution": "仍有 #44500 重複記帳與 SpendLogs 掉列，用 v1.105.1。",
+      "caution": "仍有 #44500 重複記帳與 SpendLogs 掉列，用 v1.105.1。 LTS 試行期間（2026-11 起）四條線政策暫停，這條線不保證再有 patch。",
       "sources": [
         {
           "id": "litellm-v1-105-0"
         }
       ],
-      "supported": true
+      "supported": false
     },
     {
       "version": "v1.105.0-rc.1",
@@ -373,8 +427,8 @@
           "id": "litellm-gh-v1-104-5"
         }
       ],
-      "supported": true,
-      "caution": "只有 GitHub release，沒有 notes 頁。"
+      "supported": false,
+      "caution": "只有 GitHub release，沒有 notes 頁。 LTS 試行期間（2026-11 起）四條線政策暫停，這條線不保證再有 patch。"
     },
     {
       "version": "v1.104.4",
@@ -382,13 +436,13 @@
       "highlights": [
         "修正 supported_decisions_providers（#45935）、team 範圍的 batch model 存取（#47344）、count_tokens（#47389、#47446、#47454）。"
       ],
-      "caution": "只有 GitHub release notes，docs 還沒有頁面；notes 沒有 #44508 修正。",
+      "caution": "只有 GitHub release notes，docs 還沒有頁面；notes 沒有 #44508 修正。 LTS 試行期間（2026-11 起）四條線政策暫停，這條線不保證再有 patch。",
       "sources": [
         {
           "id": "litellm-gh-v1-104-4"
         }
       ],
-      "supported": true
+      "supported": false
     },
     {
       "version": "v1.104.3",
@@ -398,13 +452,13 @@
         "Decisions providers（hosted_vllm/、azure_ai/）、litellm.systemone()；litellm.decisions(state=...) 棄用。",
         "Decisions 對非 OpenAI provider 送 safety_identifier 回 400（drop_params: true 可還原）。"
       ],
-      "caution": "notes 沒有 #44508（重複記帳）的修正。",
+      "caution": "notes 沒有 #44508（重複記帳）的修正。 LTS 試行期間（2026-11 起）四條線政策暫停，這條線不保證再有 patch。",
       "sources": [
         {
           "id": "litellm-v1-104-3"
         }
       ],
-      "supported": true
+      "supported": false
     },
     {
       "version": "v1.104.2",
@@ -412,13 +466,13 @@
       "highlights": [
         "/v1/systemone、/v1/decisions 與 OpenAI Decisions provider 回移植到 1.104 線；沒有 migration 與 breaking change。"
       ],
-      "caution": "沒有 #44508（重複記帳）的修正；建議改用 v1.105.1。",
+      "caution": "沒有 #44508（重複記帳）的修正；建議改用 v1.105.1。 LTS 試行期間（2026-11 起）四條線政策暫停，這條線不保證再有 patch。",
       "sources": [
         {
           "id": "litellm-v1-104-2"
         }
       ],
-      "supported": true
+      "supported": false
     },
     {
       "version": "v1.104.1",
@@ -431,7 +485,8 @@
           "id": "litellm-v1-104-1"
         }
       ],
-      "supported": true
+      "supported": false,
+      "caution": "LTS 試行期間（2026-11 起）四條線政策暫停，這條線不保證再有 patch。"
     },
     {
       "version": "v1.104.0",
@@ -445,8 +500,8 @@
         "rc.1 之後併入：pass-through 還原（#43962）、跨 worker 新建模型的 400 Invalid model name（#44277）、多 pod migration 重試（#44283）；另有 Bedrock Converse reasoning 模型丟棄不支援的取樣參數（#39834）、Claude Code safeguards 與 beta 轉送到 Bedrock Invoke / Vertex（#42288）。",
         "Bedrock 相關：OpenAI 模型可經 /v1/responses 走 bedrock-runtime 的原生 Responses API（#42767）、未對應的 openai 家族 model ID 導向 Converse（#42713）、Claude 經 Bedrock Mantle 的原生 /v1/messages（#42049）；Azure 的 gpt-5.4+ 帶 reasoning 的工具呼叫橋接到 Foundry Responses API（#42041）。"
       ],
-      "supported": true,
-      "caution": "Breaking：master key 未設 / 為空 / 為公開已知值時拒絕啟動；預算用盡回 422 而不是 429；stdio MCP 預設關閉；DB setup 失敗時啟動即退出；自 v1.103.0 以前升級要重新登入；v1.103.0 的 SpendLogs 索引 migration 改為 no-op（自 v1.102.x 以前升級要自己建索引）。發布三天、尚無 patch（2026-10-06）——先過 staging。notes 全文沒有提到 #42725、#42689、#44500 的修正。",
+      "supported": false,
+      "caution": "Breaking：master key 未設 / 為空 / 為公開已知值時拒絕啟動；預算用盡回 422 而不是 429；stdio MCP 預設關閉；DB setup 失敗時啟動即退出；自 v1.103.0 以前升級要重新登入；v1.103.0 的 SpendLogs 索引 migration 改為 no-op（自 v1.102.x 以前升級要自己建索引）。發布三天、尚無 patch（2026-10-06）——先過 staging。notes 全文沒有提到 #42725、#42689、#44500 的修正。 LTS 試行期間（2026-11 起）四條線政策暫停，這條線不保證再有 patch。",
       "sources": [
         {
           "id": "litellm-v1-104-0"
@@ -472,8 +527,8 @@
           "id": "litellm-gh-v1-103-7"
         }
       ],
-      "supported": true,
-      "caution": "只有 GitHub release，沒有 notes 頁；batch 修正標為 breaking。"
+      "supported": false,
+      "caution": "只有 GitHub release，沒有 notes 頁；batch 修正標為 breaking。 LTS 試行期間（2026-11 起）四條線政策暫停，這條線不保證再有 patch。"
     },
     {
       "version": "v1.103.6",
@@ -489,7 +544,8 @@
           "id": "litellm-v1-103-6"
         }
       ],
-      "supported": true
+      "supported": false,
+      "caution": "LTS 試行期間（2026-11 起）四條線政策暫停，這條線不保證再有 patch。"
     },
     {
       "version": "v1.103.5",
@@ -498,16 +554,16 @@
       "highlights": [
         "Responses API：tool call 不再落在 choices[1]（PR #46099）；non-streaming 的每個 tool call 有自己的 index（PR #46109）。"
       ],
-      "caution": "notes 沒有 #44508（重複記帳）的修正。",
+      "caution": "notes 沒有 #44508（重複記帳）的修正。 LTS 試行期間（2026-11 起）四條線政策暫停，這條線不保證再有 patch。",
       "sources": [
         {
           "id": "litellm-v1-103-5"
         }
       ],
-      "supported": true
+      "supported": false
     },
     {
-      "caution": "官方 release notes 頁（docs）沒有 v1.103.4；內容取自 GitHub release 的 What's Changed。",
+      "caution": "官方 release notes 頁（docs）沒有 v1.103.4；內容取自 GitHub release 的 What's Changed。 LTS 試行期間（2026-11 起）四條線政策暫停，這條線不保證再有 patch。",
       "channel": "patch",
       "highlights": [
         "PyPI 2026-10-07 上傳。GitHub release 的變更：stable/1.103.x 刷新相依套件並切出 1.103.4（#44776）。"
@@ -520,7 +576,7 @@
           "id": "litellm-github-releases"
         }
       ],
-      "supported": true,
+      "supported": false,
       "version": "v1.103.4"
     },
     {
@@ -531,8 +587,8 @@
         "PyPI 2026-10-03 23:28 UTC 上傳（v1.103 線最新 patch，與 1.104.0 同時切出）。",
         "內容只見於第三方 Renovate PR 轉載的上游 notes（官方 notes 頁 2026-10-06 仍回 404、release notes 索引沒有這個版本；GitHub tag 頁讀不到）：預設強制 migration 檢查並停止在 migration 中建立 SpendLogs 索引（#44205、#44286）、回移植 #42643 / #44341 / #44346、pyjwt / pypdf / tornado / urllib3 / gitpython 升版（#44352）。"
       ],
-      "supported": true,
-      "caution": "依第三方轉載，這個 patch 改了預設行為（migration 檢查失敗會擋下啟動）；讀過官方 notes、在 staging 驗證後再升。",
+      "supported": false,
+      "caution": "依第三方轉載，這個 patch 改了預設行為（migration 檢查失敗會擋下啟動）；讀過官方 notes、在 staging 驗證後再升。 LTS 試行期間（2026-11 起）四條線政策暫停，這條線不保證再有 patch。",
       "sources": [
         {
           "id": "pypi-litellm-1-103-3"
@@ -555,7 +611,7 @@
         "CLI session 的花費改記在每位使用者的 cli-session-<user_id> alias 下，不再是 64 字元的 hash。",
         "還原 v1.103.0 改動的 pass-through endpoint 處理（PR #43962）：config 與 DB 的 pass-through 重新合併、Authorization 恢復轉送。"
       ],
-      "supported": true,
+      "supported": false,
       "sources": [
         {
           "id": "litellm-v1-103-2"
@@ -564,7 +620,7 @@
           "id": "pypi-litellm-json"
         }
       ],
-      "caution": "從 v1.103.0 或更早升級：先讀 v1.103.1 的 breaking changes（session token 失效，需重新登入；自 v1.102.x 以前升級會在啟動時建立 SpendLogs 索引）。升級後 DB 內其他路徑的 pass-through 會重新開始服務。"
+      "caution": "從 v1.103.0 或更早升級：先讀 v1.103.1 的 breaking changes（session token 失效，需重新登入；自 v1.102.x 以前升級會在啟動時建立 SpendLogs 索引）。升級後 DB 內其他路徑的 pass-through 會重新開始服務。 LTS 試行期間（2026-11 起）四條線政策暫停，這條線不保證再有 patch。"
     },
     {
       "version": "v1.103.1",
@@ -574,7 +630,7 @@
         "只有一項變更：Admin UI 與 lite CLI 登入後拿到的 session token 改用獨立的 AES-256-GCM context 與 header-safe 格式（litellm_login_ 前綴）。",
         "與 1.100.4 / 1.101.3 / 1.102.2 同時發布（2026-09-29 23:04–23:36 UTC），四條線是同一個變更。"
       ],
-      "supported": true,
+      "supported": false,
       "sources": [
         {
           "id": "litellm-v1-103-1"
@@ -583,20 +639,20 @@
           "id": "pypi-litellm-json"
         }
       ],
-      "caution": "升級前簽發的 session token 失效：Admin UI 與 lite CLI 使用者要重新登入；rolling upgrade 期間新舊 pod 互不接受對方的 token。仍帶有 v1.103.0 的 pass-through endpoint 問題，請直接用 v1.103.2。"
+      "caution": "升級前簽發的 session token 失效：Admin UI 與 lite CLI 使用者要重新登入；rolling upgrade 期間新舊 pod 互不接受對方的 token。仍帶有 v1.103.0 的 pass-through endpoint 問題，請直接用 v1.103.2。 LTS 試行期間（2026-11 起）四條線政策暫停，這條線不保證再有 patch。"
     },
     {
       "version": "v1.103.0",
       "date": "2026-09-27",
       "channel": "stable",
-      "supported": true,
+      "supported": false,
       "highlights": [
         "Config file ownership、Fuse V2 router、capability classifier、per-model fast mode。",
         "MCP client allowlist、delegated OAuth admission、RFC 8693 token exchange；408 個新模型條目。",
         "以 organization member 追蹤花費、以 project 強制 budget。",
         "Docker：docker.litellm.ai/berriai/litellm:1.103.0。"
       ],
-      "caution": "Breaking：config.yaml 宣告的 key 由檔案擁有（runtime 寫入回 400）；org / project max_budget: 0 = 零額度（不限額用 null）；litellm-proxy CLI 棄用改用 lite；啟動時建立 LiteLLM_SpendLogs 新索引會阻擋 spend log 寫入（大表請先 CONCURRENTLY 建索引）；fallback 每一跳重新檢查 budget；未准入的 legacy delegated MCP 回 401。release notes 未提及 9 月 Townhall 所說的 master key 檢查。",
+      "caution": "Breaking：config.yaml 宣告的 key 由檔案擁有（runtime 寫入回 400）；org / project max_budget: 0 = 零額度（不限額用 null）；litellm-proxy CLI 棄用改用 lite；啟動時建立 LiteLLM_SpendLogs 新索引會阻擋 spend log 寫入（大表請先 CONCURRENTLY 建索引）；fallback 每一跳重新檢查 budget；未准入的 legacy delegated MCP 回 401。release notes 未提及 9 月 Townhall 所說的 master key 檢查。 LTS 試行期間（2026-11 起）四條線政策暫停，這條線不保證再有 patch。",
       "sources": [
         {
           "id": "litellm-v1-103-0"
@@ -1110,6 +1166,39 @@
     }
   ],
   "knownPitfalls": [
+    {
+      "title": "1.108：token count 路由在 provider 計數失敗時回錯誤",
+      "affects": "v1.108.0 起；/v1/messages/count_tokens、/v1/responses/input_tokens、Google :countTokens、/utils/token_counter?call_endpoint=true",
+      "symptom": "原本會回本地 tiktoken 估算值，現在回 provider 的錯誤；經 proxy 使用的 Claude Code 可能受影響。",
+      "fix": "升級前經 proxy 測 Claude Code；需要時在 config 設 token_count_framing 或 token_count_model。",
+      "sources": [
+        {
+          "id": "litellm-v1-108-0"
+        }
+      ]
+    },
+    {
+      "title": "1.108.1：字串形式的 fallback 目標讓 proxy 起不來",
+      "affects": "v1.108.1 起（#48943）；config 的 fallbacks 寫成字串而非清單",
+      "symptom": "proxy 啟動失敗；滾動更新時新 pod 起不來。",
+      "fix": "升級前把 fallbacks 改成清單格式，並在 staging 以 --config 實際啟動一次確認。",
+      "sources": [
+        {
+          "id": "litellm-v1-108-1"
+        }
+      ]
+    },
+    {
+      "title": "1.108：fallback 預設略過呼叫者沒有權限的模型",
+      "affects": "v1.108.0 起（#46127）；設有 fallbacks 而 virtual key / team 的模型清單沒有包含 fallback 目標的部署",
+      "symptom": "主模型失敗時不再切到 fallback，直接回原本的錯誤；升級前能用的備援突然失效。",
+      "fix": "把 fallback 目標加進 key / team 的模型存取清單；暫時可設 general_settings.enforce_fallback_model_access: false 還原舊行為（不建議長期使用）。",
+      "sources": [
+        {
+          "id": "litellm-v1-108-0"
+        }
+      ]
+    },
     {
       "title": "Bedrock 上的 GPT-6 / GPT-5.6 拒收 temperature",
       "affects": "bedrock/converse/…openai.gpt-6-*、bedrock_mantle/openai.gpt-6-*（LiteLLM issue #42725，2026-10-05 仍開啟；v1.101.0 起，回報者稱 1.104.0 的 main 仍可重現）",
@@ -1636,6 +1725,21 @@
     },
     {
       "id": "litellm-gh-v1-106-2"
+    },
+    {
+      "id": "litellm-v1-108-0"
+    },
+    {
+      "id": "litellm-v1-108-1"
+    },
+    {
+      "id": "litellm-v1-108-2"
+    },
+    {
+      "id": "litellm-lts-pilot"
+    },
+    {
+      "id": "litellm-cadence-lts-blog"
     }
   ]
 }

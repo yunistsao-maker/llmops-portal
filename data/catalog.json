@@ -1,8 +1,8 @@
 {
   "schema": "catalog/v1",
-  "generatedAt": "2026-10-14T17:43:00Z",
+  "generatedAt": "2026-11-14T14:30:00Z",
   "locale": "zh-TW",
-  "asOf": "2026-10-15",
+  "asOf": "2026-11-14",
   "models": [
     {
       "id": "claude-fable-5-1",
@@ -1155,7 +1155,7 @@
           "rank": "#5 / 216",
           "measuredBy": "independent",
           "date": "2026-10-15",
-          "notes": "AA 模型頁 2026-10-15 讀取；名次與分母取自頁面的 Model summary。",
+          "notes": "AA 模型頁 2026-10-15 讀取；名次與分母取自頁面的 Model summary。 v5 leaderboard（2026-11-14 讀取）沒有 Claude Fable 5.1；v4.3.2 的分數不可與 v5 直接比較。",
           "sources": [
             {
               "id": "aa-fable51"
@@ -1170,7 +1170,7 @@
           "unit": "index",
           "measuredBy": "independent",
           "date": "2026-10-15",
-          "notes": "AA leaderboard 頁（xhigh with fallback 為 53，medium 49、low 47）。",
+          "notes": "AA leaderboard 頁（xhigh with fallback 為 53，medium 49、low 47）。 v5 leaderboard（2026-11-14 讀取）沒有 Claude Fable 5.1；v4.3.2 的分數不可與 v5 直接比較。",
           "sources": [
             {
               "id": "aa-leaderboard-models"
@@ -2333,6 +2333,24 @@
       "benchmarks": [
         {
           "name": "Artificial Analysis Intelligence Index",
+          "version": "v5",
+          "variant": "max",
+          "score": 59,
+          "unit": "index",
+          "measuredBy": "independent",
+          "date": "2026-11-14",
+          "sources": [
+            {
+              "id": "aa-leaderboard-models"
+            },
+            {
+              "id": "aa-intelligence-index-v5"
+            }
+          ],
+          "notes": "v5（2026-10-27 改版）：新增 FrontierCode 2.0、Terminal-Bench-Science，HLE 換成 HLE-Diamond，移除 GDPval-AA、SciCode、AA-LCR；分數不可與 v4.3.2 直接比較。 v5 發表文（10-27）為 58；leaderboard 11-14 為 59，以 leaderboard 為準。"
+        },
+        {
+          "name": "Artificial Analysis Intelligence Index",
           "version": "v4.3.2",
           "variant": "Adaptive reasoning, max effort, default fallback",
           "score": 58,
@@ -3370,6 +3388,23 @@
       "benchmarks": [
         {
           "name": "Artificial Analysis Intelligence Index",
+          "version": "v5",
+          "score": 55,
+          "unit": "index",
+          "measuredBy": "independent",
+          "date": "2026-11-14",
+          "sources": [
+            {
+              "id": "aa-leaderboard-models"
+            },
+            {
+              "id": "aa-intelligence-index-v5"
+            }
+          ],
+          "notes": "v5（2026-10-27 改版）：新增 FrontierCode 2.0、Terminal-Bench-Science，HLE 換成 HLE-Diamond，移除 GDPval-AA、SciCode、AA-LCR；分數不可與 v4.3.2 直接比較。"
+        },
+        {
+          "name": "Artificial Analysis Intelligence Index",
           "version": "v4.3.2",
           "variant": "Adaptive reasoning, max effort, default fallback",
           "score": 56,
@@ -4260,6 +4295,24 @@
       "benchmarks": [
         {
           "name": "Artificial Analysis Intelligence Index",
+          "version": "v5",
+          "variant": "max",
+          "score": 36,
+          "unit": "index",
+          "measuredBy": "independent",
+          "date": "2026-11-14",
+          "sources": [
+            {
+              "id": "aa-leaderboard-models"
+            },
+            {
+              "id": "aa-intelligence-index-v5"
+            }
+          ],
+          "notes": "v5（2026-10-27 改版）：新增 FrontierCode 2.0、Terminal-Bench-Science，HLE 換成 HLE-Diamond，移除 GDPval-AA、SciCode、AA-LCR；分數不可與 v4.3.2 直接比較。"
+        },
+        {
+          "name": "Artificial Analysis Intelligence Index",
           "version": "v4.3.2",
           "variant": "max effort",
           "score": 43,
@@ -5125,6 +5178,24 @@
         }
       ],
       "benchmarks": [
+        {
+          "name": "Artificial Analysis Intelligence Index",
+          "version": "v5",
+          "variant": "max",
+          "score": 57,
+          "unit": "index",
+          "measuredBy": "independent",
+          "date": "2026-11-14",
+          "sources": [
+            {
+              "id": "aa-leaderboard-models"
+            },
+            {
+              "id": "aa-intelligence-index-v5"
+            }
+          ],
+          "notes": "v5（2026-10-27 改版）：新增 FrontierCode 2.0、Terminal-Bench-Science，HLE 換成 HLE-Diamond，移除 GDPval-AA、SciCode、AA-LCR；分數不可與 v4.3.2 直接比較。"
+        },
         {
           "name": "Artificial Analysis Intelligence Index",
           "version": "v4.3.2",
@@ -6022,7 +6093,7 @@
               "id": "aa-sol"
             }
           ],
-          "notes": "2026-10-06 重新讀取：分數未變；名次與分母直接取自頁面的 Model summary（同級模型數會隨新模型加入而變）。",
+          "notes": "2026-10-06 重新讀取：分數未變；名次與分母直接取自頁面的 Model summary（同級模型數會隨新模型加入而變）。 v5 leaderboard（2026-11-14 讀取）沒有 GPT-6 Sol；v4.3.2 的分數不可與 v5 直接比較。",
           "rank": "#25 / 225"
         }
       ],
@@ -6729,6 +6800,24 @@
         }
       ],
       "benchmarks": [
+        {
+          "name": "Artificial Analysis Intelligence Index",
+          "version": "v5",
+          "variant": "max",
+          "score": 55,
+          "unit": "index",
+          "measuredBy": "independent",
+          "date": "2026-11-14",
+          "sources": [
+            {
+              "id": "aa-leaderboard-models"
+            },
+            {
+              "id": "aa-intelligence-index-v5"
+            }
+          ],
+          "notes": "v5（2026-10-27 改版）：新增 FrontierCode 2.0、Terminal-Bench-Science，HLE 換成 HLE-Diamond，移除 GDPval-AA、SciCode、AA-LCR；分數不可與 v4.3.2 直接比較。"
+        },
         {
           "name": "Artificial Analysis Intelligence Index",
           "version": "v4.3.2",
@@ -7489,6 +7578,23 @@
         }
       ],
       "benchmarks": [
+        {
+          "name": "Artificial Analysis Intelligence Index",
+          "version": "v5",
+          "score": 28,
+          "unit": "index",
+          "measuredBy": "independent",
+          "date": "2026-11-14",
+          "sources": [
+            {
+              "id": "aa-leaderboard-models"
+            },
+            {
+              "id": "aa-intelligence-index-v5"
+            }
+          ],
+          "notes": "v5（2026-10-27 改版）：新增 FrontierCode 2.0、Terminal-Bench-Science，HLE 換成 HLE-Diamond，移除 GDPval-AA、SciCode、AA-LCR；分數不可與 v4.3.2 直接比較。"
+        },
         {
           "name": "Artificial Analysis Intelligence Index",
           "version": "v4.3.2",
@@ -8418,6 +8524,24 @@
       "benchmarks": [
         {
           "name": "Artificial Analysis Intelligence Index",
+          "version": "v5",
+          "variant": "high",
+          "score": 50,
+          "unit": "index",
+          "measuredBy": "independent",
+          "date": "2026-11-14",
+          "sources": [
+            {
+              "id": "aa-leaderboard-models"
+            },
+            {
+              "id": "aa-intelligence-index-v5"
+            }
+          ],
+          "notes": "v5（2026-10-27 改版）：新增 FrontierCode 2.0、Terminal-Bench-Science，HLE 換成 HLE-Diamond，移除 GDPval-AA、SciCode、AA-LCR；分數不可與 v4.3.2 直接比較。"
+        },
+        {
+          "name": "Artificial Analysis Intelligence Index",
           "version": "v4.3.2",
           "variant": "high",
           "score": 53,
@@ -9006,6 +9130,23 @@
         }
       ],
       "benchmarks": [
+        {
+          "name": "Artificial Analysis Intelligence Index",
+          "version": "v5",
+          "score": 31,
+          "unit": "index",
+          "measuredBy": "independent",
+          "date": "2026-11-14",
+          "sources": [
+            {
+              "id": "aa-leaderboard-models"
+            },
+            {
+              "id": "aa-intelligence-index-v5"
+            }
+          ],
+          "notes": "v5（2026-10-27 改版）：新增 FrontierCode 2.0、Terminal-Bench-Science，HLE 換成 HLE-Diamond，移除 GDPval-AA、SciCode、AA-LCR；分數不可與 v4.3.2 直接比較。"
+        },
         {
           "name": "Artificial Analysis Intelligence Index",
           "version": "v4.3.2",
@@ -9842,7 +9983,7 @@
           "id": "grok-4-7@agent-platform",
           "cloud": "gcp",
           "service": "agent-platform",
-          "status": "preview",
+          "status": "ga",
           "availableSince": "2026-09-30",
           "providerModelId": "grok-4.7",
           "inferenceTargets": [
@@ -9879,7 +10020,7 @@
             }
           ],
           "regionNotes": [
-            "Preview，適用 Pre-GA Offerings Terms（as is、支援有限）。"
+            "2026-10-27 GA（release notes）：global endpoint 與 US multi-region；沒有亞太區域。"
           ],
           "dataProcessing": {
             "processor": "Google Cloud（xAI 提供模型）",
@@ -10013,7 +10154,8 @@
           ],
           "lifecycle": {
             "notes": [
-              "模型頁：Launch stage Preview，Release date 2026-09-30。"
+              "模型頁：Launch stage Preview，Release date 2026-09-30。",
+              "2026-10-27 轉 GA（Agent Platform release notes）；Preview 期間為 2026-09-30 起。"
             ]
           },
           "litellmModel": "vertex_ai/xai/grok-4.7",
@@ -10029,12 +10171,32 @@
             },
             {
               "id": "litellm-vertex-partner"
+            },
+            {
+              "id": "google-agentplatform-release-notes"
             }
           ],
           "verification": "official"
         }
       ],
       "benchmarks": [
+        {
+          "name": "Artificial Analysis Intelligence Index",
+          "version": "v5",
+          "score": 35,
+          "unit": "index",
+          "measuredBy": "independent",
+          "date": "2026-11-14",
+          "sources": [
+            {
+              "id": "aa-leaderboard-models"
+            },
+            {
+              "id": "aa-intelligence-index-v5"
+            }
+          ],
+          "notes": "v5（2026-10-27 改版）：新增 FrontierCode 2.0、Terminal-Bench-Science，HLE 換成 HLE-Diamond，移除 GDPval-AA、SciCode、AA-LCR；分數不可與 v4.3.2 直接比較。"
+        },
         {
           "name": "Artificial Analysis Intelligence Index",
           "version": "v4.3.2",
@@ -10284,7 +10446,7 @@
       "vendor": "google",
       "status": "limited-preview",
       "expected": "未公布",
-      "note": "已宣布但沒有 GA 日期與公開價格。 2026-10-06 查：Gemini API 的 models 頁仍沒有 3.5 Pro，Agent Platform 的模型版本頁與定價頁也沒有；DeepMind 的 Pro 頁仍寫「3.5 Pro coming soon」。Google 已先發表 Gemini 4 Argon。 2026-10-15 查：DeepMind 的 Pro 頁仍寫「3.5 Pro coming soon」；Gemini API models 頁（2026-10-13 更新）與 Agent Platform 模型版本頁都沒有 3.5 Pro。Google 已於 2026-10-13 讓 Gemini 4 Argon GA（見目錄）。 2026-10-20 查：Agent Platform 的模型版本頁（10-19 更新）與 Gemini API changelog（最新 10-13）都沒有 3.5 Pro；Google 已先讓 Gemini 4 Argon GA。",
+      "note": "已宣布但沒有 GA 日期與公開價格。 2026-10-06 查：Gemini API 的 models 頁仍沒有 3.5 Pro，Agent Platform 的模型版本頁與定價頁也沒有；DeepMind 的 Pro 頁仍寫「3.5 Pro coming soon」。Google 已先發表 Gemini 4 Argon。 2026-10-15 查：DeepMind 的 Pro 頁仍寫「3.5 Pro coming soon」；Gemini API models 頁（2026-10-13 更新）與 Agent Platform 模型版本頁都沒有 3.5 Pro。Google 已於 2026-10-13 讓 Gemini 4 Argon GA（見目錄）。 2026-10-20 查：Agent Platform 的模型版本頁（10-19 更新）與 Gemini API changelog（最新 10-13）都沒有 3.5 Pro；Google 已先讓 Gemini 4 Argon GA。 2026-11-14 查：Agent Platform release notes（10-26～11-12）沒有 3.5 Pro；Google 先後推出 Gemini 4 Carbon（11-10 GA）與 Gemini 4 Hydrogen（11-12 GA）。",
       "sources": [
         {
           "id": "capitalandcompute-sept"
@@ -10348,9 +10510,9 @@
     {
       "name": "GPT-6 Cyber",
       "vendor": "openai",
-      "status": "rumoured",
-      "expected": "未公布",
-      "note": "2026-10-06 查：OpenAI 官方仍未發布（models、changelog、pricing 與 deprecations 頁都沒有；changelog 最新是 10-05 的 HIPAA BAA 流程；cyber 模型仍是 gpt-5.6-cyber，另有 gpt-daybreak-red-latest / gpt-daybreak-blue-latest 別名）。PYMNTS 2026-09-25 引述 Fortune：OpenAI 準備推出 GPT-6 Cyber 與資安 gateway 產品，無日期、價格與平台資訊。openai.com 的 news 頁本期讀不到（403）。 2026-10-15 查：OpenAI models 頁的資安模型仍是 gpt-5.6-cyber（Daybreak Red 另行核准存取），沒有 GPT-6 Cyber；changelog 也沒有。 2026-10-20 查：OpenAI API changelog（最新 10-16）、deprecations 頁都沒有 GPT-6 Cyber；只有 9 月下旬的媒體報導（Fortune 轉述）。 2026-10-24 查：OpenAI deprecations 頁最新仍是 10-14 的條目，changelog 沒有 GPT-6 Cyber。",
+      "status": "limited-preview",
+      "expected": "已發布（2026-11-05，受控存取）",
+      "note": "2026-10-06 查：OpenAI 官方仍未發布（models、changelog、pricing 與 deprecations 頁都沒有；changelog 最新是 10-05 的 HIPAA BAA 流程；cyber 模型仍是 gpt-5.6-cyber，另有 gpt-daybreak-red-latest / gpt-daybreak-blue-latest 別名）。PYMNTS 2026-09-25 引述 Fortune：OpenAI 準備推出 GPT-6 Cyber 與資安 gateway 產品，無日期、價格與平台資訊。openai.com 的 news 頁本期讀不到（403）。 2026-10-15 查：OpenAI models 頁的資安模型仍是 gpt-5.6-cyber（Daybreak Red 另行核准存取），沒有 GPT-6 Cyber；changelog 也沒有。 2026-10-20 查：OpenAI API changelog（最新 10-16）、deprecations 頁都沒有 GPT-6 Cyber；只有 9 月下旬的媒體報導（Fortune 轉述）。 2026-10-24 查：OpenAI deprecations 頁最新仍是 10-14 的條目，changelog 沒有 GPT-6 Cyber。 2026-11-14 查：OpenAI changelog 11-05 已發布 gpt-6-cyber，第一次請求前要先完成 Daybreak 設定（受控存取）；gpt-5.5-cyber-preview 於 2027-02-01 關閉。",
       "sources": [
         {
           "id": "fortune-gpt6-cyber"
@@ -10372,6 +10534,9 @@
         },
         {
           "id": "openai-deprecations"
+        },
+        {
+          "id": "openai-gpt6-cyber"
         }
       ]
     },
@@ -10379,8 +10544,8 @@
       "name": "Mistral Large 4",
       "vendor": "mistral",
       "status": "limited-preview",
-      "expected": "權重：Hugging Face 頁 ETA 2026-10-31；三雲上架未公布",
-      "note": "Mistral 2026-10-06 發表的 public preview（官方暱稱 le Chonk）：1 兆參數、49B active 的原生多模態 open-weight 模型。目前只有 Mistral Studio 的 preview API，權重「by the end of the month」釋出；發表頁的模型卡列價為 input $1.36、output $4.18（每百萬 token，Mistral 自家 API）。發表文沒有提到 Bedrock、Foundry 或 Agent Platform。官方自述強項是資安（稱在 Artificial Analysis Cyber Index 進全球前五、其中重現並修補真實漏洞的測試得 82%）、agentic coding 與視覺 grounding，並稱訓練與 preview 都在自家歐洲資料中心——以上都是廠商自報。Artificial Analysis 10-06 的評測紀錄為 Mistral Large 4 Preview：Intelligence Index 38（GPT-6 Luna 為 38、Gemini 3.8 Flash 為 41）。追蹤重點：權重釋出後是否由 Bedrock / Foundry / Agent Platform 代管，以及授權條款。2026-10-06 首次收錄。 2026-10-11：Hugging Face 仍沒有權重；OpenRouter 已上架 preview API（mistralai/mistral-large-4-0）。 2026-10-15 查：發表頁仍寫權重 end of the month 釋出；Hugging Face 的 mistralai 組織頁沒有 Mistral Large 4（最新的 Large 仍是 Mistral-Large-3）。 2026-10-20 查：Hugging Face 只有「Planned artifacts」頁（ETA October 31, 2026，未列授權）；Mistral 文件仍寫 Public Preview、權重 Coming soon，規格寫 1.05T total / 52B active、1M context（與 10-06 發表頁的 1T / 49B、Artificial Analysis 與 OpenRouter 標的 524K 不同）。三雲都沒有。 2026-10-24 查：Hugging Face 頁面仍是「Upcoming release」、ETA 2026-10-31，沒有檔案與授權。",
+      "expected": "權重已釋出（2026-10-29）；三雲上架未確認",
+      "note": "Mistral 2026-10-06 發表的 public preview（官方暱稱 le Chonk）：1 兆參數、49B active 的原生多模態 open-weight 模型。目前只有 Mistral Studio 的 preview API，權重「by the end of the month」釋出；發表頁的模型卡列價為 input $1.36、output $4.18（每百萬 token，Mistral 自家 API）。發表文沒有提到 Bedrock、Foundry 或 Agent Platform。官方自述強項是資安（稱在 Artificial Analysis Cyber Index 進全球前五、其中重現並修補真實漏洞的測試得 82%）、agentic coding 與視覺 grounding，並稱訓練與 preview 都在自家歐洲資料中心——以上都是廠商自報。Artificial Analysis 10-06 的評測紀錄為 Mistral Large 4 Preview：Intelligence Index 38（GPT-6 Luna 為 38、Gemini 3.8 Flash 為 41）。追蹤重點：權重釋出後是否由 Bedrock / Foundry / Agent Platform 代管，以及授權條款。2026-10-06 首次收錄。 2026-10-11：Hugging Face 仍沒有權重；OpenRouter 已上架 preview API（mistralai/mistral-large-4-0）。 2026-10-15 查：發表頁仍寫權重 end of the month 釋出；Hugging Face 的 mistralai 組織頁沒有 Mistral Large 4（最新的 Large 仍是 Mistral-Large-3）。 2026-10-20 查：Hugging Face 只有「Planned artifacts」頁（ETA October 31, 2026，未列授權）；Mistral 文件仍寫 Public Preview、權重 Coming soon，規格寫 1.05T total / 52B active、1M context（與 10-06 發表頁的 1T / 49B、Artificial Analysis 與 OpenRouter 標的 524K 不同）。三雲都沒有。 2026-10-24 查：Hugging Face 頁面仍是「Upcoming release」、ETA 2026-10-31，沒有檔案與授權。 2026-11-14 查：權重 10-29 釋出（Hugging Face mistralai/Mistral-Large-4-1T-A52B；repo 名稱為 52B active，與發表文的 49B 不同）。三雲上架本期沒有讀到；Intelligence Index v5 為 26。",
       "sources": [
         {
           "id": "mistral-large-4-announce"
@@ -10405,15 +10570,21 @@
         },
         {
           "id": "mistral-docs-large-4"
+        },
+        {
+          "id": "mistral-large-4-oss"
+        },
+        {
+          "id": "aa-intelligence-index-v5"
         }
       ]
     },
     {
       "name": "Meta Muse Wonder / Muse Wonder Full",
       "vendor": "meta",
-      "status": "announced",
+      "status": "limited-preview",
       "expected": "三雲上架未公布",
-      "note": "Meta 2026-10-12 發表：Muse Wonder 即日起透過 Meta Model API 與 Muse Code 提供給開發者，Muse Wonder Full 只給 Muse Code 訂閱者；官方稱為自家最強模型，主打個人與專業 agentic 任務（Active Memory、Active Focus），依 Meta Superintelligence Scaling Framework 發布，完整安全評估報告「即將」公布。公告沒有價格，也沒有提到 Bedrock、Foundry 或 Agent Platform；2026-10-15 查 Bedrock 模型總覽、Foundry 直售模型頁與夥伴模型頁、Agent Platform 定價頁都沒有 Muse Wonder。Artificial Analysis（2026-10-15）：Muse Wonder（max）Intelligence Index v4.3.2 52 分（#9 / 216）、131.0 tok/s、TTFT 39.24 秒、每任務 $4.52；Muse Wonder Full（max）在 leaderboard 為 56 分（與 Claude Sonnet 5.5 max 同分）。LiteLLM main 分支 cost map 已有 meta/muse-wonder-1.0，但 Meta Model API 不在本平台的三雲路由內。2026-10-15 首次收錄。",
+      "note": "Meta 2026-10-12 發表：Muse Wonder 即日起透過 Meta Model API 與 Muse Code 提供給開發者，Muse Wonder Full 只給 Muse Code 訂閱者；官方稱為自家最強模型，主打個人與專業 agentic 任務（Active Memory、Active Focus），依 Meta Superintelligence Scaling Framework 發布，完整安全評估報告「即將」公布。公告沒有價格，也沒有提到 Bedrock、Foundry 或 Agent Platform；2026-10-15 查 Bedrock 模型總覽、Foundry 直售模型頁與夥伴模型頁、Agent Platform 定價頁都沒有 Muse Wonder。Artificial Analysis（2026-10-15）：Muse Wonder（max）Intelligence Index v4.3.2 52 分（#9 / 216）、131.0 tok/s、TTFT 39.24 秒、每任務 $4.52；Muse Wonder Full（max）在 leaderboard 為 56 分（與 Claude Sonnet 5.5 max 同分）。LiteLLM main 分支 cost map 已有 meta/muse-wonder-1.0，但 Meta Model API 不在本平台的三雲路由內。2026-10-15 首次收錄。 2026-11-14 查：Agent Platform 11-09 以 Preview 提供 Muse Wonder 1.0、Muse Ember 1.0、Muse Spark 1.3（global endpoint，經 OpenAI 相容的 Responses API；1M context）。",
       "sources": [
         {
           "id": "meta-muse-wonder-announce"
@@ -10438,6 +10609,84 @@
         },
         {
           "id": "litellm-cost-map-main"
+        },
+        {
+          "id": "google-agentplatform-release-notes"
+        }
+      ]
+    },
+    {
+      "name": "Claude Fable 5.2",
+      "vendor": "anthropic",
+      "status": "announced",
+      "expected": "已 GA（2026-11-09）：Claude API、Bedrock、Agent Platform、Foundry",
+      "note": "2026-11-14 查：$8 / $40（Fable 5.1 為 $10 / $50），1M context、128k 輸出；必須 30 天資料保留、不適用 ZDR；prefix check 強制、computer use 改用 computer_toolset_20260801。Bedrock 為 Global 與 US Geo CRIS。待 G1 模型卡與 G2 審查後決定是否取代 Fable 5.1。",
+      "sources": [
+        {
+          "id": "anthropic-release-notes"
+        },
+        {
+          "id": "aws-ml-blog-fable-52"
+        },
+        {
+          "id": "aws-bedrock-fable52-card"
+        },
+        {
+          "id": "google-agentplatform-release-notes"
+        }
+      ]
+    },
+    {
+      "name": "Gemini 4 Carbon",
+      "vendor": "google",
+      "status": "announced",
+      "expected": "已 GA（2026-11-10）：Gemini API、Agent Platform",
+      "note": "2026-11-14 查：推出價 $2 / $10，12-01 起 $4 / $20；thinking LOW / MEDIUM / HIGH，可用 Provisioned Throughput；cyber-permissive 版本只限 Fairwind allowlist。區域與台灣境內處理未讀到。",
+      "sources": [
+        {
+          "id": "google-agentplatform-release-notes"
+        },
+        {
+          "id": "google-gemini4-carbon-blog"
+        }
+      ]
+    },
+    {
+      "name": "Gemini 4 Hydrogen",
+      "vendor": "google",
+      "status": "announced",
+      "expected": "已 GA（2026-11-12）：Gemini API、Agent Platform（short-term model）",
+      "note": "2026-11-14 查：$1.50 / $7.50，Gemini API 有免費層；Agent Platform 以 short-term model 發布，退役只保證 45 天通知；Provisioned Throughput 只在 global、us、eu。",
+      "sources": [
+        {
+          "id": "google-agentplatform-release-notes"
+        },
+        {
+          "id": "google-gemini4-hydrogen-blog"
+        },
+        {
+          "id": "deepmind-gemini4-hydrogen-card"
+        }
+      ]
+    },
+    {
+      "name": "GPT-6.1 Terra",
+      "vendor": "openai",
+      "status": "announced",
+      "expected": "已 GA（2026-10-26）：OpenAI API、Bedrock",
+      "note": "2026-11-14 查：$1 / $5（cached $0.05）；Bedrock 以 global.openai.gpt-6.1-terra 提供，Converse / Responses / Chat Completions 皆可；Bedrock 模型卡（價格、區域）10-27 時尚未公布。Foundry 與 Agent Platform 未讀到。",
+      "sources": [
+        {
+          "id": "openai-changelog"
+        },
+        {
+          "id": "openai-pricing"
+        },
+        {
+          "id": "aws-gpt61-terra-whatsnew"
+        },
+        {
+          "id": "classmethod-bedrock-gpt61-terra"
         }
       ]
     }
