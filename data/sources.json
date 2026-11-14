@@ -1,6 +1,6 @@
 {
   "schema": "sources/v1",
-  "generatedAt": "2026-10-24T03:00:00Z",
+  "generatedAt": "2026-11-14T14:30:00Z",
   "sources": [
     {
       "id": "anthropic-opus55-announce",
@@ -48,7 +48,7 @@
       "url": "https://platform.claude.com/docs/en/release-notes/overview",
       "publisher": "Anthropic",
       "type": "vendor-doc",
-      "accessed": "2026-10-24"
+      "accessed": "2026-11-14"
     },
     {
       "id": "anthropic-claude-on-gcp",
@@ -152,7 +152,7 @@
       "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-lifecycle-legacy.html",
       "publisher": "AWS",
       "type": "csp-doc",
-      "accessed": "2026-10-24"
+      "accessed": "2026-11-14"
     },
     {
       "id": "aws-bedrock-endpoints",
@@ -344,7 +344,7 @@
       "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/release-notes",
       "publisher": "Google Cloud",
       "type": "csp-doc",
-      "accessed": "2026-10-24"
+      "accessed": "2026-11-14"
     },
     {
       "id": "google-vertex-release-notes",
@@ -1064,7 +1064,7 @@
       "url": "https://ai.google.dev/gemini-api/docs/changelog",
       "publisher": "Google",
       "type": "vendor-doc",
-      "accessed": "2026-10-11"
+      "accessed": "2026-11-14"
     },
     {
       "id": "digitalapplied-flash-image",
@@ -1368,7 +1368,7 @@
       "url": "https://developers.openai.com/api/docs/deprecations",
       "publisher": "OpenAI",
       "type": "vendor-doc",
-      "accessed": "2026-10-06"
+      "accessed": "2026-11-14"
     },
     {
       "id": "pymnts-gpt6-cyber",
@@ -1496,7 +1496,7 @@
       "url": "https://ai.google.dev/gemini-api/docs/pricing",
       "publisher": "Google",
       "type": "vendor-doc",
-      "accessed": "2026-10-06"
+      "accessed": "2026-11-14"
     },
     {
       "id": "google-gemini-api-models",
@@ -1512,7 +1512,7 @@
       "url": "https://developers.openai.com/api/docs/changelog",
       "publisher": "OpenAI",
       "type": "vendor-doc",
-      "accessed": "2026-10-24"
+      "accessed": "2026-11-14"
     },
     {
       "id": "aws-whats-new-feed",
@@ -1936,7 +1936,7 @@
       "url": "https://developers.openai.com/api/docs/pricing",
       "publisher": "OpenAI",
       "type": "vendor-doc",
-      "accessed": "2026-10-24"
+      "accessed": "2026-11-14"
     },
     {
       "id": "openai-gpt6-family-guide",
@@ -2280,7 +2280,7 @@
       "url": "https://artificialanalysis.ai/leaderboards/models",
       "publisher": "Artificial Analysis",
       "type": "benchmark",
-      "accessed": "2026-10-11"
+      "accessed": "2026-11-14"
     },
     {
       "id": "aa-open-source-models",
@@ -3976,7 +3976,7 @@
       "url": "https://www.mofcom.gov.cn/zwgk/zcfb/art/2026/art_0a31a3c9ac404f7a9b0e917ce3412997.html",
       "publisher": "中華人民共和國商務部",
       "type": "regulator",
-      "accessed": "2026-10-24"
+      "accessed": "2026-11-14"
     },
     {
       "id": "eu-virkkunen-speech-2026-10-14",
@@ -4025,6 +4025,158 @@
       "publisher": "Microsoft Azure",
       "type": "csp-doc",
       "accessed": "2026-10-24"
+    },
+    {
+      "id": "aws-ml-blog-fable-52",
+      "title": "Introducing Claude Fable 5.2 on AWS",
+      "url": "https://aws.amazon.com/blogs/machine-learning/introducing-claude-fable-5-2-on-aws/",
+      "publisher": "AWS",
+      "type": "csp-blog",
+      "accessed": "2026-11-14"
+    },
+    {
+      "id": "aws-bedrock-fable52-card",
+      "title": "Amazon Bedrock model card: Claude Fable 5.2",
+      "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-fable-5-2.html",
+      "publisher": "AWS",
+      "type": "csp-doc",
+      "accessed": "2026-11-14"
+    },
+    {
+      "id": "classmethod-bedrock-fable52",
+      "title": "Amazon Bedrock で Claude Fable 5.2 を試してみた",
+      "url": "https://dev.classmethod.jp/articles/bedrock-claude-fable-5-2/",
+      "publisher": "Classmethod DevelopersIO",
+      "type": "community",
+      "accessed": "2026-11-14"
+    },
+    {
+      "id": "google-gemini4-carbon-blog",
+      "title": "Gemini 4 Carbon is now available",
+      "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-4-carbon-now-available/",
+      "publisher": "Google",
+      "type": "vendor-blog",
+      "accessed": "2026-11-14"
+    },
+    {
+      "id": "google-gemini4-hydrogen-blog",
+      "title": "Introducing Gemini 4 Hydrogen",
+      "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-hydrogen/",
+      "publisher": "Google",
+      "type": "vendor-blog",
+      "accessed": "2026-11-14"
+    },
+    {
+      "id": "deepmind-gemini4-hydrogen-card",
+      "title": "Gemini 4 Hydrogen model card",
+      "url": "https://deepmind.google/models/model-cards/gemini-4-hydrogen/",
+      "publisher": "Google DeepMind",
+      "type": "vendor-doc",
+      "accessed": "2026-11-14"
+    },
+    {
+      "id": "aws-gpt61-terra-whatsnew",
+      "title": "OpenAI GPT-6.1 Terra is now generally available on Amazon Bedrock",
+      "url": "https://aws.amazon.com/about-aws/whats-new/2026/10/openai-gpt-6-1-terra-on-amazon-bedrock/",
+      "publisher": "AWS",
+      "type": "csp-blog",
+      "accessed": "2026-11-14"
+    },
+    {
+      "id": "classmethod-bedrock-gpt61-terra",
+      "title": "Amazon Bedrock で GPT-6.1 の新モデル「Terra」を試してみた",
+      "url": "https://dev.classmethod.jp/articles/bedrock-openai-gpt61-terra/",
+      "publisher": "Classmethod DevelopersIO",
+      "type": "community",
+      "accessed": "2026-11-14"
+    },
+    {
+      "id": "aimagazine-gpt61-terra",
+      "title": "How OpenAI's GPT-6.1 Terra is much faster and 50% cheaper",
+      "url": "https://aimagazine.com/news/how-openais-gpt-6-1-terra-is-much-faster-and-50-cheaper",
+      "publisher": "AI Magazine",
+      "type": "news",
+      "accessed": "2026-11-14"
+    },
+    {
+      "id": "openai-gpt6-cyber",
+      "title": "Introducing GPT-6 Cyber",
+      "url": "https://openai.com/index/introducing-gpt-6-cyber/",
+      "publisher": "OpenAI",
+      "type": "vendor-blog",
+      "accessed": "2026-11-14"
+    },
+    {
+      "id": "aws-kimi-k31-pro-whatsnew",
+      "title": "Moonshot AI Kimi K3.1 Pro on Amazon Bedrock",
+      "url": "https://aws.amazon.com/about-aws/whats-new/2026/11/moonshot-ai-kimi-k3-1-pro-on-amazon-bedrock/",
+      "publisher": "AWS",
+      "type": "csp-blog",
+      "accessed": "2026-11-14"
+    },
+    {
+      "id": "hf-kimi-k31-pro",
+      "title": "moonshotai/Kimi-K3.1-Pro",
+      "url": "https://huggingface.co/moonshotai/Kimi-K3.1-Pro",
+      "publisher": "Moonshot AI (Hugging Face)",
+      "type": "vendor-doc",
+      "accessed": "2026-11-14"
+    },
+    {
+      "id": "mistral-large-4-oss",
+      "title": "Mistral Large 4: open weights",
+      "url": "https://mistral.ai/news/mistral-large-4-oss/",
+      "publisher": "Mistral AI",
+      "type": "vendor-blog",
+      "accessed": "2026-11-14"
+    },
+    {
+      "id": "litellm-v1-108-0",
+      "title": "LiteLLM v1.108.0 release notes",
+      "url": "https://docs.litellm.ai/release_notes/v1.108.0/v1-108-0",
+      "publisher": "LiteLLM",
+      "type": "vendor-doc",
+      "accessed": "2026-11-14"
+    },
+    {
+      "id": "litellm-v1-108-1",
+      "title": "LiteLLM v1.108.1 (LTS) release notes",
+      "url": "https://docs.litellm.ai/release_notes/v1.108.1/v1-108-1",
+      "publisher": "LiteLLM",
+      "type": "vendor-doc",
+      "accessed": "2026-11-14"
+    },
+    {
+      "id": "litellm-v1-108-2",
+      "title": "LiteLLM v1.108.2 (LTS) release notes",
+      "url": "https://docs.litellm.ai/release_notes/v1.108.2/v1-108-2",
+      "publisher": "LiteLLM",
+      "type": "vendor-doc",
+      "accessed": "2026-11-14"
+    },
+    {
+      "id": "litellm-lts-pilot",
+      "title": "LiteLLM LTS pilot",
+      "url": "https://docs.litellm.ai/docs/enterprise/lts_pilot",
+      "publisher": "LiteLLM",
+      "type": "vendor-doc",
+      "accessed": "2026-11-14"
+    },
+    {
+      "id": "litellm-cadence-lts-blog",
+      "title": "Release cadence changes and an LTS version pilot",
+      "url": "https://docs.litellm.ai/blog/release-cadence-and-lts-pilot",
+      "publisher": "LiteLLM",
+      "type": "vendor-blog",
+      "accessed": "2026-11-14"
+    },
+    {
+      "id": "aa-intelligence-index-v5",
+      "title": "Artificial Analysis Intelligence Index v5",
+      "url": "https://artificialanalysis.ai/articles/artificial-analysis-intelligence-index-v5",
+      "publisher": "Artificial Analysis",
+      "type": "benchmark",
+      "accessed": "2026-11-14"
     }
   ]
 }
