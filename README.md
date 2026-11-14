@@ -281,3 +281,7 @@ system／prompt／回應／judge 說明／tool 呼叫全部清空並標 `redacte
 - Gemini 3.8 Flash 在 Agent Platform 的區域與價格取自第三方追蹤。
 - `platformStatus` 全部預設為 `evaluating`——這是你們平台的決策欄位，請依發布關卡結果更新。
 - 範例 gateway 網址、支援窗口與資料分級政策都是佔位內容，請換成公司實際值。
+
+## 新版 UI（llm-ops-frontend 分支）
+
+`frontend/` 是依「LLMOps Portal UI 版本」設計做的靜態唯讀網站（總覽、模型 × 雲端矩陣、導入看板、模型頁），只讀 `frontend/data/ui.json`（schema `llmops-ui/v1`，`schema/ui.schema.json`），由 `tools/build_ui_data.py` 從本 repo 的研究資料產生。這個分支的 `amplify.yml` 會驗證兩種 schema 並發布 `dist-frontend/`；細節見 `frontend/README.md`。

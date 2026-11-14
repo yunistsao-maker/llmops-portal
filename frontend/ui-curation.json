@@ -1,0 +1,23 @@
+{
+  "note": "Hand-written UI content that the research data does not carry. Keyed by digest id; tools/build_ui_data.py falls back to the radar when a key is missing.",
+  "brief": {
+    "2026-11-14": [
+      { "priority": "P1", "due": "2026-11-15", "text": "Foundry 的 Claude Haiku 4.5 明天退役，Opus 4.5（11-24）、Sonnet 4.5（11-30）接著退：確認路由與 fallback 都已改到 5.5" },
+      { "priority": "P1", "due": "2026-11-20", "text": "Gemini API 新付費專案預設 store=true：盤點 10-26 之後建立的專案並關閉 logging" },
+      { "priority": "P1", "due": "2026-11-24", "text": "LiteLLM 試行 1.108 LTS：staging 驗證 v1.108.2 後升級；升級前先查 OPENAI_ADMIN_KEY" }
+    ]
+  },
+  "decisions": {
+    "2026-11-14": [
+      { "title": "Claude Fable 5.2 要不要取代 Fable 5.1？", "due": "2026-11-21", "why": "便宜 20%（$8 / $40），但必須 30 天資料保留、不適用 ZDR；Bedrock 仍要 aws_review。", "who": "法務 + 資安（G2）、平台團隊" },
+      { "title": "LiteLLM 是否改跟 1.108 LTS 線？", "due": "2026-11-24", "why": "試行期間四條線政策暫停，只有 1.108 保證有 patch；1.108.0 / 1.108.1 有多項 breaking changes。", "who": "平台團隊 + SRE" },
+      { "title": "Gemini 4 Carbon / Hydrogen 是否進評估？", "due": "2026-11-25", "why": "Carbon 12-01 起價格加倍；Hydrogen 是 short-term 模型（45 天退役通知）；兩者都沒有亞太駐留。", "who": "平台團隊 + FinOps" },
+      { "title": "GPT-6.1 Terra 是否列入主力層評估？", "due": "2026-11-28", "why": "$1 / $5，Bedrock 已 GA；Bedrock 價格與區域要等模型卡。", "who": "平台團隊" }
+    ]
+  },
+  "availabilityOverrides": {
+    "gpt-6-astra": { "agent-platform": { "status": "private-preview", "since": "2026-10-21", "note": "Model Garden private preview（申請制）；價格、區域與 model ID 未公布。", "sources": [{ "id": "gcp-blog-openai-models" }, { "id": "openai-models-google-cloud" }] } },
+    "gpt-6-1-sol": { "agent-platform": { "status": "private-preview", "since": "2026-10-21", "note": "Model Garden private preview（申請制）；價格、區域與 model ID 未公布。", "sources": [{ "id": "gcp-blog-openai-models" }, { "id": "openai-models-google-cloud" }] } },
+    "gpt-6-luna": { "agent-platform": { "status": "private-preview", "since": "2026-10-21", "note": "Model Garden private preview（申請制）；價格、區域與 model ID 未公布。", "sources": [{ "id": "gcp-blog-openai-models" }, { "id": "openai-models-google-cloud" }] } }
+  }
+}

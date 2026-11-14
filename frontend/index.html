@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="LLMOps Portal：三雲模型上架、價格、退役、Gateway 與導入關卡的每週整理（靜態網站，資料唯讀）。">
+<title>LLMOps Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+<link rel="stylesheet" href="app.css">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<a class="skip" href="#main">跳到主要內容</a>
+<header class="top">
+  <div class="wrap top-in">
+    <a class="brand" href="#/">LLMOps Portal</a>
+    <nav aria-label="主要頁面" class="nav">
+      <a href="#/" data-nav="overview">總覽</a>
+      <a href="#/models" data-nav="models">模型</a>
+      <a href="#/adoption" data-nav="adoption">導入</a>
+    </nav>
+    <span class="asof mono" id="asof">資料載入中…</span>
+  </div>
+</header>
+<main id="main" class="wrap main" tabindex="-1">
+  <p class="muted">載入中…</p>
+</main>
+<noscript><p class="wrap">這個網站需要 JavaScript 才能顯示資料（只讀取同一網站上的靜態 JSON，沒有後端）。</p></noscript>
+<script src="app.js" defer></script>
+</body>
+</html>

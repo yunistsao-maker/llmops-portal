@@ -27,3 +27,6 @@ __pycache__/
 .portal-release.json
 .portal-versions.json
 versions/
+
+# new UI build output (llm-ops-frontend)
+dist-frontend/
