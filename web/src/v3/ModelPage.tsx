@@ -3,21 +3,29 @@ import { useState } from "react";
 import { fmt, linkTo, money, useView, type J, type Val } from "./data";
 import { Cell, Fields, PageHead, Sections, Src, Status, Tabs } from "./parts";
 
-const TABS = ["模型卡", "通路", "深度調查", "LiteLLM", "資安", "內部", "時間軸", "品質"] as const;
+const TABS = ["模型卡", "通路", "市場", "深度調查", "LiteLLM", "資安", "內部", "時間軸", "品質"] as const;
 type Tab = (typeof TABS)[number];
 
 export default function ModelPage({ id }: { id: string }) {
   const { data, error } = useView(`models/${encodeURIComponent(id)}`);
-  const [tab, setTab] = useState<Tab>("模型卡");
+  const [picked, setTab] = useState<Tab | null>(null);
   if (!data) return <Status error={error && `${id}：${error}`} />;
   const row = data.row ?? {}, ident = data.identity ?? {};
   const offerings: J[] = Object.values(data.offerings ?? {});
+  // open the first tab that has something: a model only the market roles know yet has no card or channels
+  const tab: Tab = picked ?? (data.card ? "模型卡" : offerings.length ? "通路" : data.market ? "市場" : "時間軸");
   return (
     <>
       <p><a href={linkTo("models")}>← 模型目錄</a></p>
       <PageHead eyebrow={`${row.vendorLabel ?? ident.vendor ?? ""}${ident.family ? ` · ${ident.family}` : ""}${row.tierLabel ? ` · ${row.tierLabel}` : ""}`} title={row.name ?? ident.name ?? id}
         right={<span className="mono note">{id}</span>} />
       {row.summary && <p className="lead">{row.summary}</p>}
+      {!offerings.length && data.market && (
+        <div className="card" role="note" style={{ marginBottom: 16 }}>
+          <b>通路資料還沒建立。</b> 市場紀錄：{(data.market.sections ?? []).flatMap((s: J) => s.fields).filter((f: Val) => f.key === "release.stage").map((f: Val) => `${f.display}${f.note ? `（${f.note}）` : ""}`).join("；") || "—"}。
+          各通路的上架／GA 狀態、model id 與價格由 csp-* 角色寫入，模型卡由 model-cards 寫入；它們執行之後這裡才會有通路與模型卡。
+        </div>
+      )}
       <div className="stats" style={{ marginBottom: 16 }}>
         <div className="card stat"><div className="note">發布日</div><div className="v">{row.releaseDate ?? "—"}</div></div>
         <div className="card stat"><div className="note">Context</div><div className="v">{fmt(row.contextWindow)}</div></div>
@@ -29,6 +37,7 @@ export default function ModelPage({ id }: { id: string }) {
       <div className="card">
         {tab === "模型卡" && <Doc d={data.card} empty="還沒有模型卡。" />}
         {tab === "通路" && (offerings.length ? offerings.map((o) => <Offering key={o.channel} o={o} />) : <p className="note">還沒有上架到任何通路。</p>)}
+        {tab === "市場" && <Doc d={data.market} empty="沒有市場紀錄。" />}
         {tab === "深度調查" && <Doc d={data.survey} empty="沒有深度調查（只做上線 30 天內的模型）。" />}
         {tab === "LiteLLM" && <Doc d={data.litellm} />}
         {tab === "資安" && <Doc d={data.security} />}

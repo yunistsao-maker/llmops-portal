@@ -104,7 +104,9 @@ export function Models() {
                 <td><ModelLink id={m.id} name={m.name} />{m.summary && <div className="note" style={{ maxWidth: 320 }}>{m.summary.slice(0, 80)}{m.summary.length > 80 ? "…" : ""}</div>}</td>
                 <td>{m.vendorLabel}</td><td>{m.tierLabel ?? "—"}</td><td className="mono">{m.releaseDate ?? "—"}</td>
                 <td className="mono">{fmt(m.contextWindow)}</td>
-                {channels.map((c) => <td key={c.id}><Cell c={m.channels?.[c.id]} /></td>)}
+                {Object.keys(m.channels ?? {}).length || !m.stage
+                  ? channels.map((c) => <td key={c.id}><Cell c={m.channels?.[c.id]} /></td>)
+                  : <td colSpan={channels.length} className="note">市場紀錄：{m.stage === "released" ? "已釋出" : m.stage}（通路資料待 csp-* 角色建立）</td>}
                 <td className="mono">{m.priceMin ? `${money(m.priceMin.input)} / ${money(m.priceMin.output)}` : "—"}</td>
                 <td>{(m.flags ?? []).map((f: string) => <span key={f} className="pill warn" style={{ marginRight: 4 }}>{f}</span>)}</td>
               </tr>
