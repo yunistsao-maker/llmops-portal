@@ -148,27 +148,95 @@ export function Matrix() {
 export function Pricing() {
   const { data, error } = useView("pricing");
   const [q, setQ] = useState("");
+  const [channel, setChannel] = useState("all");
+  const [allChanges, setAllChanges] = useState(false);
   if (!data) return <Status error={error} />;
-  const cur = (data.current as J[]).filter((p) => !q || `${p.name} ${p.model} ${p.channel}`.toLowerCase().includes(q.toLowerCase()));
+  const match = (p: J) => (channel === "all" || p.channel === channel) &&
+    (!q || `${p.name} ${p.model} ${p.channel}`.toLowerCase().includes(q.toLowerCase()));
+  const cur = pivot((data.current as J[]).filter(match));
+  const sched = pivot((data.scheduled as J[] ?? []).filter(match), true);
+  const channels = Array.from(new Set((data.current as J[]).map((p) => p.channel))).sort();
+  const changes: J[] = data.changes ?? [];
   return (
     <>
       <PageHead eyebrow={`單位 ${data.unit} · 資料日 ${data.asOf}`} title="價格" />
-      {!!data.scheduled?.length && <div className="card"><h2>已排定的調價</h2>
-        <table><thead><tr><th>生效日</th><th>模型</th><th>通路</th><th>項目</th><th>新價格</th><th>來源</th></tr></thead><tbody>
-          {(data.scheduled as J[]).map((p, i) => <tr key={i}><td className="mono">{p.from}</td><td><ModelLink id={p.model} name={p.name} /></td><td>{p.channel}</td>
-            <td>{p.label}<div className="note">{p.whereLabel}</div></td><td className="mono">{p.display}</td><td><Src ids={p.src} /></td></tr>)}
-        </tbody></table></div>}
-      {!!data.changes?.length && <div className="card" style={{ marginTop: 16 }}><h2>最近的變動</h2>
-        <ul className="bullets">{(data.changes as J[]).map((c, i) => <li key={i}><span className="mono note">{c.date}</span> <b>{c.name}</b>：{c.summary} <Src ids={c.src} /></li>)}</ul></div>}
-      <div className="card" style={{ marginTop: 16 }}>
-        <div className="row" style={{ justifyContent: "space-between" }}><h2>目前價格（{cur.length}）</h2>
-          <input placeholder="篩選模型或通路" value={q} onChange={(e) => setQ(e.target.value)} aria-label="篩選" /></div>
-        <table><thead><tr><th>模型</th><th>通路</th><th>項目</th><th>價格</th><th>依據</th><th>核對</th></tr></thead><tbody>
-          {cur.map((p, i) => <tr key={i}><td><ModelLink id={p.model} name={p.name} /></td><td>{p.channel}</td><td>{p.label}<div className="note">{p.whereLabel}</div></td>
-            <td className="mono">{p.display}</td><td><Basis b={p.basis} /> <Src ids={p.src} max={1} /></td><td className="mono note">{p.verified ?? "—"}</td></tr>)}
-        </tbody></table>
+      <div className="row" style={{ gap: 16, flexWrap: "wrap", marginBottom: 12 }}>
+        <input placeholder="搜尋模型" value={q} onChange={(e) => setQ(e.target.value)} aria-label="搜尋模型" />
+        <Filters label="通路" value={channel} onChange={setChannel} options={[["all", "全部通路"], ...channels.map((c) => [c, c] as const)]} />
       </div>
+      <div className="card">
+        <h2>目前價格 <span className="note">（{cur.length} 組 · USD / 1M tokens）</span></h2>
+        <PriceTable rows={cur} />
+      </div>
+      {!!sched.length && <div className="card" style={{ marginTop: 16 }}>
+        <h2>已排定的調價 <span className="note">（USD / 1M tokens）</span></h2>
+        <PriceTable rows={sched} scheduled />
+      </div>}
+      {!!changes.length && <div className="card" style={{ marginTop: 16 }}><h2>最近的變動</h2>
+        <ul className="bullets">{(allChanges ? changes : changes.slice(0, 6)).map((c, i) => <li key={i}><span className="mono note">{c.date}</span> <b>{c.name}</b>：{c.summary} <Src ids={c.src} /></li>)}</ul>
+        {changes.length > 6 && <button className="linklike" onClick={() => setAllChanges(!allChanges)}>{allChanges ? "收起" : `顯示全部 ${changes.length} 則`}</button>}
+      </div>}
     </>
+  );
+}
+
+/** Price columns: the per-token prices; other keys (notes, long-context threshold, batch discount) go to 備註. */
+const PRICE_COLS: [string, string][] = [
+  ["price.input", "輸入"], ["price.output", "輸出"], ["price.cache-read", "快取讀取"],
+  ["price.cache-write", "快取寫入"], ["price.cache-write-1h", "快取寫入 1h"],
+];
+interface PriceRow { model: string; name: string; channel: string; scope: string; from?: string; cells: Record<string, J>; extra: J[]; verified?: string; src: string[]; basis?: string }
+
+const BASIS_RANK = ["official", "independent", "internal-test", "derived", "community", "unverified"];
+/** One row per model × channel × scope (× effective date for scheduled prices). */
+function pivot(items: J[], scheduled = false): PriceRow[] {
+  const rows = new Map<string, PriceRow>();
+  for (const p of items) {
+    const scope = Object.entries(p.where ?? {}).map(([k, v]) => (k === "context" ? `${v} context` : String(v))).join(" · ") || "—";
+    const id = [p.model, p.channel, scope, scheduled ? p.from : ""].join("|");
+    let r = rows.get(id);
+    if (!r) rows.set(id, (r = { model: p.model, name: p.name, channel: p.channel, scope, from: p.from, cells: {}, extra: [], src: [] }));
+    if (PRICE_COLS.some(([k]) => k === p.key) && !(p.key in r.cells)) r.cells[p.key] = p; else r.extra.push(p);
+    if (p.verified && (!r.verified || p.verified < r.verified)) r.verified = p.verified; // the oldest check of the row
+    for (const s of p.src ?? []) if (!r.src.includes(s)) r.src.push(s);
+    if (p.basis && BASIS_RANK.indexOf(p.basis) > BASIS_RANK.indexOf(r.basis ?? "official")) r.basis = p.basis; // the weakest basis of the row
+  }
+  return [...rows.values()].sort((a, b) => (a.from ?? "").localeCompare(b.from ?? "") || a.name.localeCompare(b.name) || a.channel.localeCompare(b.channel) || a.scope.localeCompare(b.scope));
+}
+
+function PriceTable({ rows, scheduled = false }: { rows: PriceRow[]; scheduled?: boolean }) {
+  if (!rows.length) return <Empty>沒有符合的價格</Empty>;
+  return (
+    <div className="v3-scroll">
+      <table className="v3-prices">
+        <thead><tr>
+          {scheduled && <th>生效日</th>}<th>模型</th><th>通路</th><th>範圍</th>
+          {PRICE_COLS.map(([k, l]) => <th key={k} className="num">{l}</th>)}
+          <th>備註</th><th>核對</th><th>來源</th>
+        </tr></thead>
+        <tbody>{rows.map((r, i) => {
+          const first = i === 0 || rows[i - 1].model !== r.model || (scheduled && rows[i - 1].from !== r.from);
+          return (
+            <tr key={i} className={first ? "v3-first" : undefined}>
+              {scheduled && <td className="mono">{first ? r.from : ""}</td>}
+              <td>{first && <ModelLink id={r.model} name={r.name} />}</td>
+              <td className="mono">{r.channel}</td>
+              <td className="note">{r.scope}</td>
+              {PRICE_COLS.map(([k]) => {
+                const c = r.cells[k];
+                return <td key={k} className="num mono" title={c ? `${c.label}：${c.display}${c.note ? ` ${c.note}` : ""}` : undefined}>{c ? money(c.value as number) : <span className="note">—</span>}</td>;
+              })}
+              <td className="v3-extra" title={r.extra.map((x) => `${x.label}：${x.display}`).join("\n")}>
+                {r.extra.slice(0, 2).map((x, n) => <div key={n} className="note"><b>{x.label}</b> {x.display}</div>)}
+                {r.extra.length > 2 && <div className="note">+{r.extra.length - 2} 則（滑過看全部）</div>}
+              </td>
+              <td className="mono note">{r.verified ?? "—"}{r.basis && r.basis !== "official" && <> <Basis b={r.basis} /></>}</td>
+              <td><Src ids={r.src} max={1} /></td>
+            </tr>
+          );
+        })}</tbody>
+      </table>
+    </div>
   );
 }
 

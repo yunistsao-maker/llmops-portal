@@ -119,3 +119,18 @@ details.radar-checks{border-top:none;padding:0}details.radar-checks>summary{font
 .v3-rec{border:1px solid var(--line);border-radius:4px;padding:12px}.v3-rec .kv{grid-template-columns:110px 1fr}
 .v3-rec-title{font-weight:700;margin-bottom:8px}
 details>summary{cursor:pointer;padding:6px 0}
+/* v3 pricing: one row per model × channel × scope; scrolls sideways instead of squeezing columns */
+.v3-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -8px;padding:0 8px}
+.v3-prices{min-width:1080px;font-size:13px}
+.v3-prices th,.v3-prices td{padding:7px 10px 7px 0;white-space:nowrap}
+.v3-prices th{position:sticky;top:0;background:var(--card);z-index:1}
+.v3-prices th.num,.v3-prices td.num{text-align:right;padding-right:16px}
+.v3-prices td.v3-extra{white-space:normal;min-width:200px;max-width:320px}
+.v3-prices td.v3-extra{cursor:help}.v3-prices td.v3-extra .note{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:320px}
+.v3-prices tr.v3-first td{border-top:1px solid var(--line2)}
+.v3-prices tr:not(.v3-first) td{border-top:none}
+/* v3: a wide table scrolls inside its card instead of widening the page */
+main.v3>*{min-width:0;max-width:100%}main.v3 .row>.filters{flex:1 1 auto;min-width:0;align-items:flex-start}
+main.v3 input[type=text],main.v3 input:not([type]){font:inherit;padding:8px 10px;border:1px solid var(--line2);border-radius:2px;min-height:40px;box-sizing:border-box;max-width:100%}
+@media (max-width:720px){main.v3{padding:20px 12px}main.v3 .card{padding:16px}.topbar{padding:0 12px;gap:16px}.topbar nav{overflow-x:auto;gap:20px}
+  main.v3 .filters button{padding:6px 10px;min-height:36px;font-size:13px}main.v3 .stats{grid-template-columns:repeat(2,minmax(0,1fr))}}

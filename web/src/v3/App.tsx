@@ -46,7 +46,7 @@ export default function App() {
           {NAV.map(([path, label]) => <button key={label} aria-current={(p ?? "") === path ? "page" : undefined} onClick={() => go(path)}>{label}</button>)}
         </nav>
       </header>
-      <main id="main-content" tabIndex={-1} key={version ?? "latest"}>
+      <main id="main-content" className="v3" tabIndex={-1} key={version ?? "latest"}>
         {m.data ? <VersionBar m={m.data} version={version} onPick={(v) => go(parts.join("/"), v)} /> : m.error && <Status error={m.error} />}
         {m.data && page}
       </main>
