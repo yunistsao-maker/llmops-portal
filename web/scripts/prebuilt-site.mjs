@@ -5,7 +5,9 @@
 import { cpSync, existsSync, mkdirSync, rmSync } from "node:fs";
 
 const web = new URL("../", import.meta.url).pathname;
-for (const [from, to, extra] of [["dist", "site", ["security-tests.html"]], ["dist-clean", "site-clean", []]]) {
+// `node scripts/prebuilt-site.mjs v3`: only dist-v3/ -> ../site-v3/ (the v3 portal, PORTAL_EDITION=v3)
+const builds = process.argv[2] === "v3" ? [["dist-v3", "site-v3", []]] : [["dist", "site", ["security-tests.html"]], ["dist-clean", "site-clean", []]];
+for (const [from, to, extra] of builds) {
   const src = web + from + "/";
   const dst = web + "../" + to + "/";
   if (!existsSync(src + "index.html")) throw new Error(`${from}/index.html is missing: run the build first`);

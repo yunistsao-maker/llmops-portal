@@ -112,3 +112,10 @@ details.radar-checks{border-top:none;padding:0}details.radar-checks>summary{font
 .radar-date{width:100px;flex-shrink:0}
 @media (max-width:600px){.radar-history-list li{flex-direction:column;gap:2px}.radar-history-list li>.mono{width:auto}
 .radar-action{flex-wrap:wrap;gap:6px 12px}.radar-action>.radar-date{width:auto}.radar-action>.radar-date>.note{display:inline;margin-left:8px}.radar-action>span:last-child{flex-basis:100%}}
+/* v3 portal (src/v3): generic sections of value objects */
+.v3-section{margin-bottom:20px}.v3-section h3{margin:16px 0 8px;font-size:15px;color:var(--brand)}
+.v3-val{margin-bottom:4px}.v3-val .pill.warn{display:inline-block;margin-top:4px}
+.v3-records{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;margin-top:10px}
+.v3-rec{border:1px solid var(--line);border-radius:4px;padding:12px}.v3-rec .kv{grid-template-columns:110px 1fr}
+.v3-rec-title{font-weight:700;margin-bottom:8px}
+details>summary{cursor:pointer;padding:6px 0}

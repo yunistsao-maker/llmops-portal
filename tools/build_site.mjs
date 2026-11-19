@@ -15,7 +15,21 @@ const dist = `${root}dist`;
 const jsonIn = (dir) =>
   existsSync(dir) ? readdirSync(dir).filter((f) => f.endsWith(".json")).sort() : [];
 const edition = (process.env.PORTAL_EDITION || "full").trim();
-if (!["full", "clean"].includes(edition)) throw new Error(`PORTAL_EDITION must be full or clean, not ${JSON.stringify(edition)}`);
+if (!["full", "clean", "v3"].includes(edition)) throw new Error(`PORTAL_EDITION must be full, clean or v3, not ${JSON.stringify(edition)}`);
+
+// The v3 portal (site-v3/, web: npm run site:v3) reads the research pipeline's live release (views/) in the browser,
+// so the build carries no data: only portal-config.json with the data location (PORTAL_V3_DATA_BASE_URL, the v3
+// data-plane stack's DataBaseUrl output). The URL carries the access token: it is never printed and never committed.
+if (edition === "v3") {
+  const url = (process.env.PORTAL_V3_DATA_BASE_URL || "").trim();
+  if (!/^https:\/\/[^/]+\/[A-Za-z0-9]{16,64}\/?$/.test(url)) throw new Error("PORTAL_EDITION=v3 needs PORTAL_V3_DATA_BASE_URL=https://<host>/<token>/");
+  if (!existsSync(`${root}site-v3/index.html`)) throw new Error("site-v3/index.html is missing: cd web && npm run site:v3");
+  rmSync(dist, { recursive: true, force: true });
+  cpSync(`${root}site-v3`, dist, { recursive: true });
+  writeFileSync(`${dist}/portal-config.json`, JSON.stringify({ dataBaseUrl: url.endsWith("/") ? url : url + "/" }) + "\n");
+  console.log(`built dist/ (v3 portal): data from ${new URL(url).host}`);
+  process.exit(0);
+}
 const app = edition === "clean" ? "site-clean" : "site";
 
 rmSync(dist, { recursive: true, force: true });

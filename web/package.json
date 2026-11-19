@@ -9,7 +9,9 @@
     "build": "npm run sync-data && tsc -b && vite build",
     "preview": "vite preview",
     "build:clean": "npm run sync-data && tsc -b && vite build --mode clean --outDir dist-clean",
-    "site": "npm run build && npm run build:clean && node scripts/prebuilt-site.mjs"
+    "site": "npm run build && npm run build:clean && node scripts/prebuilt-site.mjs",
+    "build:v3": "tsc -b && vite build --mode v3 --outDir dist-v3",
+    "site:v3": "npm run build:v3 && node scripts/prebuilt-site.mjs v3"
   },
   "dependencies": {
     "react": "^18.3.1",
